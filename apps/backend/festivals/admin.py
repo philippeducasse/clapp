@@ -1,3 +1,8 @@
 from django.contrib import admin
+from festivals.models import Festival
 
-# Register your models here.
+
+class FestivalAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(Festival, FestivalAdmin)
