@@ -1,7 +1,9 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from festivals.views import FestivalViewSet
 
-from . import views
-
+router = DefaultRouter()
+router.register(r'festivals', FestivalViewSet)
 urlpatterns = [
-    path("", views.index, name="index"),
+    path("", include(router.urls)),
 ]

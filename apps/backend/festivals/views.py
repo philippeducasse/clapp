@@ -1,5 +1,10 @@
-from django.http import HttpResponse
+from rest_framework import viewsets
+from festivals.models import Festival
+from .serializers import FestivalSerializer
 
 
-def index(request):
-    return HttpResponse("Festivals")
+# Provides CRUD operations for Festival
+class FestivalViewSet(viewsets.ModelViewSet):
+    queryset = Festival.objects.all()
+    # Class used to convert JSON into Django Model objects and vice versa
+    serializer_class = FestivalSerializer
