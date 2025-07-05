@@ -1,13 +1,25 @@
-import {useEffect} from "react";
+"use client";
 
-useEffect(()=>{
-        const fetchFestivals = async () =>{
-            const data = await fetch('http://localhost:8000/api/festivals')
-            const festivals = await data.json()
+import { useEffect, useState } from "react";
 
-            setFestivals(festivals);
-        }
-        fetchFestivals()
-    }, [],
+const useFestivals = () => {
+  const [festivals, setFestivals] = useState();
 
-    )
+  useEffect(() => {
+    const fetchFestivals = async () => {
+      try {
+        const data = await fetch("http://localhost:8000/api/festivals/");
+        const festivals = await data.json();
+
+        setFestivals(festivals);
+      } catch (error) {
+        console.error(`Error fetching festivals: ${error}`);
+      }
+    };
+    fetchFestivals();
+  }, []);
+
+  return festivals;
+};
+
+export default useFestivals;
