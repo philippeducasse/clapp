@@ -16,7 +16,6 @@ async function fetchFestivals(): Promise<Festival[]> {
 }
 
 export default async function FestivalsPage() {
-  console.log("cols: ", columns);
   const data = await fetchFestivals();
 
   return (

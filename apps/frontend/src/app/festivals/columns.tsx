@@ -30,6 +30,15 @@ export const columns: ColumnDef<Festival>[] = [
     accessorKey: "dateString",
     header: "Date",
   },
+  // {
+  //   accessorKey: "startDate",
+  //   header: "Date",
+  //   cell: ({ row }) => {
+  //     const date = new Date(row.getValue("startDate"));
+  //     const formattedDate = date.toLocaleDateString();
+  //     return <div>{formattedDate}</div>;
+  //   },
+  // },
   {
     header: "Actions",
     id: "actions",

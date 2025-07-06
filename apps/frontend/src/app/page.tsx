@@ -1,7 +1,3 @@
-"use client";
-import React, { useEffect } from "react";
-import useFestivals from "@/hooks/useFestivals";
-
 const Page = () => {
   return (
     <>
