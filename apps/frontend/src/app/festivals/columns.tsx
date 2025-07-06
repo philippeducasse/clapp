@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 export const columns: ColumnDef<Festival>[] = [
   {
     accessorKey: "festivalName",
@@ -25,6 +26,18 @@ export const columns: ColumnDef<Festival>[] = [
   {
     accessorKey: "websiteUrl",
     header: "Website",
+    size: 200,
+
+    cell: ({ row }) => {
+      const festival = row.original;
+      return (
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+          <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
+            {festival.websiteUrl}
+          </Link>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "dateString",
