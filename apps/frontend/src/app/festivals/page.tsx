@@ -1,50 +1,27 @@
-"use client";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Festival } from "@/interfaces/festival";
+import { columns } from "./columns";
+import { DataTable } from "@/components/ui/data-table";
+import camelcaseKeys from "camelcase-keys";
 
-import useFestivals from "@/hooks/useFestivals";
+async function fetchFestivals(): Promise<Festival[]> {
+  let festivals = [];
+  try {
+    const data = await fetch("http://localhost:8000/api/festivals/");
+    const json = await data.json();
+    festivals = camelcaseKeys(json, { deep: true });
+  } catch (error) {
+    console.error(`Error fetching festivals: ${error}`);
+  }
+  return festivals;
+}
 
-const festivalTable = () => {
-  const festivals = useFestivals();
-  console.log("festivals:", festivals);
+export default async function FestivalsPage() {
+  console.log("cols: ", columns);
+  const data = await fetchFestivals();
 
   return (
-    <Table>
-      <TableCaption>Festivals</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Name</TableHead>
-          <TableHead>Country</TableHead>
-          <TableHead>Website</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {festivals?.map((f) => (
-          <TableRow key={f.id}>
-            <TableCell className="font-medium">{f.festivalName}</TableCell>
-            <TableCell>{f.country}</TableCell>
-            <TableCell>{f.websiteUrl}</TableCell>
-            <TableCell className="text-right">{f.dateString}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">{festivals.length}</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
+    <div className="container mx-auto py-10">
+      <DataTable columns={columns} data={data} />
+    </div>
   );
-};
-
-export default festivalTable;
+}
