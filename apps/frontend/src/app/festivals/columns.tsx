@@ -18,6 +18,19 @@ export const columns: ColumnDef<Festival>[] = [
   {
     accessorKey: "festivalName",
     header: "Name",
+    cell: ({ row }) => {
+      const festival = row.original;
+      return (
+        <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+          <Link
+            // className="underline text-slate-400 hover:text-slate-500"
+            href={`/festivals/${festival.id}`}
+          >
+            {festival.festivalName}
+          </Link>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "country",
@@ -32,7 +45,12 @@ export const columns: ColumnDef<Festival>[] = [
       const festival = row.original;
       return (
         <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-          <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
+          <Link
+            // className="underline text-slate-400 hover:text-slate-500"
+            href={festival.websiteUrl ?? "#"}
+            target="_blank"
+            title={festival.websiteUrl}
+          >
             {festival.websiteUrl}
           </Link>
         </div>

@@ -13,7 +13,7 @@ import Link from "next/link";
 import { DarkModeToggle } from "../ui/dark-mode-toggle";
 
 const Navbar = () => {
-  const navItems = ["Home", "Festivals", "Invoices", "Settings"];
+  const navItems = ["Home", "Festivals", "Applications", "Invoices", "Settings"];
 
   return (
     <NavigationMenu viewport={false} className="mx-auto">
@@ -21,7 +21,7 @@ const Navbar = () => {
         {navItems.map((item) => (
           <NavigationMenuItem key={item}>
             <NavigationMenuLink
-              href={item === "Home" ? "/" : item.toLowerCase()}
+              href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
               className={navigationMenuTriggerStyle()}
             >
               {item}

@@ -2,21 +2,10 @@ import { Festival } from "@/interfaces/festival";
 import { columns } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
 import camelcaseKeys from "camelcase-keys";
-
-async function fetchFestivals(): Promise<Festival[]> {
-  let festivals = [];
-  try {
-    const data = await fetch("http://localhost:8000/api/festivals/");
-    const json = await data.json();
-    festivals = camelcaseKeys(json, { deep: true });
-  } catch (error) {
-    console.error(`Error fetching festivals: ${error}`);
-  }
-  return festivals;
-}
+import festivalApiSerivice from "@/api/festivalApiService";
 
 export default async function FestivalsPage() {
-  const data = await fetchFestivals();
+  const data = await festivalApiSerivice.getAllFestivals();
 
   return (
     <div className="container mx-auto py-10">
