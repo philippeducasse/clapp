@@ -60,6 +60,32 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3020",   # Next.js dev server
 ]
 
+# Allow credentials
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow specific methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Allow specific headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
 ROOT_URLCONF = 'circus_agent_backend.urls'
 
 TEMPLATES = [
