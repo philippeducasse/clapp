@@ -4,7 +4,7 @@ import { fetchJson } from "./fetchJson";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
-const festivalApiSerivice = {
+const festivalApiService = {
   async getAllFestivals(): Promise<Festival[]> {
     return fetchJson<Festival[]>(endpoint);
   },
@@ -12,6 +12,10 @@ const festivalApiSerivice = {
   async getFestival(id: string): Promise<Festival> {
     return fetchJson<Festival>(`${endpoint}${id}`);
   },
+
+  async enrichFestival(festival: Festival): Promise<any> {
+    return fetchJson<Festival>(`${endpoint}${festival.id}/enrich/`, { method: "POST", body: JSON.stringify(festival) });
+  },
 };
 
-export default festivalApiSerivice;
+export default festivalApiService;

@@ -3,10 +3,16 @@ export interface Festival {
   festivalName: string;
   websiteUrl?: string;
   country?: string;
-  city?: string;
-  dateString?: string;
+  town?: string;
+  approximateDate?: string;
   contactEmail?: string;
+  contactPerson?: string;
   startDate?: Date;
   endDate?: Date;
   type?: string;
+  description?: string;
+  applicationType?: string;
+  applicationStart?: string;
+  applicationEnd?: string;
+  applied?: boolean;
 }

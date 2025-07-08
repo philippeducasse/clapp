@@ -3,19 +3,46 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Festival } from "@/interfaces/festival";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import festivalApiService from "@/api/festivalApiService";
 
 // This is the client-side view component.
 // It receives the festival data as a prop.
 const FestivalView = ({ festival }: { festival: Festival }) => {
   console.log("festival", festival);
+  const handleUpdate = async () => {
+    const response = await festivalApiService.enrichFestival(festival);
+
+    console.log("response:", response);
+  };
+
   return (
-    <Card>
+    <Card className="max-w-3xl mx-auto mt-6">
       <CardHeader>
         <CardTitle>{festival.festivalName}</CardTitle>
-        <CardDescription>{festival.country || "No description available."}</CardDescription>
+        <CardDescription>{festival.country}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p>More festival details can be displayed here.</p>
+        <p>
+          Website:{" "}
+          <Link href={festival.websiteUrl ?? "#"} target="_blank" className="underline">
+            <Button variant="link">{festival.websiteUrl}</Button>
+          </Link>
+        </p>
+        <p>Approximate date : {festival.approximateDate}</p>
+        {/* <p>start date : {festival.startDate?.getDate()}</p>
+        <p>end date : {festival.endDate?.getDate()}</p> */}
+        <p>description : {festival.description}</p>
+        <p>contact email : {festival.contactEmail}</p>
+        <p>contact person : {festival.contactPerson}</p>
+        <p>application start: {festival.applicationStart}</p>
+        <p>application end: {festival.applicationEnd}</p>
+
+        <Button variant="secondary" onClick={handleUpdate}>
+          {" "}
+          Update
+        </Button>
       </CardContent>
       <CardFooter>
         <p>Footer for the festival card.</p>
