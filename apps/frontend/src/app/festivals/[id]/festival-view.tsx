@@ -2,15 +2,14 @@
 
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Festival } from "@/interfaces/festival";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import festivalApiService from "@/api/festivalApiService";
+import { useFestival } from "@/context/FestivalContext";
 
-// This is the client-side view component.
-// It receives the festival data as a prop.
-const FestivalView = ({ festival }: { festival: Festival }) => {
-  console.log("festival", festival);
+const FestivalView = () => {
+  const festival = useFestival();
+
   const handleUpdate = async () => {
     const response = await festivalApiService.enrichFestival(festival);
 
@@ -43,6 +42,7 @@ const FestivalView = ({ festival }: { festival: Festival }) => {
           {" "}
           Update
         </Button>
+        <Link href={`/festivals/${festival.id}/edit`}>Edit</Link>
       </CardContent>
       <CardFooter>
         <p>Footer for the festival card.</p>
