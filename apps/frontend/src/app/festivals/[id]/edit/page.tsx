@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/context/FestivalContext";
+import { useState } from "react";
+import { Festival } from "@/interfaces/festival";
 
 // 1. Define the validation schema with zod
 const formSchema = z.object({
@@ -27,7 +29,14 @@ const formSchema = z.object({
 });
 
 export default function FestivalForm() {
-  const festival = useFestival();
+  const festivalData = useFestival();
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Submitted data:", values);
+    // Add mutation or API update logic here
+  }
+
+  const [festival, setFestival] = useState<Festival>(festivalData);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,10 +58,9 @@ export default function FestivalForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Submitted data:", values);
-    // Add mutation or API update logic here
-  }
+  const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFestival((prev) => ({ ...prev, [field]: e.target.value }));
+  };
 
   return (
     <Form {...form}>
@@ -84,7 +92,11 @@ export default function FestivalForm() {
                   <Input
                     type={name.includes("Date") ? "date" : name.includes("Type") ? "submit" : "text"}
                     {...field}
-                    value={festival[field.name]}
+                    value={field.value}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleChange(field as unknown as keyof Festival)(e);
+                    }}
                   />
                 </FormControl>
                 <FormDescription>{desc}</FormDescription>

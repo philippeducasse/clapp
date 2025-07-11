@@ -12,7 +12,6 @@ const FestivalView = () => {
 
   const handleUpdate = async () => {
     const response = await festivalApiService.enrichFestival(festival);
-
     console.log("response:", response);
   };
 
