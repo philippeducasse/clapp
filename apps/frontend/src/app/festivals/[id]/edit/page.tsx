@@ -10,6 +10,8 @@ import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
 import { Festival } from "@/interfaces/festival";
 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 // 1. Define the validation schema with zod
 const formSchema = z.object({
   festivalName: z.string().min(1, "Festival name is required"),
@@ -21,7 +23,7 @@ const formSchema = z.object({
   contactPerson: z.string().optional(),
   startDate: z.string().optional(), // ISO date string
   endDate: z.string().optional(),
-  type: z.string().optional(),
+  festivalType: z.string().optional(),
   description: z.string().optional(),
   applicationType: z.string().optional(),
   applicationStart: z.string().optional(),
@@ -50,7 +52,7 @@ export default function FestivalForm() {
       contactPerson: festival.contactPerson ?? "",
       startDate: festival.startDate?.toISOString().slice(0, 10) ?? "",
       endDate: festival.endDate?.toISOString().slice(0, 10) ?? "",
-      type: festival.type ?? "",
+      festivalType: festival.festivalType ?? "",
       description: festival.description ?? "",
       applicationType: festival.applicationType ?? "",
       applicationStart: festival.applicationStart ?? "",
@@ -61,7 +63,7 @@ export default function FestivalForm() {
   const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFestival((prev) => ({ ...prev, [field]: e.target.value }));
   };
-
+  console.log({ festival });
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto mt-6">
@@ -75,7 +77,7 @@ export default function FestivalForm() {
           ["contactPerson", "Contact Person", "Who to reach out to"],
           ["startDate", "Start Date", "Actual or expected start date"],
           ["endDate", "End Date", "Actual or expected end date"],
-          ["type", "Type", "e.g. Circus, Theater, Music"],
+          ["festivalType", "Festival Type", "e.g. Circus, Theater, Music"],
           ["description", "Description", "A short description of the event"],
           ["applicationType", "Application Type", "e.g. Open call, Curated"],
           ["applicationStart", "Application Start", "When the application opens"],
@@ -89,15 +91,34 @@ export default function FestivalForm() {
               <FormItem>
                 <FormLabel>{label}</FormLabel>
                 <FormControl>
-                  <Input
-                    type={name.includes("Date") ? "date" : name.includes("Type") ? "submit" : "text"}
-                    {...field}
-                    value={field.value}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      handleChange(field as unknown as keyof Festival)(e);
-                    }}
-                  />
+                  {name === "festivalType" ? (
+                    <Select
+                      value={field.value}
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        setFestival((prev) => ({ ...prev, festivalType: val }));
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="STREET">Street</SelectItem>
+                        <SelectItem value="CIRCUS">Circus</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      type={name.includes("startDate") || name.includes("endDate") ? "date" : "text"}
+                      {...field}
+                      value={field.value}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleChange(field as unknown as keyof Festival)(e);
+                      }}
+                    />
+                  )}
                 </FormControl>
                 <FormDescription>{desc}</FormDescription>
                 <FormMessage />

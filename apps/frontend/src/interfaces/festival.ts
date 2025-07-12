@@ -9,7 +9,7 @@ export interface Festival {
   contactPerson?: string;
   startDate?: Date;
   endDate?: Date;
-  type?: string;
+  festivalType?: string;
   description?: string;
   applicationType?: string;
   applicationStart?: string;
