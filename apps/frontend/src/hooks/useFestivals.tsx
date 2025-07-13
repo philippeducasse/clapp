@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Festival } from "@/interfaces/festival";
+import { Festival } from "@/interfaces/Festival";
 import camelcaseKeys from "camelcase-keys";
 
 const useFestivals = () => {

@@ -1,5 +1,5 @@
 import camelcaseKeys from "camelcase-keys";
-import { Festival } from "@/interfaces/festival";
+import { Festival } from "@/interfaces/Festival";
 import { fetchJson } from "./fetchJson";
 
 const endpoint = "http://localhost:8000/api/festivals/";

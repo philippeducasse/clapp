@@ -1,4 +1,4 @@
-import { Festival } from "@/interfaces/festival";
+import { Festival } from "@/interfaces/Festival";
 import { columns } from "./columns";
 import { DataTable } from "@/components/ui/data-table";
 import camelcaseKeys from "camelcase-keys";

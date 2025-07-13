@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Festival } from "@/interfaces/festival";
+import { Festival } from "@/interfaces/Festival";
 import { MoreHorizontal, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";

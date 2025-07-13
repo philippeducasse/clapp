@@ -8,7 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
-import { Festival } from "@/interfaces/festival";
+import { Festival } from "@/interfaces/Festival";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
