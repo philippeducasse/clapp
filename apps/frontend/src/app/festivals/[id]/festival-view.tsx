@@ -26,7 +26,7 @@ const FestivalView = () => {
 
   return (
     <>
-      <Card className="max-w-3xl mx-auto mt-6">
+      <Card className=" mx-auto mt-6">
         <CardHeader>
           <CardTitle>{festival.festivalName}</CardTitle>
           <CardDescription>{festival.country}</CardDescription>

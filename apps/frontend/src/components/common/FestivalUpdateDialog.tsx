@@ -48,7 +48,7 @@ export function FestivalUpdateDialog() {
           Update
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-full h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Festival</DialogTitle>
           <DialogDescription>Review changes</DialogDescription>
