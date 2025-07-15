@@ -31,7 +31,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
         self.clean_festival_data(festival)
 
-        festival.save()
+        # festival.save()
 
         return Response(FestivalSerializer(festival).data)
 
@@ -48,34 +48,36 @@ class FestivalViewSet(viewsets.ModelViewSet):
         print("Missing fields:", missing)
 
         base = f"""
-            You are an assistant enriching festival data for a cultural booking app.
-        
-            Here is the current known information (some fields are missing). Additional info is provided for necessary 
-            fields. For date fields, provide dates for or after {current_year}
-        
-            {festival.country=}
-            {festival.town=} Could also be a city
-            {festival.approximate_date=} give the approximate date, for example "end of August", or "Summer". Be as
-            specific as possible 
-            {festival.start_date=}
-            {festival.end_date=}
-            {festival.website_url=}
-            {festival.festival_type=}
-            {festival.description=}
-            {festival.contact_person=}
-            {festival.contact_email=}
-            {festival.application_date_end=}
-            {festival.application_date_start=}
-            {festival.application_type=}
-            
-        
-        
-            Please provide the missing fields only, as a JSON object with keys from:
-            {missing}
-        
-            Search the web if necessary.
-            Return only valid JSON.
-            """
+        You are an assistant enriching festival data for a cultural booking app. 
+        Your task is to verify and complete the information about the festival below.
+
+        Always perform a web search to retrieve the most accurate and current information, 
+        even if a field is already partially filled or looks complete. Assume nothing — verify everything.
+        For all date-related fields, ensure the result is relevant for {current_year} or later.
+
+        Here is the current known information:
+
+        country: {festival.country}
+        town (could be a city): {festival.town}
+        approximate_date (give as "early July", "end of August", etc.): {festival.approximate_date}
+        start_date: {festival.start_date}
+        end_date: {festival.end_date}
+        website_url: {festival.website_url}
+        festival_type: {festival.festival_type}
+        description: {festival.description}
+        contact_person: {festival.contact_person}
+        contact_email: {festival.contact_email}
+        application_date_start: {festival.application_date_start}
+        application_date_end: {festival.application_date_end}
+        application_type: {festival.application_type}
+
+        Your task:
+        - Perform a web search to confirm or fill in the fields listed below.
+        - Return a JSON object containing **only these fields** (even if already filled):  
+          {missing}
+        - Use accurate and up-to-date data.
+        - Output valid JSON and nothing else.
+        """
 
         return base
 
@@ -84,7 +86,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         api_key = os.getenv('MISTRAL_API_KEY')
         if not api_key:
             raise ValueError("MISTRAL_API_KEY environment variable not set.")
-        model = "mistral-small-2503"
+        model = "mistral-medium-2505"
         client = Mistral(api_key=api_key)
 
         try:
