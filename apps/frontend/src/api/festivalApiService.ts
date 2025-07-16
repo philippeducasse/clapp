@@ -1,6 +1,5 @@
-import camelcaseKeys from "camelcase-keys";
 import { Festival } from "@/interfaces/Festival";
-import { fetchJson } from "./fetchJson";
+import { fetchJson, sendJson } from "./fetchJson";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
@@ -15,6 +14,10 @@ const festivalApiService = {
 
   async enrichFestival(festival: Festival): Promise<any> {
     return fetchJson<Festival>(`${endpoint}${festival.id}/enrich/`, { method: "POST", body: JSON.stringify(festival) });
+  },
+
+  async updateFestival(festival: Festival): Promise<any> {
+    return sendJson<Festival>(`${endpoint}${festival.id}/`, festival, "PUT");
   },
 };
 
