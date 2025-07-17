@@ -9,29 +9,15 @@ import { Input } from "@/components/ui/input";
 import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
 import { Festival } from "@/interfaces/Festival";
-
+import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// 1. Define the validation schema with zod
-const formSchema = z.object({
-  festivalName: z.string().min(1, "Festival name is required"),
-  websiteUrl: z.url(),
-  country: z.string().optional(),
-  town: z.string().optional(),
-  approximateDate: z.string().optional(),
-  contactEmail: z.email(),
-  contactPerson: z.string().optional(),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
-  festivalType: z.string().optional(),
-  description: z.string().optional(),
-  applicationType: z.string().optional(),
-  applicationStart: z.string().optional(),
-  applicationEnd: z.string().optional(),
-});
+import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
 
 export default function FestivalForm() {
   const festivalData = useFestival();
+
+  const formFields = getFestivalFormFields();
+  const formSchema = createZodFormSchema(formFields);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Submitted data:", values);
@@ -40,13 +26,9 @@ export default function FestivalForm() {
 
   const [festival, setFestival] = useState<Festival>(festivalData);
 
-  const getFestivalFormFields = () => {};
-
-  // const formFields =
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: festival,
+    defaultValues: sanitizeFormData(festival),
   });
 
   const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,29 +38,14 @@ export default function FestivalForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto mt-6">
-        {[
-          ["festivalName", "Festival Name", "The public-facing name of the festival"],
-          ["websiteUrl", "Website", "Optional website URL"],
-          ["country", "Country", "Country where the festival takes place"],
-          ["town", "Town", "Town or city name"],
-          ["approximateDate", "Approximate Date", "e.g. 'Early July'"],
-          ["contactEmail", "Contact Email", "Email for communication"],
-          ["contactPerson", "Contact Person", "Who to reach out to"],
-          ["startDate", "Start Date", "Actual or expected start date"],
-          ["endDate", "End Date", "Actual or expected end date"],
-          ["festivalType", "Festival Type", "e.g. Circus, Theater, Music"],
-          ["description", "Description", "A short description of the event"],
-          ["applicationType", "Application Type", "e.g. Open call, Curated"],
-          ["applicationStart", "Application Start", "When the application opens"],
-          ["applicationEnd", "Application End", "When the application closes"],
-        ].map(([name, label, desc]) => (
+        {formFields.map((formField) => (
           <FormField
-            key={name}
+            key={formField.fieldName}
             control={form.control}
-            name={name as keyof z.infer<typeof formSchema>}
+            name={formField.fieldName as keyof z.infer<typeof formSchema>}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{label}</FormLabel>
+                <FormLabel>{formField.label}</FormLabel>
                 <FormControl>
                   {name === "festivalType" ? (
                     <Select

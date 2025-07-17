@@ -1,4 +1,5 @@
 export interface Festival {
+  [key: string]: unknown;
   id: number;
   festivalName: string;
   websiteUrl?: string;

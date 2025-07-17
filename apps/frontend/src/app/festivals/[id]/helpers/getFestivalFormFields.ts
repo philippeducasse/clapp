@@ -9,6 +9,7 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.TEXT,
       required: true,
       className: "col-span-1",
+      helpText: "The name of the festival",
     },
   ];
 };
