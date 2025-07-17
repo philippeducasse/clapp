@@ -1,10 +1,10 @@
 import React from "react";
-import { SectionCellValueType } from "./DetailsView";
+import { SectionCellValueType, SectionCellType } from "@/interfaces/DetailsView";
 import Link from "next/link";
-import { SectionCellType } from "./DetailsView";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-export interface RowProps {
+
+interface RowProps {
   value: SectionCellValueType;
   type?: SectionCellType;
   title: string;

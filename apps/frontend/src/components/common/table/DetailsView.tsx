@@ -1,9 +1,9 @@
 import React from "react";
-import { DetailsViewProps } from "@/interfaces/DetailsView";
+import { SectionCellProps } from "@/interfaces/DetailsView";
 import Row from "./Row";
 
-const DetailsView = ({ data, title }: DetailsViewProps) => {
-  return data.map((d) => <Row value={d.value} title={d.title} type={d?.type} isLoading={false} />);
+const DetailsView = ({ data }: { data: SectionCellProps[] }) => {
+  return data.map((d) => <Row key={d.id} value={d.value} title={d.title} type={d?.type} isLoading={false} />);
 };
 
 export default DetailsView;

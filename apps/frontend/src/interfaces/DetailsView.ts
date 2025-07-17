@@ -27,8 +27,3 @@ export const enum SectionCellType {
   Log = "log",
   Video = "video",
 }
-
-export interface DetailsViewProps {
-  data: SectionCellProps[];
-  title: string;
-}

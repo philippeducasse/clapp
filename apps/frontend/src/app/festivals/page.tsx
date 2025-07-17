@@ -1,15 +1,11 @@
-import { Festival } from "@/interfaces/Festival";
-import { columns } from "./columns";
-import { DataTable } from "@/components/ui/data-table";
-import camelcaseKeys from "camelcase-keys";
 import festivalApiService from "@/api/festivalApiService";
+import { FestivalTable } from "./components/festival-table";
 
 export default async function FestivalsPage() {
   const data = await festivalApiService.getAllFestivals();
-
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
+      <FestivalTable data={data} />
     </div>
   );
 }
