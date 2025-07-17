@@ -15,14 +15,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 // 1. Define the validation schema with zod
 const formSchema = z.object({
   festivalName: z.string().min(1, "Festival name is required"),
-  websiteUrl: z.string().url().optional().or(z.literal("")),
+  websiteUrl: z.url(),
   country: z.string().optional(),
   town: z.string().optional(),
   approximateDate: z.string().optional(),
-  contactEmail: z.string().email().optional().or(z.literal("")),
+  contactEmail: z.email(),
   contactPerson: z.string().optional(),
-  startDate: z.string().optional(), // ISO date string
-  endDate: z.string().optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
   festivalType: z.string().optional(),
   description: z.string().optional(),
   applicationType: z.string().optional(),
@@ -40,24 +40,13 @@ export default function FestivalForm() {
 
   const [festival, setFestival] = useState<Festival>(festivalData);
 
+  const getFestivalFormFields = () => {};
+
+  // const formFields =
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      festivalName: festival.festivalName ?? "",
-      websiteUrl: festival.websiteUrl ?? "",
-      country: festival.country ?? "",
-      town: festival.town ?? "",
-      approximateDate: festival.approximateDate ?? "",
-      contactEmail: festival.contactEmail ?? "",
-      contactPerson: festival.contactPerson ?? "",
-      startDate: festival.startDate?.toISOString().slice(0, 10) ?? "",
-      endDate: festival.endDate?.toISOString().slice(0, 10) ?? "",
-      festivalType: festival.festivalType ?? "",
-      description: festival.description ?? "",
-      applicationType: festival.applicationType ?? "",
-      applicationStart: festival.applicationStart ?? "",
-      applicationEnd: festival.applicationEnd ?? "",
-    },
+    defaultValues: festival,
   });
 
   const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {

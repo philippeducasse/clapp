@@ -6,4 +6,6 @@ export interface ControlledFormElement {
   helpText?: string;
   type: ControlledFormElementType;
   placeholder?: string;
+  required?: boolean;
+  className?: string;
 }

@@ -18,7 +18,7 @@ const FestivalView = () => {
         <CardDescription>{festival.country}</CardDescription>
       </CardHeader>
       <CardContent className="grid-cols-2">
-        <DetailsView data={getDetailsView(festival)} title="" />
+        <DetailsView data={getDetailsView(festival)} />
         <FestivalUpdateDialog />
         <Link href={`/festivals/${festival.id}/edit`} className="ml-8">
           Edit
