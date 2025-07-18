@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Festival } from "@/interfaces/Festival";
 import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 
 export default function FestivalForm() {
   const festivalData = useFestival();
@@ -38,50 +38,7 @@ export default function FestivalForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto mt-6">
-        {formFields.map((formField) => (
-          <FormField
-            key={formField.fieldName}
-            control={form.control}
-            name={formField.fieldName as keyof z.infer<typeof formSchema>}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{formField.label}</FormLabel>
-                <FormControl>
-                  {name === "festivalType" ? (
-                    <Select
-                      value={field.value}
-                      onValueChange={(val) => {
-                        field.onChange(val);
-                        setFestival((prev) => ({ ...prev, festivalType: val }));
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="STREET">Street</SelectItem>
-                        <SelectItem value="CIRCUS">Circus</SelectItem>
-                        <SelectItem value="OTHER">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Input
-                      type={name.includes("startDate") || name.includes("endDate") ? "date" : "text"}
-                      {...field}
-                      value={field.value}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        handleChange(field as unknown as keyof Festival)(e);
-                      }}
-                    />
-                  )}
-                </FormControl>
-                <FormDescription>{desc}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
+        {createFormComponents(formFields, form, formSchema, handleChange)}
 
         <Button type="submit">Save Festival</Button>
       </form>

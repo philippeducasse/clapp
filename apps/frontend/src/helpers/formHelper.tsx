@@ -4,56 +4,38 @@ import { z, ZodObject, ZodType } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
+import { ControllerRenderProps } from "react-hook-form";
+import ControlledSelect from "@/components/common/ControlledFormFields/ControlledSelect";
+import DefaultInput from "@/components/common/ControlledFormFields/DefaultInput";
+import { Festival } from "@/interfaces/Festival";
 
-
-export const createFormComponents = (formFields: ControlledFormElement[],
-   form: UseFormReturn<Record<string, unknown>, any, Record<string, unknown>>,
-    formSchema:z.ZodObject<any, z.core.$strip>) => {
-     formFields.map((formField) => (
-       <FormField
-         key={formField.fieldName}
-         control={form.control}
-         name={formField.fieldName as keyof z.infer<typeof formSchema>}
-         render={({ field }) => (
-           <FormItem>
-             <FormLabel>{formField.label}</FormLabel>
-             <FormControl>
-               {name === "festivalType" ? (
-                 <Select
-                   value={field.value}
-                   onValueChange={(val) => {
-                     field.onChange(val);
-                     setFestival((prev) => ({ ...prev, festivalType: val }));
-                   }}
-                 >
-                   <SelectTrigger>
-                     <SelectValue placeholder="Select a type" />
-                   </SelectTrigger>
-                   <SelectContent>
-                     <SelectItem value="STREET">Street</SelectItem>
-                     <SelectItem value="CIRCUS">Circus</SelectItem>
-                     <SelectItem value="OTHER">Other</SelectItem>
-                   </SelectContent>
-                 </Select>
-               ) : (
-                 <Input
-                   type={name.includes("startDate") || name.includes("endDate") ? "date" : "text"}
-                   {...field}
-                   value={field.value}
-                   onChange={(e) => {
-                     field.onChange(e);
-                     handleChange(field as unknown as keyof Festival)(e);
-                   }}
-                 />
-               )}
-             </FormControl>
-             <FormDescription>{desc}</FormDescription>
-             <FormMessage />
-           </FormItem>
-         )}
-       />
-     ));
-   }
+export const createFormComponents = (
+  formFields: ControlledFormElement[],
+  form: UseFormReturn<Record<string, unknown>, any, Record<string, unknown>>,
+  formSchema: z.ZodObject<any, z.core.$strip>,
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+) => {
+  return formFields.map((formField) => (
+    <FormField
+      key={formField.fieldName}
+      control={form.control}
+      name={formField.fieldName as keyof z.infer<typeof formSchema>}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{formField.label}</FormLabel>
+          <FormControl>
+            {formField.type === ControlledFormElementType.SELECT ? (
+              <ControlledSelect {...field} />
+            ) : (
+              <DefaultInput field={field} type={formField.type} handleChange={handleChange} />
+            )}
+          </FormControl>
+          {formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  ));
 };
 
 export const sanitizeFormData = <T extends Record<string, any>>(entity: T): T => {
