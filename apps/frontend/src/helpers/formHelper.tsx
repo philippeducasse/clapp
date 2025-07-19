@@ -1,4 +1,4 @@
-import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
+import { ControlledFormElement, SelectOptions } from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -8,12 +8,13 @@ import { ControllerRenderProps } from "react-hook-form";
 import ControlledSelect from "@/components/common/ControlledFormFields/ControlledSelect";
 import DefaultInput from "@/components/common/ControlledFormFields/DefaultInput";
 import { Festival } from "@/interfaces/Festival";
+import { capitalize } from "lodash";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
   form: UseFormReturn<Record<string, unknown>, any, Record<string, unknown>>,
   formSchema: z.ZodObject<any, z.core.$strip>,
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  handleChange: (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => void
 ) => {
   return formFields.map((formField) => (
     <FormField
@@ -25,7 +26,7 @@ export const createFormComponents = (
           <FormLabel>{formField.label}</FormLabel>
           <FormControl>
             {formField.type === ControlledFormElementType.SELECT ? (
-              <ControlledSelect {...field} />
+              <ControlledSelect />
             ) : (
               <DefaultInput field={field} type={formField.type} handleChange={handleChange} />
             )}
@@ -100,4 +101,12 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
     }
   });
   return z.object(schema);
+};
+
+export const getOptions = <T extends Record<string, string>>(optionsEnum: T): SelectOptions[] => {
+  const options = Object.values(optionsEnum).map((o) => ({
+    value: o.toUpperCase(),
+    label: capitalize(o.replace(/_/g, " ").toLowerCase()),
+  }));
+  return options;
 };

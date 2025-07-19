@@ -10,10 +10,28 @@ export interface Festival {
   contactPerson?: string;
   startDate?: Date;
   endDate?: Date;
-  festivalType?: string;
+  festivalType?: FestivalType;
   description?: string;
   applicationType?: string;
   applicationStart?: string;
   applicationEnd?: string;
   applied?: boolean;
+}
+
+export enum FestivalType {
+  STREET = "STREET",
+  PUPPET = "PUPPET",
+  JUGGLING_CONVENTION = "JUGGLING_CONVENTION",
+  CIRCUS = "CIRCUS",
+  MUSIC = "MUSIC",
+  THEATRE = "THEATRE",
+  DANCE = "DANCE",
+  OTHER = "OTHER",
+}
+
+export enum ApplicationType {
+  EMAIL = "EMAIL",
+  FORM = "FORM",
+  OTHER = "OTHER",
+  UNKNOWN = "UNKNOWN",
 }

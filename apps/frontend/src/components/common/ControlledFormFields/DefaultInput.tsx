@@ -7,7 +7,7 @@ import { Festival } from "@/interfaces/Festival";
 interface DefaultInputProps {
   field: ControllerRenderProps<Record<string, unknown>, string>;
   type: ControlledFormElementType;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleChange: (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const DefaultInput = ({ field, type, handleChange }: DefaultInputProps) => {
