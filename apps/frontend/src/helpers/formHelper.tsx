@@ -25,8 +25,8 @@ export const createFormComponents = (
         <FormItem>
           <FormLabel>{formField.label}</FormLabel>
           <FormControl>
-            {formField.type === ControlledFormElementType.SELECT ? (
-              <ControlledSelect />
+            {formField.type === ControlledFormElementType.SELECT && formField.options ? (
+              <ControlledSelect field={field} options={formField.options} handleChange={handleChange} />
             ) : (
               <DefaultInput field={field} type={formField.type} handleChange={handleChange} />
             )}
@@ -40,14 +40,14 @@ export const createFormComponents = (
 };
 
 export const sanitizeFormData = <T extends Record<string, any>>(entity: T): T => {
-  const sanitizedData = { ...entity } as T; // Assert the type of sanitizedData as T
+  const sanitizedData = { ...entity } as T;
 
   for (const key in sanitizedData) {
     if (Object.prototype.hasOwnProperty.call(sanitizedData, key)) {
       const value = sanitizedData[key];
-      // Replace null or undefined with undefined
+      // Replace null or undefined with an empty string to prevent uncontrolled inputs
       if (value === null || value === undefined) {
-        sanitizedData[key] = undefined!; // Use non-null assertion to inform TypeScript
+        sanitizedData[key] = "" as any;
       }
     }
   }
@@ -97,7 +97,7 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
     if (required) {
       schema[fieldName] = zodType;
     } else {
-      schema[fieldName] = zodType.optional();
+      schema[fieldName] = zodType.transform((val) => (val === "" ? undefined : val)).optional();
     }
   });
   return z.object(schema);

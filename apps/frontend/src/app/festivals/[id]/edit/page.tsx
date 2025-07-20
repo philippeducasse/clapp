@@ -34,7 +34,7 @@ export default function FestivalForm() {
   const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFestival((prev) => ({ ...prev, [field]: e.target.value }));
   };
-  console.log({ festival });
+  console.log({ formSchema });
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto mt-6">
