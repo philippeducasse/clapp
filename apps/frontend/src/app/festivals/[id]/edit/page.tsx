@@ -12,6 +12,9 @@ import { Festival } from "@/interfaces/Festival";
 import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
+import festivalApiService from "@/api/festivalApiService";
+import SubmitButton from "@/components/common/SubmitButton";
+import { toast } from "sonner";
 
 export default function FestivalForm() {
   const festivalData = useFestival();
@@ -19,10 +22,20 @@ export default function FestivalForm() {
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("Submitted data:", values);
-    // Add mutation or API update logic here
-  }
+    setIsLoading(true);
+    try {
+      await festivalApiService.updateFestival(values as Festival);
+      toast.success("Festival has been updated successfully");
+    } catch (error) {
+      toast.error(`Error: Could not update festival : ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const [festival, setFestival] = useState<Festival>(festivalData);
 
@@ -34,13 +47,13 @@ export default function FestivalForm() {
   const handleChange = (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFestival((prev) => ({ ...prev, [field]: e.target.value }));
   };
-  console.log({ formSchema });
+  console.log({ form });
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-3xl mx-auto mt-6">
         {createFormComponents(formFields, form, formSchema, handleChange)}
 
-        <Button type="submit">Save Festival</Button>
+        <SubmitButton isLoading={isLoading} />
       </form>
     </Form>
   );

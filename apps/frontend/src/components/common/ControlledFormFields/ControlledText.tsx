@@ -4,18 +4,18 @@ import { ControlledFormElementType } from "@/interfaces/ControlledFormElementTyp
 import { ControllerRenderProps } from "react-hook-form";
 import { Festival } from "@/interfaces/Festival";
 
-interface DefaultInputProps {
+interface ControlledTextProps {
   field: ControllerRenderProps<Record<string, unknown>, string>;
   type: ControlledFormElementType;
   handleChange: (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const DefaultInput = ({ field, type, handleChange }: DefaultInputProps) => {
+const ControlledText = ({ field, type, handleChange }: ControlledTextProps) => {
   return (
     <Input
       type={type.toLowerCase()}
       {...field}
-      value={field.value}
+      value={field.value as string}
       onChange={(e) => {
         field.onChange(e);
         handleChange(field as unknown as keyof Festival)(e);
@@ -24,4 +24,4 @@ const DefaultInput = ({ field, type, handleChange }: DefaultInputProps) => {
   );
 };
 
-export default DefaultInput;
+export default ControlledText;

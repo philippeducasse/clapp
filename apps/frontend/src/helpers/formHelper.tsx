@@ -1,14 +1,13 @@
 import { ControlledFormElement, SelectOptions } from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import { ControllerRenderProps } from "react-hook-form";
 import ControlledSelect from "@/components/common/ControlledFormFields/ControlledSelect";
-import DefaultInput from "@/components/common/ControlledFormFields/DefaultInput";
+import ControlledText from "@/components/common/ControlledFormFields/ControlledText";
 import { Festival } from "@/interfaces/Festival";
 import { capitalize } from "lodash";
+import ControlledBoolean from "@/components/common/ControlledFormFields/ControlledBoolean";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
@@ -25,11 +24,18 @@ export const createFormComponents = (
         <FormItem>
           <FormLabel>{formField.label}</FormLabel>
           <FormControl>
-            {formField.type === ControlledFormElementType.SELECT && formField.options ? (
-              <ControlledSelect field={field} options={formField.options} handleChange={handleChange} />
-            ) : (
-              <DefaultInput field={field} type={formField.type} handleChange={handleChange} />
-            )}
+            {(() => {
+              switch (formField.type) {
+                case ControlledFormElementType.SELECT:
+                  return formField.options ? (
+                    <ControlledSelect field={field} options={formField.options} handleChange={handleChange} />
+                  ) : null;
+                case ControlledFormElementType.BOOLEAN:
+                  return <ControlledBoolean field={field} />;
+                default:
+                  return <ControlledText field={field} type={formField.type} handleChange={handleChange} />;
+              }
+            })()}
           </FormControl>
           {formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
           <FormMessage />
@@ -73,13 +79,14 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
 
       case ControlledFormElementType.BOOLEAN:
         zodType = z.boolean();
+        break;
 
       case ControlledFormElementType.FILE:
         zodType = z.instanceof(File);
         break;
 
       case ControlledFormElementType.DATE:
-        zodType = z.date();
+        zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
         break;
 
       case ControlledFormElementType.TEXT:
@@ -97,7 +104,7 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
     if (required) {
       schema[fieldName] = zodType;
     } else {
-      schema[fieldName] = zodType.transform((val) => (val === "" ? undefined : val)).optional();
+      schema[fieldName] = zodType.optional().or(z.literal(""));
     }
   });
   return z.object(schema);
