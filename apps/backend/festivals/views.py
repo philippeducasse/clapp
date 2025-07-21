@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from festivals.models import Festival
-from .serializers import FestivalSerializer
+from circus_agent_backend.serializers import FestivalSerializer
 import os
 from .helpers import generate_prompt_from_festival, extract_fields_from_llm, clean_festival_data
 from services.mistral_service import call_mistral_api

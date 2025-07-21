@@ -18,7 +18,6 @@ class Festival(models.Model):
         ('FORM', 'Form'),
         ("OTHER", "Other"),
         ("UNKNOWN", "Unknown"),
-
     ]
 
     festival_name = models.CharField(max_length=200)
