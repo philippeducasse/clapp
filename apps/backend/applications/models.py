@@ -4,10 +4,9 @@ from festivals.models import Festival
 
 
 class Application(models.Model):
-
     APPLICATION_TYPE = [
-        ('EMAIL', 'Email'),
-        ('FORM', 'Form'),
+        ("EMAIL", "Email"),
+        ("FORM", "Form"),
         ("OTHER", "Other"),
         ("UNKNOWN", "Unknown"),
     ]
@@ -25,9 +24,13 @@ class Application(models.Model):
     ]
 
     festival = models.ForeignKey(Festival, on_delete=models.CASCADE)
-    application_type = models.CharField(max_length=50, choices=APPLICATION_TYPE, default="UNKNOWN")
+    application_type = models.CharField(
+        max_length=50, choices=APPLICATION_TYPE, default="UNKNOWN"
+    )
     application_date = models.DateField(blank=True, null=True)
     answer_received = models.BooleanField(default=False)
     answer_date = models.DateField(blank=True, null=True)
-    application_status = models.CharField(max_length=50, choices=APPLICATION_STATUS, default="NOT_APPLIED")
+    application_status = models.CharField(
+        max_length=50, choices=APPLICATION_STATUS, default="NOT_APPLIED"
+    )
     comments = models.CharField(max_length=500, blank=True, null=True)

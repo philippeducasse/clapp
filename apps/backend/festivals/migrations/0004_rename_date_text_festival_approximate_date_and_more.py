@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('festivals', '0003_alter_festival_comments'),
+        ("festivals", "0003_alter_festival_comments"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='festival',
-            old_name='date_text',
-            new_name='approximate_date',
+            model_name="festival",
+            old_name="date_text",
+            new_name="approximate_date",
         ),
         migrations.AddField(
-            model_name='festival',
-            name='description',
+            model_name="festival",
+            name="description",
             field=models.CharField(blank=True, max_length=1000, null=True),
         ),
     ]

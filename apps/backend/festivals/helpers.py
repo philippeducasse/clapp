@@ -4,12 +4,11 @@ from datetime import datetime
 import re
 import math
 
-def generate_prompt_from_festival(festival : Festival):
+
+def generate_prompt_from_festival(festival: Festival):
     current_year = datetime.now().year
     fields = [
-        f.name
-        for f in Festival._meta.get_fields()
-        if f.concrete and not f.many_to_many
+        f.name for f in Festival._meta.get_fields() if f.concrete and not f.many_to_many
     ]
 
     for field in fields:
@@ -59,6 +58,7 @@ def generate_prompt_from_festival(festival : Festival):
 
     return base
 
+
 def extract_fields_from_llm(llm_response):
     # Use regular expression to remove Markdown code block formatting
     json_str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
@@ -79,14 +79,14 @@ def extract_fields_from_llm(llm_response):
                 return None
 
         # Check each field that might be returned by the API
-        if 'festival_name' in response_data:
-            updated_fields['festival_name'] = response_data['festival_name']
-        if 'town' in response_data:
-            updated_fields['town'] = response_data['town']
-        if 'country' in response_data:
-            updated_fields['country'] = response_data['country']
-        if 'approximate_date' in response_data:
-            updated_fields['approximate_date'] = response_data['approximate_date']
+        if "festival_name" in response_data:
+            updated_fields["festival_name"] = response_data["festival_name"]
+        if "town" in response_data:
+            updated_fields["town"] = response_data["town"]
+        if "country" in response_data:
+            updated_fields["country"] = response_data["country"]
+        if "approximate_date" in response_data:
+            updated_fields["approximate_date"] = response_data["approximate_date"]
         if "start_date" in response_data:
             converted_date = convert_date(response_data["start_date"])
             if converted_date:
@@ -95,16 +95,16 @@ def extract_fields_from_llm(llm_response):
             converted_date = convert_date(response_data["end_date"])
             if converted_date:
                 updated_fields["end_date"] = converted_date
-        if 'website_url' in response_data:
-            updated_fields['website_url'] = response_data['website_url']
-        if 'type' in response_data:
-            updated_fields['type'] = response_data['type']
-        if 'description' in response_data:
-            updated_fields['description'] = response_data['description']
-        if 'contact_person' in response_data:
-            updated_fields['contact_person'] = response_data['contact_person']
-        if 'contact_email' in response_data:
-            updated_fields['contact_email'] = response_data['contact_email']
+        if "website_url" in response_data:
+            updated_fields["website_url"] = response_data["website_url"]
+        if "type" in response_data:
+            updated_fields["type"] = response_data["type"]
+        if "description" in response_data:
+            updated_fields["description"] = response_data["description"]
+        if "contact_person" in response_data:
+            updated_fields["contact_person"] = response_data["contact_person"]
+        if "contact_email" in response_data:
+            updated_fields["contact_email"] = response_data["contact_email"]
 
         print("Updated fields:", updated_fields)
         return updated_fields
@@ -118,6 +118,7 @@ def extract_fields_from_llm(llm_response):
         # Handle any other errors
         print(f"An error occurred: {e}")
         return {}
+
 
 def clean_festival_data(festival: Festival):
     # Capitalize name

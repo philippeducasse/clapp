@@ -5,25 +5,67 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('festivals', '0006_festival_application_type'),
+        ("festivals", "0006_festival_application_type"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Application',
+            name="Application",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('application_type', models.CharField(choices=[('EMAIL', 'Email'), ('FORM', 'Form'), ('OTHER', 'Other'), ('UNKNOWN', 'Unknown')], default='UNKNOWN', max_length=50)),
-                ('application_date', models.DateField(blank=True, null=True)),
-                ('answer_received', models.BooleanField(default=False)),
-                ('answer_date', models.DateField(blank=True, null=True)),
-                ('application_status', models.CharField(choices=[('NOT_APPLIED', 'Not applied'), ('APPLIED', 'Applied'), ('IN_DISCUSSION', 'In discussion'), ('REJECTED', 'Rejected'), ('IGNORED', 'Ignored'), ('ACCEPTED', 'Accepted'), ('POSTPONED', 'Postponed'), ('Cancelled', 'Cancelled'), ('OTHER', 'Other')], default='NOT_APPLIED', max_length=50)),
-                ('comments', models.CharField(blank=True, max_length=500, null=True)),
-                ('festival', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='festivals.festival')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "application_type",
+                    models.CharField(
+                        choices=[
+                            ("EMAIL", "Email"),
+                            ("FORM", "Form"),
+                            ("OTHER", "Other"),
+                            ("UNKNOWN", "Unknown"),
+                        ],
+                        default="UNKNOWN",
+                        max_length=50,
+                    ),
+                ),
+                ("application_date", models.DateField(blank=True, null=True)),
+                ("answer_received", models.BooleanField(default=False)),
+                ("answer_date", models.DateField(blank=True, null=True)),
+                (
+                    "application_status",
+                    models.CharField(
+                        choices=[
+                            ("NOT_APPLIED", "Not applied"),
+                            ("APPLIED", "Applied"),
+                            ("IN_DISCUSSION", "In discussion"),
+                            ("REJECTED", "Rejected"),
+                            ("IGNORED", "Ignored"),
+                            ("ACCEPTED", "Accepted"),
+                            ("POSTPONED", "Postponed"),
+                            ("Cancelled", "Cancelled"),
+                            ("OTHER", "Other"),
+                        ],
+                        default="NOT_APPLIED",
+                        max_length=50,
+                    ),
+                ),
+                ("comments", models.CharField(blank=True, max_length=500, null=True)),
+                (
+                    "festival",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="festivals.festival",
+                    ),
+                ),
             ],
         ),
     ]

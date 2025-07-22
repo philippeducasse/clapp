@@ -6,4 +6,5 @@ from applications.models import Application
 class ApplicationAdmin(admin.ModelAdmin):
     pass
 
+
 admin.site.register(Application, ApplicationAdmin)

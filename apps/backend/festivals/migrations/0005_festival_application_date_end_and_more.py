@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('festivals', '0004_rename_date_text_festival_approximate_date_and_more'),
+        ("festivals", "0004_rename_date_text_festival_approximate_date_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='festival',
-            name='application_date_end',
+            model_name="festival",
+            name="application_date_end",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='festival',
-            name='application_date_start',
+            model_name="festival",
+            name="application_date_start",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

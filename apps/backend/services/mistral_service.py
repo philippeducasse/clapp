@@ -2,9 +2,10 @@ from dotenv import load_dotenv
 from mistralai import Mistral
 import os
 
-def call_mistral_api(model:str, prompt: str):
+
+def call_mistral_api(model: str, prompt: str):
     load_dotenv(".env")
-    api_key = os.getenv('MISTRAL_API_KEY')
+    api_key = os.getenv("MISTRAL_API_KEY")
     if not api_key:
         raise ValueError("MISTRAL_API_KEY environment variable not set.")
     client = Mistral(api_key=api_key)

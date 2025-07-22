@@ -4,29 +4,54 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Festival',
+            name="Festival",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('festival_name', models.CharField(max_length=200)),
-                ('country', models.CharField(blank=True, max_length=100, null=True)),
-                ('town', models.CharField(blank=True, max_length=100, null=True)),
-                ('festival_type', models.CharField(choices=[('STREET', 'Street'), ('PUPPET', 'Puppet'), ('JUGGLING_CONVENTION', 'Juggling convention'), ('CIRCUS', 'Circus'), ('MUSIC', 'Music'), ('THEATRE', 'Theatre'), ('DANCE', 'Dance'), ('OTHER', 'Other')], default='STREET', max_length=50)),
-                ('website_url', models.CharField(blank=True, max_length=200, null=True)),
-                ('contact_email', models.CharField(max_length=200)),
-                ('contact_person', models.CharField(max_length=200)),
-                ('start_date', models.DateField(blank=True, null=True)),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('date_text', models.CharField(blank=True, max_length=100, null=True)),
-                ('applied', models.BooleanField(default=False)),
-                ('comments', models.CharField(max_length=500)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("festival_name", models.CharField(max_length=200)),
+                ("country", models.CharField(blank=True, max_length=100, null=True)),
+                ("town", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "festival_type",
+                    models.CharField(
+                        choices=[
+                            ("STREET", "Street"),
+                            ("PUPPET", "Puppet"),
+                            ("JUGGLING_CONVENTION", "Juggling convention"),
+                            ("CIRCUS", "Circus"),
+                            ("MUSIC", "Music"),
+                            ("THEATRE", "Theatre"),
+                            ("DANCE", "Dance"),
+                            ("OTHER", "Other"),
+                        ],
+                        default="STREET",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "website_url",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("contact_email", models.CharField(max_length=200)),
+                ("contact_person", models.CharField(max_length=200)),
+                ("start_date", models.DateField(blank=True, null=True)),
+                ("end_date", models.DateField(blank=True, null=True)),
+                ("date_text", models.CharField(blank=True, max_length=100, null=True)),
+                ("applied", models.BooleanField(default=False)),
+                ("comments", models.CharField(max_length=500)),
             ],
         ),
     ]

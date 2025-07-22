@@ -1,7 +1,7 @@
-
 import pandas as pd
 from datetime import datetime
 from festivals.models import Festival
+
 
 def parse_date(val):
     if pd.isna(val):
@@ -9,9 +9,10 @@ def parse_date(val):
     if isinstance(val, datetime):
         return val.date()
     try:
-        return pd.to_datetime(val, errors='coerce').date()
+        return pd.to_datetime(val, errors="coerce").date()
     except Exception:
         return None
+
 
 # Load the CSV with correct delimiter
 df = pd.read_csv("scripts/excel_import.csv", delimiter=";", dtype=str)
@@ -37,8 +38,9 @@ for index, row in df.iterrows():
         start_date=parse_date(row.get("START DATE") if "START DATE" in row else None),
         end_date=parse_date(row.get("END DATE") if "END DATE" in row else None),
         date_text=str(row.get("EVENT DATE", "") or "").strip(),
-        applied=bool(float(row.get("APPLIED 2023", "0") or 0)) or bool(float(row.get("APPLIED 2025", "0") or 0)),
-        comments=str(row.get("COMMENT", "") or "").strip()
+        applied=bool(float(row.get("APPLIED 2023", "0") or 0))
+        or bool(float(row.get("APPLIED 2025", "0") or 0)),
+        comments=str(row.get("COMMENT", "") or "").strip(),
     )
 
     festival.save()
