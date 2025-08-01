@@ -1,10 +1,7 @@
 import React from "react";
-import { useFestival } from "@/context/FestivalContext";
 
-const UpdateFestivalView = ({ updatedFields }: { updatedFields: any }) => {
-  const festivalData = useFestival();
-
-  return <div>UpdateFestivalView</div>;
+const UpdateFestivalView = () => {
+  return <div>Update Festival View</div>;
 };
 
 export default UpdateFestivalView;

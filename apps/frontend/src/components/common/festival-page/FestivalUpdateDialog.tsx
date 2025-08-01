@@ -9,8 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { FestivalDiffTable } from "./FestivalDiffTable";
 import { Festival } from "@/interfaces/Festival";
 import { useState } from "react";
@@ -21,15 +20,12 @@ import { Skeleton } from "../../ui/skeleton";
 
 export function FestivalUpdateDialog() {
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Festival | undefined>();
   const festival = useFestival();
 
   const handleUpdate = async () => {
-    setIsLoading(true);
     const response = await festivalApiService.enrichFestival(festival);
     if (response) {
-      setIsLoading(false);
       setUpdatedFields(response);
     }
   };

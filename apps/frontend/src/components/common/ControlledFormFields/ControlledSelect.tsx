@@ -1,22 +1,19 @@
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ControllerRenderProps } from "react-hook-form";
-import { Festival } from "@/interfaces/Festival";
 import { SelectOptions } from "@/interfaces/ControlledFormElement";
 
 interface ControlledSelectProps {
   field: ControllerRenderProps<Record<string, unknown>, string>;
   options: SelectOptions[];
-  handleChange: (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ControlledSelect = ({ field, options, handleChange }: ControlledSelectProps) => {
+const ControlledSelect = ({ field, options }: Omit<ControlledSelectProps, "handleChange">) => {
   return (
     <Select
       value={field.value as string | undefined}
       onValueChange={(val) => {
         field.onChange(val);
-        handleChange;
       }}
     >
       <SelectTrigger>

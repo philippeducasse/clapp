@@ -4,6 +4,10 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/common/Navbar";
 import { Toaster } from "@/components/ui/sonner";
+
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/ui/app-sidebar";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,15 +33,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-background`}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
-            <header className="flex justify-end p-4">
-              <Navbar />
-            </header>
-            <main>{children}</main>
-          </div>
-          <Toaster />
-        </ThemeProvider>
+        <SidebarProvider>
+          <AppSidebar />
+
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
+              <header className="flex justify-end p-4">
+                <Navbar />
+              </header>
+              <main>{children}</main>
+            </div>
+            <Toaster />
+          </ThemeProvider>
+        </SidebarProvider>
       </body>
     </html>
   );

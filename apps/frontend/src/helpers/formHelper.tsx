@@ -5,21 +5,18 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { UseFormReturn } from "react-hook-form";
 import ControlledSelect from "@/components/common/ControlledFormFields/ControlledSelect";
 import ControlledText from "@/components/common/ControlledFormFields/ControlledText";
-import { Festival } from "@/interfaces/Festival";
 import { capitalize } from "lodash";
 import ControlledBoolean from "@/components/common/ControlledFormFields/ControlledBoolean";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
-  form: UseFormReturn<Record<string, unknown>, any, Record<string, unknown>>,
-  formSchema: z.ZodObject<any, z.core.$strip>,
-  handleChange: (field: keyof Festival) => (e: React.ChangeEvent<HTMLInputElement>) => void
+  form: UseFormReturn<Record<string, unknown>>
 ) => {
   return formFields.map((formField) => (
     <FormField
       key={formField.fieldName}
       control={form.control}
-      name={formField.fieldName as keyof z.infer<typeof formSchema>}
+      name={formField.fieldName}
       render={({ field }) => (
         <FormItem>
           <FormLabel>{formField.label}</FormLabel>
@@ -27,13 +24,11 @@ export const createFormComponents = (
             {(() => {
               switch (formField.type) {
                 case ControlledFormElementType.SELECT:
-                  return formField.options ? (
-                    <ControlledSelect field={field} options={formField.options} handleChange={handleChange} />
-                  ) : null;
+                  return formField.options ? <ControlledSelect field={field} options={formField.options} /> : null;
                 case ControlledFormElementType.BOOLEAN:
                   return <ControlledBoolean field={field} />;
                 default:
-                  return <ControlledText field={field} type={formField.type} handleChange={handleChange} />;
+                  return <ControlledText field={field} type={formField.type} />;
               }
             })()}
           </FormControl>
@@ -45,7 +40,7 @@ export const createFormComponents = (
   ));
 };
 
-export const sanitizeFormData = <T extends Record<string, any>>(entity: T): T => {
+export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {
   const sanitizedData = { ...entity } as T;
 
   for (const key in sanitizedData) {
@@ -53,7 +48,7 @@ export const sanitizeFormData = <T extends Record<string, any>>(entity: T): T =>
       const value = sanitizedData[key];
       // Replace null or undefined with an empty string to prevent uncontrolled inputs
       if (value === null || value === undefined) {
-        sanitizedData[key] = "" as any;
+        sanitizedData[key] = "" as T[Extract<keyof T, string>];
       }
     }
   }
@@ -61,7 +56,7 @@ export const sanitizeFormData = <T extends Record<string, any>>(entity: T): T =>
   return sanitizedData;
 };
 
-export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObject<any> => {
+export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObject<Record<string, ZodType>> => {
   const schema: Record<string, ZodType> = {};
 
   formFields.forEach((field) => {

@@ -1,22 +1,20 @@
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import Link from "next/link";
 import { DarkModeToggle } from "../ui/dark-mode-toggle";
+import { SidebarTrigger } from "../ui/sidebar";
 
 const Navbar = () => {
   const navItems = ["Home", "Festivals", "Applications", "Invoices", "Settings"];
 
   return (
     <NavigationMenu viewport={false} className="mx-auto">
+      <SidebarTrigger />
+
       <NavigationMenuList>
         {navItems.map((item) => (
           <NavigationMenuItem key={item}>

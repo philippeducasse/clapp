@@ -13,7 +13,7 @@ const useFestivals = () => {
         const data = await fetch("http://localhost:8000/api/festivals/");
         const json = await data.json();
         const camelized = camelcaseKeys(json, { deep: true });
-        if (festivals) setFestivals(camelized);
+        if (camelized) setFestivals(camelized);
       } catch (error) {
         console.error(`Error fetching festivals: ${error}`);
       }

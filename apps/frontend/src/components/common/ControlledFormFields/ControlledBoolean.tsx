@@ -1,8 +1,5 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { ControllerRenderProps } from "react-hook-form";
-import { Festival } from "@/interfaces/Festival";
 import { Switch } from "@/components/ui/switch";
 
 interface ControlledBooleanProps {

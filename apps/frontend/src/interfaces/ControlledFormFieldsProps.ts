@@ -3,8 +3,8 @@ import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
 
 export interface ControlledFormFieldsProps<T> {
   fields: ControlledFormElement[];
-  errors: FieldErrors<any>;
-  control: Control<T, object> | any;
+  errors: FieldErrors<T>;
+  control: Control<T, object>;
   isLoading?: boolean;
   disabled?: boolean;
 }
