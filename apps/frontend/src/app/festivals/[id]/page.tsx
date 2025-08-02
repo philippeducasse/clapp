@@ -1,5 +1,7 @@
 import FestivalView from "./festival-view";
 
-export default async function FestivalDetailPage() {
+const FestivalDetailPage = async () => {
   return <FestivalView />;
-}
+};
+
+export default FestivalDetailPage;

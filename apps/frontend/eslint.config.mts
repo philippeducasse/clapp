@@ -19,6 +19,16 @@ export default defineConfig([
     rules: {
       "prefer-arrow-callback": "error",
       "func-style": ["error", "expression", { allowArrowFunctions: true }],
+      "prefer-arrow-functions/prefer-arrow-functions": [
+        "warn",
+        {
+          allowNamedFunctions: false,
+          classPropertiesAllowed: false,
+          disallowPrototype: false,
+          returnStyle: "unchanged",
+          singleReturnOnly: false,
+        },
+      ],
     },
     settings: {
       react: {

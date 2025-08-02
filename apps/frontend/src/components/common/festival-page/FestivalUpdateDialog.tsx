@@ -18,7 +18,7 @@ import festivalApiService from "@/api/festivalApiService";
 import { useFestival } from "@/context/FestivalContext";
 import { Skeleton } from "../../ui/skeleton";
 
-export function FestivalUpdateDialog() {
+export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Festival | undefined>();
   const festival = useFestival();
@@ -67,4 +67,4 @@ export function FestivalUpdateDialog() {
       </DialogContent>
     </Dialog>
   );
-}
+};

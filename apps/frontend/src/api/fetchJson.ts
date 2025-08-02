@@ -1,17 +1,17 @@
 import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
 
-export async function fetchJson<T = unknown>(url: string, options?: RequestInit): Promise<T> {
+export const fetchJson = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
   const json = await res.json();
   return transformKeysToCamelCase(json);
 }
 
-export async function sendJson<T = unknown>(
+export const sendJson = async <T = unknown>(
   url: string,
   data: Record<string, unknown>,
   method: "POST" | "PUT" | "PATCH" = "POST"
-): Promise<T> {
+): Promise<T> => {
   const res = await fetch(url, {
     method,
     headers: {

@@ -2,7 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Festival } from "@/interfaces/Festival";
 import { DiffViewProps } from "@/interfaces/DiffViewProps";
 
-export function FestivalDiffTable({ original, updated }: DiffViewProps) {
+export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
   const fields = Object.keys(original) as (keyof Festival)[];
 
   return (
@@ -31,4 +31,4 @@ export function FestivalDiffTable({ original, updated }: DiffViewProps) {
       </TableBody>
     </Table>
   );
-}
+};

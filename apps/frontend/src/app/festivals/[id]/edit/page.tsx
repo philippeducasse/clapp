@@ -14,7 +14,7 @@ import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/SubmitButton";
 import { toast } from "sonner";
 
-export default function FestivalForm() {
+const FestivalForm = () => {
   const festivalData = useFestival();
 
   const formFields = getFestivalFormFields();
@@ -48,4 +48,6 @@ export default function FestivalForm() {
       </form>
     </Form>
   );
-}
+};
+
+export default FestivalForm;

@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 
 
-export function DarkModeToggle() {
+export const DarkModeToggle = () => {
   const { setTheme } = useTheme();
   const [mode, setMode] = useState<"dark" | "light" | "system">("system");
 
@@ -28,4 +28,4 @@ export function DarkModeToggle() {
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
-}
+};

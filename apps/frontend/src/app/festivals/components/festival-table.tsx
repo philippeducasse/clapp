@@ -9,7 +9,7 @@ interface FestivalTableProps {
   data: Festival[];
 }
 
-export function FestivalTable({ data }: FestivalTableProps) {
+export const FestivalTable = ({ data }: FestivalTableProps) => {
   const router = useRouter();
 
   const onEdit = (id: string) => {
@@ -18,4 +18,4 @@ export function FestivalTable({ data }: FestivalTableProps) {
 
   const columns = getFestivalColumns(onEdit);
   return <DataTable columns={columns} data={data} />;
-}
+};
