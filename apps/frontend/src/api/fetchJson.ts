@@ -1,11 +1,10 @@
-import camelcaseKeys from "camelcase-keys";
-import snakecaseKeys from "snakecase-keys";
+import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
 
 export async function fetchJson<T = unknown>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, options);
   if (!res.ok) throw new Error(`Failed to fetch ${url}: ${res.status}`);
   const json = await res.json();
-  return camelcaseKeys(json, { deep: true });
+  return transformKeysToCamelCase(json);
 }
 
 export async function sendJson<T = unknown>(
@@ -19,14 +18,12 @@ export async function sendJson<T = unknown>(
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    body: JSON.stringify(snakecaseKeys(data, { deep: true })),
+    body: JSON.stringify(transformKeysToSnakeCase(data)),
   });
-
   if (!res.ok) {
     const error = await res.text();
     throw new Error(`Failed to ${method} ${url}: ${res.status} - ${error}`);
   }
-
   const json = await res.json();
   return json;
 }
