@@ -6,7 +6,7 @@ import re
 import math
 
 
-def generate_prompt_from_festival(festival: Festival) -> str:
+def generate_enrich_prompt(festival: Festival) -> str:
     current_year: int = datetime.now().year
     fields: list[str] = [
         f.name for f in Festival._meta.get_fields() if f.concrete and not f.many_to_many
@@ -23,9 +23,7 @@ def generate_prompt_from_festival(festival: Festival) -> str:
 
     missing: list[str] = [field for field in fields if not getattr(festival, field)]
 
-    print("Missing fields:", missing)
-
-    base: str = f"""
+    prompt: str = f"""
       You are an assistant enriching festival data for a cultural booking app.
       Your task is to verify and complete the information about the festival below.
 
@@ -57,8 +55,7 @@ def generate_prompt_from_festival(festival: Festival) -> str:
       - Output valid JSON and nothing else.
       """
 
-    return base
-
+    return prompt
 
 def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
     # Use regular expression to remove Markdown code block formatting
@@ -120,7 +117,6 @@ def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
         print(f"An error occurred: {e}")
         return {}
 
-
 def clean_festival_data(festival: Festival) -> None:
     # Capitalize name
     if festival.festival_name:
@@ -151,3 +147,30 @@ def clean_festival_data(festival: Festival) -> None:
         festival.description = desc
 
     # Optionally normalize dates here (if needed)
+
+def generate_application_mail_prompt(festival: Festival) -> str:
+    # Determine the appropriate salutation based on the contact person's name
+    contact_name = festival.contact_person.strip() if festival.contact_person else None
+    if contact_name and contact_name.lower() != 'nan':
+        salutation = f"Use a standard salutation in the language of {festival.country} and include the name '{contact_name}'."
+    else:
+        salutation = f"Use a standard salutation in the language of {festival.country} addressed to the {festival.festival_name} organizers."
+
+    prompt = f"""
+You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
+Your task is to generate a personalized and professional email in plain text format to apply for participation in the festival.
+The entire email should be written in the language of {festival.country}. Do not include a subject.
+
+Festival Details:
+- Festival Type: {festival.festival_type}
+- Description: {festival.description}
+- Contact Person: {contact_name}
+- Contact Email: {festival.contact_email}
+
+Email Requirements:
+- Salutation: {salutation}
+- Body: Explain why "Ah Bah Bravo!" is a great fit for their festival. Mention the unique aspects of your show and how it aligns with the festival's theme and audience. Ensure the text is engaging and professional. Keep the body concise, max 500 characters.
+- Closing: Express enthusiasm for the opportunity to perform and provide your contact information for further discussion.
+Ensure the email is formatted as plain text without any markdown or bullet points.
+"""
+    return prompt

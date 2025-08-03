@@ -5,7 +5,8 @@ from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
 import os
 from .helpers import (
-    generate_prompt_from_festival,
+    generate_enrich_prompt,
+    generate_application_mail_prompt,
     extract_fields_from_llm,
     clean_festival_data,
 )
@@ -27,7 +28,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def enrich(self, request: HttpRequest, pk: int = None) -> Response:
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
-        prompt: str = generate_prompt_from_festival(festival)
+        prompt: str = generate_enrich_prompt(festival)
         load_dotenv(".env")
         model: str = os.getenv("MISTRAL_DEFAULT_MODEL")
         llm_response: str = call_mistral_api(model, prompt)
@@ -47,28 +48,14 @@ class FestivalViewSet(viewsets.ModelViewSet):
         except Festival.DoesNotExist:
             return Response({"error": "Festival not found"}, status=404)
 
-        # Extract necessary data for the email
         festival_name: str = festival.festival_name
-        application_type: str = festival.get_application_type_display()
-        # application_status: str = festival.get_application_status_display()
-        comments: str = festival.comments
 
         # Email content
-        subject: str = f"Application Update for {festival_name}"
-        message: str = f"""
-           Dear Festival Organizer,
-
-           We are writing to inform you about the status of your application for {festival_name}.
-
-           Application Type: {application_type}
-
-           Comments: {comments if comments else "No comments provided"}
-
-           Thank you for your attention.
-
-           Best regards,
-           Your Organization
-           """
+        subject: str = f"Philippe Ducasse Application for {festival_name}"
+        load_dotenv(".env")
+        model: str = os.getenv("MISTRAL_DEFAULT_MODEL")
+        prompt: str = generate_application_mail_prompt(festival)
+        message: str = call_mistral_api(model, prompt)
 
         # Create and send the email
         email: EmailMessage = EmailMessage(
