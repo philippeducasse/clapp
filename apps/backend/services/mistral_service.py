@@ -1,18 +1,19 @@
 from dotenv import load_dotenv
-from mistralai import Mistral
+from mistralai.client import MistralClient
 import os
+from typing import Dict, Any, Union
 
 
-def call_mistral_api(model: str, prompt: str):
+def call_mistral_api(model: str, prompt: str) -> Union[str, Dict[str, Any]]:
     load_dotenv(".env")
-    api_key = os.getenv("MISTRAL_API_KEY")
+    api_key: str = os.getenv("MISTRAL_API_KEY")
     if not api_key:
         raise ValueError("MISTRAL_API_KEY environment variable not set.")
-    client = Mistral(api_key=api_key)
+    client: MistralClient = MistralClient(api_key=api_key)
 
     try:
         # Call the Mistral API to get a chat response
-        chat_response = client.chat.complete(
+        chat_response = client.chat(
             model=model, messages=[{"role": "user", "content": prompt}]
         )
         # Extract and return the content of the response

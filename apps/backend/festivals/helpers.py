@@ -1,3 +1,4 @@
+from typing import Dict, Any, Optional
 from festivals.models import Festival
 import json
 from datetime import datetime
@@ -5,14 +6,14 @@ import re
 import math
 
 
-def generate_prompt_from_festival(festival: Festival):
-    current_year = datetime.now().year
-    fields = [
+def generate_prompt_from_festival(festival: Festival) -> str:
+    current_year: int = datetime.now().year
+    fields: list[str] = [
         f.name for f in Festival._meta.get_fields() if f.concrete and not f.many_to_many
     ]
 
     for field in fields:
-        value = getattr(festival, field)
+        value: Any = getattr(festival, field)
 
         # Check if the value is NaN or a string representation of NaN
         if isinstance(value, float) and math.isnan(value):
@@ -20,15 +21,15 @@ def generate_prompt_from_festival(festival: Festival):
         elif isinstance(value, str) and value.lower() == "nan":
             setattr(festival, field, None)
 
-    missing = [field for field in fields if not getattr(festival, field)]
+    missing: list[str] = [field for field in fields if not getattr(festival, field)]
 
     print("Missing fields:", missing)
 
-    base = f"""
-      You are an assistant enriching festival data for a cultural booking app. 
+    base: str = f"""
+      You are an assistant enriching festival data for a cultural booking app.
       Your task is to verify and complete the information about the festival below.
 
-      Always perform a web search to retrieve the most accurate and current information, 
+      Always perform a web search to retrieve the most accurate and current information,
       even if a field is already partially filled or looks complete. Assume nothing — verify everything.
       For all date-related fields, ensure the result is relevant for {current_year} or later.
 
@@ -50,7 +51,7 @@ def generate_prompt_from_festival(festival: Festival):
 
       Your task:
       - Perform a web search to confirm or fill in the fields listed below.
-      - Return a JSON object containing **only these fields** (even if already filled):  
+      - Return a JSON object containing **only these fields** (even if already filled):
         {missing}
       - Use accurate and up-to-date data.
       - Output valid JSON and nothing else.
@@ -59,21 +60,21 @@ def generate_prompt_from_festival(festival: Festival):
     return base
 
 
-def extract_fields_from_llm(llm_response):
+def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
     # Use regular expression to remove Markdown code block formatting
-    json_str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
+    json_str: str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
     print("CLEANED: ", json_str)
 
     try:
         # Parse the JSON response from the Mistral API
-        response_data = json.loads(json_str)
+        response_data: Dict[str, Any] = json.loads(json_str)
 
         # Extract the fields from the response
-        updated_fields = {}
+        updated_fields: Dict[str, Any] = {}
 
-        def convert_date(date_str):
+        def convert_date(date_str: str) -> Optional[str]:
             try:
-                date_obj = datetime.strptime(date_str, "%B %d, %Y")
+                date_obj: datetime = datetime.strptime(date_str, "%B %d, %Y")
                 return date_obj.strftime("%Y-%m-%d")
             except ValueError:
                 return None
@@ -88,11 +89,11 @@ def extract_fields_from_llm(llm_response):
         if "approximate_date" in response_data:
             updated_fields["approximate_date"] = response_data["approximate_date"]
         if "start_date" in response_data:
-            converted_date = convert_date(response_data["start_date"])
+            converted_date: Optional[str] = convert_date(response_data["start_date"])
             if converted_date:
                 updated_fields["start_date"] = converted_date
         if "end_date" in response_data:
-            converted_date = convert_date(response_data["end_date"])
+            converted_date: Optional[str] = convert_date(response_data["end_date"])
             if converted_date:
                 updated_fields["end_date"] = converted_date
         if "website_url" in response_data:
@@ -120,7 +121,7 @@ def extract_fields_from_llm(llm_response):
         return {}
 
 
-def clean_festival_data(festival: Festival):
+def clean_festival_data(festival: Festival) -> None:
     # Capitalize name
     if festival.festival_name:
         festival.festival_name = festival.festival_name.title()
@@ -138,13 +139,13 @@ def clean_festival_data(festival: Festival):
         festival.contact_email = festival.contact_email.strip().lower()
 
     if festival.website_url:
-        url = festival.website_url.strip()
+        url: str = festival.website_url.strip()
         if not url.startswith("http"):
             url = "https://" + url
         festival.website_url = url.lower()
 
     if festival.description:
-        desc = festival.description.strip()
+        desc: str = festival.description.strip()
         if not desc.endswith("."):
             desc += "."
         festival.description = desc

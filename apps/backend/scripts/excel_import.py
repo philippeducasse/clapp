@@ -1,9 +1,10 @@
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 from festivals.models import Festival
+from typing import Optional, Any
 
 
-def parse_date(val):
+def parse_date(val: Any) -> Optional[date]:
     if pd.isna(val):
         return None
     if isinstance(val, datetime):
@@ -15,19 +16,19 @@ def parse_date(val):
 
 
 # Load the CSV with correct delimiter
-df = pd.read_csv("scripts/excel_import.csv", delimiter=";", dtype=str)
+df: pd.DataFrame = pd.read_csv("scripts/excel_import.csv", delimiter=";", dtype=str)
 
 # Normalize column names
 df.columns = [col.strip().upper() for col in df.columns]
 
 for index, row in df.iterrows():
-    name = str(row.get("NAME", "") or "").strip()
+    name: str = str(row.get("NAME", "") or "").strip()
 
     if not name:
         print(f"Skipping row {index}: Missing festival name")
         continue
 
-    festival = Festival(
+    festival: Festival = Festival(
         festival_name=name,
         country=str(row.get("COUNTRY", "") or "").strip(),
         town=str(row.get("TOWN", "") or "").strip(),

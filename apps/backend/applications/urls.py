@@ -1,9 +1,10 @@
-from django.urls import path, include
+from django.urls import path, include, URLPattern
 from rest_framework.routers import DefaultRouter
-from festivals.views import FestivalViewSet
+from applications.views import ApplicationViewSet
+from typing import List
 
-router = DefaultRouter()
-router.register(r"applications", FestivalViewSet)
-urlpatterns = [
+router: DefaultRouter = DefaultRouter()
+router.register(r"", ApplicationViewSet, basename="application")
+urlpatterns: List[URLPattern] = [
     path("", include(router.urls)),
 ]
