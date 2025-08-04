@@ -13,25 +13,27 @@ import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/h
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/SubmitButton";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const FestivalForm = () => {
   const festivalData = useFestival();
-
+  const router = useRouter();
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
 
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Submitted data:", values);
     setIsLoading(true);
     try {
       await festivalApiService.updateFestival(values as Festival);
       toast.success("Festival has been updated successfully");
     } catch (error) {
       toast.error(`Error: Could not update festival : ${error}`);
+      console.error(error);
     } finally {
       setIsLoading(false);
+      router.push(`/festivals/${festivalData.id}`);
     }
   };
 

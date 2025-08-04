@@ -19,7 +19,11 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
     switch (type) {
       case SectionCellType.Link:
         return (
-          <Link href={linkTo as string} className="text-sky-600 hover:text-sky-500 font-medium" target={target}>
+          <Link
+            href={(linkTo as string) ?? value}
+            className="text-sky-600 hover:text-sky-500 font-medium"
+            target={target ?? "_blank"}
+          >
             {value}
           </Link>
         );

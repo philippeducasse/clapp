@@ -9,7 +9,6 @@ interface ControlledBooleanProps {
 }
 
 const ControlledBoolean = ({ field }: ControlledBooleanProps) => {
-  console.log("field:", field);
   return <Switch checked={field?.value as boolean} onCheckedChange={field.onChange} />;
 };
 
