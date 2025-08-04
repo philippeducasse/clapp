@@ -1,3 +1,7 @@
+from datetime import datetime
+from typing import Any, Dict
+
+from mistralai import ConversationResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -5,15 +9,15 @@ from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
 import os
 from .helpers import (
-    generate_enrich_prompt,
     generate_application_mail_prompt,
+    extract_search_results,
     extract_fields_from_llm,
     clean_festival_data,
+    generate_enrich_prompt,
 )
-from services.mistral_service import call_mistral_api
+from services.mistral_service import MistralClient
 from dotenv import load_dotenv
 from django.http import HttpRequest
-from typing import Dict, Any
 from django.core.mail import EmailMessage
 
 
@@ -23,15 +27,23 @@ class FestivalViewSet(viewsets.ModelViewSet):
     # Class used to convert JSON into Django Model objects and vice versa
     serializer_class = FestivalSerializer
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.mistral_client = MistralClient()
+        
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["post"])
     def enrich(self, request: HttpRequest, pk: int = None) -> Response:
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
-        prompt: str = generate_enrich_prompt(festival)
-        load_dotenv(".env")
-        model: str = os.getenv("MISTRAL_DEFAULT_MODEL")
-        llm_response: str = call_mistral_api(model, prompt)
+
+        query = f"{festival.festival_name} {festival.country} {datetime.now().year}"
+        search_results: ConversationResponse = self.mistral_client.search(query=query)
+        parsed_results: str = extract_search_results(search_results)
+
+        prompt: str = generate_enrich_prompt(festival, parsed_results)
+
+        llm_response: str = self.mistral_client.chat(prompt=prompt)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
         for field, value in updated_fields.items():
@@ -55,7 +67,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         load_dotenv(".env")
         model: str = os.getenv("MISTRAL_DEFAULT_MODEL")
         prompt: str = generate_application_mail_prompt(festival)
-        message: str = call_mistral_api(model, prompt)
+        message: str = self.mistral_client.chat(prompt=prompt)
 
         # Create and send the email
         email: EmailMessage = EmailMessage(

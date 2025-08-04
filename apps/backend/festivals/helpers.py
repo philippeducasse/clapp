@@ -4,9 +4,9 @@ import json
 from datetime import datetime
 import re
 import math
+from mistralai import ConversationResponse, TextChunk
 
-
-def generate_enrich_prompt(festival: Festival) -> str:
+def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
     current_year: int = datetime.now().year
     fields: list[str] = [
         f.name for f in Festival._meta.get_fields() if f.concrete and not f.many_to_many
@@ -27,9 +27,7 @@ def generate_enrich_prompt(festival: Festival) -> str:
       You are an assistant enriching festival data for a cultural booking app.
       Your task is to verify and complete the information about the festival below.
 
-      Always perform a web search to retrieve the most accurate and current information,
-      even if a field is already partially filled or looks complete. Assume nothing — verify everything.
-      For all date-related fields, ensure the result is relevant for {current_year} or later.
+      You have retrieved this information through a web search: {search_results}.  
 
       Here is the current known information:
 
@@ -40,7 +38,7 @@ def generate_enrich_prompt(festival: Festival) -> str:
       end_date: {festival.end_date}
       website_url: {festival.website_url}
       festival_type: {festival.festival_type}
-      description: {festival.description}
+      description : {festival.description}
       contact_person: {festival.contact_person}
       contact_email: {festival.contact_email}
       application_date_start: {festival.application_date_start}
@@ -48,19 +46,38 @@ def generate_enrich_prompt(festival: Festival) -> str:
       application_type: {festival.application_type}
 
       Your task:
-      - Perform a web search to confirm or fill in the fields listed below.
+      - Use the provided web search to complete missing fields or update old fields with new information.
+      - If the search result are in a different language, translate the data into English.
       - Return a JSON object containing **only these fields** (even if already filled):
         {missing}
       - Use accurate and up-to-date data.
       - Output valid JSON and nothing else.
+      
+      Example Output:
+        {{
+          "country": "Belgium",
+          "town": "Brussels",
+          "start_date": "2023-10-15",
+          "description": "An annual festival celebrating contemporary arts."
+        }}
       """
 
     return prompt
 
+def extract_search_results(search_results: ConversationResponse ):
+    content = next((o for o in search_results.outputs if o.type == "message.output"), None)
+
+    print("content", content)
+
+    chunks = getattr(content, "content", [])
+
+    parsed_text = " ".join(chunk.text for chunk in chunks if isinstance(chunk, TextChunk))
+
+    return parsed_text
+
 def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
     # Use regular expression to remove Markdown code block formatting
     json_str: str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
-    print("CLEANED: ", json_str)
 
     try:
         # Parse the JSON response from the Mistral API
