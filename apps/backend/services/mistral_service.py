@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from mistralai import Mistral, ConversationResponse
 import os
 
+
 class MistralClient:
     def __init__(self):
         load_dotenv(".env")
@@ -33,10 +34,9 @@ class MistralClient:
             print(f"An error occurred: {e}")
             return {"error": str(e)}
 
-    def search(self, query:str):
+    def search(self, query: str):
         response: ConversationResponse = self.client.beta.conversations.start(
-            agent_id=self.search_agent.id,
-            inputs=query
+            agent_id=self.search_agent.id, inputs=query
         )
 
         return response

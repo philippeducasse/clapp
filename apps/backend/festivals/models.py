@@ -22,20 +22,34 @@ class Festival(models.Model):
     ]
 
     festival_name: models.CharField = models.CharField(max_length=200)
-    description: models.CharField = models.CharField(max_length=1000, blank=True, null=True)
+    description: models.CharField = models.CharField(
+        max_length=1000, blank=True, null=True
+    )
     country: models.CharField = models.CharField(max_length=100, blank=True, null=True)
     town: models.CharField = models.CharField(max_length=100, blank=True, null=True)
     festival_type: models.CharField = models.CharField(
         max_length=50, choices=FESTIVAL_TYPES, default="STREET"
     )
-    website_url: models.CharField = models.CharField(max_length=200, blank=True, null=True)
-    contact_email: models.CharField = models.CharField(max_length=200, blank=True, null=True)
-    contact_person: models.CharField = models.CharField(max_length=200, blank=True, null=True)
+    website_url: models.CharField = models.CharField(
+        max_length=200, blank=True, null=True
+    )
+    contact_email: models.CharField = models.CharField(
+        max_length=200, blank=True, null=True
+    )
+    contact_person: models.CharField = models.CharField(
+        max_length=200, blank=True, null=True
+    )
     start_date: models.DateField = models.DateField(null=True, blank=True)
     end_date: models.DateField = models.DateField(null=True, blank=True)
-    approximate_date: models.CharField = models.CharField(max_length=100, blank=True, null=True)
-    application_date_start: models.CharField = models.CharField(max_length=100, blank=True, null=True)
-    application_date_end: models.CharField = models.CharField(max_length=100, blank=True, null=True)
+    approximate_date: models.CharField = models.CharField(
+        max_length=100, blank=True, null=True
+    )
+    application_date_start: models.CharField = models.CharField(
+        max_length=100, blank=True, null=True
+    )
+    application_date_end: models.CharField = models.CharField(
+        max_length=100, blank=True, null=True
+    )
     application_type: models.CharField = models.CharField(
         max_length=50, choices=APPLICATION_TYPE, default="UNKNOWN"
     )

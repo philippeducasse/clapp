@@ -6,6 +6,7 @@ import re
 import math
 from mistralai import ConversationResponse, TextChunk
 
+
 def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
     current_year: int = datetime.now().year
     fields: list[str] = [
@@ -64,16 +65,22 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
 
     return prompt
 
-def extract_search_results(search_results: ConversationResponse ):
-    content = next((o for o in search_results.outputs if o.type == "message.output"), None)
+
+def extract_search_results(search_results: ConversationResponse):
+    content = next(
+        (o for o in search_results.outputs if o.type == "message.output"), None
+    )
 
     print("content", content)
 
     chunks = getattr(content, "content", [])
 
-    parsed_text = " ".join(chunk.text for chunk in chunks if isinstance(chunk, TextChunk))
+    parsed_text = " ".join(
+        chunk.text for chunk in chunks if isinstance(chunk, TextChunk)
+    )
 
     return parsed_text
+
 
 def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
     # Use regular expression to remove Markdown code block formatting
@@ -134,6 +141,7 @@ def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
         print(f"An error occurred: {e}")
         return {}
 
+
 def clean_festival_data(festival: Festival) -> None:
     # Capitalize name
     if festival.festival_name:
@@ -165,10 +173,11 @@ def clean_festival_data(festival: Festival) -> None:
 
     # Optionally normalize dates here (if needed)
 
+
 def generate_application_mail_prompt(festival: Festival) -> str:
     # Determine the appropriate salutation based on the contact person's name
     contact_name = festival.contact_person.strip() if festival.contact_person else None
-    if contact_name and contact_name.lower() != 'nan':
+    if contact_name and contact_name.lower() != "nan":
         salutation = f"Use a standard salutation in the language of {festival.country} and include the name '{contact_name}'."
     else:
         salutation = f"Use a standard salutation in the language of {festival.country} addressed to the {festival.festival_name} organizers."

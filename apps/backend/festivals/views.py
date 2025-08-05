@@ -30,7 +30,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mistral_client = MistralClient()
-        
+
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["post"])
     def enrich(self, request: HttpRequest, pk: int = None) -> Response:
@@ -74,7 +74,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
             subject,
             message,
             "ducassephi@hotmail.fr",  # From email
-            ["info@philippeducasse.com"]
+            ["info@philippeducasse.com"],
             # [application.festival.contact_email],  # To email
         )
 
