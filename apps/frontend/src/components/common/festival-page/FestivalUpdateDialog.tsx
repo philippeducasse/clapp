@@ -16,30 +16,41 @@ import { useState } from "react";
 
 import festivalApiService from "@/api/festivalApiService";
 import { useFestival } from "@/context/FestivalContext";
-import { Skeleton } from "../../ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
+  const [_loading, setLoading] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Festival | undefined>();
-  const festival = useFestival();
+
+  const { festival, setFestival } = useFestival();
 
   const handleUpdate = async () => {
-    const response = await festivalApiService.enrichFestival(festival);
-    if (response) {
+    setLoading(true);
+    try {
+      const response = await festivalApiService.enrichFestival(festival);
       setUpdatedFields(response);
+    } catch (error) {
+      console.error(`Error: could not update festival: ${error}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async () => {
     if (updatedFields) {
+      setLoading(true);
       await festivalApiService.updateFestival(updatedFields);
       setOpen(false);
+      setLoading(false);
+      setFestival(updatedFields);
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" onClick={handleUpdate}>
+        <Button variant="default" onClick={handleUpdate}>
           Update
         </Button>
       </DialogTrigger>
@@ -52,9 +63,7 @@ export const FestivalUpdateDialog = () => {
           <FestivalDiffTable original={festival} updated={updatedFields} />
         ) : (
           <>
-            <Skeleton className="h-4 w-[200px]" />
-            <Skeleton className="h-4 w-[200px]" />
-            <Skeleton className="h-4 w-[200px]" />
+            <Progress />
           </>
         )}
 

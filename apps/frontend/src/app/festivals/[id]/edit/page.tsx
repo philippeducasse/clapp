@@ -11,12 +11,12 @@ import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
 
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 import festivalApiService from "@/api/festivalApiService";
-import SubmitButton from "@/components/common/SubmitButton";
+import SubmitButton from "@/components/common/buttons/SubmitButton";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const FestivalForm = () => {
-  const festivalData = useFestival();
+  const { festival } = useFestival();
   const router = useRouter();
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
@@ -33,13 +33,13 @@ const FestivalForm = () => {
       console.error(error);
     } finally {
       setIsLoading(false);
-      router.push(`/festivals/${festivalData.id}`);
+      router.push(`/festivals/${festival.id}`);
     }
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: sanitizeFormData(festivalData),
+    defaultValues: sanitizeFormData(festival),
   });
 
   return (
