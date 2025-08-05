@@ -3,10 +3,10 @@ import { ControlledFormElementType } from "@/interfaces/ControlledFormElementTyp
 import { z, ZodObject, ZodType } from "zod";
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
-import ControlledSelect from "@/components/common/ControlledFormFields/ControlledSelect";
-import ControlledText from "@/components/common/ControlledFormFields/ControlledText";
+import ControlledSelect from "@/components/common/controlled-form-fields/ControlledSelect";
+import ControlledText from "@/components/common/controlled-form-fields/ControlledText";
 import { capitalize } from "lodash";
-import ControlledBoolean from "@/components/common/ControlledFormFields/ControlledBoolean";
+import ControlledBoolean from "@/components/common/controlled-form-fields/ControlledBoolean";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
