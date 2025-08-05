@@ -3,26 +3,25 @@ from festivals.models import Festival
 import json
 from datetime import datetime
 import re
-import math
 from mistralai import ConversationResponse, TextChunk
 
 
 def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
-    current_year: int = datetime.now().year
-    fields: list[str] = [
-        f.name for f in Festival._meta.get_fields() if f.concrete and not f.many_to_many
+    output_fields = [
+        "country",
+        "town",
+        "approximate_date",
+        "start_date",
+        "end_date",
+        "website_url",
+        "festival_type",
+        "description",
+        "contact_person",
+        "contact_email",
+        "application_date_start",
+        "application_date_end",
+        "application_type",
     ]
-
-    for field in fields:
-        value: Any = getattr(festival, field)
-
-        # Check if the value is NaN or a string representation of NaN
-        if isinstance(value, float) and math.isnan(value):
-            setattr(festival, field, None)
-        elif isinstance(value, str) and value.lower() == "nan":
-            setattr(festival, field, None)
-
-    missing: list[str] = [field for field in fields if not getattr(festival, field)]
 
     prompt: str = f"""
       You are an assistant enriching festival data for a cultural booking app.
@@ -47,10 +46,11 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
       application_type: {festival.application_type}
 
       Your task:
+      - If no better data is found, keep the existing value.
       - Use the provided web search to complete missing fields or update old fields with new information.
       - If the search result are in a different language, translate the data into English.
-      - Return a JSON object containing **only these fields** (even if already filled):
-        {missing}
+      - Return a JSON object containing the following fields, updated or completed as necessary:
+        {output_fields}
       - Use accurate and up-to-date data.
       - Output valid JSON and nothing else.
       
