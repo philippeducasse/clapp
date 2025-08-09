@@ -10,7 +10,8 @@ import ControlledBoolean from "@/components/common/controlled-form-fields/Contro
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
-  form: UseFormReturn<Record<string, unknown>>
+  form: UseFormReturn<Record<string, unknown>>,
+  showLabels: boolean = true
 ) => {
   return formFields.map((formField) => (
     <FormField
@@ -19,7 +20,7 @@ export const createFormComponents = (
       name={formField.fieldName}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{formField.label}</FormLabel>
+          {showLabels && <FormLabel>{formField.label}</FormLabel>}
           <FormControl>
             {(() => {
               switch (formField.type) {

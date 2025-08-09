@@ -15,7 +15,7 @@ const BackButton = ({ label, href }: BackButtonProps) => {
   };
 
   return (
-    <Button size="sm" variant="outline" onClick={handleClick}>
+    <Button size="sm" variant="outline" onClick={handleClick} type="button">
       {label ?? "Go back"}
     </Button>
   );

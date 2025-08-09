@@ -13,7 +13,7 @@ export const FestivalTable = ({ data }: FestivalTableProps) => {
   const router = useRouter();
 
   const onEdit = (id: string) => {
-    router.push(`/festivals/${id}`); // Navigate programmatically
+    router.push(`/festivals/${id}`);
   };
 
   const columns = getFestivalColumns(onEdit);
