@@ -17,10 +17,12 @@ import { useState } from "react";
 import festivalApiService from "@/api/festivalApiService";
 import { useFestival } from "@/context/FestivalContext";
 import { Progress } from "@/components/ui/progress";
+import SubmitButton from "../buttons/SubmitButton";
+import { DynamicProgress } from "../DynamicProgress";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
-  const [_loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Festival | undefined>();
 
   const { festival, setFestival } = useFestival();
@@ -59,19 +61,13 @@ export const FestivalUpdateDialog = () => {
           <DialogTitle>Update Festival</DialogTitle>
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
-        {updatedFields ? (
-          <FestivalDiffTable original={festival} updated={updatedFields} />
-        ) : (
-          <>
-            <Progress />
-          </>
-        )}
+        {updatedFields ? <FestivalDiffTable original={festival} updated={updatedFields} /> : <DynamicProgress />}
 
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button onClick={handleSubmit}>Save changes</Button>
+          <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -12,11 +12,10 @@ import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/buttons/SubmitButton";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 const FestivalForm = () => {
-  const { festival } = useFestival();
+  const { festival, setFestival } = useFestival();
   const router = useRouter();
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
@@ -27,9 +26,8 @@ const FestivalForm = () => {
     setIsLoading(true);
     try {
       await festivalApiService.updateFestival(values as Festival);
-      toast.success("Festival has been updated successfully");
+      setFestival(values as Festival);
     } catch (error) {
-      toast.error(`Error: Could not update festival : ${error}`);
       console.error(error);
     } finally {
       setIsLoading(false);

@@ -17,7 +17,7 @@ const festivalApiService = {
   },
 
   async updateFestival(festival: Festival): Promise<Festival> {
-    return sendJson<Festival>(`${endpoint}${festival.id}/`, festival, "PUT");
+    return sendJson<Festival>(`${endpoint}${festival.id}/`, festival, "PUT", "Festival successfully updated");
   },
 };
 
