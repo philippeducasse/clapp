@@ -8,21 +8,13 @@ import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
 import { Festival } from "@/interfaces/Festival";
 import { getFestivalFormFields } from "../[id]/helpers/getFestivalFormFields";
-import { cn } from "@/lib/utils";
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/buttons/SubmitButton";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/common/buttons/BackButton";
 
-interface FestivalFormProps {
-  enrichedFestival?: Festival;
-  className?: string;
-  backButton?: boolean;
-  showLabels?: boolean;
-}
-
-const FestivalForm = ({ enrichedFestival, className, backButton = true, showLabels = true }: FestivalFormProps) => {
+const FestivalForm = () => {
   const { festival, setFestival } = useFestival();
   const router = useRouter();
   const formFields = getFestivalFormFields();
@@ -43,22 +35,20 @@ const FestivalForm = ({ enrichedFestival, className, backButton = true, showLabe
     }
   };
 
-  const relevantFestival = enrichedFestival ?? festival;
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-
-    defaultValues: sanitizeFormData(relevantFestival),
+    defaultValues: sanitizeFormData(festival),
   });
-
-  console.log(showLabels);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("w-full caption-bottom text-sm", className)}>
-        {createFormComponents(formFields, form, showLabels)}
-        <div className="flex justify-between">
-          {backButton && <BackButton href={`/festivals/${festival.id}`} />}
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full caption-bottom text-sm space-y-6 max-w-3xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
+      >
+        {createFormComponents(formFields, form)}
+        <div className="flex justify-between mt-6">
+          <BackButton href={`/festivals/${festival.id}`} />
           <SubmitButton isLoading={isLoading} />
         </div>
       </form>

@@ -1,5 +1,5 @@
 import festivalApiService from "@/api/festivalApiService";
-import { FestivalTable } from "./components/festival-table";
+import { FestivalTable } from "./components/FestivalTable";
 
 const FestivalsPage = async () => {
   const data = await festivalApiService.getAllFestivals();

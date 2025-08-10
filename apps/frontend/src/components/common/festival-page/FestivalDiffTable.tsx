@@ -1,14 +1,14 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Festival } from "@/interfaces/Festival";
 import { DiffViewProps } from "@/interfaces/DiffViewProps";
-import FestivalForm from "@/app/festivals/components/FestivalForm";
+import FestivalDiffForm from "@/app/festivals/components/FestivalDiffForm";
 
 export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
   const fields = Object.keys(original) as (keyof Festival)[];
 
   return (
     <div className="flex ">
-      <Table className="w-1/2">
+      <Table className="">
         <TableHeader>
           <TableRow>
             <TableHead>Field</TableHead>
@@ -23,14 +23,19 @@ export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
 
             return (
               <TableRow key={field}>
-                <TableCell className="font-medium max-w-sm">{field}</TableCell>
+                <TableCell className="font-medium max-w-xs">{field}</TableCell>
                 <TableCell className={`max-w-sm ${changed ? "bg-red-100" : ""}`}> {String(originalVal)}</TableCell>
               </TableRow>
             );
           })}
         </TableBody>
       </Table>
-      <FestivalForm enrichedFestival={updated} showLabels={false} />
+      <div className="">
+        <p className="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]">
+          Updated
+        </p>
+        <FestivalDiffForm updatedFestival={updated} />
+      </div>
     </div>
   );
 };
