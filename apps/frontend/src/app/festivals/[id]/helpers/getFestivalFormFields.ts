@@ -5,13 +5,6 @@ import { ApplicationType, FestivalType } from "@/interfaces/Festival";
 export const getFestivalFormFields = (): ControlledFormElement[] => {
   return [
     {
-      label: "ID",
-      fieldName: "id",
-      type: ControlledFormElementType.NUMBER,
-      required: true,
-      className: "col-span-1",
-    },
-    {
       label: "Festival Name",
       fieldName: "festivalName",
       type: ControlledFormElementType.TEXT,

@@ -26,7 +26,7 @@ const FestivalDiffForm = ({ updatedFestival }: FestivalDiffFormProps) => {
     defaultValues: sanitizeFormData(updatedFestival),
   });
 
-  const fields = Object.keys(updatedFestival) as (keyof Festival)[];
+  const fields = Object.keys(updatedFestival).filter((k) => k !== "id") as (keyof Festival)[];
 
   return (
     <form
@@ -35,14 +35,14 @@ const FestivalDiffForm = ({ updatedFestival }: FestivalDiffFormProps) => {
         router.push(`/festivals/${updatedFestival.id}`);
       })}
     >
-      <Table>
+      <Table tableWidth={"w-full"}>
         <TableBody>
           {fields.map((field) => {
             const val = form.watch(field as any) ?? "";
             return (
-              <TableRow key={field}>
-                <TableCell className="max-w-sm">
-                  <input {...form.register(field as any)} defaultValue={val} className="w-full" />
+              <TableRow key={field} className="f-full">
+                <TableCell className="w-full">
+                  <input {...form.register(field as any)} defaultValue={val as string | number} className="w-full" />
                 </TableCell>
               </TableRow>
             );
