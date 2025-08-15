@@ -5,29 +5,25 @@ import { Festival } from "@/interfaces/Festival";
 import { Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 
 const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[] => {
   return [
     {
       accessorKey: "festivalName",
-      header: "Name",
+      header: getSortableHeader("name"),
       cell: ({ row }) => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-            <Link
-              // className="underline text-slate-400 hover:text-slate-500"
-              href={`/festivals/${festival.id}`}
-            >
-              {festival.festivalName}
-            </Link>
+            <Link href={`/festivals/${festival.id}`}>{festival.festivalName}</Link>
           </div>
         );
       },
     },
     {
       accessorKey: "country",
-      header: "Country",
+      header: getSortableHeader("Country"),
     },
     {
       accessorKey: "websiteUrl",
