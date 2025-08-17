@@ -17,6 +17,7 @@ class Festival(models.Model):
     APPLICATION_TYPE: List[Tuple[str, str]] = [
         ("EMAIL", "Email"),
         ("FORM", "Form"),
+        ("INVITATION_ONLY", "Invitation only"),
         ("OTHER", "Other"),
         ("UNKNOWN", "Unknown"),
     ]
