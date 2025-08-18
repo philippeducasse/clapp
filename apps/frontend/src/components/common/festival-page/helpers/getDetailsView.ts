@@ -11,6 +11,8 @@ export const getDetailsView = (festival: Festival): SectionCellProps[] => {
     { title: "Website", value: festival.websiteUrl, type: SectionCellType.Link },
     { title: "Festival type", value: capitalize(festival.festivalType) },
     { title: "Approximate date", value: festival.approximateDate },
+    { title: "Start date", value: festival?.startDate },
+    { title: "End date", value: festival?.endDate },
     { title: "Description", value: festival.description },
     { title: "Applied?", value: festival.applied, type: SectionCellType.Bool },
     { title: "Application start", value: festival.applicationStart },

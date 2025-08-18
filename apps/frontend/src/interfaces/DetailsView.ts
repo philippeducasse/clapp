@@ -13,7 +13,7 @@ export interface SectionCellProps {
   id?: string;
 }
 
-export type SectionCellValueType = string | number | boolean | number[] | string[] | undefined;
+export type SectionCellValueType = string | number | boolean | number[] | string[] | undefined | Date;
 
 export const enum SectionCellType {
   Text = "text",

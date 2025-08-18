@@ -47,7 +47,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
       },
     },
     {
-      accessorKey: "dateString",
+      accessorKey: "approximateDate",
       header: "Date",
     },
     {
