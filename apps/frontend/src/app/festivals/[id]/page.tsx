@@ -1,4 +1,4 @@
-import FestivalView from "../../../components/common/festival-page/festival-view";
+import FestivalView from "../../../components/page-components/festival-page/components/details-view/FestivalView";
 
 const FestivalDetailPage = async () => {
   return <FestivalView />;

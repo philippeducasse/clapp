@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFestival } from "@/context/FestivalContext";
-import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
+import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
 import { Festival } from "@/interfaces/Festival";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";

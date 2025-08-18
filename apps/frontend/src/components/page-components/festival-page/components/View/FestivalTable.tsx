@@ -1,7 +1,7 @@
 "use client";
 
 import { Festival } from "@/interfaces/Festival";
-import { getFestivalColumns } from "./getFestivalColumns";
+import { getFestivalColumns } from "../../helpers/getFestivalColumns";
 import { DataTable } from "@/components/ui/data-table";
 import { useRouter } from "next/navigation";
 

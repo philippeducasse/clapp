@@ -17,8 +17,8 @@ import { useState } from "react";
 import festivalApiService from "@/api/festivalApiService";
 import { useFestival } from "@/context/FestivalContext";
 import { Progress } from "@/components/ui/progress";
-import SubmitButton from "../buttons/SubmitButton";
-import { DynamicProgress } from "../DynamicProgress";
+import SubmitButton from "../../../../common/buttons/SubmitButton";
+import { DynamicProgress } from "../../../../common/DynamicProgress";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);

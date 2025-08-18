@@ -3,9 +3,9 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useFestival } from "@/context/FestivalContext";
-import { FestivalUpdateDialog } from "@/components/common/festival-page/FestivalUpdateDialog";
+import { FestivalUpdateDialog } from "@/components/page-components/festival-page/components/update-view/FestivalUpdateDialog";
 import DetailsView from "@/components/common/table/DetailsView";
-import { getDetailsView } from "./helpers/getDetailsView";
+import { getDetailsView } from "../../helpers/getDetailsView";
 import BackButton from "@/components/common/buttons/BackButton";
 import EditButton from "@/components/common/buttons/EditButton";
 

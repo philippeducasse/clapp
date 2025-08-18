@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Festival } from "@/interfaces/Festival";
 import { DiffViewProps } from "@/interfaces/DiffViewProps";
-import FestivalDiffForm from "@/components/common/festival-page/components/FestivalDiffForm";
+import FestivalDiffForm from "@/components/page-components/festival-page/components/form/FestivalDiffForm";
 
 export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
   const { id: _, ...originalWithoutId } = original;

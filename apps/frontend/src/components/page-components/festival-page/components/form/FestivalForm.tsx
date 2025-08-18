@@ -7,7 +7,7 @@ import { Form } from "@/components/ui/form";
 import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
 import { Festival } from "@/interfaces/Festival";
-import { getFestivalFormFields } from "../helpers/getFestivalFormFields";
+import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/buttons/SubmitButton";
