@@ -2,6 +2,12 @@ import pandas as pd
 from datetime import datetime, date
 from festivals.models import Festival
 from typing import Optional, Any
+import os
+import django
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "circus_agent_backend.settings")
+django.setup()
+
 
 
 def parse_date(val: Any) -> Optional[date]:
@@ -16,7 +22,7 @@ def parse_date(val: Any) -> Optional[date]:
 
 
 # Load the CSV with correct delimiter
-df: pd.DataFrame = pd.read_csv("scripts/excel_import.csv", delimiter=";", dtype=str)
+df: pd.DataFrame = pd.read_csv("scripts/festivals/Tabellenblatt1-Table 1.csv", delimiter=";", dtype=str)
 
 # Normalize column names
 df.columns = [col.strip().upper() for col in df.columns]
@@ -26,6 +32,10 @@ for index, row in df.iterrows():
 
     if not name:
         print(f"Skipping row {index}: Missing festival name")
+        continue
+
+    if Festival.objects.filter(festival_name__iexact=name).exists():
+        print(f"Skipping row {index}: Festival '{name}' already exists in the database")
         continue
 
     festival: Festival = Festival(
@@ -38,7 +48,7 @@ for index, row in df.iterrows():
         contact_person=str(row.get("CONTACT PERSON", "") or "").strip(),
         start_date=parse_date(row.get("START DATE") if "START DATE" in row else None),
         end_date=parse_date(row.get("END DATE") if "END DATE" in row else None),
-        date_text=str(row.get("EVENT DATE", "") or "").strip(),
+        approximate_date=str(row.get("EVENT DATE", "") or "").strip(),
         applied=bool(float(row.get("APPLIED 2023", "0") or 0))
         or bool(float(row.get("APPLIED 2025", "0") or 0)),
         comments=str(row.get("COMMENT", "") or "").strip(),

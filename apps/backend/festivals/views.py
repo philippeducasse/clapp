@@ -8,6 +8,8 @@ from rest_framework.decorators import action
 from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
 import os
+
+from services.gemini_service import GeminiClient
 from .helpers import (
     generate_application_mail_prompt,
     extract_search_results,
@@ -30,6 +32,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.mistral_client = MistralClient()
+        self.gemini_client = GeminiClient()
 
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["post"])
@@ -38,10 +41,14 @@ class FestivalViewSet(viewsets.ModelViewSet):
         festival: Festival = self.get_object()
 
         query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
-        search_results: ConversationResponse = self.mistral_client.search(query=query)
-        parsed_results: str = extract_search_results(search_results)
 
-        prompt: str = generate_enrich_prompt(festival, parsed_results)
+        # search_results: ConversationResponse = self.mistral_client.search(query=query)
+        # parsed_results: str = extract_search_results(search_results)
+        # prompt: str = generate_enrich_prompt(festival, parsed_results)
+
+        search_results = self.gemini_client.search(query=query)
+        print("SEARCH: ", search_results)
+        prompt: str = generate_enrich_prompt(festival, search_results)
 
         llm_response: str = self.mistral_client.chat(prompt=prompt)
 

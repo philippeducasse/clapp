@@ -38,5 +38,4 @@ class MistralClient:
         response: ConversationResponse = self.client.beta.conversations.start(
             agent_id=self.search_agent.id, inputs=query
         )
-
         return response
