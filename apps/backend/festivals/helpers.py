@@ -251,20 +251,20 @@ def generate_application_mail_prompt(festival: Festival) -> str:
         salutation = f"Use a standard salutation in the language of {festival.country} addressed to the {festival.festival_name} organizers."
 
     prompt = f"""
-You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
-Your task is to generate a personalized and professional email in plain text format to apply for participation in the festival.
-The entire email should be written in the language of {festival.country}. Do not include a subject.
-
-Festival Details:
-- Festival Type: {festival.festival_type}
-- Description: {festival.description}
-- Contact Person: {contact_name}
-- Contact Email: {festival.contact_email}
-
-Email Requirements:
-- Salutation: {salutation}
-- Body: Explain why "Ah Bah Bravo!" is a great fit for their festival. Mention the unique aspects of your show and how it aligns with the festival's theme and audience. Ensure the text is engaging and professional. Keep the body concise, max 500 characters.
-- Closing: Express enthusiasm for the opportunity to perform and provide your contact information for further discussion.
-Ensure the email is formatted as plain text without any markdown or bullet points.
-"""
+        You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
+        Your task is to generate a personalized and professional email in plain text format to apply for participation in the festival.
+        The entire email should be written in the language of {festival.country}. Do not include a subject.
+        
+        Festival Details:
+        - Festival Type: {festival.festival_type}
+        - Description: {festival.description}
+        - Contact Person: {contact_name}
+        - Contact Email: {festival.contact_email}
+        
+        Email Requirements:
+        - Salutation: {salutation}
+        - Body: Explain why "Ah Bah Bravo!" is a great fit for their festival. Mention the unique aspects of your show and how it aligns with the festival's theme and audience. Ensure the text is engaging and professional. Keep the body concise, max 500 characters.
+        - Closing: Express enthusiasm for the opportunity to perform and provide your contact information for further discussion.
+        Ensure the email is formatted as plain text without any markdown or bullet points.
+        """
     return prompt

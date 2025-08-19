@@ -37,7 +37,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
 
-        query = f"{festival.festival_name} {festival.country} {datetime.now().year}"
+        query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
         search_results: ConversationResponse = self.mistral_client.search(query=query)
         parsed_results: str = extract_search_results(search_results)
 
