@@ -11,11 +11,11 @@ export interface Festival {
   startDate?: Date;
   endDate?: Date;
   festivalType?: FestivalType;
-  description?: string;
   applicationType?: string;
   applicationStart?: string;
   applicationEnd?: string;
   applied?: boolean;
+  description?: string;
 }
 
 export enum FestivalType {

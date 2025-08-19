@@ -4,7 +4,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const getSortableHeader = <T,>(columnName: string) => {
-  return ({ column }: HeaderContext<T, unknown>) => {
+  const SortableHeader = ({ column }: HeaderContext<T, unknown>) => {
     return (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         {columnName}
@@ -12,4 +12,9 @@ export const getSortableHeader = <T,>(columnName: string) => {
       </Button>
     );
   };
+
+  // Add displayName for debugging
+  SortableHeader.displayName = `SortableHeader(${columnName})`;
+
+  return SortableHeader;
 };

@@ -16,7 +16,6 @@ import { useState } from "react";
 
 import festivalApiService from "@/api/festivalApiService";
 import { useFestival } from "@/context/FestivalContext";
-import { Progress } from "@/components/ui/progress";
 import SubmitButton from "../../../../common/buttons/SubmitButton";
 import { DynamicProgress } from "../../../../common/DynamicProgress";
 
@@ -62,8 +61,7 @@ export const FestivalUpdateDialog = () => {
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
         {updatedFields ? <FestivalDiffTable original={festival} updated={updatedFields} /> : <DynamicProgress />}
-
-        <DialogFooter>
+        <DialogFooter className="items-end">
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
