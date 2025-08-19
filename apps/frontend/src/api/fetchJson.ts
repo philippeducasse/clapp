@@ -4,7 +4,8 @@ import { toast } from "sonner";
 export const fetchJson = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
   const res = await fetch(url, options);
   if (!res.ok) {
-    toast.error(`Error: ${res.text()}`);
+    const text = await res.text();
+    toast.error(`Error: ${text}`);
     throw new Error(`Failed to fetch ${url}: ${res.status}`);
   }
   const json = await res.json();
