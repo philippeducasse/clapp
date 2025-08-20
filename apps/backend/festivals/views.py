@@ -42,13 +42,13 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
         query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
 
-        # search_results: ConversationResponse = self.mistral_client.search(query=query)
-        # parsed_results: str = extract_search_results(search_results)
-        # prompt: str = generate_enrich_prompt(festival, parsed_results)
+        search_results: ConversationResponse = self.mistral_client.search(query=query)
+        parsed_results: str = extract_search_results(search_results)
+        prompt: str = generate_enrich_prompt(festival, parsed_results)
 
-        search_results = self.gemini_client.search(query=query)
+        # search_results = self.gemini_client.search(query=query)
         print("SEARCH: ", search_results)
-        prompt: str = generate_enrich_prompt(festival, search_results)
+        # prompt: str = generate_enrich_prompt(festival, search_results)
 
         llm_response: str = self.mistral_client.chat(prompt=prompt)
 
