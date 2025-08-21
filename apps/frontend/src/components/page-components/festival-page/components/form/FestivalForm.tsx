@@ -4,19 +4,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "@/components/ui/form";
-import { useFestival } from "@/context/FestivalContext";
 import { useState } from "react";
 import { Festival } from "@/interfaces/Festival";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData, createFormComponents } from "@/helpers/formHelper";
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "@/components/common/buttons/SubmitButton";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import BackButton from "@/components/common/buttons/BackButton";
+import { useDispatch, useSelector } from "react-redux";
+import { updateFestival } from "@/redux/slices/festivalSlice";
+import { RootState } from "@/redux/store";
+import { selectFestivalById } from "@/redux/slices/festivalSlice";
 
 const FestivalForm = () => {
-  const { festival, setFestival } = useFestival();
+  const dispatch = useDispatch();
   const router = useRouter();
+  const params = useParams();
+  const festivalId = Number(params.id);
+  const festival = useSelector((state: RootState) => {
+    console.log(state);
+    return selectFestivalById(state, festivalId);
+  });
+
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
 
@@ -26,19 +36,25 @@ const FestivalForm = () => {
     setIsLoading(true);
     try {
       await festivalApiService.updateFestival(values as Festival);
-      setFestival(values as Festival);
+      dispatch(updateFestival(values as Festival));
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
-      router.push(`/festivals/${festival.id}`);
+      if (festival) {
+        router.push(`/festivals/${festival.id}`);
+      }
     }
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: sanitizeFormData(festival),
+    defaultValues: festival ? sanitizeFormData(festival) : {},
   });
+
+  if (!festival) {
+    return <div>Festival not found</div>;
+  }
 
   return (
     <Form {...form}>
