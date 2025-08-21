@@ -25,19 +25,19 @@ const FestivalDiffForm = ({ updatedFestival, changedFields }: FestivalDiffFormPr
     defaultValues: sanitizeFormData(updatedFestival),
   });
 
-  const fields = Object.keys(updatedFestival).filter((k) => k !== "id") as (keyof Festival)[];
+  const fields = Object.keys(updatedFestival) as (keyof Festival)[];
 
+  const onSubmit = (values: Festival) => {
+    console.log("VALS: ", values);
+    setFestival(values as Festival);
+    router.push(`/festivals/${updatedFestival.id}`);
+  };
   return (
-    <form
-      onSubmit={form.handleSubmit((values) => {
-        setFestival(values as Festival);
-        router.push(`/festivals/${updatedFestival.id}`);
-      })}
-    >
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <Table tableWidth={"w-full"}>
         <TableBody>
           {fields
-            .filter((f) => f !== "description")
+            .filter((f) => f !== "description" && f !== "id")
             .map((field) => (
               <TableRow key={String(field)}>
                 <TableCell className={`w-full ${changedFields.includes(field) ? "bg-green-50" : ""}`}>

@@ -41,10 +41,15 @@ export const FestivalUpdateDialog = () => {
   const handleSubmit = async () => {
     if (updatedFields) {
       setLoading(true);
-      await festivalApiService.updateFestival(updatedFields);
-      setOpen(false);
-      setLoading(false);
-      setFestival(updatedFields);
+      try {
+        await festivalApiService.updateFestival(updatedFields);
+        setFestival(updatedFields);
+        setOpen(false);
+      } catch (error) {
+        console.error(`Error: could not update festival: ${error}`);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 

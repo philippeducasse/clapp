@@ -5,11 +5,8 @@ import FestivalDiffForm from "@/components/page-components/festival-page/compone
 import { startCase } from "lodash";
 
 export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
-  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
-  const { id: _, ...originalWithoutId } = original;
-
-  const fields = Object.keys(originalWithoutId) as (keyof Festival)[];
-  const changedFields = fields.filter((field) => originalWithoutId[field] !== updated[field]);
+  const fields = Object.keys(original) as (keyof Festival)[];
+  const changedFields = fields.filter((field) => original[field] !== updated[field]);
   return (
     <div className="flex ">
       <Table className="table-fixed" tableWidth={"w-1/2"}>
@@ -21,9 +18,9 @@ export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
         </TableHeader>
         <TableBody>
           {fields
-            .filter((field) => field !== "description")
+            .filter((field) => field !== "description" && field !== "id")
             .map((field) => {
-              const originalVal = originalWithoutId[field] ?? "";
+              const originalVal = original[field] ?? "";
               const updatedVal = updated[field] ?? "";
               const changed = originalVal !== updatedVal;
               return (
@@ -37,10 +34,8 @@ export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
           {fields.includes("description") && (
             <TableRow key="description">
               <TableCell className="font-medium truncate">{startCase("description")}</TableCell>
-              <TableCell
-                className={`truncate ${originalWithoutId.description !== updated.description ? "bg-red-50" : ""}`}
-              >
-                {String(originalWithoutId.description ?? "")}
+              <TableCell className={`truncate ${original.description !== updated.description ? "bg-red-50" : ""}`}>
+                {String(original.description ?? "")}
               </TableCell>
             </TableRow>
           )}

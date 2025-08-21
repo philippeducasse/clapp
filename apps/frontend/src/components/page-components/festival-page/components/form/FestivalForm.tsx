@@ -23,7 +23,6 @@ const FestivalForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("VALS:", values);
     setIsLoading(true);
     try {
       await festivalApiService.updateFestival(values as Festival);
