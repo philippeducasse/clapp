@@ -1,24 +1,20 @@
 from datetime import datetime
 from typing import Any, Dict
 
-from mistralai import ConversationResponse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
-import os
 
 from services.gemini_service import GeminiClient
 from .helpers import (
     generate_application_mail_prompt,
-    extract_search_results,
     extract_fields_from_llm,
     clean_festival_data,
     generate_enrich_prompt,
 )
 from services.mistral_service import MistralClient
-from dotenv import load_dotenv
 from django.http import HttpRequest
 from django.core.mail import EmailMessage
 
@@ -41,14 +37,13 @@ class FestivalViewSet(viewsets.ModelViewSet):
         festival: Festival = self.get_object()
 
         query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
+        
+        # search_results: ConversationResponse = self.mistral_client.search(query=query)
+        # parsed_results: str = extract_search_results(search_results)
+        # prompt: str = generate_enrich_prompt(festival, parsed_results)
 
-        search_results: ConversationResponse = self.mistral_client.search(query=query)
-        parsed_results: str = extract_search_results(search_results)
-        prompt: str = generate_enrich_prompt(festival, parsed_results)
-
-        # search_results = self.gemini_client.search(query=query)
-        print("SEARCH: ", search_results)
-        # prompt: str = generate_enrich_prompt(festival, search_results)
+        search_results = self.gemini_client.search(query=query)
+        prompt: str = generate_enrich_prompt(festival, search_results)
 
         llm_response: str = self.mistral_client.chat(prompt=prompt)
 
@@ -71,8 +66,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
         # Email content
         subject: str = f"Philippe Ducasse Application for {festival_name}"
-        load_dotenv(".env")
-        model: str = os.getenv("MISTRAL_DEFAULT_MODEL")
         prompt: str = generate_application_mail_prompt(festival)
         message: str = self.mistral_client.chat(prompt=prompt)
 

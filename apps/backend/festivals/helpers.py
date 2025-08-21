@@ -1,27 +1,11 @@
 from typing import Dict, Any, Optional
 from festivals.models import Festival
 import json
-from datetime import datetime
 import re
 from mistralai import ConversationResponse, TextChunk
 
 
 def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
-    output_fields = [
-        "country",
-        "town",
-        "approximate_date",
-        "start_date",
-        "end_date",
-        "website_url",
-        "festival_type",
-        "description",
-        "contact_person",
-        "contact_email",
-        "application_date_start",
-        "application_date_end",
-        "application_type",
-    ]
 
     festival_types = Festival.FESTIVAL_TYPES
     application_types = Festival.APPLICATION_TYPE
@@ -55,7 +39,6 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     SOURCES & CONFLICTS
     - Prefer official festival website > reputable cultural listings > news > blogs.
     - If sources conflict, pick the **most recent official source**.
-    - Include a "sources" object mapping each field you updated to the URL you used (empty string if unchanged).
 
     OUTPUT FORMAT
     - Return **only** a single JSON object, no prose.
@@ -92,6 +75,7 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     - If the range spans two months, combine, e.g., "late June–early July".
 
     RECOGNITION HINTS
+    festival_type (choose one: from {fest_types_str} )
     application_type  (choose one: EMAIL, FORM, INVITATION_ONLY, UNKNOWN, OTHER)
 
     Decision order (apply the first rule that matches; do not skip ahead):
@@ -135,8 +119,7 @@ def extract_search_results(search_results: ConversationResponse):
     content = next(
         (o for o in search_results.outputs if o.type == "message.output"), None
     )
-
-    print("content", content)
+    # print("content", content)
 
     chunks = getattr(content, "content", [])
 
@@ -148,61 +131,17 @@ def extract_search_results(search_results: ConversationResponse):
 
 
 def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
-    # Use regular expression to remove Markdown code block formatting
     json_str: str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
-
     try:
         # Parse the JSON response from the Mistral API
         response_data: Dict[str, Any] = json.loads(json_str)
-
-        # Extract the fields from the response
-        updated_fields: Dict[str, Any] = {}
-
-        def convert_date(date_str: str) -> Optional[str]:
-            try:
-                date_obj: datetime = datetime.strptime(date_str, "%B %d, %Y")
-                return date_obj.strftime("%Y-%m-%d")
-            except ValueError:
-                return None
-
-        # Check each field that might be returned by the API
-        if "festival_name" in response_data:
-            updated_fields["festival_name"] = response_data["festival_name"]
-        if "town" in response_data:
-            updated_fields["town"] = response_data["town"]
-        if "country" in response_data:
-            updated_fields["country"] = response_data["country"]
-        if "approximate_date" in response_data:
-            updated_fields["approximate_date"] = response_data["approximate_date"]
-        if "start_date" in response_data:
-            converted_date: Optional[str] = convert_date(response_data["start_date"])
-            if converted_date:
-                updated_fields["start_date"] = converted_date
-        if "end_date" in response_data:
-            converted_date: Optional[str] = convert_date(response_data["end_date"])
-            if converted_date:
-                updated_fields["end_date"] = converted_date
-        if "website_url" in response_data:
-            updated_fields["website_url"] = response_data["website_url"]
-        if "type" in response_data:
-            updated_fields["type"] = response_data["type"]
-        if "description" in response_data:
-            updated_fields["description"] = response_data["description"]
-        if "contact_person" in response_data:
-            updated_fields["contact_person"] = response_data["contact_person"]
-        if "contact_email" in response_data:
-            updated_fields["contact_email"] = response_data["contact_email"]
-
-        print("Updated fields:", updated_fields)
-        return updated_fields
+        return response_data
 
     except json.JSONDecodeError as e:
-        # Handle JSON parsing errors
         print(f"An error occurred while parsing the JSON response: {e}")
         return {}
 
     except Exception as e:
-        # Handle any other errors
         print(f"An error occurred: {e}")
         return {}
 
@@ -211,6 +150,7 @@ def clean_festival_data(festival: Festival) -> None:
     # Capitalize name
     def clean_nan(value: str) -> str:
         return "" if str(value).strip().lower() == "nan" else str(value).strip()
+
 
     if festival.festival_name:
         festival.festival_name = festival.festival_name.title()
@@ -227,6 +167,9 @@ def clean_festival_data(festival: Festival) -> None:
     if festival.contact_email:
         festival.contact_email = clean_nan(festival.contact_email.strip().lower())
 
+    if festival.comments:
+        festival.comments = clean_nan(festival.comments.strip().lower())
+
     if festival.website_url:
         url: str = festival.website_url.strip()
         if not url.startswith("http"):
@@ -239,7 +182,7 @@ def clean_festival_data(festival: Festival) -> None:
             desc += "."
         festival.description = desc
 
-    # Optionally normalize dates here (if needed)
+
 
 
 def generate_application_mail_prompt(festival: Festival) -> str:
