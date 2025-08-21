@@ -13,32 +13,35 @@ export const createFormComponents = (
   form: UseFormReturn<Record<string, unknown>>,
   showLabels: boolean = true
 ) => {
-  return formFields.map((formField) => (
-    <FormField
-      key={formField.fieldName}
-      control={form.control}
-      name={formField.fieldName}
-      render={({ field }) => (
-        <FormItem>
-          {showLabels && <FormLabel>{formField.label}</FormLabel>}
-          <FormControl>
-            {(() => {
-              switch (formField.type) {
-                case ControlledFormElementType.SELECT:
-                  return formField.options ? <ControlledSelect field={field} options={formField.options} /> : null;
-                case ControlledFormElementType.BOOLEAN:
-                  return <ControlledBoolean field={field} />;
-                default:
-                  return <ControlledText field={field} type={formField.type} />;
-              }
-            })()}
-          </FormControl>
-          {formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  ));
+  return formFields.map((formField) => {
+    if (formField.hidden) return null;
+    return (
+      <FormField
+        key={formField.fieldName}
+        control={form.control}
+        name={formField.fieldName}
+        render={({ field }) => (
+          <FormItem>
+            {showLabels && <FormLabel>{formField.label}</FormLabel>}
+            <FormControl>
+              {(() => {
+                switch (formField.type) {
+                  case ControlledFormElementType.SELECT:
+                    return formField.options ? <ControlledSelect field={field} options={formField.options} /> : null;
+                  case ControlledFormElementType.BOOLEAN:
+                    return <ControlledBoolean field={field} />;
+                  default:
+                    return <ControlledText field={field} type={formField.type} />;
+                }
+              })()}
+            </FormControl>
+            {formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  });
 };
 
 export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {

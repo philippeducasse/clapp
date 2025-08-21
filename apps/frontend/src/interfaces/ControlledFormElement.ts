@@ -14,4 +14,5 @@ export interface ControlledFormElement {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  hidden?: boolean;
 }
