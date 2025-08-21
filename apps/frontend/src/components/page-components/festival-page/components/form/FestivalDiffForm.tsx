@@ -7,7 +7,6 @@ import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
 import { Festival } from "@/interfaces/Festival";
 import { Form } from "@/components/ui/form";
-import { Table, TableBody } from "@/components/ui/table";
 import { createFormComponents } from "@/helpers/formHelper";
 import { isEqual } from "lodash";
 
@@ -36,11 +35,7 @@ const FestivalDiffForm = ({ updatedFestival, setUpdated }: FestivalDiffFormProps
 
   return (
     <Form {...form}>
-      <div className="w-full">
-        <Table>
-          <TableBody className="gap-2">{createFormComponents(formFields, form, false)}</TableBody>
-        </Table>
-      </div>
+      {createFormComponents(formFields, form, false)}
     </Form>
   );
 };

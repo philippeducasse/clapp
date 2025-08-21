@@ -11,7 +11,7 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
     .filter((field) => original[field as keyof Festival] !== updated[field as keyof Festival]);
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex">
       <div className="w-1/2">
         <Table className="table-fixed">
           <TableHeader>
@@ -39,10 +39,16 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
         </Table>
       </div>
       <div className="w-1/2">
-        <p className="pt-2 text-base font-normal hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]">
-          Updated
-        </p>
-        <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} setUpdated={setUpdated} />
+        <Table className="">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-full">Updated</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} setUpdated={setUpdated} />
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

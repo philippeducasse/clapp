@@ -8,6 +8,7 @@ import ControlledText from "@/components/common/controlled-form-fields/Controlle
 import { capitalize } from "lodash";
 import ControlledBoolean from "@/components/common/controlled-form-fields/ControlledBoolean";
 import ControlledTextArea from "@/components/common/controlled-form-fields/ControlledTextArea";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
@@ -17,32 +18,37 @@ export const createFormComponents = (
   return formFields.map((formField) => {
     if (formField.hidden) return null;
     return (
-      <FormField
-        key={formField.fieldName}
-        control={form.control}
-        name={formField.fieldName}
-        render={({ field }) => (
-          <FormItem>
-            {showLabels && <FormLabel>{formField.label}</FormLabel>}
-            <FormControl>
-              {(() => {
-                switch (formField.type) {
-                  case ControlledFormElementType.SELECT:
-                    return formField.options ? <ControlledSelect field={field} options={formField.options} /> : null;
-                  case ControlledFormElementType.BOOLEAN:
-                    return <ControlledBoolean field={field} />;
-                  case ControlledFormElementType.TEXT_AREA:
-                    return <ControlledTextArea field={field} />;
-                  default:
-                    return <ControlledText field={field} type={formField.type} />;
-                }
-              })()}
-            </FormControl>
-            {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <TableRow key={formField.fieldName}>
+        <TableCell>
+          <FormField
+            control={form.control}
+            name={formField.fieldName}
+            render={({ field }) => (
+              <FormItem>
+                {showLabels && <FormLabel>{formField.label}</FormLabel>}
+                <FormControl>
+                  {(() => {
+                    switch (formField.type) {
+                      case ControlledFormElementType.SELECT:
+                        return formField.options ? (
+                          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
+                        ) : null;
+                      case ControlledFormElementType.BOOLEAN:
+                        return <ControlledBoolean field={field} showLabels={showLabels} />;
+                      case ControlledFormElementType.TEXT_AREA:
+                        return <ControlledTextArea field={field} showLabels={showLabels} />;
+                      default:
+                        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
+                    }
+                  })()}
+                </FormControl>
+                {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </TableCell>
+      </TableRow>
     );
   });
 };
