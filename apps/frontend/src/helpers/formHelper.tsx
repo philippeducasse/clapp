@@ -7,6 +7,7 @@ import ControlledSelect from "@/components/common/controlled-form-fields/Control
 import ControlledText from "@/components/common/controlled-form-fields/ControlledText";
 import { capitalize } from "lodash";
 import ControlledBoolean from "@/components/common/controlled-form-fields/ControlledBoolean";
+import ControlledTextArea from "@/components/common/controlled-form-fields/ControlledTextArea";
 
 export const createFormComponents = (
   formFields: ControlledFormElement[],
@@ -30,12 +31,14 @@ export const createFormComponents = (
                     return formField.options ? <ControlledSelect field={field} options={formField.options} /> : null;
                   case ControlledFormElementType.BOOLEAN:
                     return <ControlledBoolean field={field} />;
+                  case ControlledFormElementType.TEXT_AREA:
+                    return <ControlledTextArea field={field} />;
                   default:
                     return <ControlledText field={field} type={formField.type} />;
                 }
               })()}
             </FormControl>
-            {formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+            {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
             <FormMessage />
           </FormItem>
         )}
@@ -73,6 +76,8 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
         break;
 
       case ControlledFormElementType.SELECT:
+      case ControlledFormElementType.TEXT:
+      case ControlledFormElementType.TEXT_AREA:
         zodType = z.string();
         break;
 
@@ -86,10 +91,6 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
 
       case ControlledFormElementType.DATE:
         zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
-        break;
-
-      case ControlledFormElementType.TEXT:
-        zodType = z.string();
         break;
 
       case ControlledFormElementType.URL:

@@ -7,4 +7,5 @@ export enum ControlledFormElementType {
   URL = "URL",
   EMAIL = "EMAIL",
   BOOLEAN = "BOOLEAN",
+  TEXT_AREA = "TEXT_AREA",
 }

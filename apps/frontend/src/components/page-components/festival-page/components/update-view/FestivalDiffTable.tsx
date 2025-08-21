@@ -2,50 +2,47 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Festival } from "@/interfaces/Festival";
 import { DiffViewProps } from "@/interfaces/DiffViewProps";
 import FestivalDiffForm from "@/components/page-components/festival-page/components/form/FestivalDiffForm";
-import { startCase } from "lodash";
+import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 
-export const FestivalDiffTable = ({ original, updated }: DiffViewProps) => {
-  const fields = Object.keys(original) as (keyof Festival)[];
-  const changedFields = fields.filter((field) => original[field] !== updated[field]);
+export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewProps) => {
+  const formFields = getFestivalFormFields();
+  const changedFields = formFields
+    .map((f) => f.fieldName)
+    .filter((field) => original[field as keyof Festival] !== updated[field as keyof Festival]);
+
   return (
-    <div className="flex ">
-      <Table className="table-fixed" tableWidth={"w-1/2"}>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-1/2">Field</TableHead>
-            <TableHead className="w-1/2">Original</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {fields
-            .filter((field) => field !== "description" && field !== "id")
-            .map((field) => {
-              const originalVal = original[field] ?? "";
-              const updatedVal = updated[field] ?? "";
-              const changed = originalVal !== updatedVal;
-              return (
-                <TableRow key={String(field)}>
-                  <TableCell className="font-medium truncate">{startCase(String(field))}</TableCell>
-                  <TableCell className={`truncate ${changed ? "bg-red-50" : ""}`}>{String(originalVal)}</TableCell>
-                </TableRow>
-              );
-            })}
-
-          {fields.includes("description") && (
-            <TableRow key="description">
-              <TableCell className="font-medium truncate">{startCase("description")}</TableCell>
-              <TableCell className={`truncate ${original.description !== updated.description ? "bg-red-50" : ""}`}>
-                {String(original.description ?? "")}
-              </TableCell>
+    <div className="flex space-x-4">
+      <div className="w-1/2">
+        <Table className="table-fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-1/3">Field</TableHead>
+              <TableHead className="w-2/3">Original</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-      <div className="w-full">
+          </TableHeader>
+          <TableBody>
+            {formFields
+              .filter((f) => !f.hidden)
+              .map((field) => {
+                const fieldName = field.fieldName as keyof Festival;
+                const originalVal = original[fieldName] ?? "";
+                const hasChanged = changedFields.includes(fieldName as string);
+
+                return (
+                  <TableRow key={fieldName}>
+                    <TableCell className="font-medium truncate">{field.label}</TableCell>
+                    <TableCell className={`truncate ${hasChanged ? "bg-red-50" : ""}`}>{String(originalVal)}</TableCell>
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="w-1/2">
         <p className="pt-2 text-base font-normal hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]">
           Updated
         </p>
-        <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} />
+        <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} setUpdated={setUpdated} />
       </div>
     </div>
   );

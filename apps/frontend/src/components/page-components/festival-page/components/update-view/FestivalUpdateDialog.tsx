@@ -65,7 +65,11 @@ export const FestivalUpdateDialog = () => {
           <DialogTitle>Update Festival</DialogTitle>
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
-        {updatedFields ? <FestivalDiffTable original={festival} updated={updatedFields} /> : <DynamicProgress />}
+        {updatedFields ? (
+          <FestivalDiffTable original={festival} updated={updatedFields} setUpdated={setUpdatedFields} />
+        ) : (
+          <DynamicProgress />
+        )}
         <DialogFooter className="items-end">
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
