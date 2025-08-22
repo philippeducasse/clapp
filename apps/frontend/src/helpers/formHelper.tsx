@@ -1,56 +1,32 @@
 import { ControlledFormElement, SelectOptions } from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { UseFormReturn } from "react-hook-form";
-import ControlledSelect from "@/components/common/controlled-form-fields/ControlledSelect";
-import ControlledText from "@/components/common/controlled-form-fields/ControlledText";
 import { capitalize } from "lodash";
 import ControlledBoolean from "@/components/common/controlled-form-fields/ControlledBoolean";
+import ControlledSelect from "@/components/common/controlled-form-fields/ControlledSelect";
+import ControlledText from "@/components/common/controlled-form-fields/ControlledText";
 import ControlledTextArea from "@/components/common/controlled-form-fields/ControlledTextArea";
-import { TableCell, TableRow } from "@/components/ui/table";
+import { ControllerRenderProps } from "react-hook-form";
 
-export const createFormComponents = (
-  formFields: ControlledFormElement[],
-  form: UseFormReturn<Record<string, unknown>>,
-  showLabels: boolean = true
+export const getFestivalControlledInputs = (
+  formField: ControlledFormElement,
+  field: ControllerRenderProps,
+  showLabels: boolean
 ) => {
-  return formFields.map((formField) => {
-    if (formField.hidden) return null;
-    return (
-      <TableRow key={formField.fieldName}>
-        <TableCell>
-          <FormField
-            control={form.control}
-            name={formField.fieldName}
-            render={({ field }) => (
-              <FormItem>
-                {showLabels && <FormLabel>{formField.label}</FormLabel>}
-                <FormControl>
-                  {(() => {
-                    switch (formField.type) {
-                      case ControlledFormElementType.SELECT:
-                        return formField.options ? (
-                          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
-                        ) : null;
-                      case ControlledFormElementType.BOOLEAN:
-                        return <ControlledBoolean field={field} showLabels={showLabels} />;
-                      case ControlledFormElementType.TEXT_AREA:
-                        return <ControlledTextArea field={field} showLabels={showLabels} />;
-                      default:
-                        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
-                    }
-                  })()}
-                </FormControl>
-                {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </TableCell>
-      </TableRow>
-    );
-  });
+  {
+    switch (formField.type) {
+      case ControlledFormElementType.SELECT:
+        return formField.options ? (
+          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
+        ) : null;
+      case ControlledFormElementType.BOOLEAN:
+        return <ControlledBoolean field={field} showLabels={showLabels} />;
+      case ControlledFormElementType.TEXT_AREA:
+        return <ControlledTextArea field={field} showLabels={showLabels} />;
+      default:
+        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
+    }
+  }
 };
 
 export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {
