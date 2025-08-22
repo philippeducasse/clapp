@@ -62,11 +62,10 @@ const festivalSlice = createSlice({
   },
 });
 
-export const { setFestivals, addFestival, updateFestival } = festivalSlice.actions;
+export const { setFestivals, setFestival, addFestival, updateFestival } = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
 export const selectFestivalsStatus = (state: RootState) => state.festivals.status;
-export const setFestival = (state: RootState) => state.festivals.festivals;
 export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival) => festival.id === festivalId);
 

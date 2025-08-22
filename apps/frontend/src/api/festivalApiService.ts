@@ -9,7 +9,7 @@ const festivalApiService = {
   },
 
   async getFestival(id: number): Promise<Festival> {
-    return fetchJson<Festival>(`${endpoint}${id}`);
+    return fetchJson<Festival>(`${endpoint}${id}/`);
   },
 
   async enrichFestival(festival: Festival): Promise<Festival> {

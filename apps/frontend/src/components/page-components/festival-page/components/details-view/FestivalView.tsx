@@ -13,7 +13,6 @@ import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import festivalApiService from "@/api/festivalApiService";
-import { Festival } from "@/interfaces/Festival";
 
 const FestivalView = () => {
   const params = useParams();
@@ -23,13 +22,8 @@ const FestivalView = () => {
 
   useEffect(() => {
     const fetchFestival = async () => {
-      try {
-        console.log("id:", festivalId);
-        const festival = await festivalApiService.getFestival(festivalId);
-        dispatch(setFestival(festival as Festival));
-      } catch (error) {
-        console.error("Failed to fetch festival:", error);
-      }
+      const festival = await festivalApiService.getFestival(festivalId);
+      dispatch(setFestival(festival));
     };
     if (!festival) {
       fetchFestival();
