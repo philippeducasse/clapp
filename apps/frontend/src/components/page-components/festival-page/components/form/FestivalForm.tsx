@@ -52,7 +52,7 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
     if (festivalId) {
       refreshFestival(festivalId, festival, dispatch);
     }
-  }, [festivalId, dispatch]);
+  }, [festival, festivalId, dispatch]);
 
   // Reset form when festival data is loaded or updated
   useEffect(() => {
