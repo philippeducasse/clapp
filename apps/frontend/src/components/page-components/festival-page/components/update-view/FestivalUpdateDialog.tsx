@@ -15,22 +15,30 @@ import { Festival } from "@/interfaces/Festival";
 import { useState } from "react";
 
 import festivalApiService from "@/api/festivalApiService";
-import { useFestival } from "@/context/FestivalContext";
 import SubmitButton from "../../../../common/buttons/SubmitButton";
 import { DynamicProgress } from "../../../../common/DynamicProgress";
+import { useDispatch, useSelector } from "react-redux";
+import { selectFestivalById, updateFestival } from "@/redux/slices/festivalSlice";
+import { useParams } from "next/navigation";
+import { RootState } from "@/redux/store";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updatedFields, setUpdatedFields] = useState<Festival | undefined>();
 
-  const { festival, setFestival } = useFestival();
+  const dispatch = useDispatch();
+  const params = useParams();
+  const festivalId = Number(params.id);
+  const festival = useSelector((state: RootState) => selectFestivalById(state, festivalId));
 
   const handleUpdate = async () => {
     setLoading(true);
     try {
-      const response = await festivalApiService.enrichFestival(festival);
-      setUpdatedFields(response);
+      if (festival) {
+        const response = await festivalApiService.enrichFestival(festival);
+        setUpdatedFields(response);
+      }
     } catch (error) {
       console.error(`Error: could not update festival: ${error}`);
     } finally {
@@ -43,7 +51,7 @@ export const FestivalUpdateDialog = () => {
       setLoading(true);
       try {
         await festivalApiService.updateFestival(updatedFields);
-        setFestival(updatedFields);
+        dispatch(updateFestival(updatedFields));
         setOpen(false);
       } catch (error) {
         console.error(`Error: could not update festival: ${error}`);
@@ -52,6 +60,10 @@ export const FestivalUpdateDialog = () => {
       }
     }
   };
+
+  if (!festival) {
+    return null; // Or a loading indicator, or error message
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

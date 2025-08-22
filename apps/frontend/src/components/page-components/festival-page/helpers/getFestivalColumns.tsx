@@ -11,7 +11,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
   return [
     {
       accessorKey: "festivalName",
-      header: getSortableHeader("name"),
+      header: getSortableHeader("Name"),
       cell: ({ row }) => {
         const festival = row.original;
         return (

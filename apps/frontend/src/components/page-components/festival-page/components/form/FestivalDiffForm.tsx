@@ -1,27 +1,35 @@
 "use client";
+
 import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
-import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
-import { Festival } from "@/interfaces/Festival";
-import { Form } from "@/components/ui/form";
-import { createFormComponents } from "@/helpers/formHelper";
 import { isEqual } from "lodash";
+import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
+import { createZodFormSchema, sanitizeFormData, getFestivalControlledInputs } from "@/helpers/formHelper";
+import { Festival } from "@/interfaces/Festival";
+import { Form, FormField, FormItem, FormMessage, FormControl, FormDescription } from "@/components/ui/form";
+import { TableCell, TableRow } from "@/components/ui/table";
 
 interface FestivalDiffFormProps {
   updatedFestival: Festival;
-  changedFields: (keyof Festival)[];
+  changedFields?: (keyof Festival)[];
   setUpdated: Dispatch<SetStateAction<Festival | undefined>>;
+  showLabels: boolean;
 }
 
-const FestivalDiffForm = ({ updatedFestival, setUpdated }: FestivalDiffFormProps) => {
+const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
+  updatedFestival,
+  changedFields = [],
+  setUpdated,
+  showLabels,
+}) => {
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: sanitizeFormData(updatedFestival),
+    defaultValues: sanitizeFormData(updatedFestival) as z.infer<typeof formSchema>,
   });
 
   const watchedValues = form.watch();
@@ -35,7 +43,29 @@ const FestivalDiffForm = ({ updatedFestival, setUpdated }: FestivalDiffFormProps
 
   return (
     <Form {...form}>
-      {createFormComponents(formFields, form, false)}
+      {formFields
+        .filter((ff) => !ff.hidden)
+        .map((formField) => {
+          const isChanged = changedFields.includes(formField.fieldName as keyof Festival);
+
+          return (
+            <TableRow key={formField.fieldName} className={isChanged ? "bg-green-50" : undefined}>
+              <TableCell className="align-top w-full">
+                <FormField
+                  control={form.control}
+                  name={formField.fieldName as string}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>{getFestivalControlledInputs(formField, field, showLabels)}</FormControl>
+                      {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TableCell>
+            </TableRow>
+          );
+        })}
     </Form>
   );
 };

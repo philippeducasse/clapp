@@ -5,7 +5,7 @@ const FestivalsPage = async () => {
   const data = await festivalApiService.getAllFestivals();
   return (
     <div className="container mx-auto py-10">
-      <FestivalTable data={data} />
+      <FestivalTable festivals={data} />
     </div>
   );
 };
