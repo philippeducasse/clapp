@@ -27,6 +27,14 @@ const festivalSlice = createSlice({
     setFestivals(state, action: PayloadAction<Festival[]>) {
       state.festivals = action.payload;
     },
+    setFestival(state, action: PayloadAction<Festival>) {
+      const existingIndex = state.festivals.findIndex((festival) => festival.id === action.payload.id);
+      if (existingIndex >= 0) {
+        state.festivals[existingIndex] = action.payload;
+      } else {
+        state.festivals.push(action.payload);
+      }
+    },
     addFestival(state, action: PayloadAction<Festival>) {
       state.festivals.push(action.payload);
     },
@@ -58,8 +66,8 @@ export const { setFestivals, addFestival, updateFestival } = festivalSlice.actio
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
 export const selectFestivalsStatus = (state: RootState) => state.festivals.status;
-
-export const selectFestivalById = (state: RootState, festivalId: number) =>
+export const setFestival = (state: RootState) => state.festivals.festivals;
+export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival) => festival.id === festivalId);
 
 export default festivalSlice.reducer;

@@ -8,7 +8,7 @@ const festivalApiService = {
     return fetchJson<Festival[]>(endpoint);
   },
 
-  async getFestival(id: string): Promise<Festival> {
+  async getFestival(id: number): Promise<Festival> {
     return fetchJson<Festival>(`${endpoint}${id}`);
   },
 

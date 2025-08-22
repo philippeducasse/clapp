@@ -18,7 +18,7 @@ import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "../../../../common/buttons/SubmitButton";
 import { DynamicProgress } from "../../../../common/DynamicProgress";
 import { useDispatch, useSelector } from "react-redux";
-import { selectFestivalById, updateFestival } from "@/redux/slices/festivalSlice";
+import { selectFestival, updateFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 
@@ -30,7 +30,7 @@ export const FestivalUpdateDialog = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestivalById(state, festivalId));
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
 
   const handleUpdate = async () => {
     setLoading(true);

@@ -13,7 +13,7 @@ import SubmitButton from "@/components/common/buttons/SubmitButton";
 import BackButton from "@/components/common/buttons/BackButton";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { updateFestival, selectFestivalById } from "@/redux/slices/festivalSlice";
+import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
 import { RootState } from "@/redux/store";
 
 interface FestivalFormProps {
@@ -27,7 +27,7 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
   const params = useParams();
   const festivalId = Number(params?.id);
 
-  const festival = useSelector((state: RootState) => selectFestivalById(state, festivalId));
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
 
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
