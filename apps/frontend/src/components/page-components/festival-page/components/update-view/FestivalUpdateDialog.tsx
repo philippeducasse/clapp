@@ -35,7 +35,7 @@ export const FestivalUpdateDialog = () => {
   const handleUpdate = async () => {
     setLoading(true);
     try {
-      if (festival) {
+      if (festival && !updatedFields) {
         const response = await festivalApiService.enrichFestival(festival);
         setUpdatedFields(response);
       }
@@ -77,7 +77,7 @@ export const FestivalUpdateDialog = () => {
           <DialogTitle>Update Festival</DialogTitle>
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
-        {updatedFields ? (
+        {updatedFields && !loading ? (
           <FestivalDiffTable original={festival} updated={updatedFields} setUpdated={setUpdatedFields} />
         ) : (
           <DynamicProgress />
