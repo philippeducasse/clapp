@@ -9,11 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { FestivalDiffTable } from "./FestivalDiffTable";
 import { Festival } from "@/interfaces/Festival";
 import { useState } from "react";
-
+import { Hammer } from "lucide-react";
 import festivalApiService from "@/api/festivalApiService";
 import SubmitButton from "../../../../common/buttons/SubmitButton";
 import { DynamicProgress } from "../../../../common/DynamicProgress";
@@ -62,13 +61,14 @@ export const FestivalUpdateDialog = () => {
   };
 
   if (!festival) {
-    return null; // Or a loading indicator, or error message
+    return null;
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" size="lg" onClick={handleUpdate}>
+        <Button variant="outline" className="" onClick={handleUpdate}>
+          <Hammer />
           Update
         </Button>
       </DialogTrigger>

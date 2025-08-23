@@ -16,12 +16,15 @@ import festivalApiService from "@/api/festivalApiService";
 import { getBasicFestivalInfo } from "../../helpers/getBasicFestivalInfo";
 import { getFestivalDetails } from "../../helpers/getFestivalDetails";
 import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const FestivalView = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const festivalId = Number(params.id);
   const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const router = useRouter();
 
   useEffect(() => {
     const fetchFestival = async () => {
@@ -37,11 +40,15 @@ const FestivalView = () => {
     return <div>Festival not found.</div>;
   }
 
+  const goToApplication = () => {
+    router.push("/applications");
+  };
+
   return (
     <div className="flex flex-col max-w-6xl mx-auto">
       <div className="flex justify-between my-6">
         <div className="flex items-center gap-3">
-          <Speaker color="highlight" size={32} />
+          <Speaker className="text-emerald-600" size={32} />
           <div className="flex gap-2">
             <CardTitle className="max-w-prose">{festival.festivalName}</CardTitle>
             {festival.town && <CardDescription>{festival.town}, </CardDescription>}
@@ -49,11 +56,8 @@ const FestivalView = () => {
           </div>
         </div>
         <div className="flex gap-6 self-end mx-8 items-stretch">
-          <Button
-            size="lg"
-            className="bg-primary"
-            // onClick={goToApplication}
-          >
+          <Button className="bg-emerald-700 hover:bg-emerald-600" onClick={goToApplication}>
+            <Send />
             {festival.applied ? "Go to application" : "Apply to festival"}
           </Button>
           <FestivalUpdateDialog />
@@ -62,13 +66,13 @@ const FestivalView = () => {
       </div>
       <Card className="mb-6 relative">
         <CardContent className="grid-cols-2">
-          <CardDescription className="text-lg font-semibold mb-6 text-black">Basic info</CardDescription>
+          <CardDescription className="text-lg font-semibold mb-3 text-black">Basic info</CardDescription>
           <DetailsView data={getBasicFestivalInfo(festival)} />
         </CardContent>
       </Card>
       <Card className="relative">
         <CardContent className="grid-cols-2">
-          <CardDescription className="text-lg font-semibold mb-6 text-black">Festival details</CardDescription>
+          <CardDescription className="text-lg font-semibold mb-3 text-black">Festival details</CardDescription>
           <DetailsView data={getFestivalDetails(festival)} />
         </CardContent>
       </Card>
