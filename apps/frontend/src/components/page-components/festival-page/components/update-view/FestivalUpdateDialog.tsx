@@ -68,7 +68,7 @@ export const FestivalUpdateDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" onClick={handleUpdate}>
+        <Button variant="default" size="lg" onClick={handleUpdate}>
           Update
         </Button>
       </DialogTrigger>

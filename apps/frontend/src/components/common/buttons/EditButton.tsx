@@ -15,7 +15,7 @@ const EditButton = ({ label, href }: EditButtonProps) => {
   };
 
   return (
-    <Button size="sm" className="bg-slate-600" onClick={handleClick}>
+    <Button size="lg" className="bg-slate-600 self-stretch" onClick={handleClick}>
       {label ?? "Edit"}
     </Button>
   );

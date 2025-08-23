@@ -15,6 +15,7 @@ import { useDispatch } from "react-redux";
 import festivalApiService from "@/api/festivalApiService";
 import { getBasicFestivalInfo } from "../../helpers/getBasicFestivalInfo";
 import { getFestivalDetails } from "../../helpers/getFestivalDetails";
+import { Button } from "@/components/ui/button";
 
 const FestivalView = () => {
   const params = useParams();
@@ -47,7 +48,14 @@ const FestivalView = () => {
             <CardDescription>{festival.country}</CardDescription>
           </div>
         </div>
-        <div className="flex gap-6 self-end mx-8 items-center">
+        <div className="flex gap-6 self-end mx-8 items-stretch">
+          <Button
+            size="lg"
+            className="bg-primary"
+            // onClick={goToApplication}
+          >
+            {festival.applied ? "Go to application" : "Apply to festival"}
+          </Button>
           <FestivalUpdateDialog />
           <EditButton href={`/festivals/${festival.id}/edit`} />
         </div>
