@@ -77,7 +77,7 @@ export const FestivalUpdateDialog = () => {
           <DialogTitle>Update Festival</DialogTitle>
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
-        {updatedFields && !loading ? (
+        {updatedFields ? (
           <FestivalDiffTable original={festival} updated={updatedFields} setUpdated={setUpdatedFields} />
         ) : (
           <DynamicProgress />

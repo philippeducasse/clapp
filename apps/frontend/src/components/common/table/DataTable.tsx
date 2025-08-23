@@ -10,8 +10,16 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
@@ -42,10 +50,32 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
       globalFilter,
       pagination,
     },
-    // manualPagination: true,
-    // rowCount: 20,
-    // pageCount: -1,
   });
+
+  // Calculate the current page number (1-based)
+  const currentPage = pagination.pageIndex + 1;
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
+
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5; // Max number of page links to show
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust if we're at the end of the range
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
 
   return (
     <div>
@@ -95,14 +125,64 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-          Previous
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-          Next
-        </Button>
-      </div>
+      <Pagination className="justify-between mt-8">
+        <div className="">
+          Page {currentPage} of {totalPages} | Total Festivals: {table.getFilteredRowModel().rows.length}
+        </div>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious onClick={() => table.previousPage()} />
+          </PaginationItem>
+
+          {/* Show first page with ellipsis if needed */}
+          {currentPage > 3 && (
+            <>
+              <PaginationItem>
+                <PaginationLink onClick={() => table.setPageIndex(0)} isActive={currentPage === 1}>
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              {currentPage > 4 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+            </>
+          )}
+
+          {/* Show page numbers */}
+          {getPageNumbers().map((pageNumber) => (
+            <PaginationItem key={pageNumber}>
+              <PaginationLink onClick={() => table.setPageIndex(pageNumber - 1)} isActive={currentPage === pageNumber}>
+                {pageNumber}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          {/* Show last page with ellipsis if needed */}
+          {currentPage < totalPages - 2 && (
+            <>
+              {currentPage < totalPages - 3 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationLink
+                  onClick={() => table.setPageIndex(totalPages - 1)}
+                  isActive={currentPage === totalPages}
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            </>
+          )}
+
+          <PaginationItem>
+            <PaginationNext onClick={() => table.nextPage()} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }

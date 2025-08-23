@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { Festival } from "@/interfaces/Festival";
 import { getFestivalColumns } from "../../helpers/getFestivalColumns";
-import { DataTable } from "@/components/ui/data-table";
+import { DataTable } from "@/components/common/table/DataTable";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setFestivals } from "@/redux/slices/festivalSlice";

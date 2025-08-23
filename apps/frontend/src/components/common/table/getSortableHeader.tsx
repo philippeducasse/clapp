@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export const getSortableHeader = <T,>(columnName: string) => {
   const SortableHeader = ({ column }: HeaderContext<T, unknown>) => {
     return (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+      <Button className="-ml-3" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         {columnName}
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
