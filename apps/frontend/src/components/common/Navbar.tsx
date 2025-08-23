@@ -7,16 +7,17 @@ import {
 } from "@/components/ui/navigation-menu";
 // import { DarkModeToggle } from "../ui/dark-mode-toggle";
 import { SidebarTrigger } from "../ui/sidebar";
-// import Breadcrumbs from "./Breadcrumbs";
+import Breadcrumbs from "./Breadcrumbs";
 
 const Navbar = () => {
   const navItems = ["Home", "Festivals", "Applications", "Invoices", "Settings"];
 
   return (
-    <NavigationMenu viewport={false} className="mx-auto">
-      <SidebarTrigger />
-      {/* <Breadcrumbs /> */}
-      <NavigationMenuList>
+    <NavigationMenu viewport={false} className="flex justify-between">
+      <Breadcrumbs />
+      {/* <SidebarTrigger className="self-end" /> */}
+      {/* 
+       <NavigationMenuList>
         {navItems.map((item) => (
           <NavigationMenuItem key={item}>
             <NavigationMenuLink
@@ -27,8 +28,8 @@ const Navbar = () => {
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
-        {/* <DarkModeToggle /> */}
-      </NavigationMenuList>
+        <DarkModeToggle /> 
+      </NavigationMenuList> */}
     </NavigationMenu>
   );
 };

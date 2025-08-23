@@ -13,7 +13,7 @@ const ControlledBoolean = ({ field, showLabels }: ControlledBooleanProps) => {
   ) : (
     <input
       type="checkbox"
-      className="p-2 my-0.5 mr-auto border-b align-baseline whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] overflow-hidden truncate"
+      className="p-2 mb-1 mt-0.5 mr-auto border-b align-baseline whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px] overflow-hidden truncate"
       checked={field.value as boolean}
       onChange={field.onChange}
     />
