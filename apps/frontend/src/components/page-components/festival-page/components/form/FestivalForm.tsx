@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
+import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 
 interface FestivalFormProps {
   showLabels: boolean;
@@ -24,48 +24,58 @@ interface FestivalFormProps {
 const FestivalForm = ({ showLabels }: FestivalFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
-
   const params = useParams();
   const festivalId = Number(params?.id);
-
   const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
-
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
-
   const [isLoading, setIsLoading] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  const defaultValues = formFields.reduce((acc, field) => {
-    acc[field.fieldName] = festival ? festival[field.fieldName as keyof Festival] : "";
-    return acc;
-  }, {} as Record<string, unknown>);
+  // Create initial form values
+  const getInitialValues = () => {
+    if (festival) {
+      return sanitizeFormData(festival);
+    }
 
-  // Initialize form with empty values
+    // If no festival, create empty default values for all fields
+    const emptyValues = formFields.reduce((acc, field) => {
+      acc[field.fieldName] = field.type === ControlledFormElementType.BOOLEAN ? false : "";
+      return acc;
+    }, {} as Record<string, unknown>);
+
+    return emptyValues;
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: getInitialValues(),
     mode: "onSubmit",
   });
 
-  // Fetch festival data and reset form
+  // Fetch festival data if not available
   useEffect(() => {
-    if (festivalId) {
-      refreshFestival(festivalId, festival, dispatch);
+    if (!festival && festivalId) {
+      refreshFestival(festivalId, dispatch);
+      setInitialDataLoaded(true);
     }
-  }, [festival, festivalId, dispatch]);
+  }, [festivalId, festival, dispatch]);
 
-  // Reset form when festival data is loaded or updated
+  // Reset form when festival data changes (but only once)
   useEffect(() => {
-    if (festival) {
+    if (festival && initialDataLoaded) {
+      console.log("resetting form data");
       form.reset(sanitizeFormData(festival));
+      setInitialDataLoaded(false);
     }
-  }, [festival, form]);
+  }, [festival, form, initialDataLoaded]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      await festivalApiService.updateFestival(values as Festival);
-      dispatch(updateFestival(values as Festival));
+      const updatedFestival = { ...values, id: festivalId } as Festival;
+      await festivalApiService.updateFestival(updatedFestival);
+      dispatch(updateFestival(updatedFestival));
       if (festival) {
         router.push(`/festivals/${festival.id}`);
       }
@@ -76,7 +86,11 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
     }
   };
 
-  if (!festival) {
+  if (!festival && festivalId) {
+    return <div>Loading...</div>;
+  }
+
+  if (!festival && !festivalId) {
     return <div>Festival not found</div>;
   }
 
@@ -101,14 +115,12 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
             )}
           />
         ))}
-
         <div className="flex justify-between mt-6">
-          <BackButton href={`/festivals/${festival.id}`} />
+          <BackButton href={`/festivals/${festival?.id || ""}`} />
           <SubmitButton isLoading={isLoading} />
         </div>
       </form>
     </Form>
   );
 };
-
 export default FestivalForm;
