@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Speaker } from "lucide-react";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { FestivalUpdateDialog } from "@/components/page-components/festival-page/components/update-view/FestivalUpdateDialog";
 import DetailsView from "@/components/common/table/DetailsView";
-import { getDetailsView } from "../../helpers/getDetailsView";
 import BackButton from "@/components/common/buttons/BackButton";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -13,6 +13,8 @@ import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import festivalApiService from "@/api/festivalApiService";
+import { getBasicFestivalInfo } from "../../helpers/getBasicFestivalInfo";
+import { getFestivalDetails } from "../../helpers/getFestivalDetails";
 
 const FestivalView = () => {
   const params = useParams();
@@ -35,20 +37,37 @@ const FestivalView = () => {
   }
 
   return (
-    <Card className=" mx-auto mt-6">
-      <CardHeader>
-        <CardTitle>{festival.festivalName}</CardTitle>
-        <CardDescription>{festival.country}</CardDescription>
-      </CardHeader>
-      <CardContent className="grid-cols-2">
-        <DetailsView data={getDetailsView(festival)} />
-      </CardContent>
-      <CardFooter className="gap-6">
-        <FestivalUpdateDialog />
-        <EditButton href={`/festivals/${festival.id}/edit`} />
+    <div className="flex flex-col max-w-6xl mx-auto">
+      <div className="flex justify-between my-6">
+        <div className="flex items-center gap-3">
+          <Speaker color="highlight" size={32} />
+          <div className="flex gap-2">
+            <CardTitle className="max-w-prose">{festival.festivalName}</CardTitle>
+            {festival.town && <CardDescription>{festival.town}, </CardDescription>}
+            <CardDescription>{festival.country}</CardDescription>
+          </div>
+        </div>
+        <div className="flex gap-6 self-end mx-8 items-center">
+          <FestivalUpdateDialog />
+          <EditButton href={`/festivals/${festival.id}/edit`} />
+        </div>
+      </div>
+      <Card className="mb-6 relative">
+        <CardContent className="grid-cols-2">
+          <CardDescription className="text-lg font-semibold mb-6 text-black">Basic info</CardDescription>
+          <DetailsView data={getBasicFestivalInfo(festival)} />
+        </CardContent>
+      </Card>
+      <Card className="relative">
+        <CardContent className="grid-cols-2">
+          <CardDescription className="text-lg font-semibold mb-6 text-black">Festival details</CardDescription>
+          <DetailsView data={getFestivalDetails(festival)} />
+        </CardContent>
+      </Card>
+      <div className="flex self-end bottom-4 right-4 m-6">
         <BackButton href="/festivals" />
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 
