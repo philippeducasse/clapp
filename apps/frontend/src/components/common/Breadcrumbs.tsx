@@ -1,5 +1,8 @@
 "use client";
-
+import React from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,47 +11,84 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
-import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const Breadcrumbs = () => {
-  const [section, setSection] = useState({ link: "/festivals", label: "Festivals" });
-  const [entity, setEntity] = useState({ link: `festivals/1`, label: "Festival Name" });
-  const [action, setAction] = useState("Edit");
+  // Get current route from Redux or Next.js router
+  const pathname = usePathname();
+
+  // Get data from Redux slices if needed
+  const festival = useSelector((state: RootState) => state.festivals.selectedFestival);
+  // const application = useSelector((state: RootState) => state.applications.currentApplication);
+
+  // Determine which entity we're dealing with
+  let entityName = "";
+  let entityPath = "";
+
+  if (pathname.includes("/festivals/")) {
+    entityName = festival?.festivalName || "Festival";
+    entityPath = `/festivals/${festival?.id || ""}`;
+  } else if (pathname.includes("/applications/")) {
+    // entityName = application?.name || "Application";
+    // entityPath = `/applications/${application?.id || ""}`;
+  }
+
+  // Build breadcrumbs based on current route
+  const buildBreadcrumbs = () => {
+    const pathSegments = pathname.split("/").filter(Boolean);
+    let breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600" /> }];
+
+    if (pathSegments.includes("festivals")) {
+      breadcrumbs.push({ path: "/festivals", label: "Festivals" });
+
+      if (festival?.id) {
+        breadcrumbs.push({ path: entityPath, label: entityName });
+
+        // Add action if we're on an edit/new page
+        if (pathSegments.includes("edit")) {
+          breadcrumbs.push({ path: pathname, label: "Edit" });
+        } else if (pathSegments.includes("new")) {
+          breadcrumbs.push({ path: pathname, label: "New" });
+        }
+      }
+    }
+    // else if (pathSegments.includes("applications")) {
+    //   breadcrumbs.push({ path: "/applications", label: "Applications" });
+
+    //   if (application?.id) {
+    //     breadcrumbs.push({ path: entityPath, label: entityName });
+
+    //     // Add action if we're on an edit/new page
+    //     if (pathSegments.includes("edit")) {
+    //       breadcrumbs.push({ path: pathname, label: "Edit" });
+    //     } else if (pathSegments.includes("new")) {
+    //       breadcrumbs.push({ path: pathname, label: "New" });
+    //     }
+    //   }
+    // }
+
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = buildBreadcrumbs();
 
   return (
     <Breadcrumb>
       <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">
-            <Home className="text-emerald-600" />
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink className="text-base" href={section.link}>
-            {section.label}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        {entity && (
-          <>
-            <BreadcrumbSeparator />
+        {breadcrumbs.map((crumb, index) => (
+          <React.Fragment key={crumb.path}>
+            {index > 0 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
-              <BreadcrumbLink className="text-base" href={section.link}>
-                {entity.label}
-              </BreadcrumbLink>
+              {index === breadcrumbs.length - 1 ? (
+                <span className="text-base text-gray-500">{crumb.label}</span>
+              ) : (
+                <BreadcrumbLink className="text-base" href={crumb.path}>
+                  {crumb.label}
+                </BreadcrumbLink>
+              )}
             </BreadcrumbItem>
-          </>
-        )}
-        {action && (
-          <>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink className="text-base" href={section.link}>
-                {action}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </>
-        )}
+          </React.Fragment>
+        ))}
       </BreadcrumbList>
     </Breadcrumb>
   );

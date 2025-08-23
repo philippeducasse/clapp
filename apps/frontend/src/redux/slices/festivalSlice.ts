@@ -7,12 +7,14 @@ interface FestivalsState {
   festivals: Festival[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  selectedFestival?: Festival;
 }
 
 const initialState: FestivalsState = {
   festivals: [],
   status: "idle",
   error: null,
+  selectedFestival: undefined,
 };
 
 export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
@@ -34,6 +36,9 @@ const festivalSlice = createSlice({
       } else {
         state.festivals.push(action.payload);
       }
+    },
+    setSelectedFestival(state, action: PayloadAction<Festival>) {
+      state.selectedFestival = action.payload;
     },
     addFestival(state, action: PayloadAction<Festival>) {
       state.festivals.push(action.payload);
@@ -62,7 +67,7 @@ const festivalSlice = createSlice({
   },
 });
 
-export const { setFestivals, setFestival, addFestival, updateFestival } = festivalSlice.actions;
+export const { setFestivals, setFestival, addFestival, updateFestival, setSelectedFestival } = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
 export const selectFestivalsStatus = (state: RootState) => state.festivals.status;

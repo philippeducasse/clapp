@@ -8,7 +8,7 @@ import DetailsView from "@/components/common/table/DetailsView";
 import BackButton from "@/components/common/buttons/BackButton";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectFestival, setFestival } from "@/redux/slices/festivalSlice";
+import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
@@ -30,7 +30,7 @@ const FestivalView = () => {
   useEffect(() => {
     const fetchFestival = async () => {
       const festival = await festivalApiService.getFestival(festivalId);
-      dispatch(setFestival(festival));
+      dispatch(setSelectedFestival(festival));
     };
     if (!festival) {
       fetchFestival();

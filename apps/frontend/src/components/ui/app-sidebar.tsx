@@ -45,7 +45,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-emerald-600 my-8 text-lg">Application Agent</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 text-lg">Application Agent</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
