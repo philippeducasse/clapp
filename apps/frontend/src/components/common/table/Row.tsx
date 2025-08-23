@@ -16,6 +16,12 @@ interface RowProps {
 
 const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowProps) => {
   const renderContent = () => {
+    if (value instanceof Date) {
+      return value.toLocaleDateString();
+    }
+    if (value === null || value === undefined) {
+      return <span className="text-gray-400">-</span>;
+    }
     switch (type) {
       case SectionCellType.Link:
         return (
@@ -24,7 +30,7 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
             className="text-sky-600 hover:text-sky-500 font-medium"
             target={target ?? "_blank"}
           >
-            {value}
+            {value as React.ReactNode}
           </Link>
         );
       case SectionCellType.Badge:
@@ -38,7 +44,7 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
       case SectionCellType.Bool:
         return value ? "Yes" : "No";
       default:
-        return value || <span className="text-gray-400">-</span>;
+        return value.toString() || <span className="text-gray-400">-</span>;
     }
   };
 
