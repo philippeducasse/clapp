@@ -16,8 +16,8 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     def nv(x):
         return "" if x is None else str(x)
 
-    fest_types_str = ", ".join([label for (_, label) in festival_types])
-    app_types_str = ", ".join([label for (_, label) in application_types])
+    fest_types_str = ", ".join([value for (value, _) in festival_types])
+    app_types_str = ", ".join([value for (value, _) in application_types])
 
     prompt = f"""
     You are enriching festival data for a cultural booking app.
