@@ -1,6 +1,7 @@
 import { Button } from "../../ui/button";
 import { Loader2Icon } from "lucide-react";
 import React from "react";
+import { Save } from "lucide-react";
 
 interface SubmitButtonProps {
   isLoading: boolean;
@@ -11,14 +12,17 @@ interface SubmitButtonProps {
 
 const SubmitButton = ({ onClick, isLoading, label, submissionLabel }: SubmitButtonProps) => {
   return (
-    <Button size="sm" disabled={isLoading} onClick={onClick}>
+    <Button size="default" disabled={isLoading} onClick={onClick} className="bg-emerald-700 hover:bg-emerald-600">
       {isLoading ? (
         <>
           <Loader2Icon className="animate-spin" />
           {submissionLabel ?? "Loading..."}
         </>
       ) : (
-        label ?? "Submit"
+        <>
+          <Save />
+          {label ?? "Submit"}
+        </>
       )}
     </Button>
   );

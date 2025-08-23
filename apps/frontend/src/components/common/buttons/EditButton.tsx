@@ -15,7 +15,11 @@ const EditButton = ({ label, href }: EditButtonProps) => {
   };
 
   return (
-    <Button className="bg-indigo-600 hover:bg-indigo-500" onClick={handleClick}>
+    <Button
+      className="text-emerald-600 border-emerald-600 hover:bg-background hover:text-emerald-500 hover:border-emerald-500"
+      variant="outline"
+      onClick={handleClick}
+    >
       <Pencil />
       {label ?? "Edit"}
     </Button>

@@ -49,7 +49,7 @@ const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
           const isChanged = changedFields.includes(formField.fieldName as keyof Festival);
 
           return (
-            <TableRow key={formField.fieldName} className={isChanged ? "bg-green-50" : undefined}>
+            <TableRow key={formField.fieldName} className={isChanged ? "bg-emerald-50" : undefined}>
               <TableCell className="align-top w-full">
                 <FormField
                   control={form.control}

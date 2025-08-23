@@ -45,7 +45,7 @@ const DynamicProgress = ({
 
   const progressValue = typeof value === "number" ? value : internalValue;
 
-  return <Progress value={progressValue} className={cn(className)} {...props} />;
+  return <Progress value={progressValue} className={cn(className, "bg-emerald-700")} {...props} />;
 };
 
 export { DynamicProgress };

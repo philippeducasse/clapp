@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectFestival, updateFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
+import { X } from "lucide-react";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
@@ -67,7 +68,11 @@ export const FestivalUpdateDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="" onClick={handleUpdate}>
+        <Button
+          variant="outline"
+          className="text-emerald-600 border-emerald-600 hover:bg-background hover:text-emerald-500 hover:border-emerald-500"
+          onClick={handleUpdate}
+        >
           <Hammer />
           Update
         </Button>
@@ -84,7 +89,9 @@ export const FestivalUpdateDialog = () => {
         )}
         <DialogFooter className="items-end">
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">
+              <X /> Cancel
+            </Button>
           </DialogClose>
           <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />
         </DialogFooter>

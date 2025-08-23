@@ -11,7 +11,7 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
     .filter((field) => original[field as keyof Festival] !== updated[field as keyof Festival]);
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex">
       <div className="w-1/2">
         <Table className="table-fixed">
           <TableHeader>
