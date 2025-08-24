@@ -2,7 +2,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -25,8 +24,8 @@ const Breadcrumbs = () => {
   let entityPath = "";
 
   if (pathname.includes("/festivals/")) {
-    entityName = festival?.festivalName || "Festival";
-    entityPath = `/festivals/${festival?.id || ""}`;
+    entityName = festival?.festivalName ?? "Festival";
+    entityPath = `/festivals/${festival?.id ?? ""}`;
   } else if (pathname.includes("/applications/")) {
     // entityName = application?.name || "Application";
     // entityPath = `/applications/${application?.id || ""}`;
@@ -35,7 +34,7 @@ const Breadcrumbs = () => {
   // Build breadcrumbs based on current route
   const buildBreadcrumbs = () => {
     const pathSegments = pathname.split("/").filter(Boolean);
-    let breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600" /> }];
+    const breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600" /> }];
 
     if (pathSegments.includes("festivals")) {
       breadcrumbs.push({ path: "/festivals", label: "Festivals" });
@@ -70,7 +69,6 @@ const Breadcrumbs = () => {
   };
 
   const breadcrumbs = buildBreadcrumbs();
-  console.log({ breadcrumbs }, festival);
   return (
     <Breadcrumb>
       <BreadcrumbList>

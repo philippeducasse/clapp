@@ -1,4 +1,4 @@
-import { Calendar, Home, Globe, Search, ClipboardEdit, Settings } from "lucide-react";
+import { Calendar, Home, Globe, ClipboardEdit, Settings } from "lucide-react";
 
 import {
   Sidebar,
