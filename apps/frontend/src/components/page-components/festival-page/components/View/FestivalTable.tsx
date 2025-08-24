@@ -20,7 +20,7 @@ export const FestivalTable = ({ festivals }: FestivalTableProps) => {
   }, [dispatch, festivals]);
 
   const onEdit = (id: string) => {
-    router.push(`/festivals/${id}`);
+    router.push(`/festivals/${id}/edit`);
   };
 
   const columns = getFestivalColumns(onEdit);

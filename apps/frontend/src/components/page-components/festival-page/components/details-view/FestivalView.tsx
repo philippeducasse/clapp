@@ -20,6 +20,7 @@ import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FestivalView = () => {
   const params = useParams();
@@ -29,13 +30,15 @@ const FestivalView = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!festival && festivalId) {
+    if (!festival) {
       refreshFestival(festivalId, dispatch);
+    } else {
+      dispatch(setSelectedFestival(festival));
     }
   }, [festivalId, festival, dispatch]);
 
   if (!festival) {
-    return <div>Festival not found.</div>;
+    return <Skeleton />;
   }
 
   const goToApplication = () => {

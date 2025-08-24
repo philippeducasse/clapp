@@ -14,7 +14,6 @@ import { Home } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 const Breadcrumbs = () => {
-  // Get current route from Redux or Next.js router
   const pathname = usePathname();
 
   // Get data from Redux slices if needed
@@ -71,7 +70,7 @@ const Breadcrumbs = () => {
   };
 
   const breadcrumbs = buildBreadcrumbs();
-
+  console.log({ breadcrumbs }, festival);
   return (
     <Breadcrumb>
       <BreadcrumbList>

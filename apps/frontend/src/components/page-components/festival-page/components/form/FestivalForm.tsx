@@ -16,6 +16,8 @@ import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
+import { Skeleton } from "@/components/ui/skeleton";
+import FormHeader from "@/components/common/form/FormHeader";
 
 interface FestivalFormProps {
   showLabels: boolean;
@@ -87,7 +89,7 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
   };
 
   if (!festival && festivalId) {
-    return <div>Loading...</div>;
+    return <Skeleton />;
   }
 
   if (!festival && !festivalId) {
@@ -95,32 +97,37 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full caption-bottom text-sm space-y-6 max-w-3xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
-      >
-        {formFields.map((formField) => (
-          <FormField
-            control={form.control}
-            name={formField.fieldName as string}
-            key={formField.fieldName}
-            render={({ field }) => (
-              <FormItem>
-                {showLabels && <FormLabel>{formField.label}</FormLabel>}
-                <FormControl>{getFestivalControlledInputs(formField, field, showLabels)}</FormControl>
-                {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
-        <div className="flex justify-between mt-6">
-          <BackButton href={`/festivals/${festival?.id || ""}`} />
-          <SubmitButton isLoading={isLoading} />
-        </div>
-      </form>
-    </Form>
+    <>
+      <FormHeader />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="w-full caption-bottom text-sm space-y-6 max-w-4xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
+        >
+          {formFields.map((formField) => (
+            <FormField
+              control={form.control}
+              name={formField.fieldName as string}
+              key={formField.fieldName}
+              render={({ field }) => (
+                <FormItem>
+                  {showLabels && !formField.hidden && (
+                    <FormLabel className="text-emerald-700">{formField.label}</FormLabel>
+                  )}
+                  <FormControl className="">{getFestivalControlledInputs(formField, field, showLabels)}</FormControl>
+                  {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+          <div className="flex justify-between mt-6">
+            <BackButton href={`/festivals/${festival?.id || ""}`} />
+            <SubmitButton isLoading={isLoading} />
+          </div>
+        </form>
+      </Form>
+    </>
   );
 };
 export default FestivalForm;

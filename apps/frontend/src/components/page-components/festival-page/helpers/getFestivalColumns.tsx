@@ -12,6 +12,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
     {
       accessorKey: "festivalName",
       header: getSortableHeader("Name"),
+      size: 200,
       cell: ({ row }) => {
         const festival = row.original;
         return (
@@ -24,12 +25,12 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
     {
       accessorKey: "country",
       header: getSortableHeader("Country"),
+      size: 100,
     },
     {
       accessorKey: "websiteUrl",
       header: "Website",
-      size: 200,
-
+      size: 100,
       cell: ({ row }) => {
         const festival = row.original;
         return (
@@ -44,6 +45,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
     {
       accessorKey: "approximateDate",
       header: "Date",
+      size: 100,
     },
     {
       header: "Actions",

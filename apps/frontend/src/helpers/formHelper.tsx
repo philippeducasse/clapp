@@ -2,10 +2,10 @@ import { ControlledFormElement, SelectOptions } from "@/interfaces/ControlledFor
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { capitalize } from "lodash";
-import ControlledBoolean from "@/components/common/controlled-form-fields/ControlledBoolean";
-import ControlledSelect from "@/components/common/controlled-form-fields/ControlledSelect";
-import ControlledText from "@/components/common/controlled-form-fields/ControlledText";
-import ControlledTextArea from "@/components/common/controlled-form-fields/ControlledTextArea";
+import ControlledBoolean from "@/components/common/form/form-fields/ControlledBoolean";
+import ControlledSelect from "@/components/common/form/form-fields/ControlledSelect";
+import ControlledText from "@/components/common/form/form-fields/ControlledText";
+import ControlledTextArea from "@/components/common/form/form-fields/ControlledTextArea";
 import { ControllerRenderProps } from "react-hook-form";
 
 export const getFestivalControlledInputs = (
@@ -13,6 +13,7 @@ export const getFestivalControlledInputs = (
   field: ControllerRenderProps,
   showLabels: boolean
 ) => {
+  if (formField.hidden) return;
   {
     switch (formField.type) {
       case ControlledFormElementType.SELECT:
