@@ -15,7 +15,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
       cell: ({ row }) => {
         const festival = row.original;
         return (
-          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap hover:text-emerald-500 pl-4">
+          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600">
             <Link href={`/festivals/${festival.id}`}>{festival.festivalName}</Link>
           </div>
         );
@@ -33,7 +33,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
       cell: ({ row }) => {
         const festival = row.original;
         return (
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
             <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
               {festival.websiteUrl}
             </Link>
