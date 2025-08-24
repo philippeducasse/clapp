@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
+import { refreshFestival } from "../../helpers/refreshFestival";
 
 const FestivalView = () => {
   const params = useParams();
@@ -28,12 +29,8 @@ const FestivalView = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchFestival = async () => {
-      const festival = await festivalApiService.getFestival(festivalId);
-      dispatch(setSelectedFestival(festival));
-    };
-    if (!festival) {
-      fetchFestival();
+    if (!festival && festivalId) {
+      refreshFestival(festivalId, dispatch);
     }
   }, [festivalId, festival, dispatch]);
 

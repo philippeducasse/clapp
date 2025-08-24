@@ -15,7 +15,7 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
       cell: ({ row }) => {
         const festival = row.original;
         return (
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap hover:text-emerald-500 pl-4">
             <Link href={`/festivals/${festival.id}`}>{festival.festivalName}</Link>
           </div>
         );
@@ -53,13 +53,18 @@ const getFestivalColumns = (onEdit: (id: string) => void): ColumnDef<Festival>[]
 
         return (
           <div className="flex gap-2 align-middle">
-            <Button variant="secondary" size="icon" className="size-8" onClick={() => onEdit(String(festival.id))}>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="size-8 text-emerald-600 hover:text-emerald-500"
+              onClick={() => onEdit(String(festival.id))}
+            >
               <Pencil />
             </Button>
-            <Button variant="secondary" size="icon" className="size-8">
+            <Button variant="secondary" size="icon" className="size-8 text-emerald-600 hover:text-emerald-500">
               <Mail />
             </Button>
-            <Button variant="secondary" size="icon" className="size-8">
+            <Button variant="secondary" size="icon" className="size-8 hover:text-red-500">
               <Trash />
             </Button>
           </div>

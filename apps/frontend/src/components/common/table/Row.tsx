@@ -51,7 +51,7 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
   return (
     <div
       className={
-        "grid grid-cols-2 py-3 gap-x-2 items-center border-gray-200 border-b last:border-b-0 text-sm leading-5 font-medium ml-8 my-2"
+        "grid grid-cols-2 py-3 gap-x-2 items-center border-gray-200 border-b last:border-b-0 text-sm leading-5 font-medium mx-8 my-2"
       }
     >
       {title && (
