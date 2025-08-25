@@ -1,11 +1,11 @@
 import festivalApiService from "@/api/festivalApiService";
-import { FestivalTable } from "../../components/page-components/festivals/components/view/FestivalTable";
+import { FestivalsTable } from "../../components/page-components/festivals/components/table/FestivalsTable";
 
 const FestivalsPage = async () => {
   const data = await festivalApiService.getAllFestivals();
   return (
     <div className="container mx-auto py-10">
-      <FestivalTable festivals={data} />
+      <FestivalsTable festivals={data} />
     </div>
   );
 };
