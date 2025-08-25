@@ -16,7 +16,7 @@ import { ControlledFormElementType } from "@/interfaces/ControlledFormElementTyp
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
-import { Actions } from "@/interfaces/Actions";
+import { Action } from "@/interfaces/Enums";
 
 interface FestivalFormProps {
   action: string;
@@ -79,17 +79,14 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      if (action === Actions.EDIT) {
+      if (action === Action.EDIT) {
         const updatedFestival = { ...values, id: festivalId } as Festival;
         await festivalApiService.updateFestival(updatedFestival);
         dispatch(updateFestival(updatedFestival));
-        if (festival && action === Actions.EDIT) {
-          router.push(`/festivals/${festival.id}`);
-        }
+        router.push(`/festivals/${festival?.id}`);
       } else {
-        console.log("creating festival", festival);
-        await festivalApiService.createFestival(values as Festival);
-        // dispatch(setFestival(values));
+        const newFestival = await festivalApiService.createFestival(values as Festival);
+        router.push(`/festivals/${newFestival?.id}`);
       }
     } catch (error) {
       console.error(error);

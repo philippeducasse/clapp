@@ -1,7 +1,7 @@
 import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
 import { toast } from "sonner";
 
-export const fetchJson = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
+export const fetchRequest = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
   const res = await fetch(url, options);
   if (!res.ok) {
     const text = await res.text();
@@ -12,7 +12,7 @@ export const fetchJson = async <T = unknown>(url: string, options?: RequestInit)
   return transformKeysToCamelCase(json);
 };
 
-export const sendJson = async <T = unknown>(
+export const sendRequest = async <T = unknown>(
   url: string,
   data: Record<string, unknown>,
   method: "POST" | "PUT" | "PATCH" = "POST",
@@ -34,4 +34,21 @@ export const sendJson = async <T = unknown>(
   const json = await res.json();
   toast.success(toastMessage ?? "Success");
   return json;
+};
+
+export const deleteRequest = async (url: string, toastMessage?: string): Promise<void> => {
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.text();
+    toast.error(`Error: ${error}`);
+    throw new Error(`Failed to DELETE ${url}: ${res.status} - ${error}`);
+  }
+
+  toast.success(toastMessage ?? "Successfully deleted");
 };

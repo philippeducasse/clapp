@@ -1,9 +1,9 @@
 import FestivalForm from "@/components/page-components/festivals/components/form/FestivalForm";
 import React from "react";
-import { Actions } from "@/interfaces/Actions";
+import { Action } from "@/interfaces/Enums";
 
 const FestivalCreationPage = () => {
-  return <FestivalForm action={Actions.CREATE} />;
+  return <FestivalForm action={Action.CREATE} />;
 };
 
 export default FestivalCreationPage;

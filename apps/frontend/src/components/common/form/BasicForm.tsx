@@ -29,7 +29,9 @@ const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading }: Basi
             key={formField.fieldName}
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-emerald-700 dark:text-emerald-400">{formField.label}</FormLabel>
+                {!formField.hidden && (
+                  <FormLabel className="text-emerald-700 dark:text-emerald-400">{formField.label}</FormLabel>
+                )}
                 <FormControl className="">{getControlledInputs(formField, field, true)}</FormControl>
                 <FormDescription>{formField.helpText}</FormDescription>
                 <FormMessage />
