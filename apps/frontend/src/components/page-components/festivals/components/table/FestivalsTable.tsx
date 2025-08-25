@@ -24,5 +24,6 @@ export const FestivalsTable = ({ festivals }: FestivalsTableProps) => {
   };
 
   const columns = getFestivalColumns(onEdit);
-  return <DataTable columns={columns} data={festivals} />;
+
+  return <DataTable columns={columns} data={festivals} entityName="festival" />;
 };

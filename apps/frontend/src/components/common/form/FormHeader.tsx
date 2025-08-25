@@ -1,18 +1,32 @@
 import React from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
+import { Actions } from "@/interfaces/Actions";
+import { capitalize } from "lodash";
 interface FormHeaderProps {
-  title?: string;
-  subtitle?: string;
+  action: string;
+  entityName: string;
 }
-const FormHeader = ({ title, subtitle }: FormHeaderProps) => {
+const FormHeader = ({ action, entityName }: FormHeaderProps) => {
   return (
     <div className="border-gray-200 border-b ">
       <div className="p-6">
         <div className="flex items-center">
-          <Pencil className="text-emerald-600 bg-emerald-100 p-2 rounded-md" size={48} />
+          {action === Actions.EDIT ? (
+            <Pencil
+              className="text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400"
+              size={48}
+            />
+          ) : (
+            <Plus
+              className="text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400"
+              size={48}
+            />
+          )}
           <div className="ml-4">
-            <h3 className="text-xl font-semibold">{title ?? "Edit"}</h3>
-            <p className="text-gray-400">{subtitle ?? "Edit festival entries manually."} </p>
+            <h3 className="text-xl font-semibold">{capitalize(action)}</h3>
+            <p className="text-gray-400">
+              {action === Actions.EDIT ? `Edit ${entityName} manually` : `Create a new ${entityName}`}{" "}
+            </p>
           </div>
         </div>
       </div>

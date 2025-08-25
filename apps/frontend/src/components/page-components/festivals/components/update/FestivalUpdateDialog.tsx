@@ -70,7 +70,7 @@ export const FestivalUpdateDialog = () => {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="text-emerald-600 border-emerald-600 hover:bg-background hover:text-emerald-500 hover:border-emerald-500"
+          className="text-emerald-600 border-emerald-600 hover:bg-background hover:text-emerald-500 hover:border-emerald-500 dark:text-emerald-400 dark:border-emerald-400 dark:hover:text-emerald-300 dark:hover:border-emerald-300"
           onClick={handleUpdate}
         >
           <Hammer />

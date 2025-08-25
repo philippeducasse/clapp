@@ -6,7 +6,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEqual } from "lodash";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
-import { createZodFormSchema, sanitizeFormData, getFestivalControlledInputs } from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getControlledInputs } from "@/helpers/formHelper";
 import { Festival } from "@/interfaces/Festival";
 import { Form, FormField, FormItem, FormMessage, FormControl, FormDescription } from "@/components/ui/form";
 import { TableCell, TableRow } from "@/components/ui/table";
@@ -56,7 +56,7 @@ const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
                   name={formField.fieldName as string}
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>{getFestivalControlledInputs(formField, field, showLabels)}</FormControl>
+                      <FormControl>{getControlledInputs(formField, field, showLabels)}</FormControl>
                       {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
                       <FormMessage />
                     </FormItem>

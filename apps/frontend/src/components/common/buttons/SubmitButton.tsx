@@ -12,7 +12,12 @@ interface SubmitButtonProps {
 
 const SubmitButton = ({ onClick, isLoading, label, submissionLabel }: SubmitButtonProps) => {
   return (
-    <Button size="default" disabled={isLoading} onClick={onClick} className="bg-emerald-700 hover:bg-emerald-600">
+    <Button
+      size="default"
+      disabled={isLoading}
+      onClick={onClick}
+      className="bg-emerald-700 hover:bg-emerald-600 dark:text-foreground"
+    >
       {isLoading ? (
         <>
           <Loader2Icon className="animate-spin" />

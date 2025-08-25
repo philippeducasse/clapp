@@ -8,7 +8,7 @@ import ControlledText from "@/components/common/form/form-fields/ControlledText"
 import ControlledTextArea from "@/components/common/form/form-fields/ControlledTextArea";
 import { ControllerRenderProps } from "react-hook-form";
 
-export const getFestivalControlledInputs = (
+export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
   showLabels: boolean

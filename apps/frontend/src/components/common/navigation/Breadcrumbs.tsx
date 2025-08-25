@@ -34,7 +34,7 @@ const Breadcrumbs = () => {
   // Build breadcrumbs based on current route
   const buildBreadcrumbs = () => {
     const pathSegments = pathname.split("/").filter(Boolean);
-    const breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600" /> }];
+    const breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> }];
 
     if (pathSegments.includes("festivals")) {
       breadcrumbs.push({ path: "/festivals", label: <span>Festivals</span> });
@@ -45,9 +45,9 @@ const Breadcrumbs = () => {
         // Add action if we're on an edit/new page
         if (pathSegments.includes("edit")) {
           breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
-        } else if (pathSegments.includes("new")) {
-          breadcrumbs.push({ path: pathname, label: <span>New</span> });
         }
+      } else if (pathSegments.includes("create")) {
+        breadcrumbs.push({ path: pathname, label: <span>Create</span> });
       }
     }
     // else if (pathSegments.includes("applications")) {

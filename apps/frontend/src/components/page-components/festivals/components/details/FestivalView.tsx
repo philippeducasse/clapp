@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
+import festivalApiService from "@/api/festivalApiService";
 
 const FestivalView = () => {
   const params = useParams();
@@ -40,8 +41,8 @@ const FestivalView = () => {
     return <Skeleton />;
   }
 
-  const goToApplication = () => {
-    router.push("/applications");
+  const applyToFestival = async () => {
+    router.push(`apply`);
   };
 
   return (
@@ -56,7 +57,7 @@ const FestivalView = () => {
           </div>
         </div>
         <div className="flex gap-6 self-end mx-8 items-stretch">
-          <Button className="bg-emerald-700 hover:bg-emerald-600" onClick={goToApplication}>
+          <Button className="bg-emerald-700 hover:bg-emerald-600 dark:text-foreground" onClick={applyToFestival}>
             <Send />
             {festival.applied ? "Go to application" : "Apply to festival"}
           </Button>

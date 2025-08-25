@@ -2,14 +2,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/Festival";
-import { createZodFormSchema, sanitizeFormData, getFestivalControlledInputs } from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import festivalApiService from "@/api/festivalApiService";
-import SubmitButton from "@/components/common/buttons/SubmitButton";
-import BackButton from "@/components/common/buttons/BackButton";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
@@ -18,12 +15,14 @@ import { refreshFestival } from "../../helpers/refreshFestival";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
+import BasicForm from "@/components/common/form/BasicForm";
 
 interface FestivalFormProps {
-  showLabels: boolean;
+  action: string;
+  showLabels?: boolean;
 }
 
-const FestivalForm = ({ showLabels }: FestivalFormProps) => {
+const FestivalForm = ({ action, showLabels = true }: FestivalFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
@@ -92,41 +91,19 @@ const FestivalForm = ({ showLabels }: FestivalFormProps) => {
     return <Skeleton />;
   }
 
-  if (!festival && !festivalId) {
-    return <div>Festival not found</div>;
-  }
+  const onCancelHref = festivalId ? `/festivals/${festival?.id}` : "/festivals";
 
   return (
     <>
-      <FormHeader />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full caption-bottom text-sm space-y-6 max-w-4xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
-        >
-          {formFields.map((formField) => (
-            <FormField
-              control={form.control}
-              name={formField.fieldName as string}
-              key={formField.fieldName}
-              render={({ field }) => (
-                <FormItem>
-                  {showLabels && !formField.hidden && (
-                    <FormLabel className="text-emerald-700">{formField.label}</FormLabel>
-                  )}
-                  <FormControl className="">{getFestivalControlledInputs(formField, field, showLabels)}</FormControl>
-                  {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <div className="flex justify-between mt-6">
-            <BackButton href={`/festivals/${festival?.id || ""}`} />
-            <SubmitButton isLoading={isLoading} />
-          </div>
-        </form>
-      </Form>
+      <FormHeader action={action} entityName="festival" />
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={onCancelHref}
+        isLoading={isLoading}
+        entity={festival}
+      />
     </>
   );
 };

@@ -8,7 +8,7 @@ export const getSortableHeader = <T,>(columnName: string) => {
     return (
       <Button className="-ml-3" variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         {columnName}
-        <ArrowUpDown className="ml-2 h-4 w-4 text-emerald-600 hover:text-emerald-500" />
+        <ArrowUpDown className="ml-2 h-4 w-4 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300" />
       </Button>
     );
   };
