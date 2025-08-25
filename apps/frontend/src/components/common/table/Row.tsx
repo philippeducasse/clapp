@@ -55,9 +55,15 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
       }
     >
       {title && (
-        <dt className={`${disabled ? "text-gray-400" : "text-gray-800 text-sm leading-5 font-medium"}`}>{title}</dt>
+        <dt
+          className={`${
+            disabled ? "text-gray-400" : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium"
+          }`}
+        >
+          {title}
+        </dt>
       )}
-      <dd className="text-gray-700">{isLoading ? <Skeleton /> : renderContent()}</dd>
+      <dd className="text-gray-700 dark:text-foreground">{isLoading ? <Skeleton /> : renderContent()}</dd>
     </div>
   );
 };

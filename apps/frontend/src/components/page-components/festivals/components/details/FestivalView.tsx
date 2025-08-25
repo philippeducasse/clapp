@@ -48,7 +48,7 @@ const FestivalView = () => {
     <div className="flex flex-col max-w-6xl mx-auto">
       <div className="flex justify-between my-6">
         <div className="flex items-center gap-2">
-          <Speaker className="text-emerald-600" size={32} />
+          <Speaker className="text-emerald-600 dark:text-emerald-400" size={32} />
           <div className="flex gap-2">
             <CardTitle className="max-w-prose">{festival.festivalName}</CardTitle>
             {festival.town && <CardDescription>{festival.town}, </CardDescription>}
@@ -67,17 +67,23 @@ const FestivalView = () => {
       <Card className="mb-6 relative">
         <CardContent className="grid-cols-2 ">
           <div className="flex items-center gap-2 mb-6">
-            <Info className="text-emerald-600" />
-            <CardDescription className="text-lg font-semibold text-black">Basic info</CardDescription>
+            <Info className="text-emerald-600 dark:text-emerald-400" />
+            <CardDescription className="text-lg font-semibold text-black dark:text-foreground">
+              Basic info
+            </CardDescription>
           </div>
-          <DetailsView data={getBasicFestivalInfo(festival)} />
+          <div className="col-span-2">
+            <DetailsView data={getBasicFestivalInfo(festival)} />
+          </div>
         </CardContent>
       </Card>
       <Card className="relative">
         <CardContent className="grid-cols-2">
           <div className="flex items-center gap-2 mb-6">
-            <NotebookTabs className="text-emerald-600" />
-            <CardDescription className="text-lg font-semibold text-black">Festival details</CardDescription>
+            <NotebookTabs className="text-emerald-600 dark:text-emerald-400" />
+            <CardDescription className="text-lg font-semibold text-black dark:text-foreground">
+              Festival details
+            </CardDescription>
           </div>
           <DetailsView data={getFestivalDetails(festival)} />
         </CardContent>
