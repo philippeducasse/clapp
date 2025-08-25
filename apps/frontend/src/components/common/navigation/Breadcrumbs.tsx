@@ -77,7 +77,7 @@ const Breadcrumbs = () => {
             {index > 0 && <BreadcrumbSeparator />}
             <BreadcrumbItem>
               {index === breadcrumbs.length - 1 ? (
-                <span className="text-base text-gray-500">{crumb.label}</span>
+                <span className="text-base">{crumb.label}</span>
               ) : (
                 <BreadcrumbLink className="text-base" href={crumb.path}>
                   {crumb.label}

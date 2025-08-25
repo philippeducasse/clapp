@@ -35,7 +35,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
               <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
-                <header className="flex justify-between border-b pb-4">
+                <header className="flex justify-between border-b pb-4 w-full">
                   <Navbar />
                 </header>
                 <main>{children}</main>
