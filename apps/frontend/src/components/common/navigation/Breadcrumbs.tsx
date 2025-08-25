@@ -37,16 +37,16 @@ const Breadcrumbs = () => {
     const breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600" /> }];
 
     if (pathSegments.includes("festivals")) {
-      breadcrumbs.push({ path: "/festivals", label: "Festivals" });
+      breadcrumbs.push({ path: "/festivals", label: <span>Festivals</span> });
 
       if (festival?.id) {
-        breadcrumbs.push({ path: entityPath, label: entityName });
+        breadcrumbs.push({ path: entityPath, label: <span>{entityName}</span> });
 
         // Add action if we're on an edit/new page
         if (pathSegments.includes("edit")) {
-          breadcrumbs.push({ path: pathname, label: "Edit" });
+          breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
         } else if (pathSegments.includes("new")) {
-          breadcrumbs.push({ path: pathname, label: "New" });
+          breadcrumbs.push({ path: pathname, label: <span>New</span> });
         }
       }
     }
