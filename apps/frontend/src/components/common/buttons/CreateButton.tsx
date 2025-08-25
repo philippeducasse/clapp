@@ -17,7 +17,7 @@ const CreateButton = ({ label, href }: CreateButtonProps) => {
 
   return (
     <Button
-      className="bg-emerald-600  hover:bg-emerald-500 dark:bg-emerald-400 dark:hover:bg-emerald-300 "
+      className="bg-emerald-600  hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 "
       variant="default"
       onClick={handleClick}
     >

@@ -8,7 +8,6 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       label: "Festival ID",
       fieldName: "id",
       type: ControlledFormElementType.NUMBER,
-      required: true,
       hidden: true,
     },
     {

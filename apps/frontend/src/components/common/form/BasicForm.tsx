@@ -12,11 +12,10 @@ interface BasicFormProps {
   onSubmit: (values: Record<string, unknown>) => Promise<void>;
   onCancelHref: string;
   isLoading: boolean;
-  showLabels?: boolean;
   entity?: unknown;
 }
 
-const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading, showLabels = true }: BasicFormProps) => {
+const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading }: BasicFormProps) => {
   return (
     <Form {...form}>
       <form
@@ -30,11 +29,9 @@ const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading, showLa
             key={formField.fieldName}
             render={({ field }) => (
               <FormItem>
-                {showLabels && !formField.hidden && (
-                  <FormLabel className="text-emerald-700 dark:text-emerald-400">{formField.label}</FormLabel>
-                )}
-                <FormControl className="">{getControlledInputs(formField, field, showLabels)}</FormControl>
-                {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+                <FormLabel className="text-emerald-700 dark:text-emerald-400">{formField.label}</FormLabel>
+                <FormControl className="">{getControlledInputs(formField, field, true)}</FormControl>
+                <FormDescription>{formField.helpText}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

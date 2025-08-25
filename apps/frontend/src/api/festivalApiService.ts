@@ -13,7 +13,7 @@ const festivalApiService = {
   },
 
   async createFestival(festival: Festival): Promise<Festival> {
-    return sendJson<Festival>(`${endpoint}/`, festival, "POST", "Festival successfully created");
+    return sendJson<Festival>(`${endpoint}`, festival, "POST", "Festival successfully created");
   },
 
   async enrichFestival(festival: Festival): Promise<Festival> {

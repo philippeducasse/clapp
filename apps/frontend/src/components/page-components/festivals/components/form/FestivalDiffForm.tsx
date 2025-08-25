@@ -8,22 +8,16 @@ import { isEqual } from "lodash";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { createZodFormSchema, sanitizeFormData, getControlledInputs } from "@/helpers/formHelper";
 import { Festival } from "@/interfaces/Festival";
-import { Form, FormField, FormItem, FormMessage, FormControl, FormDescription } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormMessage, FormControl } from "@/components/ui/form";
 import { TableCell, TableRow } from "@/components/ui/table";
 
 interface FestivalDiffFormProps {
   updatedFestival: Festival;
   changedFields?: (keyof Festival)[];
   setUpdated: Dispatch<SetStateAction<Festival | undefined>>;
-  showLabels: boolean;
 }
 
-const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
-  updatedFestival,
-  changedFields = [],
-  setUpdated,
-  showLabels,
-}) => {
+const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({ updatedFestival, changedFields = [], setUpdated }) => {
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
 
@@ -49,15 +43,14 @@ const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
           const isChanged = changedFields.includes(formField.fieldName as keyof Festival);
 
           return (
-            <TableRow key={formField.fieldName} className={isChanged ? "bg-emerald-50" : undefined}>
+            <TableRow key={formField.fieldName} className={isChanged ? "bg-emerald-50 dark:bg-emerald-950" : undefined}>
               <TableCell className="align-top w-full">
                 <FormField
                   control={form.control}
                   name={formField.fieldName as string}
                   render={({ field }) => (
                     <FormItem>
-                      <FormControl>{getControlledInputs(formField, field, showLabels)}</FormControl>
-                      {showLabels && formField.helpText && <FormDescription>{formField.helpText}</FormDescription>}
+                      <FormControl>{getControlledInputs(formField, field, false)}</FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

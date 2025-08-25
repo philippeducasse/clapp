@@ -16,13 +16,13 @@ import { ControlledFormElementType } from "@/interfaces/ControlledFormElementTyp
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
+import { Actions } from "@/interfaces/Actions";
 
 interface FestivalFormProps {
   action: string;
-  showLabels?: boolean;
 }
 
-const FestivalForm = ({ action, showLabels = true }: FestivalFormProps) => {
+const FestivalForm = ({ action }: FestivalFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
@@ -41,7 +41,12 @@ const FestivalForm = ({ action, showLabels = true }: FestivalFormProps) => {
 
     // If no festival, create empty default values for all fields
     const emptyValues = formFields.reduce((acc, field) => {
-      acc[field.fieldName] = field.type === ControlledFormElementType.BOOLEAN ? false : "";
+      acc[field.fieldName] =
+        field.type === ControlledFormElementType.BOOLEAN
+          ? false
+          : field.type === ControlledFormElementType.NUMBER
+          ? undefined
+          : "";
       return acc;
     }, {} as Record<string, unknown>);
 
@@ -74,11 +79,17 @@ const FestivalForm = ({ action, showLabels = true }: FestivalFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      const updatedFestival = { ...values, id: festivalId } as Festival;
-      await festivalApiService.updateFestival(updatedFestival);
-      dispatch(updateFestival(updatedFestival));
-      if (festival) {
-        router.push(`/festivals/${festival.id}`);
+      if (action === Actions.EDIT) {
+        const updatedFestival = { ...values, id: festivalId } as Festival;
+        await festivalApiService.updateFestival(updatedFestival);
+        dispatch(updateFestival(updatedFestival));
+        if (festival && action === Actions.EDIT) {
+          router.push(`/festivals/${festival.id}`);
+        }
+      } else {
+        console.log("creating festival", festival);
+        await festivalApiService.createFestival(values as Festival);
+        // dispatch(setFestival(values));
       }
     } catch (error) {
       console.error(error);

@@ -31,7 +31,9 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
                 return (
                   <TableRow key={fieldName}>
                     <TableCell className="font-medium truncate">{field.label}</TableCell>
-                    <TableCell className={`truncate ${hasChanged ? "bg-red-50" : ""}`}>{String(originalVal)}</TableCell>
+                    <TableCell className={`truncate ${hasChanged ? "bg-red-50 dark:bg-red-950" : ""}`}>
+                      {String(originalVal)}
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -46,12 +48,7 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
             </TableRow>
           </TableHeader>
           <TableBody>
-            <FestivalDiffForm
-              updatedFestival={updated}
-              changedFields={changedFields}
-              setUpdated={setUpdated}
-              showLabels={false}
-            />
+            <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} setUpdated={setUpdated} />
           </TableBody>
         </Table>
       </div>

@@ -55,7 +55,7 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
 
     switch (type) {
       case ControlledFormElementType.NUMBER:
-        zodType = z.number();
+        zodType = z.number().optional();
         break;
 
       case ControlledFormElementType.SELECT:

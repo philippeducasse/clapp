@@ -90,7 +90,7 @@ export const FestivalUpdateDialog = () => {
         <DialogFooter className="items-end">
           <DialogClose asChild>
             <Button variant="outline">
-              <X /> Cancel
+              <X className="text-red-500" /> Cancel
             </Button>
           </DialogClose>
           <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />

@@ -20,7 +20,6 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
-import festivalApiService from "@/api/festivalApiService";
 
 const FestivalView = () => {
   const params = useParams();
