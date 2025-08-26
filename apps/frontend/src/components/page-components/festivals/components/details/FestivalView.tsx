@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Speaker } from "lucide-react";
+import { Flag } from "lucide-react";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import DetailsView from "@/components/common/table/DetailsView";
@@ -41,14 +41,15 @@ const FestivalView = () => {
   }
 
   const applyToFestival = async () => {
-    router.push(`apply`);
+    console.log("going");
+    router.push(`${festivalId}/apply`);
   };
 
   return (
     <div className="flex flex-col max-w-6xl mx-auto">
       <div className="flex justify-between my-6">
         <div className="flex items-center gap-2">
-          <Speaker className="text-emerald-600 dark:text-emerald-400" size={32} />
+          <Flag className="text-emerald-600 dark:text-emerald-400" size={32} />
           <div className="flex gap-2">
             <CardTitle className="max-w-prose">{festival.festivalName}</CardTitle>
             {festival.town && <CardDescription>{festival.town}, </CardDescription>}

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/Festival";
-import { createZodFormSchema, sanitizeFormData } from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import festivalApiService from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
-import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
@@ -33,29 +32,9 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-  // Create initial form values
-  const getInitialValues = () => {
-    if (festival) {
-      return sanitizeFormData(festival);
-    }
-
-    // If no festival, create empty default values for all fields
-    const emptyValues = formFields.reduce((acc, field) => {
-      acc[field.fieldName] =
-        field.type === ControlledFormElementType.BOOLEAN
-          ? false
-          : field.type === ControlledFormElementType.NUMBER
-          ? undefined
-          : "";
-      return acc;
-    }, {} as Record<string, unknown>);
-
-    return emptyValues;
-  };
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(),
+    defaultValues: getInitialValues(formFields, festival),
     mode: "onSubmit",
   });
 

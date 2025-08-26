@@ -8,4 +8,5 @@ export enum ControlledFormElementType {
   EMAIL = "EMAIL",
   BOOLEAN = "BOOLEAN",
   TEXT_AREA = "TEXT_AREA",
+  TEXT_EDITOR = "TEXT_EDITOR",
 }

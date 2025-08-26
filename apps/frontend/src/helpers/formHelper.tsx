@@ -7,6 +7,7 @@ import ControlledSelect from "@/components/common/form/form-fields/ControlledSel
 import ControlledText from "@/components/common/form/form-fields/ControlledText";
 import ControlledTextArea from "@/components/common/form/form-fields/ControlledTextArea";
 import { ControllerRenderProps } from "react-hook-form";
+import { ControlledTextEditor } from "@/components/common/form/form-fields/ControlledTextEditor";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
@@ -24,6 +25,8 @@ export const getControlledInputs = (
         return <ControlledBoolean field={field} showLabels={showLabels} />;
       case ControlledFormElementType.TEXT_AREA:
         return <ControlledTextArea field={field} showLabels={showLabels} />;
+      case ControlledFormElementType.TEXT_EDITOR:
+        return <ControlledTextEditor field={field} />;
       default:
         return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
     }
@@ -61,6 +64,7 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
       case ControlledFormElementType.SELECT:
       case ControlledFormElementType.TEXT:
       case ControlledFormElementType.TEXT_AREA:
+      case ControlledFormElementType.TEXT_EDITOR:
         zodType = z.string();
         break;
 
@@ -99,4 +103,22 @@ export const getOptions = <T extends Record<string, string>>(optionsEnum: T): Se
     label: capitalize(o.replace(/_/g, " ").toLowerCase()),
   }));
   return options;
+};
+
+export const getInitialValues = (formFields: ControlledFormElement[], entity?: Record<string, unknown>) => {
+  if (entity) {
+    return sanitizeFormData(entity);
+  }
+
+  const emptyValues = formFields.reduce((acc, field) => {
+    acc[field.fieldName] =
+      field.type === ControlledFormElementType.BOOLEAN
+        ? false
+        : field.type === ControlledFormElementType.NUMBER
+        ? undefined
+        : "";
+    return acc;
+  }, {} as Record<string, unknown>);
+
+  return emptyValues;
 };

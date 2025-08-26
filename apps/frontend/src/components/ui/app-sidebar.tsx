@@ -1,4 +1,4 @@
-import { Calendar, Home, Globe, ClipboardEdit, Settings } from "lucide-react";
+import { Calendar, Home, Flag, ClipboardEdit, Settings } from "lucide-react";
 
 import {
   Sidebar,
@@ -21,7 +21,7 @@ const items = [
   {
     title: "Festivals",
     url: "/festivals",
-    icon: Globe,
+    icon: Flag,
   },
   {
     title: "Applications",
@@ -45,7 +45,9 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 text-lg dark:text-emerald-400">Application Agent</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 text-lg dark:text-emerald-400">
+            Application Agent
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

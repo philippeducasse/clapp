@@ -45,6 +45,8 @@ const Breadcrumbs = () => {
         // Add action if we're on an edit/new page
         if (pathSegments.includes("edit")) {
           breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
+        } else if (pathSegments.includes("apply")) {
+          breadcrumbs.push({ path: pathname, label: <span>Apply</span> });
         }
       } else if (pathSegments.includes("create")) {
         breadcrumbs.push({ path: pathname, label: <span>Create</span> });

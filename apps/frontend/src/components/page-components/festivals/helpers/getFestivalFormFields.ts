@@ -1,7 +1,7 @@
 import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
-import { ApplicationType, FestivalType } from "@/interfaces/Festival";
+import { FestivalType, ApplicationType } from "@/interfaces/Festival";
 export const getFestivalFormFields = (): ControlledFormElement[] => {
   return [
     {

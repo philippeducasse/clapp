@@ -25,7 +25,7 @@ const FormHeader = ({ action, entityName }: FormHeaderProps) => {
           <div className="ml-4">
             <h3 className="text-xl font-semibold">{capitalize(action)}</h3>
             <p className="text-gray-400">
-              {action === Action.EDIT ? `Edit ${entityName} manually` : `Create a new ${entityName}`}{" "}
+              {action === Action.EDIT ? `Edit ${entityName} manually` : `Create a new ${entityName}`}
             </p>
           </div>
         </div>

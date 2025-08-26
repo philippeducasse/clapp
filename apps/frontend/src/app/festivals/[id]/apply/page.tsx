@@ -1,12 +1,8 @@
-import FormHeader from "@/components/common/form/FormHeader";
 import React from "react";
-import { Action } from "@/interfaces/Enums";
+import ApplicationForm from "@/components/page-components/applications/form/ApplicationForm";
+
 const FestivalApplicationPage = () => {
-  return (
-    <div>
-      <FormHeader action={Action.APPLY} entityName="Festival" />
-    </div>
-  );
+  return <ApplicationForm />;
 };
 
 export default FestivalApplicationPage;
