@@ -182,28 +182,37 @@ def clean_festival_data(festival: Festival) -> None:
 
 
 def generate_application_mail_prompt(festival: Festival) -> str:
-    # Determine the appropriate salutation based on the contact person's name
-    contact_name = festival.contact_person.strip() if festival.contact_person else None
-    if contact_name and contact_name.lower() != "nan":
-        salutation = f"Use a standard salutation in the language of {festival.country} and include the name '{contact_name}'."
-    else:
-        salutation = f"Use a standard salutation in the language of {festival.country} addressed to the {festival.festival_name} organizers."
+    # Determine language for email - default to English if country not specified
+    language = "English" if not festival.country else f"language of {festival.country}"
 
+    # Determine salutation based on contact person
+    contact_name = festival.contact_person.strip() if festival.contact_person else None
+
+    if contact_name and contact_name.lower() != "nan":
+        salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
+    else:
+        salutation = f"Use a standard salutation in {language} addressed to the {festival.festival_name} organizers."
+
+    # The full prompt with instructions to return only the email content
     prompt = f"""
-        You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
-        Your task is to generate a personalized and professional email in plain text format to apply for participation in the festival.
-        The entire email should be written in the language of {festival.country}. Do not include a subject.
-        
-        Festival Details:
-        - Festival Type: {festival.festival_type}
-        - Description: {festival.description}
-        - Contact Person: {contact_name}
-        - Contact Email: {festival.contact_email}
-        
-        Email Requirements:
-        - Salutation: {salutation}
-        - Body: Explain why "Ah Bah Bravo!" is a great fit for their festival. Mention the unique aspects of your show and how it aligns with the festival's theme and audience. Ensure the text is engaging and professional. Keep the body concise, max 500 characters.
-        - Closing: Express enthusiasm for the opportunity to perform and provide your contact information for further discussion.
-        Ensure the email is formatted as plain text without any markdown or bullet points.
-        """
-    return prompt
+    You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
+    Generate ONLY the plain text email content (no additional messages) in {language}. Do not include a subject line.
+
+    Festival Details:
+    - Festival Type: {festival.festival_type}
+    - Description: {festival.description}
+    - Contact Person: {contact_name}
+    - Contact Email: {festival.contact_email}
+
+    Email Requirements:
+    - Salutation: {salutation}
+    - Body: Explain why "Ah Bah Bravo!" is a great fit for this festival, using {festival.description} as your main reference.
+     Mention unique aspects of your show and how it aligns with the festival's theme and audience. Keep the body concise (max 500 characters).
+    - Closing: Express enthusiasm and provide contact information (use placeholders like [your email] and [your phone]).
+
+    Response Format Instructions:
+    Return ONLY the email text itself with <br> tags for line breaks, with placeholders for contact information. Do not add any preamble message, notes, or formatting indicators. The response should begin immediately with the email text.
+    """
+
+    return prompt.strip()
+

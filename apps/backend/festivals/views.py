@@ -1,15 +1,18 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Dict
+
+from django.core.mail import EmailMessage
 from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status
+import json
 
-from applications.models import Application
+
 from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
-
+from applications.models import Application
 from services.gemini_service import GeminiClient
 from .helpers import (
     generate_application_mail_prompt,
@@ -19,7 +22,6 @@ from .helpers import (
 )
 from services.mistral_service import MistralClient
 from django.http import HttpRequest
-from django.core.mail import EmailMessage
 
 
 # Provides CRUD operations for Festival
@@ -60,63 +62,88 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def apply(self, request: HttpRequest, pk: int) -> Response:
+        print("req: ", request, pk)
         try:
             festival = Festival.objects.get(pk=pk)
         except Festival.DoesNotExist:
-            return Response({"error": "Festival not found"}, status=404)
+            return Response({"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        application, created = Application.objects.get_or_create(
-            festival=festival,
-            defaults={
-                "application_date": timezone.now().date(),
-                "application_status": "DRAFT",
-            },
-        )
+        try:
+            body = json.loads(request.body) if request.body else {}
+            message = body.get('message')
+            subject = body.get('email_subject')
+            if not message or not subject:
+                return Response({"error": "Message and/or subject not found"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not created:
-            return Response(
-                {
-                    "message": "Application already exists",
-                    "application_id": application.id,
+            application, created = Application.objects.get_or_create(
+                festival=festival,
+                defaults={
+                    "application_date": timezone.now().date(),
+                    "application_status": "DRAFT",
                 },
-                status=status.HTTP_200_OK,
+                message=message,
+                email_subject=subject
             )
 
-        # If a new application was created
-        return Response(
-            {
-                "message": "Application created successfully",
-                "application_id": application.id,
-                "status": application.application_status,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+            if not created and application.application_status != "DRAFT":
+                return Response(
+                    {
+                        "message": "Application has already been sent",
+                        "application_id": application.id,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            application.message = message
+            application.email_subject = subject
+            application.save()
+
+            # If a new application was created
+            # Create and send the email
+            email: EmailMessage = EmailMessage(
+                subject,
+                message,
+                "ducassephi@hotmail.fr",  # From email
+                ["info@philippeducasse.com"],
+                # [application.festival.contact_email],  # To email
+            )
+
+            try:
+                email.send(fail_silently=False)
+                application.application_status = (
+                    "APPLIED"
+                )
+                application.save()
+                return Response(
+                    {"message": "Application sent successfully"}, status=200
+                )
+            except Exception as e:
+                return Response(
+                    {"error": f"Email failed to send: {str(e)}"}, status=500
+                )
+
+        except Exception as e:
+            return Response(
+                {
+                    "error": "Failed to process application",
+                    "details": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=True, methods=["post"])
-    def send_custom_email(self, request: HttpRequest, pk: int) -> Response:
+    def generate_email(self, request: HttpRequest, pk: int) -> Response:
         try:
             festival = Festival.objects.get(pk=pk)
         except Festival.DoesNotExist:
-            return Response({"error": "Festival not found"}, status=404)
+            return Response({"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND)
 
         festival_name: str = festival.festival_name
 
         # Email content
-        subject: str = f"Philippe Ducasse Application for {festival_name}"
         prompt: str = generate_application_mail_prompt(festival)
         message: str = self.mistral_client.chat(prompt=prompt)
 
-        # Create and send the email
-        email: EmailMessage = EmailMessage(
-            subject,
-            message,
-            "ducassephi@hotmail.fr",  # From email
-            ["info@philippeducasse.com"],
-            # [application.festival.contact_email],  # To email
-        )
+        return Response({"message": message}, status=status.HTTP_200_OK)
 
-        try:
-            email.send()
-            return Response({"message": "Email sent successfully"}, status=200)
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
+
