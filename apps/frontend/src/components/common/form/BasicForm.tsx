@@ -13,9 +13,10 @@ interface BasicFormProps {
   onCancelHref: string;
   isLoading: boolean;
   entity?: unknown;
+  additionalActions?: React.ReactNode;
 }
 
-const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading }: BasicFormProps) => {
+const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading, additionalActions }: BasicFormProps) => {
   return (
     <Form {...form}>
       <form
@@ -41,7 +42,10 @@ const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading }: Basi
         ))}
         <div className="flex justify-between mt-6">
           <BackButton href={onCancelHref} />
-          <SubmitButton isLoading={isLoading} />
+          <div className="">
+            {additionalActions}
+            <SubmitButton isLoading={isLoading} />
+          </div>
         </div>
       </form>
     </Form>

@@ -57,7 +57,7 @@ const FestivalView = () => {
           </div>
         </div>
         <div className="flex gap-6 self-end mx-8 items-stretch">
-          <Button className="bg-emerald-700 hover:bg-emerald-600 dark:text-foreground" onClick={applyToFestival}>
+          <Button onClick={applyToFestival}>
             <Send />
             {festival.applied ? "Go to application" : "Apply to festival"}
           </Button>

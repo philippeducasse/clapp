@@ -14,6 +14,8 @@ import { getApplicationFormFields } from "../helpers/getApplicationFormFields";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { Bot } from "lucide-react";
 
 const ApplicationForm = () => {
   const params = useParams();
@@ -49,6 +51,16 @@ const ApplicationForm = () => {
     }
   };
 
+  const generateEmail = () => {
+    const handleClick = () => {};
+    return (
+      <Button variant="default" onClick={handleClick}>
+        <Bot />
+        Generate email
+      </Button>
+    );
+  };
+
   return (
     <>
       <FormHeader action={Action.APPLY} entityName="application" />;
@@ -59,6 +71,7 @@ const ApplicationForm = () => {
         onCancelHref={`/festivals/${festival?.id}`}
         isLoading={isLoading}
         entity={festival}
+        additionalActions={generateEmail()}
       />
     </>
   );

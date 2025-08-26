@@ -17,11 +17,20 @@ export const ControlledTextEditor = ({ field }: ControlledTextEditorProps) => {
     onUpdate: ({ editor }) => {
       field.onChange(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class:
+          "tiptap outline-none focus:outline-none focus-visible:outline-none " +
+          "border-0 focus:border-0 focus-visible:border-0 ring-0 focus:ring-0 focus-visible:ring-0",
+        role: "textbox",
+        "aria-label": "Rich text editor",
+      },
+    },
   });
 
   return (
-    <FormItem>
-      <div className="border rounded-md">
+    <FormItem className="focus-within:ring-0 focus-within:outline-none">
+      <div className="border rounded-md focus-within:ring-0 focus-within:outline-none">
         {editor && (
           <div className="flex flex-wrap p-2 border-b">
             <Toggle
@@ -71,7 +80,7 @@ export const ControlledTextEditor = ({ field }: ControlledTextEditorProps) => {
             </Toggle>
           </div>
         )}
-        <EditorContent editor={editor} className="p-2 min-h-[150px] border-0 focus-visible:border-0" />
+        <EditorContent editor={editor} className="p-2 min-h-[150px]" />
       </div>
     </FormItem>
   );
