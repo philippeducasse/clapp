@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
+import { EntityName } from "@/interfaces/Enums";
 
 interface FestivalFormProps {
   action: string;
@@ -82,7 +83,7 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
 
   return (
     <>
-      <FormHeader action={action} entityName="festival" />
+      <FormHeader action={action} entityName={EntityName.FESTIVAL} />
       <BasicForm
         form={form}
         formFields={formFields}

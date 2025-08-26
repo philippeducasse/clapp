@@ -6,6 +6,7 @@ import { DataTable } from "@/components/common/table/DataTable";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setFestivals } from "@/redux/slices/festivalSlice";
+import { EntityName } from "@/interfaces/Enums";
 
 interface FestivalsTableProps {
   festivals: Festival[];
@@ -25,5 +26,5 @@ export const FestivalsTable = ({ festivals }: FestivalsTableProps) => {
 
   const columns = getFestivalColumns(onEdit);
 
-  return <DataTable columns={columns} data={festivals} entityName="festival" />;
+  return <DataTable columns={columns} data={festivals} entityName={EntityName.FESTIVAL} />;
 };

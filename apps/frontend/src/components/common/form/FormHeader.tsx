@@ -2,9 +2,10 @@ import React from "react";
 import { Pencil, Send, Plus } from "lucide-react";
 import { Action } from "@/interfaces/Enums";
 import { capitalize } from "lodash";
+import { EntityName } from "@/interfaces/Enums";
 interface FormHeaderProps {
   action: string;
-  entityName: string;
+  entityName: EntityName;
 }
 const FormHeader = ({ action, entityName }: FormHeaderProps) => {
   const getActionIcon = (action: string) => {
