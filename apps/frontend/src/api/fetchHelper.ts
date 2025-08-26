@@ -12,7 +12,7 @@ export const fetchRequest = async <T = unknown>(url: string, options?: RequestIn
   return transformKeysToCamelCase(json);
 };
 
-export const sendRequest = async <TReq, TRes = unknown>(
+export const sendRequest = async <TReq, TRes = TReq>(
   url: string,
   data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",
