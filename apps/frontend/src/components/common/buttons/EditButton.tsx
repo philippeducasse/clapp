@@ -15,7 +15,7 @@ const EditButton = ({ label, href }: EditButtonProps) => {
   };
 
   return (
-    <Button className="" variant="outline" onClick={handleClick}>
+    <Button className="" variant="tertiary" onClick={handleClick}>
       <Pencil />
       {label ?? "Edit"}
     </Button>

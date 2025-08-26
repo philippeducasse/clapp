@@ -22,6 +22,10 @@ export interface Application {
   updatedAt?: string;
 }
 
+export type ApplicationCreate = Partial<Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">> & {
+  festival: number;
+};
+
 export enum ApplicationMethod {
   EMAIL = "EMAIL",
   FORM = "FORM",

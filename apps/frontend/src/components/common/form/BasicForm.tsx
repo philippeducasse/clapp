@@ -5,6 +5,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, For
 import BackButton from "../buttons/BackButton";
 import SubmitButton from "../buttons/SubmitButton";
 import { getControlledInputs } from "@/helpers/formHelper";
+import { Action } from "@/interfaces/Enums";
+import SendButton from "../buttons/SendButton";
 
 interface BasicFormProps {
   form: UseFormReturn;
@@ -14,9 +16,18 @@ interface BasicFormProps {
   isLoading: boolean;
   entity?: unknown;
   additionalActions?: React.ReactNode;
+  action?: Action;
 }
 
-const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading, additionalActions }: BasicFormProps) => {
+const BasicForm = ({
+  form,
+  formFields,
+  onSubmit,
+  onCancelHref,
+  isLoading,
+  additionalActions,
+  action,
+}: BasicFormProps) => {
   return (
     <Form {...form}>
       <form
@@ -42,9 +53,13 @@ const BasicForm = ({ form, formFields, onSubmit, onCancelHref, isLoading, additi
         ))}
         <div className="flex justify-between mt-6">
           <BackButton href={onCancelHref} />
-          <div className="">
+          <div className="flex gap-4">
             {additionalActions}
-            <SubmitButton isLoading={isLoading} />
+            {action === Action.APPLY ? (
+              <SendButton label="Send application" isLoading={isLoading} />
+            ) : (
+              <SubmitButton isLoading={isLoading} />
+            )}
           </div>
         </div>
       </form>

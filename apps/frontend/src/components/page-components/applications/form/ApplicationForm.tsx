@@ -16,6 +16,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
+import festivalApiService from "@/api/festivalApiService";
+import { ApplicationCreate } from "@/interfaces/Application";
 
 const ApplicationForm = () => {
   const params = useParams();
@@ -28,7 +30,7 @@ const ApplicationForm = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, festival),
+    defaultValues: getInitialValues(formFields),
     mode: "onSubmit",
   });
 
@@ -43,7 +45,8 @@ const ApplicationForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      console.log("values", values);
+      const application = await festivalApiService.applyToFestival(festivalId, values as ApplicationCreate);
+      console.log({ application });
     } catch (error) {
       console.error(error);
     } finally {
@@ -52,18 +55,29 @@ const ApplicationForm = () => {
   };
 
   const generateEmail = () => {
-    const handleClick = () => {};
+    const handleClick = async () => {
+      setIsLoading(true);
+      try {
+        const { message } = await festivalApiService.generateEmail(festivalId);
+        form.setValue("message", message);
+      } catch (error) {
+        console.error(`Failed to generate message: ${error}`);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     return (
-      <Button variant="default" onClick={handleClick}>
+      <Button variant="default" onClick={handleClick} disabled={isLoading}>
         <Bot />
-        Generate email
+        {isLoading ? "Generating..." : "Generate email"}
       </Button>
     );
   };
 
   return (
     <>
-      <FormHeader action={Action.APPLY} entityName="application" />;
+      <FormHeader action={Action.APPLY} entityName="application" />
       <BasicForm
         form={form}
         formFields={formFields}
@@ -72,6 +86,7 @@ const ApplicationForm = () => {
         isLoading={isLoading}
         entity={festival}
         additionalActions={generateEmail()}
+        action={Action.APPLY}
       />
     </>
   );

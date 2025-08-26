@@ -12,12 +12,12 @@ export const fetchRequest = async <T = unknown>(url: string, options?: RequestIn
   return transformKeysToCamelCase(json);
 };
 
-export const sendRequest = async <T = unknown>(
+export const sendRequest = async <TReq, TRes = unknown>(
   url: string,
-  data: Record<string, unknown>,
+  data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",
   toastMessage?: string
-): Promise<T> => {
+): Promise<TRes> => {
   const res = await fetch(url, {
     method,
     headers: {

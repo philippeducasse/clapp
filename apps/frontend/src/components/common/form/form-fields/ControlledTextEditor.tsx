@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { ControllerRenderProps } from "react-hook-form";
 import { FormItem } from "@/components/ui/form";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -13,7 +14,7 @@ export const ControlledTextEditor = ({ field }: ControlledTextEditorProps) => {
   const editor = useEditor({
     extensions: [StarterKit],
     immediatelyRender: false,
-    content: field,
+    content: field.value as string,
     onUpdate: ({ editor }) => {
       field.onChange(editor.getHTML());
     },
@@ -27,6 +28,20 @@ export const ControlledTextEditor = ({ field }: ControlledTextEditorProps) => {
       },
     },
   });
+
+  useEffect(() => {
+    if (!editor) return;
+    const incoming = (field.value as string) ?? "";
+
+    // Avoid useless work / loops
+    if (incoming === editor.getHTML()) return;
+
+    if (incoming) {
+      editor.commands.setContent(incoming, { emitUpdate: false });
+    } else {
+      editor.commands.clearContent(false);
+    }
+  }, [editor, field.value]);
 
   return (
     <FormItem className="focus-within:ring-0 focus-within:outline-none">

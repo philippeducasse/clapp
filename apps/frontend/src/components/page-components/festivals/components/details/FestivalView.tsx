@@ -14,12 +14,11 @@ import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getBasicFestivalInfo } from "../../helpers/getBasicFestivalInfo";
 import { getFestivalDetails } from "../../helpers/getFestivalDetails";
-import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
+import SendButton from "@/components/common/buttons/SendButton";
 
 const FestivalView = () => {
   const params = useParams();
@@ -40,8 +39,7 @@ const FestivalView = () => {
     return <Skeleton />;
   }
 
-  const applyToFestival = async () => {
-    console.log("going");
+  const goToApplyPage = async () => {
     router.push(`${festivalId}/apply`);
   };
 
@@ -57,10 +55,11 @@ const FestivalView = () => {
           </div>
         </div>
         <div className="flex gap-6 self-end mx-8 items-stretch">
-          <Button onClick={applyToFestival}>
-            <Send />
-            {festival.applied ? "Go to application" : "Apply to festival"}
-          </Button>
+          <SendButton
+            onClick={goToApplyPage}
+            label={festival.applied ? "Go to application" : "Apply to festival"}
+            isLoading={false}
+          />
           <FestivalUpdateDialog />
           <EditButton href={`/festivals/${festival.id}/edit`} />
         </div>
@@ -90,7 +89,7 @@ const FestivalView = () => {
         </CardContent>
       </Card>
       <div className="flex self-end bottom-4 right-4 m-6">
-        <BackButton href="/festivals" />
+        <BackButton href="/festivals" size={"lg"} />
       </div>
     </div>
   );

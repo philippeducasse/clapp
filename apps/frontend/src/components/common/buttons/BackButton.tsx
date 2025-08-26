@@ -7,9 +7,10 @@ interface BackButtonProps {
   href: string;
   label?: string;
   icon?: boolean;
+  size?: "icon" | "default" | "sm" | "lg" | null | undefined;
 }
 
-const BackButton = ({ label, href, icon = true }: BackButtonProps) => {
+const BackButton = ({ label, href, icon = true, size = "default" }: BackButtonProps) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -17,7 +18,7 @@ const BackButton = ({ label, href, icon = true }: BackButtonProps) => {
   };
 
   return (
-    <Button size="lg" variant="outline" onClick={handleClick} type="button">
+    <Button size={size} variant="outline" onClick={handleClick} type="button">
       {icon && <Undo2 />}
       {label ?? "Go back"}
     </Button>

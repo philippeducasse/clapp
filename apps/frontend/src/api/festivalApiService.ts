@@ -1,5 +1,6 @@
 import { Festival } from "@/interfaces/Festival";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import { Application, ApplicationCreate } from "@/interfaces/Application";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
@@ -8,16 +9,16 @@ const festivalApiService = {
     return fetchRequest<Festival[]>(endpoint);
   },
 
-  async getFestival(id: number): Promise<Festival> {
-    return fetchRequest<Festival>(`${endpoint}${id}/`);
+  async getFestival(festivalId: number): Promise<Festival> {
+    return fetchRequest<Festival>(`${endpoint}${festivalId}/`);
   },
 
   async createFestival(festival: Festival): Promise<Festival> {
     return sendRequest<Festival>(`${endpoint}`, festival, "POST", "Festival successfully created");
   },
 
-  async deleteFestival(id: number) {
-    return deleteRequest(`${endpoint}${id}`, "Festival successfully deleted");
+  async deleteFestival(festivalId: number) {
+    return deleteRequest(`${endpoint}${festivalId}`, "Festival successfully deleted");
   },
 
   async enrichFestival(festival: Festival): Promise<Festival> {
@@ -31,13 +32,22 @@ const festivalApiService = {
     return sendRequest<Festival>(`${endpoint}${festival.id}/`, festival, "PUT", "Festival successfully updated");
   },
 
-  async applyToFestival(
-    festival: Festival // : Promise<Application>
-  ) {
-    return fetchRequest<Festival>(`${endpoint}${festival.id}/apply/`, {
-      method: "POST",
-      body: JSON.stringify(festival),
-    });
+  async generateEmail(festivalId: number): Promise<{ message: string }> {
+    return sendRequest<{ message: string }>(
+      `${endpoint}${festivalId}/generate_email/`,
+      { message: "" },
+      "POST",
+      "Email successfully generated"
+    );
+  },
+
+  async applyToFestival(festivalId: number, application: Application): Promise<Application> {
+    return sendRequest<ApplicationCreate, Application>(
+      `${endpoint}${festivalId}/apply/`,
+      application,
+      "POST",
+      "Application successfully sent"
+    );
   },
 };
 
