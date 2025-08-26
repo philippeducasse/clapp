@@ -18,6 +18,7 @@ class FestivalSerializer(serializers.ModelSerializer):
     class Meta:
         model: Type[Festival] = Festival
         fields: str = "__all__"
+        read_only_fields = ("id",)
 
 
 class ApplicationSerializer(serializers.ModelSerializer):

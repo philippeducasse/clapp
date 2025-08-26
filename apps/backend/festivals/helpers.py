@@ -6,7 +6,6 @@ from mistralai import ConversationResponse, TextChunk
 
 
 def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
-
     festival_types = Festival.FESTIVAL_TYPES
     application_types = Festival.APPLICATION_TYPE
 
@@ -151,7 +150,6 @@ def clean_festival_data(festival: Festival) -> None:
     def clean_nan(value: str) -> str:
         return "" if str(value).strip().lower() == "nan" else str(value).strip()
 
-
     if festival.festival_name:
         festival.festival_name = festival.festival_name.title()
 
@@ -181,8 +179,6 @@ def clean_festival_data(festival: Festival) -> None:
         if not desc.endswith("."):
             desc += "."
         festival.description = desc
-
-
 
 
 def generate_application_mail_prompt(festival: Festival) -> str:

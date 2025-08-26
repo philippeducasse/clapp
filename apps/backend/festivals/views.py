@@ -1,9 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
-
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import status
+
+from applications.models import Application
 from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
 
@@ -37,7 +40,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         festival: Festival = self.get_object()
 
         query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
-        
+
         # search_results: ConversationResponse = self.mistral_client.search(query=query)
         # parsed_results: str = extract_search_results(search_results)
         # prompt: str = generate_enrich_prompt(festival, parsed_results)
@@ -54,6 +57,40 @@ class FestivalViewSet(viewsets.ModelViewSet):
         clean_festival_data(festival)
 
         return Response(FestivalSerializer(festival).data)
+
+    @action(detail=True, methods=["post"])
+    def apply(self, request: HttpRequest, pk: int) -> Response:
+        try:
+            festival = Festival.objects.get(pk=pk)
+        except Festival.DoesNotExist:
+            return Response({"error": "Festival not found"}, status=404)
+
+        application, created = Application.objects.get_or_create(
+            festival=festival,
+            defaults={
+                "application_date": timezone.now().date(),
+                "application_status": "DRAFT",
+            },
+        )
+
+        if not created:
+            return Response(
+                {
+                    "message": "Application already exists",
+                    "application_id": application.id,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        # If a new application was created
+        return Response(
+            {
+                "message": "Application created successfully",
+                "application_id": application.id,
+                "status": application.application_status,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     @action(detail=True, methods=["post"])
     def send_custom_email(self, request: HttpRequest, pk: int) -> Response:

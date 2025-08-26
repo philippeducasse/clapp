@@ -6,6 +6,7 @@ from google.genai import types
 # The client gets the API key from the environment variable `GEMINI_API_KEY`.
 client = genai.Client()
 
+
 class GeminiClient:
     def __init__(self):
         load_dotenv(".env")
@@ -13,12 +14,11 @@ class GeminiClient:
         if not api_key:
             raise RuntimeError("Missing GEMINI_API_KEY in .env")
 
-        self.client=genai.Client()
+        self.client = genai.Client()
         # Define the grounding tool
         self.grounding_tool = types.Tool(google_search=types.GoogleSearch())
         # Configure generation settings
         self.config = types.GenerateContentConfig(tools=[self.grounding_tool])
-
 
     def search(self, query: str) -> str:
         try:

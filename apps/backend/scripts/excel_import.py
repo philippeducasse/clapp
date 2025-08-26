@@ -9,7 +9,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "circus_agent_backend.settings")
 django.setup()
 
 
-
 def parse_date(val: Any) -> Optional[date]:
     if pd.isna(val):
         return None
@@ -22,7 +21,9 @@ def parse_date(val: Any) -> Optional[date]:
 
 
 # Load the CSV with correct delimiter
-df: pd.DataFrame = pd.read_csv("scripts/festivals/Tabellenblatt1-Table 1.csv", delimiter=";", dtype=str)
+df: pd.DataFrame = pd.read_csv(
+    "scripts/festivals/Tabellenblatt1-Table 1.csv", delimiter=";", dtype=str
+)
 
 # Normalize column names
 df.columns = [col.strip().upper() for col in df.columns]
