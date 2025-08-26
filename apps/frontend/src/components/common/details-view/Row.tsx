@@ -57,7 +57,7 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
       {title && (
         <dt
           className={`${
-            disabled ? "text-gray-400" : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium"
+            disabled ? "text-gray-400" : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium self-start"
           }`}
         >
           {title}

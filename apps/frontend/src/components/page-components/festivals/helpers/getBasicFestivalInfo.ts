@@ -1,7 +1,8 @@
 import { Festival } from "@/interfaces/Festival";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
 import { capitalize } from "lodash";
-export const getBasicFestivalInfo = (festival: Festival): SectionCellProps[] => {
+
+export const getFestivalBasicInfo = (festival: Festival): SectionCellProps[] => {
   if (!festival) return [];
 
   return [

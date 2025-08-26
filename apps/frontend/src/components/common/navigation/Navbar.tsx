@@ -1,5 +1,4 @@
 import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import Breadcrumbs from "./Breadcrumbs";
 
 const Navbar = () => {
@@ -8,7 +7,6 @@ const Navbar = () => {
       <Breadcrumbs />
       <div className="flex gap-4 items-center">
         <DarkModeToggle />
-        <SidebarTrigger className="" />
       </div>
     </nav>
   );

@@ -2,23 +2,23 @@
 
 import React, { useEffect } from "react";
 import { Flag } from "lucide-react";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
-import DetailsView from "@/components/common/table/DetailsView";
-import BackButton from "@/components/common/buttons/BackButton";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
-import { getBasicFestivalInfo } from "../../helpers/getBasicFestivalInfo";
+import { getFestivalBasicInfo } from "../../helpers/getBasicFestivalInfo";
 import { getFestivalDetails } from "../../helpers/getFestivalDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
 import SendButton from "@/components/common/buttons/SendButton";
+import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
+import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
+import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
 
 const FestivalView = () => {
   const params = useParams();
@@ -44,54 +44,34 @@ const FestivalView = () => {
   };
 
   return (
-    <div className="flex flex-col max-w-6xl mx-auto">
-      <div className="flex justify-between my-6">
-        <div className="flex items-center gap-2">
-          <Flag className="text-emerald-600 dark:text-emerald-400" size={32} />
-          <div className="flex gap-2">
-            <CardTitle className="max-w-prose">{festival.festivalName}</CardTitle>
-            {festival.town && <CardDescription>{festival.town}, </CardDescription>}
-            <CardDescription>{festival.country}</CardDescription>
-          </div>
-        </div>
-        <div className="flex gap-6 self-end mx-8 items-stretch">
-          <SendButton
-            onClick={goToApplyPage}
-            label={festival.applied ? "Go to application" : "Apply to festival"}
-            isLoading={false}
-          />
-          <FestivalUpdateDialog />
-          <EditButton href={`/festivals/${festival.id}/edit`} />
-        </div>
-      </div>
-      <Card className="mb-6 relative">
-        <CardContent className="grid-cols-2 ">
-          <div className="flex items-center gap-2 mb-6">
-            <Info className="text-emerald-600 dark:text-emerald-400" />
-            <CardDescription className="text-lg font-semibold text-black dark:text-foreground">
-              Basic info
-            </CardDescription>
-          </div>
-          <div className="col-span-2">
-            <DetailsView data={getBasicFestivalInfo(festival)} />
-          </div>
-        </CardContent>
-      </Card>
-      <Card className="relative">
-        <CardContent className="grid-cols-2">
-          <div className="flex items-center gap-2 mb-6">
-            <NotebookTabs className="text-emerald-600 dark:text-emerald-400" />
-            <CardDescription className="text-lg font-semibold text-black dark:text-foreground">
-              Festival details
-            </CardDescription>
-          </div>
-          <DetailsView data={getFestivalDetails(festival)} />
-        </CardContent>
-      </Card>
-      <div className="flex self-end bottom-4 right-4 m-6">
-        <BackButton href="/festivals" size={"lg"} />
-      </div>
-    </div>
+    <DetailsViewWrapper href="/festivals">
+      <DetailsViewHeader
+        title={festival.festivalName}
+        subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
+        icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        actionElements={
+          <>
+            <SendButton
+              onClick={goToApplyPage}
+              label={festival.applied ? "Go to application" : "Apply to festival"}
+              isLoading={false}
+            />
+            <FestivalUpdateDialog />
+            <EditButton href={`/festivals/${festival.id}/edit`} />
+          </>
+        }
+      />
+      <DetailsViewSection
+        title="Basic information"
+        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+        data={getFestivalBasicInfo(festival)}
+      />
+      <DetailsViewSection
+        title="Festival details"
+        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+        data={getFestivalDetails(festival)}
+      />
+    </DetailsViewWrapper>
   );
 };
 
