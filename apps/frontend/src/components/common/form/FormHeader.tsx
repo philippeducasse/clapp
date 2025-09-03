@@ -1,16 +1,23 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Pencil, Send, Plus } from "lucide-react";
 import { Action } from "@/interfaces/Enums";
 import { capitalize } from "lodash";
 import { EntityName } from "@/interfaces/Enums";
+
 interface FormHeaderProps {
   action: string;
   entityName: EntityName;
+  additionalActions?: ReactNode;
 }
-const FormHeader = ({ action, entityName }: FormHeaderProps) => {
+const FormHeader = ({
+  action,
+  entityName,
+  additionalActions,
+}: FormHeaderProps) => {
   const getActionIcon = (action: string) => {
     const iconProps = {
-      className: "text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400",
+      className:
+        "text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400",
       size: 48 as const,
     };
 
@@ -31,11 +38,14 @@ const FormHeader = ({ action, entityName }: FormHeaderProps) => {
           <div className="ml-4">
             <h3 className="text-xl font-semibold">{capitalize(action)}</h3>
             <p className="text-gray-400">
-              {action === Action.EDIT ? `Edit ${entityName} manually` : `Create a new ${entityName}`}
+              {action === Action.EDIT
+                ? `Edit ${entityName} manually`
+                : `Create a new ${entityName}`}
             </p>
           </div>
         </div>
       </div>
+      {additionalActions && additionalActions}
     </div>
   );
 };

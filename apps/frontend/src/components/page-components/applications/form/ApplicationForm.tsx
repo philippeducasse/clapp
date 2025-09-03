@@ -7,7 +7,7 @@ import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlic
 import { useParams } from "next/navigation";
 import { refreshFestival } from "../../festivals/helpers/refreshFestival";
 import FormHeader from "@/components/common/form/FormHeader";
-import { Action } from "@/interfaces/Enums";
+import { Action, EntityName } from "@/interfaces/Enums";
 import BasicForm from "@/components/common/form/BasicForm";
 import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
 import { getApplicationFormFields } from "../helpers/getApplicationFormFields";
@@ -77,7 +77,7 @@ const ApplicationForm = () => {
 
   return (
     <>
-      <FormHeader action={Action.APPLY} entityName="application" />
+      <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
       <BasicForm
         form={form}
         formFields={formFields}

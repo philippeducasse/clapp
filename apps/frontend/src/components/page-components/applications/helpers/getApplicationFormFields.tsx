@@ -13,5 +13,10 @@ export const getApplicationFormFields = (): ControlledFormElement[] => {
       fieldName: "message",
       type: ControlledFormElementType.TEXT_EDITOR,
     },
+    {
+      label: "attachmentsSent",
+      fieldName: "Attachments",
+      type: ControlledFormElementType.FILE,
+    },
   ];
 };

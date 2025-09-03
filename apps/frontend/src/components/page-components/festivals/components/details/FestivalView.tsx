@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
-import SendButton from "@/components/common/buttons/SendButton";
+import SendButton from "@/components/common/buttons/GenericButton";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";

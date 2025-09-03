@@ -6,7 +6,7 @@ import BackButton from "../buttons/BackButton";
 import SubmitButton from "../buttons/SubmitButton";
 import { getControlledInputs } from "@/helpers/formHelper";
 import { Action } from "@/interfaces/Enums";
-import SendButton from "../buttons/SendButton";
+import SendButton from "../buttons/GenericButton";
 
 interface BasicFormProps {
   form: UseFormReturn;

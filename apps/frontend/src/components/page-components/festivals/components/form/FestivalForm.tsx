@@ -4,7 +4,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/Festival";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import {
+  createZodFormSchema,
+  sanitizeFormData,
+  getInitialValues,
+} from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import festivalApiService from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -17,6 +21,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
+// import GenericButton from "@/components/common/buttons/GenericButton";
 
 interface FestivalFormProps {
   action: string;
@@ -27,7 +32,9 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   const router = useRouter();
   const params = useParams();
   const festivalId = Number(params?.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
+  );
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +72,9 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        const newFestival = await festivalApiService.createFestival(values as Festival);
+        const newFestival = await festivalApiService.createFestival(
+          values as Festival
+        );
         router.push(`/festivals/${newFestival?.id}`);
       }
     } catch (error) {
@@ -80,6 +89,8 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   }
 
   const onCancelHref = festivalId ? `/festivals/${festival?.id}` : "/festivals";
+
+  // const updateButton = GenericButton
 
   return (
     <>
