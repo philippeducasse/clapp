@@ -72,6 +72,8 @@ class FestivalViewSet(viewsets.ModelViewSet):
             body = json.loads(request.body) if request.body else {}
             message = body.get('message')
             subject = body.get('email_subject')
+            attachments = request.FILES.getlist("attachments_sent")
+
             if not message or not subject:
                 return Response({"error": "Message and/or subject not found"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -85,15 +87,17 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 email_subject=subject
             )
 
-            if not created and application.application_status != "DRAFT":
-                return Response(
-                    {
-                        "message": "Application has already been sent",
-                        "application_id": application.id,
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
+            # if not created and application.application_status != "DRAFT":
+            #     return Response(
+            #         {
+            #             "message": "Application has already been sent",
+            #             "application_id": application.id,
+            #         },
+            #         status=status.HTTP_400_BAD_REQUEST,
+            #     )
+            print("ATTACHMENTS",attachments)
+            print("BODY:", body)
+            print("REQ",request)
             application.message = message
             application.email_subject = subject
             application.save()
@@ -107,6 +111,10 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 ["info@philippeducasse.com"],
                 # [application.festival.contact_email],  # To email
             )
+
+ 
+            for file in attachments:
+                email.attach(file.name, file.read(), file.content_type)
 
             try:
                 email.send(fail_silently=False)
