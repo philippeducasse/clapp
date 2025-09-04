@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/reducers";
-import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
+import {
+  selectFestival,
+  setSelectedFestival,
+} from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { refreshFestival } from "../../festivals/helpers/refreshFestival";
 import FormHeader from "@/components/common/form/FormHeader";
@@ -17,12 +20,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import festivalApiService from "@/api/festivalApiService";
-import { ApplicationCreate } from "@/interfaces/Application";
+import { Application } from "@/interfaces/Application";
 
 const ApplicationForm = () => {
   const params = useParams();
   const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
+  );
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const formFields = getApplicationFormFields();
@@ -42,10 +47,14 @@ const ApplicationForm = () => {
     }
   }, [festivalId, festival, dispatch]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: Application) => {
     setIsLoading(true);
+    console.log("VALS:", values);
     try {
-      const application = await festivalApiService.applyToFestival(festivalId, values as ApplicationCreate);
+      const application = await festivalApiService.applyToFestival(
+        festivalId,
+        values as Application
+      );
       console.log({ application });
     } catch (error) {
       console.error(error);
@@ -66,6 +75,8 @@ const ApplicationForm = () => {
         setIsLoading(false);
       }
     };
+
+    console.log(form.formState);
 
     return (
       <Button variant="default" onClick={handleClick} disabled={isLoading}>

@@ -1,7 +1,15 @@
 import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from "@/components/ui/form";
 import BackButton from "../buttons/BackButton";
 import SubmitButton from "../buttons/SubmitButton";
 import { getControlledInputs } from "@/helpers/formHelper";
@@ -42,9 +50,13 @@ const BasicForm = ({
             render={({ field }) => (
               <FormItem>
                 {!formField.hidden && (
-                  <FormLabel className="text-emerald-700 dark:text-emerald-400">{formField.label}</FormLabel>
+                  <FormLabel className="text-emerald-700 dark:text-emerald-400">
+                    {formField.label}
+                  </FormLabel>
                 )}
-                <FormControl className="">{getControlledInputs(formField, field, true)}</FormControl>
+                <FormControl className="">
+                  {getControlledInputs(formField, field, true)}
+                </FormControl>
                 <FormDescription>{formField.helpText}</FormDescription>
                 <FormMessage />
               </FormItem>

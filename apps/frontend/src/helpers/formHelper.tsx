@@ -1,4 +1,7 @@
-import { ControlledFormElement, SelectOptions } from "@/interfaces/ControlledFormElement";
+import {
+  ControlledFormElement,
+  SelectOptions,
+} from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { capitalize } from "lodash";
@@ -8,6 +11,7 @@ import ControlledText from "@/components/common/form/form-fields/ControlledText"
 import ControlledTextArea from "@/components/common/form/form-fields/ControlledTextArea";
 import { ControllerRenderProps } from "react-hook-form";
 import { ControlledTextEditor } from "@/components/common/form/form-fields/ControlledTextEditor";
+import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
@@ -19,7 +23,11 @@ export const getControlledInputs = (
     switch (formField.type) {
       case ControlledFormElementType.SELECT:
         return formField.options ? (
-          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
+          <ControlledSelect
+            field={field}
+            options={formField.options}
+            showLabels={showLabels}
+          />
         ) : null;
       case ControlledFormElementType.BOOLEAN:
         return <ControlledBoolean field={field} showLabels={showLabels} />;
@@ -27,13 +35,23 @@ export const getControlledInputs = (
         return <ControlledTextArea field={field} showLabels={showLabels} />;
       case ControlledFormElementType.TEXT_EDITOR:
         return <ControlledTextEditor field={field} />;
+      case ControlledFormElementType.FILE:
+        return <ControlledFile field={field} />;
       default:
-        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
+        return (
+          <ControlledText
+            field={field}
+            type={formField.type}
+            showLabels={showLabels}
+          />
+        );
     }
   }
 };
 
-export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {
+export const sanitizeFormData = <T extends Record<string, unknown>>(
+  entity: T
+): T => {
   const sanitizedData = { ...entity } as T;
 
   for (const key in sanitizedData) {
@@ -49,7 +67,9 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): 
   return sanitizedData;
 };
 
-export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObject<Record<string, ZodType>> => {
+export const createZodFormSchema = (
+  formFields: ControlledFormElement[]
+): ZodObject<Record<string, ZodType>> => {
   const schema: Record<string, ZodType> = {};
 
   formFields.forEach((field) => {
@@ -77,7 +97,12 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
         break;
 
       case ControlledFormElementType.DATE:
-        zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
+        zodType = z
+          .string()
+          .regex(
+            /^\d{4}-\d{2}-\d{2}$/,
+            "Date must be in the format YYYY-MM-DD"
+          );
         break;
 
       case ControlledFormElementType.URL:
@@ -97,7 +122,9 @@ export const createZodFormSchema = (formFields: ControlledFormElement[]): ZodObj
   return z.object(schema);
 };
 
-export const getOptions = <T extends Record<string, string>>(optionsEnum: T): SelectOptions[] => {
+export const getOptions = <T extends Record<string, string>>(
+  optionsEnum: T
+): SelectOptions[] => {
   const options = Object.values(optionsEnum).map((o) => ({
     value: o.toUpperCase(),
     label: capitalize(o.replace(/_/g, " ").toLowerCase()),
@@ -105,7 +132,10 @@ export const getOptions = <T extends Record<string, string>>(optionsEnum: T): Se
   return options;
 };
 
-export const getInitialValues = (formFields: ControlledFormElement[], entity?: Record<string, unknown>) => {
+export const getInitialValues = (
+  formFields: ControlledFormElement[],
+  entity?: Record<string, unknown>
+) => {
   if (entity) {
     return sanitizeFormData(entity);
   }

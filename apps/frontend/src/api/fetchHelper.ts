@@ -18,6 +18,16 @@ export const sendRequest = async <TReq, TRes = TReq>(
   method: "POST" | "PUT" | "PATCH" = "POST",
   toastMessage?: string
 ): Promise<TRes> => {
+  let body: BodyInit;
+  let headers: HeadersInit = { Accept: "application/json" };
+
+  if (data instanceof FormData) {
+    body = data;
+  } else {
+    body = JSON.stringify(transformKeysToSnakeCase(data));
+    headers["Content-Type"] = "application/json";
+  }
+
   const res = await fetch(url, {
     method,
     headers: {
