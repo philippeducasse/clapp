@@ -69,10 +69,10 @@ class FestivalViewSet(viewsets.ModelViewSet):
             return Response({"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            body = json.loads(request.body) if request.body else {}
-            message = body.get('message')
-            subject = body.get('email_subject')
-            attachments = request.FILES.getlist("attachments_sent")
+            message = request.data.get("message")
+            subject = request.data.get("email_subject")
+            attachments = request.FILES.getlist("attachments_sent")  # <-- note camelCase vs snake_case
+
 
             if not message or not subject:
                 return Response({"error": "Message and/or subject not found"}, status=status.HTTP_400_BAD_REQUEST)
