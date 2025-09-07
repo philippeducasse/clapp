@@ -93,7 +93,7 @@ export const createZodFormSchema = (
         break;
 
       case ControlledFormElementType.FILE:
-        zodType = z.instanceof(File);
+        zodType = z.array(z.instanceof(File));
         break;
 
       case ControlledFormElementType.DATE:

@@ -1,5 +1,5 @@
 import { Festival } from "@/interfaces/Festival";
-import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import { fetchRequest, sendRequest, deleteRequest, sendFormDataRequest } from "./fetchHelper";
 import { Application, ApplicationCreate } from "@/interfaces/Application";
 
 const endpoint = "http://localhost:8000/api/festivals/";
@@ -41,10 +41,12 @@ const festivalApiService = {
     );
   },
 
-  async applyToFestival(festivalId: number, application: Application): Promise<Application> {
-    return sendRequest<ApplicationCreate, Application>(
+  async applyToFestival(festivalId: number, application: Application, files: File[], fileFieldName: string): Promise<Application> {
+    return sendFormDataRequest<ApplicationCreate, Application>(
       `${endpoint}${festivalId}/apply/`,
       application,
+      files,
+      fileFieldName,
       "POST",
       "Application successfully sent"
     );

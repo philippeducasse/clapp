@@ -1,5 +1,4 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ControllerRenderProps } from "react-hook-form";
 
@@ -13,7 +12,10 @@ const ControlledFile = ({ field }: ControlledFileProps) => {
       <Input
         id={field.name}
         type="file"
-        onChange={(e) => field.onChange(e.target.files?.[0])}
+        multiple
+        onChange={(e) =>
+          field.onChange(e.target.files ? Array.from(e.target.files) : [])
+        }
       />
     </div>
   );

@@ -50,12 +50,15 @@ const ApplicationForm = () => {
   const onSubmit = async (values: Application) => {
     setIsLoading(true);
     console.log("VALS:", values);
+    const { attachmentsSent, ...vals } = values;
     try {
       const application = await festivalApiService.applyToFestival(
         festivalId,
-        values as Application
+        vals as Application,
+        attachmentsSent as File[],
+        "attachments_sent"
       );
-      console.log({ application });
+      console.log("RESPONSE:", { application });
     } catch (error) {
       console.error(error);
     } finally {
