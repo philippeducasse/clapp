@@ -1,15 +1,12 @@
 from datetime import datetime
 from typing import Any, Dict
 
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework import status
-import json
-
-
+from django.utils.html import strip_tags
 from festivals.models import Festival
 from circus_agent_backend.serializers import FestivalSerializer
 from applications.models import Application
@@ -62,7 +59,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def apply(self, request: HttpRequest, pk: int) -> Response:
-        print("req: ", request, pk)
+
         try:
             festival = Festival.objects.get(pk=pk)
         except Festival.DoesNotExist:
@@ -71,7 +68,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         try:
             message = request.data.get("message")
             subject = request.data.get("email_subject")
-            attachments = request.FILES.getlist("attachments_sent")  # <-- note camelCase vs snake_case
+            attachments = request.FILES.getlist("attachments_sent")
 
 
             if not message or not subject:
@@ -82,35 +79,41 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 defaults={
                     "application_date": timezone.now().date(),
                     "application_status": "DRAFT",
+                    "message":message,
+                    "email_subject":subject
                 },
-                message=message,
-                email_subject=subject
             )
 
-            # if not created and application.application_status != "DRAFT":
-            #     return Response(
-            #         {
-            #             "message": "Application has already been sent",
-            #             "application_id": application.id,
-            #         },
-            #         status=status.HTTP_400_BAD_REQUEST,
-            #     )
-            print("ATTACHMENTS",attachments)
-            print("BODY:", body)
-            print("REQ",request)
+            if not created and application.application_status != "DRAFT":
+                return Response(
+                    {
+                        "message": "Application has already been sent",
+                        "application_id": application.id,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             application.message = message
             application.email_subject = subject
             application.save()
 
             # If a new application was created
             # Create and send the email
-            email: EmailMessage = EmailMessage(
-                subject,
-                message,
-                "ducassephi@hotmail.fr",  # From email
-                ["info@philippeducasse.com"],
-                # [application.festival.contact_email],  # To email
-            )
+            # email: EmailMessage = EmailMessage(
+            #     subject,
+            #     message,
+            #     "ducassephi@hotmail.fr",  # From email
+            #     ["info@philippeducasse.com"],
+            #     # [application.festival.contact_email],  # To email
+            # )
+
+
+            text_content = strip_tags(application.message)  # plain text fallback
+            html_content = application.message  # Tiptap HTML
+
+            email = EmailMultiAlternatives(subject, text_content, "ducassephi@hotmail.fr", ["info@philippeducasse.com"])
+            email.attach_alternative(html_content, "text/html")
+            email.send()
 
  
             for file in attachments:
