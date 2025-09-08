@@ -96,30 +96,16 @@ class FestivalViewSet(viewsets.ModelViewSet):
             application.message = message
             application.email_subject = subject
             application.save()
-
-            # If a new application was created
-            # Create and send the email
-            # email: EmailMessage = EmailMessage(
-            #     subject,
-            #     message,
-            #     "ducassephi@hotmail.fr",  # From email
-            #     ["info@philippeducasse.com"],
-            #     # [application.festival.contact_email],  # To email
-            # )
-
-
-            text_content = strip_tags(application.message)  # plain text fallback
-            html_content = application.message  # Tiptap HTML
-
-            email = EmailMultiAlternatives(subject, text_content, "ducassephi@hotmail.fr", ["info@philippeducasse.com"])
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-
  
             for file in attachments:
                 email.attach(file.name, file.read(), file.content_type)
 
             try:
+                text_content = strip_tags(application.message)  # plain text fallback
+                html_content = application.message  # Tiptap HTML
+
+                email = EmailMultiAlternatives(subject, text_content, "ducassephi@hotmail.fr", ["info@philippeducasse.com"])
+                email.attach_alternative(html_content, "text/html")
                 email.send(fail_silently=False)
                 application.application_status = (
                     "APPLIED"
