@@ -57,3 +57,17 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.festival.festival_name} {self.application_date.year}"
+    
+    @property
+    def application_year(self) -> int:
+        """Derive the festival year based on the application date."""
+        if not self.application_date:
+            return None
+
+        month = self.application_date.month
+        year = self.application_date.year
+
+        if 9 <= month <= 12:
+            return year + 1
+        else:
+            return year

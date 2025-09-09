@@ -73,32 +73,40 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
             if not message or not subject:
                 return Response({"error": "Message and/or subject not found"}, status=status.HTTP_400_BAD_REQUEST)
+            
+             # Calculate the application year
+            current_date = timezone.now().date()
+            application_year = current_date.year
+            if current_date.month >= 9:
+                application_year += 1
 
-            application, created = Application.objects.get_or_create(
+            # Check if an application already exists for the festival and year
+            existing_application = Application.objects.filter(
                 festival=festival,
-                defaults={
-                    "application_date": timezone.now().date(),
-                    "application_status": "DRAFT",
-                    "message":message,
-                    "email_subject":subject
-                },
-            )
-
-            if not created and application.application_status != "DRAFT":
+                application_date__year=application_year
+            ).first()
+            
+            if existing_application:
                 return Response(
                     {
-                        "message": "Application has already been sent",
-                        "application_id": application.id,
+                        "message": "Application already exists for this festival and year",
+                        "application_id": existing_application.id,
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-            application.message = message
-            application.email_subject = subject
-            application.save()
+            application = Application.objects.create(
+                festival=festival,
+                application_date=timezone.now().date(),
+                application_status="DRAFT",
+                message=message,
+                email_subject=subject,
+            )
  
-            for file in attachments:
-                email.attach(file.name, file.read(), file.content_type)
+            if attachments:
+                application.attachments_sent = [file.name for file in attachments]
+                application.save()
+
 
             try:
                 text_content = strip_tags(application.message)  # plain text fallback
@@ -106,6 +114,10 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
                 email = EmailMultiAlternatives(subject, text_content, "ducassephi@hotmail.fr", ["info@philippeducasse.com"])
                 email.attach_alternative(html_content, "text/html")
+
+                for file in attachments:
+                    email.attach(file.name, file.read(), file.content_type)
+
                 email.send(fail_silently=False)
                 application.application_status = (
                     "APPLIED"
