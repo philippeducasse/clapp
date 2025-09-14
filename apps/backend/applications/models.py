@@ -57,7 +57,7 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.festival.festival_name} {self.application_date.year}"
-    
+
     @property
     def application_year(self) -> int:
         """Derive the festival year based on the application date."""

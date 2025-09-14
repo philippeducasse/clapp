@@ -4,35 +4,61 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('festivals', '0007_alter_festival_application_type'),
+        ("festivals", "0007_alter_festival_application_type"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='festival',
-            name='application_type',
-            field=models.CharField(blank=True, choices=[('EMAIL', 'Email'), ('FORM', 'Form'), ('INVITATION_ONLY', 'Invitation only'), ('OTHER', 'Other'), ('UNKNOWN', 'Unknown')], default='UNKNOWN', max_length=50, null=True),
+            model_name="festival",
+            name="application_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("EMAIL", "Email"),
+                    ("FORM", "Form"),
+                    ("INVITATION_ONLY", "Invitation only"),
+                    ("OTHER", "Other"),
+                    ("UNKNOWN", "Unknown"),
+                ],
+                default="UNKNOWN",
+                max_length=50,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='festival',
-            name='comments',
+            model_name="festival",
+            name="comments",
             field=models.TextField(blank=True, max_length=500, null=True),
         ),
         migrations.AlterField(
-            model_name='festival',
-            name='contact_email',
+            model_name="festival",
+            name="contact_email",
             field=models.EmailField(blank=True, max_length=200, null=True),
         ),
         migrations.AlterField(
-            model_name='festival',
-            name='festival_type',
-            field=models.CharField(blank=True, choices=[('STREET', 'Street'), ('PUPPET', 'Puppet'), ('JUGGLING_CONVENTION', 'Juggling convention'), ('CIRCUS', 'Circus'), ('MUSIC', 'Music'), ('THEATRE', 'Theatre'), ('DANCE', 'Dance'), ('OTHER', 'Other')], default='STREET', max_length=50, null=True),
+            model_name="festival",
+            name="festival_type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("STREET", "Street"),
+                    ("PUPPET", "Puppet"),
+                    ("JUGGLING_CONVENTION", "Juggling convention"),
+                    ("CIRCUS", "Circus"),
+                    ("MUSIC", "Music"),
+                    ("THEATRE", "Theatre"),
+                    ("DANCE", "Dance"),
+                    ("OTHER", "Other"),
+                ],
+                default="STREET",
+                max_length=50,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='festival',
-            name='website_url',
+            model_name="festival",
+            name="website_url",
             field=models.URLField(blank=True, null=True),
         ),
     ]

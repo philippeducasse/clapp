@@ -215,4 +215,3 @@ def generate_application_mail_prompt(festival: Festival) -> str:
     """
 
     return prompt.strip()
-

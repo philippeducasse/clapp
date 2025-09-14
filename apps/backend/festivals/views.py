@@ -59,39 +59,40 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def apply(self, request: HttpRequest, pk: int) -> Response:
-
         try:
             festival = Festival.objects.get(pk=pk)
         except Festival.DoesNotExist:
-            return Response({"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             message = request.data.get("message")
             subject = request.data.get("email_subject")
             attachments = request.FILES.getlist("attachments_sent")
 
-
             if not message or not subject:
-                return Response({"error": "Message and/or subject not found"}, status=status.HTTP_400_BAD_REQUEST)
-            
-             # Calculate the application year
+                return Response(
+                    {"error": "Message and/or subject not found"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Calculate the application year
             current_date = timezone.now().date()
             application_year = current_date.year
             if current_date.month >= 9:
                 application_year += 1
 
             # Check if an application already exists for the festival and year
-            existing_application = Application.objects.filter(
-                festival=festival,
-                application_date__year=application_year
-            ).first()
-            
+            applications = Application.objects.filter(festival=festival)
+            existing_application = next(
+                (a for a in applications if a.application_year == application_year),
+                None,
+            )
+
             if existing_application:
                 return Response(
-                    {
-                        "message": "Application already exists for this festival and year",
-                        "application_id": existing_application.id,
-                    },
+                    "Application already exists for this festival and year",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
@@ -102,26 +103,28 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 message=message,
                 email_subject=subject,
             )
- 
+
             if attachments:
                 application.attachments_sent = [file.name for file in attachments]
                 application.save()
-
 
             try:
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
 
-                email = EmailMultiAlternatives(subject, text_content, "ducassephi@hotmail.fr", ["info@philippeducasse.com"])
+                email = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    "ducassephi@hotmail.fr",
+                    ["info@philippeducasse.com"],
+                )
                 email.attach_alternative(html_content, "text/html")
 
                 for file in attachments:
                     email.attach(file.name, file.read(), file.content_type)
 
                 email.send(fail_silently=False)
-                application.application_status = (
-                    "APPLIED"
-                )
+                application.application_status = "APPLIED"
                 application.save()
                 return Response(
                     {"message": "Application sent successfully"}, status=200
@@ -145,7 +148,9 @@ class FestivalViewSet(viewsets.ModelViewSet):
         try:
             festival = Festival.objects.get(pk=pk)
         except Festival.DoesNotExist:
-            return Response({"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         festival_name: str = festival.festival_name
 
@@ -154,5 +159,3 @@ class FestivalViewSet(viewsets.ModelViewSet):
         message: str = self.mistral_client.chat(prompt=prompt)
 
         return Response({"message": message}, status=status.HTTP_200_OK)
-
-
