@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from applications.models import Application
 from festivals.models import Festival
-from performance.models import Performance
+from performances.models import Performance
 from typing import Type
 
 

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     "corsheaders",
     "festivals",
     "applications",
+    "performances",
+    "profiles",
 ]
 
 MIDDLEWARE = [
@@ -60,7 +62,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3020",  # Next.js dev server
+    "http://localhost:3020",
+    "http://localhost",  # Next.js dev server
 ]
 
 # Allow credentials
@@ -172,3 +175,6 @@ EMAIL_PORT = os.getenv("EMAIL_PORT")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+# overides default django user model
+AUTH_USER_MODEL = "profiles.CustomUser"
