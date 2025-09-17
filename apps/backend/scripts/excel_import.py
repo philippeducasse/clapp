@@ -2,10 +2,16 @@ import pandas as pd
 from datetime import datetime, date
 from festivals.models import Festival
 from typing import Optional, Any
+
 import os
+import sys
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "circus_agent_backend.settings")
+# Add the project directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Set up Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project_name.settings")
 django.setup()
 
 
