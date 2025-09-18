@@ -34,6 +34,11 @@ const items = [
     icon: ClipboardEdit,
   },
   {
+    title: "Residencies",
+    url: "/residencies",
+    icon: ClipboardEdit,
+  },
+  {
     title: "Calendar",
     url: "#",
     icon: Calendar,
