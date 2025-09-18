@@ -7,26 +7,49 @@ import multiselectfield.db.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('performances', '0001_initial'),
+        ("performances", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='performance',
-            old_name='performance_name',
-            new_name='performance_title',
+            model_name="performance",
+            old_name="performance_name",
+            new_name="performance_title",
         ),
         migrations.AddField(
-            model_name='performance',
-            name='genres',
-            field=multiselectfield.db.fields.MultiSelectField(blank=True, choices=[('CIRCUS', 'Circus / Street Show'), ('JUGGLING', 'Juggling'), ('COMEDY', 'Comedy / Stand-up'), ('PUPPETRY', 'Puppetry'), ('WALK_ACT', 'Walk Act'), ('FIRE_SHOW', 'Fire Show'), ('MUSIC', 'Live Music'), ('DANCE', 'Dance / Physical Theatre'), ('THEATRE', 'Theatre / Drama'), ('MAGIC', 'Magic / Illusion'), ('INSTALLATION', 'Installation / Interactive Art'), ('KIDS', 'Kids / Family Show'), ('MULTIMEDIA', 'Multimedia / Projection')], max_length=105),
+            model_name="performance",
+            name="genres",
+            field=multiselectfield.db.fields.MultiSelectField(
+                blank=True,
+                choices=[
+                    ("CIRCUS", "Circus / Street Show"),
+                    ("JUGGLING", "Juggling"),
+                    ("COMEDY", "Comedy / Stand-up"),
+                    ("PUPPETRY", "Puppetry"),
+                    ("WALK_ACT", "Walk Act"),
+                    ("FIRE_SHOW", "Fire Show"),
+                    ("MUSIC", "Live Music"),
+                    ("DANCE", "Dance / Physical Theatre"),
+                    ("THEATRE", "Theatre / Drama"),
+                    ("MAGIC", "Magic / Illusion"),
+                    ("INSTALLATION", "Installation / Interactive Art"),
+                    ("KIDS", "Kids / Family Show"),
+                    ("MULTIMEDIA", "Multimedia / Projection"),
+                ],
+                max_length=105,
+            ),
         ),
         migrations.AddField(
-            model_name='performance',
-            name='profile',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='performances', to=settings.AUTH_USER_MODEL),
+            model_name="performance",
+            name="profile",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="performances",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

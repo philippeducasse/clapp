@@ -4,25 +4,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Performance',
+            name="Performance",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('performance_name', models.CharField(max_length=200)),
-                ('short_description', models.CharField(blank=True, max_length=1000, null=True)),
-                ('trailer', models.URLField(blank=True, max_length=100, null=True)),
-                ('length', models.DurationField(blank=True, null=True)),
-                ('long_description', models.TextField(blank=True, max_length=10000, null=True)),
-                ('creation_date', models.DateField(blank=True, null=True)),
-                ('dossier', models.FileField(blank=True, null=True, upload_to='pdfs/')),
-                ('performance_type', models.CharField(blank=True, choices=[('STREET', 'Street show'), ('INDOOR_STAGE', 'Indoor stage'), ('OUTDOOR', 'Outdoor'), ('INSTALLATION', 'Installation'), ('WALK_ACT', 'Walk act'), ('FIRE_SHOW', 'Fire show')], max_length=50, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("performance_name", models.CharField(max_length=200)),
+                (
+                    "short_description",
+                    models.CharField(blank=True, max_length=1000, null=True),
+                ),
+                ("trailer", models.URLField(blank=True, max_length=100, null=True)),
+                ("length", models.DurationField(blank=True, null=True)),
+                (
+                    "long_description",
+                    models.TextField(blank=True, max_length=10000, null=True),
+                ),
+                ("creation_date", models.DateField(blank=True, null=True)),
+                ("dossier", models.FileField(blank=True, null=True, upload_to="pdfs/")),
+                (
+                    "performance_type",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("STREET", "Street show"),
+                            ("INDOOR_STAGE", "Indoor stage"),
+                            ("OUTDOOR", "Outdoor"),
+                            ("INSTALLATION", "Installation"),
+                            ("WALK_ACT", "Walk act"),
+                            ("FIRE_SHOW", "Fire show"),
+                        ],
+                        max_length=50,
+                        null=True,
+                    ),
+                ),
             ],
         ),
     ]

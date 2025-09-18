@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "django_extensions",
     "corsheaders",
     "festivals",
+    "residencies",
+    "venues",
     "applications",
     "performances",
     "profiles",
