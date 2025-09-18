@@ -28,6 +28,11 @@ const items = [
     url: "/applications",
     icon: ClipboardEdit,
   },
+  // {
+  //   title: "Performances",
+  //   url: "/applications",
+  //   icon: ClipboardEdit,
+  // },
   {
     title: "Calendar",
     url: "#",
