@@ -29,25 +29,23 @@ def parse_date(val: Any) -> Optional[date]:
 
 
 # Load the CSV with correct delimiter
-df: pd.DataFrame = pd.read_csv(
-    "scripts/imports/only_festivals.csv", delimiter=",", dtype=str
-)
+df: pd.DataFrame = pd.read_csv("scripts/data/all_events.csv", delimiter=",", dtype=str)
 
 # Normalize column names
 df.columns = [col.strip().upper() for col in df.columns]
 
 for index, row in df.iterrows():
     entry_type: str = str(row.get("EVENT_TYPE", "") or "").strip().lower()
-    name: str = str(row.get("NAME", "") or "").strip()
+    name: str = str(row.get("NAME", "") or "").strip().lower()
 
     if not name:
         continue
 
     if entry_type == "festival" or entry_type == "juggling convention":
         if Festival.objects.filter(festival_name__iexact=name).exists():
-            print(
-                f"Skipping row {index}: Festival '{name}' already exists in the database"
-            )
+            # print(
+            #     f"Skipping row {index}: Festival '{name}' already exists in the database"
+            # )
             continue
 
         festival: Festival = Festival(
@@ -65,8 +63,10 @@ for index, row in df.iterrows():
         festival.save()
         print(f"Imported: {festival.festival_name}")
 
-    elif entry_type == "residency":
-        if Festival.objects.filter(resideny_name__iexact=name).exists():
+    elif "residenc" in name or "residenc" in entry_type:
+        print("importing residency: ", name)
+
+        if Residency.objects.filter(residency_name__iexact=name).exists():
             print(
                 f"Skipping row {index}: Residency '{name}' already exists in the database"
             )
@@ -88,9 +88,9 @@ for index, row in df.iterrows():
 
     else:
         if Venue.objects.filter(venue_name__iexact=name).exists():
-            print(
-                f"Skipping row {index}: Residency '{name}' already exists in the database"
-            )
+            # print(
+            #     f"Skipping row {index}: Residency '{name}' already exists in the database"
+            # )
             continue
 
         venue: Venue = Venue(
