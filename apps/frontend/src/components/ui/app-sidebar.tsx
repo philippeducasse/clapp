@@ -1,4 +1,12 @@
-import { Calendar, Home, Flag, ClipboardEdit, Settings } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Flag,
+  ClipboardEdit,
+  Settings,
+  University,
+  Theater,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -31,12 +39,12 @@ const items = [
   {
     title: "Venues",
     url: "/venues",
-    icon: ClipboardEdit,
+    icon: Theater,
   },
   {
     title: "Residencies",
     url: "/residencies",
-    icon: ClipboardEdit,
+    icon: University,
   },
   {
     title: "Calendar",
