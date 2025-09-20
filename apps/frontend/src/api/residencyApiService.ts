@@ -1,6 +1,6 @@
-import { Residency, ResidencyUpdate } from "@/interfaces/Residency";
-import { get, post, put } from "./fetchHelper";
-import { serialize } from "@/helpers/serializer";
+import { Residency } from "@/interfaces/Residency";
+// import { fetchRequest, sendRequest, deleteRequest, sendFormDataRequest  } from "./fetchHelper";
+
 
 const getResidencies = async (): Promise<Residency[]> => {
   return await get("/residencies");
