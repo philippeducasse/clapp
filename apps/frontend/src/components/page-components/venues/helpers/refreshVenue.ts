@@ -1,5 +1,5 @@
 import { AppDispatch } from "@/redux/store";
-import venueApiService from "@/api/venueApiService";
+import { venueApiService } from "@/api/venueApiService";
 import { setVenue, setSelectedVenue } from "@/redux/slices/venueSlice";
 
 export const refreshVenue = async (venueId: number, dispatch: AppDispatch) => {
