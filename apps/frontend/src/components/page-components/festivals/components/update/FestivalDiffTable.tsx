@@ -7,9 +7,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Festival } from "@/interfaces/entities/Festival";
-import { DiffViewProps } from "@/interfaces/DiffViewProps";
 import FestivalDiffForm from "@/components/page-components/festivals/components/form/FestivalDiffForm";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
+import { Dispatch, SetStateAction } from "react";
+
+export interface DiffViewProps {
+  original: Festival;
+  updated: Festival;
+  setUpdated: Dispatch<SetStateAction<Festival | undefined>>;
+}
 
 export const FestivalDiffTable = ({
   original,
