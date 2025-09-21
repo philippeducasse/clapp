@@ -3,6 +3,7 @@ from applications.models import Application
 from festivals.models import Festival
 from performances.models import Performance
 from residencies.models import Residency
+from venues.models import Venue
 from typing import Type
 
 
@@ -40,5 +41,12 @@ class PerformanceSerializer(serializers.ModelSerializer):
 class ResidencySerializer(serializers.ModelSerializer):
     class Meta:
         model: Type[Residency] = Residency
+        fields: str = "__all__"
+        read_only_fields = ("id",)
+
+
+class VenueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Type[Venue] = Venue
         fields: str = "__all__"
         read_only_fields = ("id",)
