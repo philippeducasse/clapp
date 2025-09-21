@@ -1,35 +1,55 @@
 import { Residency } from "@/interfaces/Residency";
-// import { fetchRequest, sendRequest, deleteRequest, sendFormDataRequest  } from "./fetchHelper";
+import {
+  fetchRequest,
+  sendRequest,
+  deleteRequest,
+  // sendFormDataRequest,
+} from "./fetchHelper";
 
+const endpoint = "http://localhost:8000/api/residencies/";
 
 const getResidencies = async (): Promise<Residency[]> => {
-  return await get("/residencies");
+  return await fetchRequest(endpoint);
 };
 
 const getResidency = async (id: number): Promise<Residency> => {
-  return await get(`/residencies/${id}`);
+  return await fetchRequest(`${endpoint}${id}/`);
 };
 
 const createResidency = async (
   residency: Partial<Residency>
 ): Promise<Residency> => {
-  return await post("/residencies", residency);
+  return await sendRequest(`${endpoint}`, residency);
+};
+
+const deleteResidency = (residencyId: number) => {
+  return deleteRequest(
+    `${endpoint}${residencyId}`,
+    "Residency successfully deleted"
+  );
 };
 
 const updateResidency = async (
   id: number,
   residency: Partial<Residency>
 ): Promise<Residency> => {
-  return await put(`/residencies/${id}`, residency);
+  return await sendRequest(`${endpoint}/${id}`, residency);
 };
 
-const getResidencyUpdates = async (): Promise<ResidencyUpdate[]> => {
-  const residencies = await get("/residencies/updates");
-  return serialize(residencies) as ResidencyUpdate[];
+const enerichResidency = async (residency: Residency): Promise<Residency[]> => {
+  return fetchRequest(`${endpoint}/${residency.id}/enrich/`, {
+    method: "POST",
+    body: JSON.stringify(residency),
+  });
 };
 
-const refreshResidency = async (id: number): Promise<Residency> => {
-  return await post(`/residencies/${id}/refresh`, {});
+const generateEmail = (residencyId: number): Promise<{ message: string }> => {
+  return sendRequest<{ message: string }>(
+    `${endpoint}${residencyId}/generate_email/`,
+    { message: "" },
+    "POST",
+    "Email successfully generated"
+  );
 };
 
 export const residencyApiService = {
@@ -37,6 +57,7 @@ export const residencyApiService = {
   getResidency,
   createResidency,
   updateResidency,
-  getResidencyUpdates,
-  refreshResidency,
+  enerichResidency,
+  generateEmail,
+  deleteResidency,
 };

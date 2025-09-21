@@ -20,5 +20,11 @@ export const FestivalsTable = ({ festivals }: FestivalsTableProps) => {
 
   const columns = useFestivalColumns();
 
-  return <DataTable columns={columns} data={festivals} entityName={EntityName.FESTIVAL} />;
+  return (
+    <DataTable
+      columns={columns}
+      data={festivals}
+      entityName={EntityName.FESTIVAL}
+    />
+  );
 };

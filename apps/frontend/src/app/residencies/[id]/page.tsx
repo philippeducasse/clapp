@@ -1,10 +1,7 @@
-'use client';
+import ResidencyView from "@/components/page-components/residencies/components/details/ResidencyView";
 
-import React from 'react';
-import { ResidencyView } from '@/components/page-components/residencies/components/details/ResidencyView';
-
-const ResidencyDetailsPage = ({ params }: { params: { id: string } }) => {
-  return <ResidencyView id={Number(params.id)} />;
+const ResidencyDetailsPage = () => {
+  return <ResidencyView />;
 };
 
 export default ResidencyDetailsPage;

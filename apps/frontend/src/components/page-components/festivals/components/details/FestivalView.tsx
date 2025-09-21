@@ -5,7 +5,10 @@ import { Flag } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
+import {
+  selectFestival,
+  setSelectedFestival,
+} from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
@@ -24,7 +27,9 @@ const FestivalView = () => {
   const params = useParams();
   const dispatch = useDispatch();
   const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -48,12 +53,16 @@ const FestivalView = () => {
       <DetailsViewHeader
         title={festival.festivalName}
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
-        icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={
+          <Flag className="text-emerald-600 dark:text-emerald-400" size={32} />
+        }
         actionElements={
           <>
             <SendButton
               onClick={goToApplyPage}
-              label={festival.applied ? "Go to application" : "Apply to festival"}
+              label={
+                festival.applied ? "Go to application" : "Apply to festival"
+              }
               isLoading={false}
             />
             <FestivalUpdateDialog />
@@ -68,7 +77,9 @@ const FestivalView = () => {
       />
       <DetailsViewSection
         title="Festival details"
-        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+        icon={
+          <NotebookTabs className="text-emerald-600 dark:text-emerald-400" />
+        }
         data={getFestivalDetails(festival)}
       />
     </DetailsViewWrapper>

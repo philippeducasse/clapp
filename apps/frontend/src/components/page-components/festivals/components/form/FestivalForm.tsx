@@ -10,7 +10,7 @@ import {
   getInitialValues,
 } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
-import festivalApiService from "@/api/festivalApiService";
+import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";

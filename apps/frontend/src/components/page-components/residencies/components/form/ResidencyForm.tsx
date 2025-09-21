@@ -1,37 +1,43 @@
-'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { useEffect, useState } from 'react';
-import { Residency } from '@/interfaces/Residency';
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useEffect, useState } from "react";
+import { Residency } from "@/interfaces/Residency";
 import {
   createZodFormSchema,
   sanitizeFormData,
   getInitialValues,
-} from '@/helpers/formHelper';
-import { getResidencyFormFields } from '../../helpers/getResidencyFormFields';
-import { residencyApiService } from '@/api/residencyApiService';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateResidency, selectResidency, addResidency } from '@/redux/slices/residencySlice';
-import { AppDispatch, RootState } from '@/redux/store';
-import { refreshResidency } from '../../helpers/refreshResidency';
-import { Skeleton } from '@/components/ui/skeleton';
-import FormHeader from '@/components/common/form/FormHeader';
-import BasicForm from '@/components/common/form/BasicForm';
-import { Action, EntityName } from '@/interfaces/Enums';
-
+} from "@/helpers/formHelper";
+import { getResidencyFormFields } from "../../helpers/getResidencyFormFields";
+import { residencyApiService } from "@/api/residencyApiService";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateResidency,
+  selectResidency,
+  addResidency,
+} from "@/redux/slices/residencySlice";
+import { AppDispatch, RootState } from "@/redux/store";
+import { refreshResidency } from "../../helpers/refreshResidency";
+import { Skeleton } from "@/components/ui/skeleton";
+import FormHeader from "@/components/common/form/FormHeader";
+import BasicForm from "@/components/common/form/BasicForm";
+import { Action, EntityName } from "@/interfaces/Enums";
+import { useParams } from "next/navigation";
 interface ResidencyFormProps {
-  id?: number;
+  action: string;
 }
 
-const ResidencyForm = ({ id }: ResidencyFormProps) => {
+const ResidencyForm = ({ action }: ResidencyFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
+  const params = useParams();
+  const residencyId = Number(params?.id);
   const residency = useSelector((state: RootState) =>
-    selectResidency(state, id)
+    selectResidency(state, residencyId)
   );
-  const formFields = getResidencyFormFields(residency);
+  const formFields = getResidencyFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
@@ -39,16 +45,16 @@ const ResidencyForm = ({ id }: ResidencyFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: getInitialValues(formFields, residency),
-    mode: 'onSubmit',
+    mode: "onSubmit",
   });
 
   // Fetch residency data if not available
   useEffect(() => {
-    if (!residency && id) {
-      refreshResidency(id, dispatch);
+    if (!residency && residencyId) {
+      refreshResidency(residencyId, dispatch);
       setInitialDataLoaded(true);
     }
-  }, [id, residency, dispatch]);
+  }, [residencyId, residency, dispatch]);
 
   // Reset form when residency data changes (but only once)
   useEffect(() => {
@@ -58,14 +64,15 @@ const ResidencyForm = ({ id }: ResidencyFormProps) => {
     }
   }, [residency, form, initialDataLoaded]);
 
-  const action = id ? Action.EDIT : Action.CREATE;
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
-        const updatedResidency = { ...values, id: id } as Residency;
-        await residencyApiService.updateResidency(id, updatedResidency);
+        const updatedResidency = { ...values, id: residencyId } as Residency;
+        await residencyApiService.updateResidency(
+          residencyId,
+          updatedResidency
+        );
         dispatch(updateResidency(updatedResidency));
         router.push(`/residencies/${residency?.id}`);
       } else {
@@ -82,11 +89,13 @@ const ResidencyForm = ({ id }: ResidencyFormProps) => {
     }
   };
 
-  if (!residency && id) {
+  if (!residency && residencyId) {
     return <Skeleton />;
   }
 
-  const onCancelHref = id ? `/residencies/${residency?.id}` : '/residencies';
+  const onCancelHref = residencyId
+    ? `/residencies/${residency?.id}`
+    : "/residencies";
 
   return (
     <>

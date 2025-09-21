@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Festival } from "@/interfaces/Festival";
 import { RootState } from "../store";
-import festivalApiService from "@/api/festivalApiService";
+import { festivalApiService } from "@/api/festivalApiService";
 
 interface FestivalsState {
   festivals: Festival[];
@@ -17,10 +17,13 @@ const initialState: FestivalsState = {
   selectedFestival: undefined,
 };
 
-export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
-  const response = await festivalApiService.getAllFestivals();
-  return response;
-});
+export const fetchFestivals = createAsyncThunk(
+  "festivals/fetchFestivals",
+  async () => {
+    const response = await festivalApiService.getAllFestivals();
+    return response;
+  }
+);
 
 const festivalSlice = createSlice({
   name: "festivals",
@@ -30,7 +33,9 @@ const festivalSlice = createSlice({
       state.festivals = action.payload;
     },
     setFestival(state, action: PayloadAction<Festival>) {
-      const existingIndex = state.festivals.findIndex((festival) => festival.id === action.payload.id);
+      const existingIndex = state.festivals.findIndex(
+        (festival) => festival.id === action.payload.id
+      );
       if (existingIndex >= 0) {
         state.festivals[existingIndex] = action.payload;
       } else {
@@ -45,7 +50,9 @@ const festivalSlice = createSlice({
     },
     updateFestival(state, action: PayloadAction<Festival>) {
       const { id } = action.payload;
-      const existingFestival = state.festivals.find((festival) => festival.id === id);
+      const existingFestival = state.festivals.find(
+        (festival) => festival.id === id
+      );
       if (existingFestival) {
         Object.assign(existingFestival, action.payload);
       }
@@ -67,10 +74,18 @@ const festivalSlice = createSlice({
   },
 });
 
-export const { setFestivals, setFestival, addFestival, updateFestival, setSelectedFestival } = festivalSlice.actions;
+export const {
+  setFestivals,
+  setFestival,
+  addFestival,
+  updateFestival,
+  setSelectedFestival,
+} = festivalSlice.actions;
 
-export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
-export const selectFestivalsStatus = (state: RootState) => state.festivals.status;
+export const selectAllFestivals = (state: RootState) =>
+  state.festivals.festivals;
+export const selectFestivalsStatus = (state: RootState) =>
+  state.festivals.status;
 export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival) => festival.id === festivalId);
 
