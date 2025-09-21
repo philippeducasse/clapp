@@ -1,14 +1,28 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Festival } from "@/interfaces/Festival";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Festival } from "@/interfaces/entities/Festival";
 import { DiffViewProps } from "@/interfaces/DiffViewProps";
 import FestivalDiffForm from "@/components/page-components/festivals/components/form/FestivalDiffForm";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 
-export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewProps) => {
+export const FestivalDiffTable = ({
+  original,
+  updated,
+  setUpdated,
+}: DiffViewProps) => {
   const formFields = getFestivalFormFields();
   const changedFields = formFields
     .map((f) => f.fieldName)
-    .filter((field) => original[field as keyof Festival] !== updated[field as keyof Festival]);
+    .filter(
+      (field) =>
+        original[field as keyof Festival] !== updated[field as keyof Festival]
+    );
 
   return (
     <div className="flex">
@@ -30,8 +44,14 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
 
                 return (
                   <TableRow key={fieldName}>
-                    <TableCell className="font-medium truncate">{field.label}</TableCell>
-                    <TableCell className={`truncate ${hasChanged ? "bg-red-50 dark:bg-red-950" : ""}`}>
+                    <TableCell className="font-medium truncate">
+                      {field.label}
+                    </TableCell>
+                    <TableCell
+                      className={`truncate ${
+                        hasChanged ? "bg-red-50 dark:bg-red-950" : ""
+                      }`}
+                    >
                       {String(originalVal)}
                     </TableCell>
                   </TableRow>
@@ -48,7 +68,11 @@ export const FestivalDiffTable = ({ original, updated, setUpdated }: DiffViewPro
             </TableRow>
           </TableHeader>
           <TableBody>
-            <FestivalDiffForm updatedFestival={updated} changedFields={changedFields} setUpdated={setUpdated} />
+            <FestivalDiffForm
+              updatedFestival={updated}
+              changedFields={changedFields}
+              setUpdated={setUpdated}
+            />
           </TableBody>
         </Table>
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import { Pencil, Trash, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -23,7 +23,9 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/festivals/${festival.id}`}>{festival.festivalName}</Link>
+            <Link href={`/festivals/${festival.id}`}>
+              {festival.festivalName}
+            </Link>
           </div>
         );
       },
@@ -41,7 +43,11 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
+            <Link
+              href={festival.websiteUrl ?? "#"}
+              target="_blank"
+              title={festival.websiteUrl}
+            >
               {festival.websiteUrl}
             </Link>
           </div>
@@ -58,7 +64,9 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       id: "actions",
       cell: ({ row }) => {
         const festival = row.original;
-        const applyRoute = festival.applied ? `/application/${1}` : `/festivals/${festival.id}/apply`; // find way to reference application id
+        const applyRoute = festival.applied
+          ? `/application/${1}`
+          : `/festivals/${festival.id}/apply`; // find way to reference application id
         const onApply = () => {
           router.push(applyRoute);
         };
@@ -80,7 +88,11 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
             >
               <Send />
             </Button>
-            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 hover:text-red-500"
+            >
               <Trash />
             </Button>
           </div>

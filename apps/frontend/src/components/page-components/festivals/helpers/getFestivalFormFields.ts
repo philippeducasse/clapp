@@ -1,7 +1,7 @@
 import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
-import { FestivalType, ApplicationType } from "@/interfaces/Festival";
+import { FestivalType, ApplicationType } from "@/interfaces/entities/Festival";
 export const getFestivalFormFields = (): ControlledFormElement[] => {
   return [
     {
@@ -71,7 +71,8 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       label: "Application start",
       fieldName: "applicationStart",
       type: ControlledFormElementType.TEXT,
-      helpText: "Approximate or exact date of when festival begins accepting applications",
+      helpText:
+        "Approximate or exact date of when festival begins accepting applications",
     },
     {
       label: "Application end",

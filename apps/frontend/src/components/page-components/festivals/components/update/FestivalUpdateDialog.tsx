@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FestivalDiffTable } from "./FestivalDiffTable";
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import { useState } from "react";
 import { Hammer } from "lucide-react";
 import festivalApiService from "@/api/festivalApiService";
@@ -31,7 +31,9 @@ export const FestivalUpdateDialog = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
+  );
 
   const handleUpdate = async () => {
     setLoading(true);
@@ -69,9 +71,12 @@ export const FestivalUpdateDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-          
-        <GenericButton variant="secondary"icon={<Hammer />} label="Update" onClick={handleUpdate}/>
-  
+        <GenericButton
+          variant="secondary"
+          icon={<Hammer />}
+          label="Update"
+          onClick={handleUpdate}
+        />
       </DialogTrigger>
       <DialogContent className="w-full md:w-[90vw] max-w-full h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -79,7 +84,11 @@ export const FestivalUpdateDialog = () => {
           <DialogDescription>Review changes</DialogDescription>
         </DialogHeader>
         {updatedFields ? (
-          <FestivalDiffTable original={festival} updated={updatedFields} setUpdated={setUpdatedFields} />
+          <FestivalDiffTable
+            original={festival}
+            updated={updatedFields}
+            setUpdated={setUpdatedFields}
+          />
         ) : (
           <DynamicProgress />
         )}
@@ -89,7 +98,11 @@ export const FestivalUpdateDialog = () => {
               <X className="text-red-500" /> Cancel
             </Button>
           </DialogClose>
-          <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />
+          <SubmitButton
+            isLoading={loading}
+            onClick={handleSubmit}
+            label="Save changes"
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

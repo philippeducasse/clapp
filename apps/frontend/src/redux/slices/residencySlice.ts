@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Residency } from "@/interfaces/Residency";
+import { Residency } from "@/interfaces/entities/Residency";
 import { RootState } from "../store";
 import { residencyApiService } from "@/api/residencyApiService";
 
@@ -17,10 +17,13 @@ const initialState: ResidenciesState = {
   selectedResidency: undefined,
 };
 
-export const fetchResidencies = createAsyncThunk("residencies/fetchResidencies", async () => {
-  const response = await residencyApiService.getResidencies();
-  return response;
-});
+export const fetchResidencies = createAsyncThunk(
+  "residencies/fetchResidencies",
+  async () => {
+    const response = await residencyApiService.getResidencies();
+    return response;
+  }
+);
 
 const residencySlice = createSlice({
   name: "residencies",
@@ -30,7 +33,9 @@ const residencySlice = createSlice({
       state.residencies = action.payload;
     },
     setResidency(state, action: PayloadAction<Residency>) {
-      const existingIndex = state.residencies.findIndex((residency) => residency.id === action.payload.id);
+      const existingIndex = state.residencies.findIndex(
+        (residency) => residency.id === action.payload.id
+      );
       if (existingIndex >= 0) {
         state.residencies[existingIndex] = action.payload;
       } else {
@@ -45,7 +50,9 @@ const residencySlice = createSlice({
     },
     updateResidency(state, action: PayloadAction<Residency>) {
       const { id } = action.payload;
-      const existingResidency = state.residencies.find((residency) => residency.id === id);
+      const existingResidency = state.residencies.find(
+        (residency) => residency.id === id
+      );
       if (existingResidency) {
         Object.assign(existingResidency, action.payload);
       }
@@ -67,11 +74,21 @@ const residencySlice = createSlice({
   },
 });
 
-export const { setResidencies, setResidency, addResidency, updateResidency, setSelectedResidency } = residencySlice.actions;
+export const {
+  setResidencies,
+  setResidency,
+  addResidency,
+  updateResidency,
+  setSelectedResidency,
+} = residencySlice.actions;
 
-export const selectAllResidencies = (state: RootState) => state.residencies.residencies;
-export const selectResidenciesStatus = (state: RootState) => state.residencies.status;
+export const selectAllResidencies = (state: RootState) =>
+  state.residencies.residencies;
+export const selectResidenciesStatus = (state: RootState) =>
+  state.residencies.status;
 export const selectResidency = (state: RootState, residencyId: number) =>
-  state.residencies.residencies.find((residency) => residency.id === residencyId);
+  state.residencies.residencies.find(
+    (residency) => residency.id === residencyId
+  );
 
 export default residencySlice.reducer;

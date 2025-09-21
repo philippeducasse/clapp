@@ -1,7 +1,9 @@
-import { Residency } from "@/interfaces/Residency";
+import { Residency } from "@/interfaces/entities/Residency";
 import { SectionCellProps } from "@/interfaces/DetailsView";
 
-export const getResidencyDetails = (residency: Residency): SectionCellProps[] => {
+export const getResidencyDetails = (
+  residency: Residency
+): SectionCellProps[] => {
   if (!residency) return [];
 
   return [

@@ -1,4 +1,4 @@
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
 import { capitalize } from "lodash";
 export const getFestivalDetails = (festival: Festival): SectionCellProps[] => {

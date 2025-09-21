@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import { RootState } from "../store";
 import { festivalApiService } from "@/api/festivalApiService";
 

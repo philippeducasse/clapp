@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import { useFestivalColumns } from "../../helpers/useFestivalColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";

@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import festivalApiService from "@/api/festivalApiService";
-import { Application } from "@/interfaces/Application";
+import { Application } from "@/interfaces/entities/Application";
 
 const ApplicationForm = () => {
   const params = useParams();

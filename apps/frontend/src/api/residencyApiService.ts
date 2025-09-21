@@ -1,4 +1,4 @@
-import { Residency } from "@/interfaces/Residency";
+import { Residency } from "@/interfaces/entities/Residency";
 import {
   fetchRequest,
   sendRequest,

@@ -5,7 +5,7 @@ import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
 import { EntityName } from "@/interfaces/Enums";
 import { AppDispatch } from "@/redux/store";
-import { Residency } from "@/interfaces/Residency";
+import { Residency } from "@/interfaces/entities/Residency";
 import { setResidencies } from "@/redux/slices/residencySlice";
 
 interface ResidenciesTableProps {

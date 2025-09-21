@@ -1,11 +1,14 @@
-import { Festival } from "@/interfaces/Festival";
+import { Festival } from "@/interfaces/entities/Festival";
 import {
   fetchRequest,
   sendRequest,
   deleteRequest,
   sendFormDataRequest,
 } from "./fetchHelper";
-import { Application, ApplicationCreate } from "@/interfaces/Application";
+import {
+  Application,
+  ApplicationCreate,
+} from "@/interfaces/entities/Application";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 

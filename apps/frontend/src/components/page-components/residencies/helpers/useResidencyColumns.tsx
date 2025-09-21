@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Residency } from "@/interfaces/Residency";
+import { Residency } from "@/interfaces/entities/Residency";
 import { Pencil, Trash, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
