@@ -1,5 +1,5 @@
 import { venueApiService } from "../../api/venueApiService";
-import { VenuesTable } from "../../components/page-components/venues/components/table/VenuesTable";
+import { VenuesTable } from "@/components/page-components/venues/components/table/FestivalsTable";
 
 const VenuesPage = async () => {
   const data = await venueApiService.getAllVenues();

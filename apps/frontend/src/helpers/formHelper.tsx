@@ -1,8 +1,8 @@
 import {
   ControlledFormElement,
   SelectOptions,
-} from "@/interfaces/ControlledFormElement";
-import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
+} from "@/interfaces/forms/ControlledFormElement";
+import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { capitalize } from "lodash";
 import ControlledBoolean from "@/components/common/form/form-fields/ControlledBoolean";

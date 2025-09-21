@@ -88,7 +88,7 @@ export const selectResidenciesStatus = (state: RootState) =>
   state.residencies.status;
 export const selectResidency = (state: RootState, residencyId: number) =>
   state.residencies.residencies.find(
-    (residency) => residency.id === residencyId
+    (residency: Residency) => residency.id === residencyId
   );
 
 export default residencySlice.reducer;

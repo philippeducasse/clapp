@@ -87,6 +87,8 @@ export const selectAllFestivals = (state: RootState) =>
 export const selectFestivalsStatus = (state: RootState) =>
   state.festivals.status;
 export const selectFestival = (state: RootState, festivalId: number) =>
-  state.festivals.festivals.find((festival) => festival.id === festivalId);
+  state.festivals.festivals.find(
+    (festival: Festival) => festival.id === festivalId
+  );
 
 export default festivalSlice.reducer;

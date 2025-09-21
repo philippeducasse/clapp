@@ -1,4 +1,4 @@
-import VenueForm from "@/components/page-components/venues/components/form/VenueForm";
+import VenueForm from "@/components/page-components/venues/components/form/FestivalForm";
 import React from "react";
 import { Action } from "@/interfaces/Enums";
 
