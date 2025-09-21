@@ -1,4 +1,4 @@
-import { venueApiService } from "@/api/venueApiService";
+import { venueApiService } from "../../api/venueApiService";
 import { VenuesTable } from "../../components/page-components/venues/components/table/VenuesTable";
 
 const VenuesPage = async () => {
