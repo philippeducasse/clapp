@@ -53,11 +53,6 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
       },
     },
     {
-      accessorKey: "approximateDate",
-      header: "Date",
-      size: 100,
-    },
-    {
       header: "Actions",
       id: "actions",
       cell: ({ row }) => {

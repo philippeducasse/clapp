@@ -1,7 +1,7 @@
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
-import { VenueType, ApplicationType } from "@/interfaces/entities/Venue";
+import { VenueType } from "@/interfaces/entities/Venue";
 export const getVenueFormFields = (): ControlledFormElement[] => {
   return [
     {
@@ -20,12 +20,6 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
       label: "Website",
       fieldName: "websiteUrl",
       type: ControlledFormElementType.URL,
-    },
-    {
-      label: "Approximate Date",
-      fieldName: "approximateDate",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Approximate date the venue will take place",
     },
     {
       label: "Country",
@@ -56,39 +50,8 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
       helpText: "Name of main person of contact",
     },
     {
-      label: "Start Date",
-      fieldName: "startDate",
-      type: ControlledFormElementType.DATE,
-      helpText: "Exact date the venue will start",
-    },
-    {
-      label: "End Date",
-      fieldName: "endDate",
-      type: ControlledFormElementType.DATE,
-      helpText: "Exact date the venue will end",
-    },
-    {
-      label: "Application start",
-      fieldName: "applicationStart",
-      type: ControlledFormElementType.TEXT,
-      helpText:
-        "Approximate or exact date of when venue begins accepting applications",
-    },
-    {
-      label: "Application end",
-      fieldName: "applicationEnd",
-      type: ControlledFormElementType.TEXT,
-    },
-    {
-      label: "Application type",
-      fieldName: "applicationType",
-      type: ControlledFormElementType.SELECT,
-      options: getOptions(ApplicationType),
-      helpText: "How the venue accepts applications",
-    },
-    {
-      label: "Applied",
-      fieldName: "applied",
+      label: "Conntacted",
+      fieldName: "contacted",
       type: ControlledFormElementType.BOOLEAN,
     },
     {

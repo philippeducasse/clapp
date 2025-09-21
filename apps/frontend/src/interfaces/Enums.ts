@@ -8,4 +8,5 @@ export enum EntityName {
   FESTIVAL = "festival",
   APPLICATION = "application",
   RESIDENCY = "residency",
+  VENUE = "venue",
 }

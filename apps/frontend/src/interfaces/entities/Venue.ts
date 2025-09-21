@@ -14,7 +14,7 @@ export interface Venue {
   comments?: string;
 }
 
-enum VenueType {
+export enum VenueType {
   THEATRE = "Theatre",
   OPERA_HOUSE = "Opera house",
   CONCERT_HALL = "Concert hall",
