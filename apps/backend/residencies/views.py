@@ -1,3 +1,10 @@
 from django.shortcuts import render
+from residencies.models import Residency
+from circus_agent_backend.serializers import ResidencySerializer
+from rest_framework import viewsets
 
-# Create your views here.
+
+class ResidencyViewSet(viewsets.ModelViewSet):
+    queryset = Residency.objects.all()
+    # Class used to convert JSON into Django Model objects and vice versa
+    serializer_class = ResidencySerializer
