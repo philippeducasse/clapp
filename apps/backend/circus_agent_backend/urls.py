@@ -12,6 +12,7 @@ urlpatterns: List[URLPattern] = [
                 path("applications/", include("applications.urls")),
                 path("performances/", include("performances.urls")),
                 path("residencies/", include("residencies.urls")),
+                path("venues/", include("venues.urls")),
             ]
         ),
     ),
