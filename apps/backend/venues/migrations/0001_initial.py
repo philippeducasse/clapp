@@ -4,27 +4,65 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Venue',
+            name="Venue",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('venue_name', models.CharField(max_length=200)),
-                ('description', models.CharField(blank=True, max_length=1000, null=True)),
-                ('country', models.CharField(blank=True, max_length=100, null=True)),
-                ('town', models.CharField(blank=True, max_length=100, null=True)),
-                ('website_url', models.URLField(blank=True, null=True)),
-                ('contact_email', models.EmailField(blank=True, max_length=200, null=True)),
-                ('contact_person', models.CharField(blank=True, max_length=200, null=True)),
-                ('venue_type', models.CharField(blank=True, choices=[('THEATRE', 'Theatre'), ('OPERA_HOUSE', 'Opera house'), ('CONCERT_HALL', 'Concert hall'), ('DANCE_STUDIO', 'Dance studio'), ('MUSIC_VENUE', 'Music venue'), ('CIRCUS_TENT', 'Circus tent'), ('PERFORMANCE_SPACE', 'Performance space'), ('ART_GALLERY', 'Art gallery'), ('OUTDOOR_STAGE', 'Outdoor stage'), ('PUPPET_THEATRE', 'Puppet theatre'), ('CIRCUS_SPACE', 'Circus space'), ('OTHER', 'Other'), ('UNKNOWN', 'Unknown')], default='UNKNOWN', max_length=50, null=True)),
-                ('contacted', models.BooleanField(default=False)),
-                ('comments', models.TextField(blank=True, max_length=500, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("venue_name", models.CharField(max_length=200)),
+                (
+                    "description",
+                    models.CharField(blank=True, max_length=1000, null=True),
+                ),
+                ("country", models.CharField(blank=True, max_length=100, null=True)),
+                ("town", models.CharField(blank=True, max_length=100, null=True)),
+                ("website_url", models.URLField(blank=True, null=True)),
+                (
+                    "contact_email",
+                    models.EmailField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "contact_person",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                (
+                    "venue_type",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("THEATRE", "Theatre"),
+                            ("OPERA_HOUSE", "Opera house"),
+                            ("CONCERT_HALL", "Concert hall"),
+                            ("DANCE_STUDIO", "Dance studio"),
+                            ("MUSIC_VENUE", "Music venue"),
+                            ("CIRCUS_TENT", "Circus tent"),
+                            ("PERFORMANCE_SPACE", "Performance space"),
+                            ("ART_GALLERY", "Art gallery"),
+                            ("OUTDOOR_STAGE", "Outdoor stage"),
+                            ("PUPPET_THEATRE", "Puppet theatre"),
+                            ("CIRCUS_SPACE", "Circus space"),
+                            ("OTHER", "Other"),
+                            ("UNKNOWN", "Unknown"),
+                        ],
+                        default="UNKNOWN",
+                        max_length=50,
+                        null=True,
+                    ),
+                ),
+                ("contacted", models.BooleanField(default=False)),
+                ("comments", models.TextField(blank=True, max_length=500, null=True)),
             ],
         ),
     ]
