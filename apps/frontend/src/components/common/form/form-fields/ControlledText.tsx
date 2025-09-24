@@ -1,6 +1,6 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
-import { ControlledFormElementType } from "@/interfaces/ControlledFormElementType";
+import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { ControllerRenderProps } from "react-hook-form";
 
 interface ControlledTextProps {
@@ -13,7 +13,12 @@ const ControlledText = ({ field, type, showLabels }: ControlledTextProps) => {
   return showLabels ? (
     <Input type={type.toLowerCase()} {...field} value={field.value as string} />
   ) : (
-    <input className="max-w-fit" type={type.toLowerCase()} {...field} value={field.value as string} />
+    <input
+      className="max-w-fit"
+      type={type.toLowerCase()}
+      {...field}
+      value={field.value as string}
+    />
   );
 };
 

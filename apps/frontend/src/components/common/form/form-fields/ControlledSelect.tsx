@@ -1,7 +1,13 @@
 import React from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ControllerRenderProps } from "react-hook-form";
-import { SelectOptions } from "@/interfaces/ControlledFormElement";
+import { SelectOptions } from "@/interfaces/forms/ControlledFormElement";
 
 interface ControlledSelectProps {
   field: ControllerRenderProps<Record<string, unknown>, string>;
@@ -9,7 +15,11 @@ interface ControlledSelectProps {
   showLabels: boolean;
 }
 
-const ControlledSelect = ({ field, options, showLabels }: ControlledSelectProps) => {
+const ControlledSelect = ({
+  field,
+  options,
+  showLabels,
+}: ControlledSelectProps) => {
   return showLabels ? (
     <Select
       value={field.value as string | undefined}
@@ -29,7 +39,11 @@ const ControlledSelect = ({ field, options, showLabels }: ControlledSelectProps)
       </SelectContent>
     </Select>
   ) : (
-    <select className="pb-0.5 max-w-fit" {...field} value={field.value as string}>
+    <select
+      className="pb-0.5 max-w-fit"
+      {...field}
+      value={field.value as string}
+    >
       {options.map((o, i) => (
         <option key={`${o.label}/${i}`} value={o.value}>
           {o.label}

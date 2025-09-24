@@ -1,5 +1,5 @@
 import { Control, FieldErrors } from "react-hook-form";
-import { ControlledFormElement } from "@/interfaces/ControlledFormElement";
+import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 
 export interface ControlledFormFieldsProps<T> {
   fields: ControlledFormElement[];
