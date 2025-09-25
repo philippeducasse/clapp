@@ -13,7 +13,7 @@ import { FestivalDiffTable } from "./FestivalDiffTable";
 import { Festival } from "@/interfaces/entities/Festival";
 import { useState } from "react";
 import { Hammer } from "lucide-react";
-import { festivalApiSerivce } from "@/api/festivalApiService";
+import { festivalApiService } from "@/api/festivalApiService";
 import SubmitButton from "../../../../common/buttons/SubmitButton";
 import { DynamicProgress } from "../../../../common/DynamicProgress";
 import { useDispatch, useSelector } from "react-redux";

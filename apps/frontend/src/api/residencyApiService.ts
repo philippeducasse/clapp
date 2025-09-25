@@ -1,10 +1,5 @@
 import { Residency } from "@/interfaces/entities/Residency";
-import {
-  fetchRequest,
-  sendRequest,
-  deleteRequest,
-  // sendFormDataRequest,
-} from "./fetchHelper";
+import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 
 const endpoint = "http://localhost:8000/api/residencies/";
 

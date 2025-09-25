@@ -7,6 +7,7 @@ const rootReducer = combineReducers({
   festivals: festivalsReducer,
   residencies: residenciesReducer,
   venues: venuesReducer,
+  profile: profileReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
