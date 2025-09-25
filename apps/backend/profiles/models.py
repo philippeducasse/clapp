@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 
-class CustomUserManager(BaseUserManager):
+class ProfileManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("Users must provide an email address")
@@ -19,7 +19,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class CustomUser(AbstractUser):
+class Profile(AbstractUser):
     username = None  # remove username field
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255, blank=True, null=True)
@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
-    objects = CustomUserManager()
+    objects = ProfileManager()
 
     def __str__(self):
         return self.email

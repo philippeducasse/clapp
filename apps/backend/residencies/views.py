@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from residencies.models import Residency
 from circus_agent_backend.serializers import ResidencySerializer
 from rest_framework import viewsets

@@ -4,6 +4,7 @@ from festivals.models import Festival
 from performances.models import Performance
 from residencies.models import Residency
 from venues.models import Venue
+from profiles.models import Profile
 from typing import Type
 
 
@@ -48,5 +49,12 @@ class ResidencySerializer(serializers.ModelSerializer):
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model: Type[Venue] = Venue
+        fields: str = "__all__"
+        read_only_fields = ("id",)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: Type[Profile] = Profile
         fields: str = "__all__"
         read_only_fields = ("id",)

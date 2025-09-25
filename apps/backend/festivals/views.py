@@ -34,7 +34,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["post"])
-    def enrich(self, request: HttpRequest, pk: int = None) -> Response:
+    def enrich(self) -> Response:
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
 
