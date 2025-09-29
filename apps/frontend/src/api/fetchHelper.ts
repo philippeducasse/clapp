@@ -1,7 +1,13 @@
-import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
+import {
+  transformKeysToCamelCase,
+  transformKeysToSnakeCase,
+} from "@/helpers/serializer";
 import { toast } from "sonner";
 
-export const fetchRequest = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
+export const fetchRequest = async <T = unknown>(
+  url: string,
+  options?: RequestInit
+): Promise<T> => {
   const res = await fetch(url, options);
   if (!res.ok) {
     const text = await res.text();
@@ -9,6 +15,7 @@ export const fetchRequest = async <T = unknown>(url: string, options?: RequestIn
     throw new Error(`Failed to fetch ${url}: ${res.status}`);
   }
   const json = await res.json();
+  console.log("RETURNED:", json);
   return transformKeysToCamelCase(json);
 };
 
@@ -38,10 +45,12 @@ export const sendRequest = async <TReq, TRes = TReq>(
   toast.success(toastMessage ?? "Success");
 
   return json;
-
 };
 
-export const deleteRequest = async (url: string, toastMessage?: string): Promise<void> => {
+export const deleteRequest = async (
+  url: string,
+  toastMessage?: string
+): Promise<void> => {
   const res = await fetch(url, {
     method: "DELETE",
     headers: {
@@ -69,12 +78,12 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
   const formData = new FormData();
 
   const jsonData = transformKeysToSnakeCase(data);
-  Object.keys(jsonData).forEach(key => {
+  Object.keys(jsonData).forEach((key) => {
     formData.append(key, jsonData[key]);
   });
-  
-  if(files && fileFieldName) {
-    files.forEach(file => {
+
+  if (files && fileFieldName) {
+    files.forEach((file) => {
       formData.append(fileFieldName, file);
     });
   }

@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import StoreProvider from "@/redux/StoreProvider";
+import { profileApiService } from "@/api/profileApiService";
+import ProfileHydrator from "@/components/ProfileHydrator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,20 +22,31 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Circus Agent",
-  description: "Your personal assistant for your career in the performance arts",
+  description:
+    "Your personal assistant for your career in the performance arts",
 };
 
-const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
+const RootLayout = async ({
+  children,
+}: Readonly<{ children: React.ReactNode }>) => {
+  const profile = await profileApiService.getProfile();
+  console.log("PROFILE:", profile);
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-background`}
       >
         <StoreProvider>
+          <ProfileHydrator profile={profile} />
           <SidebarProvider>
             <AppSidebar />
 
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
               <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
                 <header className="flex justify-between border-b pb-4 w-full">
                   <Navbar />
