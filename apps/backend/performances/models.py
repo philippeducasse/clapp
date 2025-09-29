@@ -1,6 +1,6 @@
 from django.db import models
 from typing import List, Tuple
-from profiles.models import CustomUser
+from profiles.models import Profile
 from multiselectfield import MultiSelectField
 
 
@@ -30,7 +30,7 @@ class Performance(models.Model):
     ]
 
     profile = models.ForeignKey(
-        CustomUser,
+        Profile,
         related_name="performances",
         on_delete=models.CASCADE,
         null=True,

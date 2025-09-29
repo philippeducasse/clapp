@@ -179,4 +179,4 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
 # overides default django user model
-AUTH_USER_MODEL = "profiles.CustomUser"
+AUTH_USER_MODEL = "profiles.Profile"
