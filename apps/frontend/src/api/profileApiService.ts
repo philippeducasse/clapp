@@ -1,10 +1,10 @@
 import { Profile } from "@/interfaces/entities/Profile";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 
-const endpoint = "http://localhost:8000/api/profiles";
+const endpoint = "/api/profiles";
 
 const getProfile = async (): Promise<Profile> => {
-  return await fetchRequest(`${endpoint}/me/`);
+  return await fetchRequest(`${endpoint}/me/`, { credentials: "include" });
 };
 
 const createProfile = async (profile: Partial<Profile>): Promise<Profile> => {

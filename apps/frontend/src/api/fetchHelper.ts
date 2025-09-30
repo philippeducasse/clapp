@@ -8,6 +8,7 @@ export const fetchRequest = async <T = unknown>(
   url: string,
   options?: RequestInit
 ): Promise<T> => {
+  console.log("url:", url, options);
   const res = await fetch(url, options);
   if (!res.ok) {
     const text = await res.text();
@@ -15,7 +16,7 @@ export const fetchRequest = async <T = unknown>(
     throw new Error(`Failed to fetch ${url}: ${res.status}`);
   }
   const json = await res.json();
-  console.log("RETURNED:", json);
+  console.log("RETURNED:", transformKeysToCamelCase(json));
   return transformKeysToCamelCase(json);
 };
 
