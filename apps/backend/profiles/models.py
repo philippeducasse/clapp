@@ -33,7 +33,7 @@ class Profile(AbstractUser):
     instagram_profile = models.URLField(blank=True, null=True)
     facebook_profile = models.URLField(blank=True, null=True)
     tiktok_profile = models.URLField(blank=True, null=True)
-
+    youtube_profile = models.URLField(blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

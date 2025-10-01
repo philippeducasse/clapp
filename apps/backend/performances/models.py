@@ -1,5 +1,7 @@
 from django.db import models
 from typing import List, Tuple
+
+from django.forms import ValidationError
 from profiles.models import Profile
 from multiselectfield import MultiSelectField
 
@@ -51,3 +53,22 @@ class Performance(models.Model):
 
     def __str__(self):
         return self.performance_name
+
+
+class Dossier(models.Model):
+    # Foreign key to link back to your main model
+    performance = models.ForeignKey(
+        Performance,
+        related_name="dossiers",  # Access via yourmodel.dossiers.all()
+        on_delete=models.CASCADE,
+    )
+    file = models.FileField(upload_to="dossiers/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    # Optional: add validation to ensure only PDFs
+    def clean(self):
+        if self.file and not self.file.name.endswith(".pdf"):
+            raise ValidationError("Only PDF files are allowed.")
+
+    class Meta:
+        ordering = ["-uploaded_at"]

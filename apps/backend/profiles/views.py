@@ -24,10 +24,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def me(self, request):
         """Get the authenticated user's profile"""
         profile = self.get_queryset().first()
-        print("PROFILE: ", profile)
         serializer = self.get_serializer(profile)
-        # print("PROFILE: ", serializer)
-
         return Response(serializer.data)
 
     @action(detail=False, methods=["post"])
