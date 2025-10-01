@@ -10,7 +10,7 @@ import {
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 
-const endpoint = "http://localhost:8000/api/venues/";
+const endpoint = "/api/venues/";
 
 const getAllVenues = (): Promise<Venue[]> => {
   return fetchRequest<Venue[]>(endpoint);

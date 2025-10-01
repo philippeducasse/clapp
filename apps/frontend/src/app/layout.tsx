@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import StoreProvider from "@/redux/StoreProvider";
-import { profileApiService } from "@/api/profileApiService";
 import ProfileHydrator from "@/components/ProfileHydrator";
 
 const geistSans = Geist({
@@ -26,18 +25,16 @@ export const metadata: Metadata = {
     "Your personal assistant for your career in the performance arts",
 };
 
-const RootLayout = async ({
+const RootLayout = ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {
-  const profile = await profileApiService.getProfile();
-  console.log("PROFILE:", profile);
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-background`}
       >
         <StoreProvider>
-          <ProfileHydrator profile={profile} />
+          <ProfileHydrator />
           <SidebarProvider>
             <AppSidebar />
 

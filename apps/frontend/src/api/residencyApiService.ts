@@ -1,7 +1,7 @@
 import { Residency } from "@/interfaces/entities/Residency";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 
-const endpoint = "http://localhost:8000/api/residencies/";
+const endpoint = "/api/residencies/";
 
 const getResidencies = async (): Promise<Residency[]> => {
   return await fetchRequest(endpoint);

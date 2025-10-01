@@ -2,15 +2,14 @@
 
 import { useEffect } from "react";
 import { useAppDispatch } from "@/redux/hook";
-import { setProfile } from "@/redux/slices/authSlice";
-import { Profile } from "@/interfaces/entities/Profile";
+import { fetchProfile } from "@/redux/slices/authSlice";
 
-export default function ProfileHydrator({ profile }: { profile: Profile }) {
+export default function ProfileHydrator() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (profile) dispatch(setProfile(profile));
-  }, [dispatch, profile]);
+    dispatch(fetchProfile());
+  }, [dispatch]);
 
   return null;
 }

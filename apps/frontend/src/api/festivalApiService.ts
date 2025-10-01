@@ -10,7 +10,7 @@ import {
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 
-const endpoint = "http://localhost:8000/api/festivals/";
+const endpoint = "/api/festivals/";
 
 const getAllFestivals = (): Promise<Festival[]> => {
   return fetchRequest<Festival[]>(endpoint);
