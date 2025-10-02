@@ -55,5 +55,6 @@ const authSlice = createSlice({
 export const { setProfile, updateProfile } = authSlice.actions;
 
 export const selectProfileStatus = (state: RootState) => state.profile.status;
+export const selectProfile = (state: RootState) => state.profile.profile;
 
 export default authSlice.reducer;
