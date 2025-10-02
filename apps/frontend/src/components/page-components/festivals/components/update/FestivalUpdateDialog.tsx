@@ -39,7 +39,7 @@ export const FestivalUpdateDialog = () => {
     setLoading(true);
     try {
       if (festival && !updatedFields) {
-        const response = await festivalApiService.enrichFestival(festival);
+        const response = await festivalApiService.enrichFestival(festival.id);
         setUpdatedFields(response);
       }
     } catch (error) {
