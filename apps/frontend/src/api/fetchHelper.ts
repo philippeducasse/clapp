@@ -20,7 +20,7 @@ export const fetchRequest = async <T = unknown>(
   return transformKeysToCamelCase(json);
 };
 
-export const sendRequest = async <TReq, TRes = TReq>(
+export const sendRequest = async <TReq, TRes>(
   url: string,
   data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",

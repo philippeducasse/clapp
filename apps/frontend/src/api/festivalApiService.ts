@@ -9,8 +9,9 @@ import {
   Application,
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
+import { Profile } from "@/interfaces/entities/Profile";
 
-const endpoint = "/api/festivals/";
+const endpoint = "http://localhost:8000/api/festivals/";
 
 const getAllFestivals = (): Promise<Festival[]> => {
   return fetchRequest<Festival[]>(endpoint);
@@ -21,7 +22,7 @@ const getFestival = (festivalId: number): Promise<Festival> => {
 };
 
 const createFestival = (festival: Festival): Promise<Festival> => {
-  return sendRequest<Festival>(
+  return sendRequest<Festival, Festival>(
     `${endpoint}`,
     festival,
     "POST",
@@ -36,15 +37,12 @@ const deleteFestival = (festivalId: number) => {
   );
 };
 
-const enrichFestival = (festival: Festival): Promise<Festival> => {
-  return fetchRequest<Festival>(`${endpoint}${festival.id}/enrich/`, {
-    method: "POST",
-    body: JSON.stringify(festival),
-  });
+const enrichFestival = (festivalId: number): Promise<Festival> => {
+  return fetchRequest<Festival>(`${endpoint}${festivalId}/enrich/`);
 };
 
 const updateFestival = (festival: Festival): Promise<Festival> => {
-  return sendRequest<Festival>(
+  return sendRequest<Festival, Festival>(
     `${endpoint}${festival.id}/`,
     festival,
     "PUT",
@@ -52,10 +50,13 @@ const updateFestival = (festival: Festival): Promise<Festival> => {
   );
 };
 
-const generateEmail = (festivalId: number): Promise<{ message: string }> => {
-  return sendRequest<{ message: string }>(
+const generateEmail = (
+  festivalId: number,
+  profile: Profile
+): Promise<{ message: string }> => {
+  return sendRequest<Profile, { message: string }>(
     `${endpoint}${festivalId}/generate_email/`,
-    { message: "" },
+    profile,
     "POST",
     "Email successfully generated"
   );
