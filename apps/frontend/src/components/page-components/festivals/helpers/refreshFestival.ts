@@ -1,5 +1,5 @@
 import { AppDispatch } from "@/redux/store";
-import { festivalApiSerivce } from "@/api/festivalApiService";
+import { festivalApiService } from "@/api/festivalApiService";
 import { setFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
 
 export const refreshFestival = async (
