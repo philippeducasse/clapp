@@ -5,7 +5,7 @@ const ResidenciesPage = async () => {
   const data = await residencyApiService.getResidencies();
   return (
     <div className="container mx-auto py-10">
-      <ResidenciesTable residencies={data} />;
+      <ResidenciesTable residencies={data} />
     </div>
   );
 };
