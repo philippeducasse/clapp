@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useAppDispatch } from "@/redux/hook";
 import { RootState } from "@/redux/reducers";
 import {
   selectFestival,
@@ -23,6 +24,11 @@ import { festivalApiService } from "@/api/festivalApiService";
 import { Application } from "@/interfaces/entities/Application";
 import { selectProfile } from "@/redux/slices/authSlice";
 import { Profile } from "@/interfaces/entities/Profile";
+import {
+  selectAllPerformances,
+  fetchPerformances,
+} from "@/redux/slices/performanceSlice";
+import PerformanceSelector from "./PerformanceSelector";
 
 const ApplicationForm = () => {
   const signature = `<br><br>
@@ -50,13 +56,17 @@ const ApplicationForm = () => {
     </tr>
   </tbody>
 </table>`;
-
+  const useAsyncDispatch = useAppDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
   const festival = useSelector((state: RootState) =>
     selectFestival(state, festivalId)
   );
   const profile = useSelector((state: RootState) => selectProfile(state));
+  const performances = useSelector((state: RootState) =>
+    selectAllPerformances(state)
+  );
+
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const formFields = getApplicationFormFields();
@@ -75,6 +85,13 @@ const ApplicationForm = () => {
       dispatch(setSelectedFestival(festival));
     }
   }, [festivalId, festival, dispatch]);
+
+  useEffect(() => {
+    if (profile?.id) {
+      useAsyncDispatch(fetchPerformances(profile.id));
+    }
+    console.log("PERF:", performances);
+  }, [profile, useAsyncDispatch]);
 
   const onSubmit = async (values: Application) => {
     setIsLoading(true);
@@ -120,16 +137,19 @@ const ApplicationForm = () => {
   return (
     <>
       <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
-      <BasicForm
-        form={form}
-        formFields={formFields}
-        onSubmit={onSubmit}
-        onCancelHref={`/festivals/${festival?.id}`}
-        isLoading={isLoading}
-        entity={festival}
-        additionalActions={generateEmail()}
-        action={Action.APPLY}
-      />
+      <div className="flex justify between">
+        <PerformanceSelector />
+        <BasicForm
+          form={form}
+          formFields={formFields}
+          onSubmit={onSubmit}
+          onCancelHref={`/festivals/${festival?.id}`}
+          isLoading={isLoading}
+          entity={festival}
+          additionalActions={generateEmail()}
+          action={Action.APPLY}
+        />
+      </div>
     </>
   );
 };

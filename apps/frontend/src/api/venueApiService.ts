@@ -21,7 +21,7 @@ const getVenue = (venueId: number): Promise<Venue> => {
 };
 
 const createVenue = (venue: Venue): Promise<Venue> => {
-  return sendRequest<Venue>(
+  return sendRequest<Venue, Venue>(
     `${endpoint}`,
     venue,
     "POST",
@@ -41,7 +41,7 @@ const enrichVenue = (venue: Venue): Promise<Venue> => {
 };
 
 const updateVenue = (venue: Venue): Promise<Venue> => {
-  return sendRequest<Venue>(
+  return sendRequest<Venue, Venue>(
     `${endpoint}${venue.id}/`,
     venue,
     "PUT",
@@ -50,7 +50,7 @@ const updateVenue = (venue: Venue): Promise<Venue> => {
 };
 
 const generateEmail = (venueId: number): Promise<{ message: string }> => {
-  return sendRequest<{ message: string }>(
+  return sendRequest<{ message: string }, { message: string }>(
     `${endpoint}${venueId}/generate_email/`,
     { message: "" },
     "POST",
