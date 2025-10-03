@@ -17,7 +17,7 @@ export const ResidenciesTable = ({ residencies }: ResidenciesTableProps) => {
 
   useEffect(() => {
     dispatch(setResidencies(residencies));
-  }, [dispatch]);
+  }, [dispatch, residencies]);
 
   const columns = useResidencyColumns();
 
