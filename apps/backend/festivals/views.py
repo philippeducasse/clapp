@@ -33,8 +33,8 @@ class FestivalViewSet(viewsets.ModelViewSet):
         self.gemini_client = GeminiClient()
 
     # Adds an endpoint to default queryset. Detail means it affects only one entity
-    @action(detail=True, methods=["post"])
-    def enrich(self) -> Response:
+    @action(detail=True, methods=["get"])
+    def enrich(self, request: HttpRequest, pk: int = None) -> Response:
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
 
@@ -147,12 +147,12 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def generate_email(self, request: HttpRequest, pk: int) -> Response:
         try:
             festival = Festival.objects.get(pk=pk)
+            # profile = request.data.get("profile")
+            # print("profile:", profile, request.data)
         except Festival.DoesNotExist:
             return Response(
                 {"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND
             )
-
-        festival_name: str = festival.festival_name
 
         # Email content
         prompt: str = generate_application_mail_prompt(festival)

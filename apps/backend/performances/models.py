@@ -16,9 +16,12 @@ class Performance(models.Model):
         ("FIRE_SHOW", "Fire show"),
     ]
     GENRES: list[tuple[str, str]] = [
-        ("CIRCUS", "Circus / Street Show"),
+        ("CIRCUS", "Circus"),
         ("JUGGLING", "Juggling"),
-        ("COMEDY", "Comedy / Stand-up"),
+        ("COMEDY", "Comedy"),
+        ("CLOWN", "Clown"),
+        ("MIME", "Mime"),
+        ("STANDUP", "Stand up"),
         ("PUPPETRY", "Puppetry"),
         ("WALK_ACT", "Walk Act"),
         ("FIRE_SHOW", "Fire Show"),
@@ -52,7 +55,7 @@ class Performance(models.Model):
     genres = MultiSelectField(choices=GENRES, blank=True)
 
     def __str__(self):
-        return self.performance_name
+        return self.performance_title
 
 
 class Dossier(models.Model):
