@@ -100,7 +100,6 @@ const ApplicationForm = () => {
         await festivalApiService.applyToFestival(
           festivalId,
           vals as Application,
-          profile.id,
           attachmentsSent as File[],
           "attachments_sent"
         );
