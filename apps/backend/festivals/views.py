@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -19,6 +20,8 @@ from .helpers import (
 )
 from services.mistral_service import MistralClient
 from django.http import HttpRequest
+from performances.models import Performance
+from profiles.models import Profile
 
 
 # Provides CRUD operations for Festival
@@ -70,7 +73,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
             message = request.data.get("message")
             subject = request.data.get("email_subject")
             attachments = request.FILES.getlist("attachments_sent")
-
+            performances = request.data.get("performances")
             if not message or not subject:
                 return Response(
                     {"error": "Message and/or subject not found"},
@@ -95,14 +98,21 @@ class FestivalViewSet(viewsets.ModelViewSet):
                     "Application already exists for this festival and year",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
+            default_profile = Profile.objects.get(id=2)
             application = Application.objects.create(
                 festival=festival,
                 application_date=timezone.now().date(),
                 application_status="DRAFT",
                 message=message,
                 email_subject=subject,
+                profile=default_profile,
             )
+
+            if performances:
+                performance_objects = Performance.objects.filter(
+                    id__in=performances.split(",")
+                )
+                application.performances.set(performance_objects)
 
             if attachments:
                 application.attachments_sent = [file.name for file in attachments]
@@ -147,15 +157,54 @@ class FestivalViewSet(viewsets.ModelViewSet):
     def generate_email(self, request: HttpRequest, pk: int) -> Response:
         try:
             festival = Festival.objects.get(pk=pk)
-            # profile = request.data.get("profile")
-            # print("profile:", profile, request.data)
+            profile = Profile.objects.get(
+                id=2
+            )  # TODO: Use request.user.profile in production
+
+            performances = request.data.get("performances")
+            performance_objects = []
+
+            # Parse performance IDs and fetch objects if provided
+            if performances:
+                if isinstance(performances, str):
+                    performance_ids = [
+                        int(id.strip()) for id in performances.split(",") if id.strip()
+                    ]
+                elif isinstance(performances, list):
+                    performance_ids = performances
+                else:
+                    performance_ids = [performances]
+
+                performance_objects = list(
+                    Performance.objects.filter(id__in=performance_ids)
+                )
+
+                if not performance_objects:
+                    pass
+
+            # Generate email content (works with empty list too)
+            prompt = generate_application_mail_prompt(
+                festival, profile, performance_objects
+            )
+            message = self.mistral_client.chat(prompt=prompt)
+
+            return Response({"message": message}, status=status.HTTP_200_OK)
+
         except Festival.DoesNotExist:
             return Response(
                 {"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND
             )
-
-        # Email content
-        prompt: str = generate_application_mail_prompt(festival)
-        message: str = self.mistral_client.chat(prompt=prompt)
-
-        return Response({"message": message}, status=status.HTTP_200_OK)
+        except Profile.DoesNotExist:
+            return Response(
+                {"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except ValueError as e:
+            return Response(
+                {"error": f"Invalid performance ID format: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response(
+                {"error": f"Failed to generate email: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

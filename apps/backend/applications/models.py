@@ -2,6 +2,8 @@ from django.db import models
 
 from festivals.models import Festival
 from typing import List, Tuple
+from profiles.models import Profile
+from performances.models import Performance
 
 
 class Application(models.Model):
@@ -24,7 +26,15 @@ class Application(models.Model):
         ("OTHER", "Other"),
     ]
 
-    festival = models.ForeignKey(Festival, on_delete=models.CASCADE)
+    festival = models.ForeignKey(
+        Festival, on_delete=models.CASCADE, related_name="applications"
+    )
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="applications"
+    )
+    performances = models.ManyToManyField(
+        Performance, related_name="applications", blank=True
+    )
     application_date = models.DateField(blank=True, null=True)
     application_method = models.CharField(
         max_length=50,

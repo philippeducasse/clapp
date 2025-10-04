@@ -1,5 +1,7 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from festivals.models import Festival
+from profiles.models import Profile
+from performances.models import Performance
 import json
 import re
 from mistralai import ConversationResponse, TextChunk
@@ -181,37 +183,126 @@ def clean_festival_data(festival: Festival) -> None:
         festival.description = desc
 
 
-def generate_application_mail_prompt(festival: Festival) -> str:
+def generate_application_mail_prompt(
+    festival: Festival, profile: Profile, performances: List[Performance]
+) -> str:
     # Determine language for email - default to English if country not specified
     language = "English" if not festival.country else f"language of {festival.country}"
 
     # Determine salutation based on contact person
     contact_name = festival.contact_person.strip() if festival.contact_person else None
-
     if contact_name and contact_name.lower() != "nan":
         salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
     else:
         salutation = f"Use a standard salutation in {language} addressed to the {festival.festival_name} organizers."
 
+    # Build artist identity section
+    artist_identity = (
+        f"{profile.first_name} {profile.last_name}".strip()
+        or profile.artist_name
+        or "the artist"
+    )
+    company_info = (
+        f" representing {profile.company_name}" if profile.company_name else ""
+    )
+
+    # Build performances section with details
+    if len(performances) == 1:
+        performance = performances[0]
+        performance_intro = f'your show "{performance.performance_title}"'
+        performances_details = f"""
+Performance Details:
+- Title: {performance.performance_title}
+- Type: {performance.get_performance_type_display() if performance.performance_type else "Not specified"}
+- Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in performance.genres]) if performance.genres else "Not specified"}
+- Duration: {performance.length if performance.length else "Not specified"}
+- Short Description: {performance.short_description if performance.short_description else "Not available"}
+"""
+    else:
+        performance_intro = "your performances"
+        performances_list = []
+        for perf in performances:
+            perf_details = f"""
+  * "{perf.performance_title}"
+    - Type: {perf.get_performance_type_display() if perf.performance_type else "Not specified"}
+    - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres]) if perf.genres else "Not specified"}
+    - Duration: {perf.length if perf.length else "Not specified"}
+    - Description: {perf.short_description if perf.short_description else "Not available"}
+"""
+            performances_list.append(perf_details)
+        performances_details = "\nPerformances Details:" + "".join(performances_list)
+
+    # Build contact information
+    contact_info = []
+    if profile.email:
+        contact_info.append(f"Email: {profile.email}")
+    if profile.personal_website:
+        contact_info.append(f"Website: {profile.personal_website}")
+    contact_section = (
+        "\n- ".join(contact_info)
+        if contact_info
+        else "Email: [your email]\nPhone: [your phone]"
+    )
+
+    # Build social media section (optional to mention if relevant)
+    social_links = []
+    if profile.instagram_profile:
+        social_links.append(f"Instagram: {profile.instagram_profile}")
+    if profile.facebook_profile:
+        social_links.append(f"Facebook: {profile.facebook_profile}")
+    if profile.youtube_profile:
+        social_links.append(f"YouTube: {profile.youtube_profile}")
+    social_section = "\n- ".join(social_links) if social_links else ""
+
     # The full prompt with instructions to return only the email content
     prompt = f"""
-    You are Philippe Ducasse, a renowned performer seeking to apply to various festivals with your show "Ah Bah Bravo!".
-    Generate ONLY the plain text email content (no additional messages) in {language}. Do not include a subject line.
+You are {artist_identity}{company_info}, a performer seeking to apply to various festivals with {performance_intro}.
 
-    Festival Details:
-    - Festival Type: {festival.festival_type}
-    - Description: {festival.description}
-    - Contact Person: {contact_name}
-    - Contact Email: {festival.contact_email}
+Generate ONLY the plain text email content (no additional messages) in {language}. 
+IMPORTANT: Use the STANDARD written form of the language, NOT regional dialects or colloquial variations.
+Do not include a subject line.
 
-    Email Requirements:
-    - Salutation: {salutation}
-    - Body: Explain why "Ah Bah Bravo!" is a great fit for this festival, using {festival.description} as your main reference.
-     Mention unique aspects of your show and how it aligns with the festival's theme and audience. Keep the body concise (max 500 characters).
-    - Closing: Express enthusiasm and provide contact information (use placeholders like [your email] and [your phone]).
+Artist Profile:
+- Name: {artist_identity}
+{f"- Company: {profile.company_name}" if profile.company_name else ""}
+{f"- Location: {profile.location}" if profile.location else ""}
+{f"- Nationality: {profile.nationality}" if profile.nationality else ""}
+{f"- Website: {profile.personal_website}" if profile.personal_website else ""}
 
-    Response Format Instructions:
-    Return ONLY the email text itself with <br> tags for line breaks, with placeholders for contact information. Do not add any preamble message, notes, or formatting indicators. The response should begin immediately with the email text.
-    """
+{performances_details}
 
+Festival Details:
+- Festival Name: {festival.festival_name}
+- Festival Type: {festival.festival_type}
+- Description: {festival.description}
+- Contact Person: {contact_name}
+- Contact Email: {festival.contact_email}
+
+Email Requirements:
+- Salutation: {salutation}
+- Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences). 
+  This should come immediately after the salutation and before discussing the performances.
+- Body: Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this festival, using the festival description as your main reference.
+  Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the festival's theme and audience.
+  Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
+- Closing: Express enthusiasm and provide contact information using HTML anchor tags for clickable links:
+  Email: {profile.email}
+  {f"Website: <a href='{profile.personal_website}'>{profile.personal_website}</a>" if profile.personal_website else ""}
+  {f"Instagram: <a href='{profile.instagram_profile}'>{profile.instagram_profile}</a>" if profile.instagram_profile else ""}
+  {f"Facebook: <a href='{profile.facebook_profile}'>{profile.facebook_profile}</a>" if profile.facebook_profile else ""}
+  {f"YouTube: <a href='{profile.youtube_profile}'>{profile.youtube_profile}</a>" if profile.youtube_profile else ""}
+
+Response Format Instructions:
+Return ONLY the email HTML content with <br> tags for line breaks and <a> tags for links. 
+Do not add any preamble message, notes, or formatting indicators. 
+The response should begin immediately with the salutation.
+
+Email Structure:
+1. Salutation (e.g., "Dear [Name],")
+2. Brief self-introduction (1-2 sentences about who you are)
+3. Main pitch about the performance(s) and festival fit
+4. Closing with enthusiasm
+5. Contact information with clickable links
+6. Sign-off (e.g., "Best regards," or equivalent in the target language)
+"""
     return prompt.strip()
