@@ -12,6 +12,7 @@ import ControlledTextArea from "@/components/common/form/form-fields/ControlledT
 import { ControllerRenderProps } from "react-hook-form";
 import { ControlledTextEditor } from "@/components/common/form/form-fields/ControlledTextEditor";
 import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
+import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
@@ -28,6 +29,10 @@ export const getControlledInputs = (
             options={formField.options}
             showLabels={showLabels}
           />
+        ) : null;
+      case ControlledFormElementType.MULTI_SELECT:
+        return formField.options ? (
+          <ControlledMultiSelect field={field} options={formField.options} />
         ) : null;
       case ControlledFormElementType.BOOLEAN:
         return <ControlledBoolean field={field} showLabels={showLabels} />;
@@ -88,6 +93,9 @@ export const createZodFormSchema = (
         zodType = z.string();
         break;
 
+      case ControlledFormElementType.MULTI_SELECT:
+        zodType = z.array(z.string());
+        break;
       case ControlledFormElementType.BOOLEAN:
         zodType = z.boolean();
         break;

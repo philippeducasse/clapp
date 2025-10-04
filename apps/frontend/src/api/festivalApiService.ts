@@ -65,6 +65,7 @@ const generateEmail = (
 const applyToFestival = (
   festivalId: number,
   application: Application,
+  // profileId: number,
   files: File[],
   fileFieldName: string
 ): Promise<Application> => {

@@ -69,7 +69,7 @@ const ApplicationForm = () => {
 
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const formFields = getApplicationFormFields();
+  const formFields = getApplicationFormFields(performances);
   const formSchema = createZodFormSchema(formFields);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -90,23 +90,25 @@ const ApplicationForm = () => {
     if (profile?.id) {
       useAsyncDispatch(fetchPerformances(profile.id));
     }
-    console.log("PERF:", performances);
   }, [profile, useAsyncDispatch]);
 
   const onSubmit = async (values: Application) => {
     setIsLoading(true);
     const { attachmentsSent, ...vals } = values;
-    try {
-      await festivalApiService.applyToFestival(
-        festivalId,
-        vals as Application,
-        attachmentsSent as File[],
-        "attachments_sent"
-      );
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
+    if (profile) {
+      try {
+        await festivalApiService.applyToFestival(
+          festivalId,
+          vals as Application,
+          profile.id,
+          attachmentsSent as File[],
+          "attachments_sent"
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -137,19 +139,16 @@ const ApplicationForm = () => {
   return (
     <>
       <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
-      <div className="flex justify between">
-        <PerformanceSelector />
-        <BasicForm
-          form={form}
-          formFields={formFields}
-          onSubmit={onSubmit}
-          onCancelHref={`/festivals/${festival?.id}`}
-          isLoading={isLoading}
-          entity={festival}
-          additionalActions={generateEmail()}
-          action={Action.APPLY}
-        />
-      </div>
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={`/festivals/${festival?.id}`}
+        isLoading={isLoading}
+        entity={festival}
+        additionalActions={generateEmail()}
+        action={Action.APPLY}
+      />
     </>
   );
 };

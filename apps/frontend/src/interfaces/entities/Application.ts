@@ -1,8 +1,13 @@
+import { Festival } from "./Festival";
+import { Profile } from "./Profile";
+
 export interface Application {
   id?: number;
-  festival: number;
+  festival: number | Festival;
+  profile: number | Profile;
   applicationDate: string | null;
   applicationMethod: ApplicationMethod | null;
+  performances?: number[] | Performance[];
   emailSubject?: string;
   message?: string;
   attachmentsSent?: File[] | null;
@@ -22,8 +27,10 @@ export interface Application {
   updatedAt?: string;
 }
 
-export type ApplicationCreate = Partial<Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">> & {
-  festival: number;
+export type ApplicationCreate = Partial<
+  Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">
+> & {
+  // profileId: number;
 };
 
 export enum ApplicationMethod {
