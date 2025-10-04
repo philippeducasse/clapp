@@ -113,6 +113,9 @@ class FestivalViewSet(viewsets.ModelViewSet):
                     id__in=performances.split(",")
                 )
                 application.performances.set(performance_objects)
+                for p in performance_objects:
+                    print("Dossier:", p.dossier)
+                    attachments.append(p.dossier)
 
             if attachments:
                 application.attachments_sent = [file.name for file in attachments]
@@ -130,8 +133,29 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 )
                 email.attach_alternative(html_content, "text/html")
 
+                if performances:
+                    for p in performance_objects:
+                        if p.dossier:
+                            # Open and attach the file from storage
+                            email.attach(
+                                p.dossier.name.split("/")[-1],
+                                p.dossier.read(),
+                                "application/pdf",
+                            )
+
+                print("attachments", attachments)
                 for file in attachments:
-                    email.attach(file.name, file.read(), file.content_type)
+                    if hasattr(file, "content_type"):
+                        # It's an uploaded file from request.FILES
+                        email.attach(file.name, file.read(), file.content_type)
+                    else:
+                        # It's a FieldFile from the database
+                        filename = file.name.split("/")[-1]  # Get just the filename
+                        email.attach(
+                            filename,
+                            file.read(),
+                            "application/pdf",
+                        )
 
                 email.send(fail_silently=False)
                 application.application_status = "APPLIED"
