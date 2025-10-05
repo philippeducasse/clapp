@@ -10,6 +10,7 @@ import {
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
+import { Performance } from "@/interfaces/entities/Performance";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
@@ -52,11 +53,14 @@ const updateFestival = (festival: Festival): Promise<Festival> => {
 
 const generateEmail = (
   festivalId: number,
-  profile: Profile
+  data: { profile: Profile; performances: Performance[] }
 ): Promise<{ message: string }> => {
-  return sendRequest<Profile, { message: string }>(
+  return sendRequest<
+    { profile: Profile; performances: Performance[] },
+    { message: string }
+  >(
     `${endpoint}${festivalId}/generate_email/`,
-    profile,
+    data,
     "POST",
     "Email successfully generated"
   );
@@ -65,7 +69,6 @@ const generateEmail = (
 const applyToFestival = (
   festivalId: number,
   application: Application,
-  // profileId: number,
   files: File[],
   fileFieldName: string
 ): Promise<Application> => {

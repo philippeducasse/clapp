@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
+import { capitalize } from "lodash";
 
 const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const router = useRouter();
@@ -14,11 +15,12 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const onEdit = (id: string) => {
     router.push(`/festivals/${id}/edit`);
   };
+
   return [
     {
       accessorKey: "festivalName",
       header: getSortableHeader("Name"),
-      size: 200,
+      size: 100,
       cell: ({ row }) => {
         const festival = row.original;
         return (
@@ -36,9 +38,15 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       size: 100,
     },
     {
+      accessorKey: "festivalType",
+      header: getSortableHeader("Type"),
+      size: 100,
+      cell: ({ row }) => capitalize(row.original.festivalType),
+    },
+    {
       accessorKey: "websiteUrl",
       header: "Website",
-      size: 100,
+      size: 50,
       cell: ({ row }) => {
         const festival = row.original;
         return (

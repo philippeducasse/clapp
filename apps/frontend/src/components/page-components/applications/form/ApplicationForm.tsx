@@ -114,16 +114,19 @@ const ApplicationForm = () => {
   const generateEmail = () => {
     const handleClick = async () => {
       setIsLoading(true);
-      try {
-        const { message } = await festivalApiService.generateEmail(
-          festivalId,
-          profile as Profile
-        );
-        form.setValue("message", message + signature);
-      } catch (error) {
-        console.error(`Failed to generate message: ${error}`);
-      } finally {
-        setIsLoading(false);
+      if (profile) {
+        const data = { profile, performances };
+        try {
+          const { message } = await festivalApiService.generateEmail(
+            festivalId,
+            data
+          );
+          form.setValue("message", message + signature);
+        } catch (error) {
+          console.error(`Failed to generate message: ${error}`);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
