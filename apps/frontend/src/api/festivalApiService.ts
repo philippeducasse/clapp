@@ -53,10 +53,10 @@ const updateFestival = (festival: Festival): Promise<Festival> => {
 
 const generateEmail = (
   festivalId: number,
-  data: { profile: Profile; performances: Performance[] }
+  data: { profile: Profile; selectedPerformanceIds: number[] }
 ): Promise<{ message: string }> => {
   return sendRequest<
-    { profile: Profile; performances: Performance[] },
+    { profile: Profile; selectedPerformanceIds: number[] },
     { message: string }
   >(
     `${endpoint}${festivalId}/generate_email/`,

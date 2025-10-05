@@ -23,39 +23,12 @@ import { Bot } from "lucide-react";
 import { festivalApiService } from "@/api/festivalApiService";
 import { Application } from "@/interfaces/entities/Application";
 import { selectProfile } from "@/redux/slices/authSlice";
-import { Profile } from "@/interfaces/entities/Profile";
 import {
   selectAllPerformances,
   fetchPerformances,
 } from "@/redux/slices/performanceSlice";
-import PerformanceSelector from "./PerformanceSelector";
 
 const ApplicationForm = () => {
-  const signature = `<br><br>
-<table cellpadding="0" cellspacing="0" border="0" style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-  <tbody>
-    <tr>
-      <td style="padding-bottom: 10px;">
-        <strong style="font-size: 16px;">Philippe Ducasse</strong><br>
-        <span style="color: #666;">Philocircus | Circus Artist</span><br>
-        <span style="color: #666;">Berlin, Germany</span>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding-top: 10px; border-top: 2px solid #e0e0e0;">
-        <a href="http://www.philippeducasse.com" style="color: #0066cc; text-decoration: none;">www.philippeducasse.com</a><br>
-        <a href="mailto:info@philippeducasse.com" style="color: #0066cc; text-decoration: none;">info@philippeducasse.com</a>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding-top: 10px;">
-        <a href="https://instagram.com/philocircus" style="color: #0066cc; text-decoration: none; margin-right: 10px;">Instagram</a>
-        <a href="https://facebook.com/philocircus" style="color: #0066cc; text-decoration: none; margin-right: 10px;">Facebook</a>
-        <a href="https://www.youtube.com/@philocircus2242" style="color: #0066cc; text-decoration: none;">YouTube</a>
-      </td>
-    </tr>
-  </tbody>
-</table>`;
   const useAsyncDispatch = useAppDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
@@ -69,6 +42,9 @@ const ApplicationForm = () => {
 
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<
+    number[]
+  >([]);
   const formFields = getApplicationFormFields(performances);
   const formSchema = createZodFormSchema(formFields);
 
@@ -77,6 +53,12 @@ const ApplicationForm = () => {
     defaultValues: getInitialValues(formFields),
     mode: "onSubmit",
   });
+
+  const performanceSelection = form.watch("performances") as number[];
+
+  useEffect(() => {
+    setSelectedPerformanceIds(performanceSelection);
+  }, [performanceSelection]);
 
   useEffect(() => {
     if (!festival) {
@@ -115,13 +97,13 @@ const ApplicationForm = () => {
     const handleClick = async () => {
       setIsLoading(true);
       if (profile) {
-        const data = { profile, performances };
+        const data = { profile, selectedPerformanceIds };
         try {
           const { message } = await festivalApiService.generateEmail(
             festivalId,
             data
           );
-          form.setValue("message", message + signature);
+          form.setValue("message", message);
         } catch (error) {
           console.error(`Failed to generate message: ${error}`);
         } finally {
