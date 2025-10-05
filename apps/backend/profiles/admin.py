@@ -25,6 +25,7 @@ class CustomUserAdmin(UserAdmin):
                     "instagram_profile",
                     "facebook_profile",
                     "tiktok_profile",
+                    "phone",
                 )
             },
         ),

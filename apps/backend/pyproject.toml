@@ -16,6 +16,7 @@ dependencies = [
     "django-cors-headers==4.7.0",
     "django-extensions==4.1",
     "django-multiselectfield>=1.0.1",
+    "django-phonenumber-field[phonenumbers]>=8.2.0",
     "djangorestframework==3.16.0",
     "et-xmlfile==2.0.0",
     "eval-type-backport==0.2.2",

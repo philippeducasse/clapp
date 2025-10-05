@@ -155,6 +155,7 @@ dependencies = [
     { name = "django-cors-headers" },
     { name = "django-extensions" },
     { name = "django-multiselectfield" },
+    { name = "django-phonenumber-field", extra = ["phonenumbers"] },
     { name = "djangorestframework" },
     { name = "et-xmlfile" },
     { name = "eval-type-backport" },
@@ -217,6 +218,7 @@ requires-dist = [
     { name = "django-cors-headers", specifier = "==4.7.0" },
     { name = "django-extensions", specifier = "==4.1" },
     { name = "django-multiselectfield", specifier = ">=1.0.1" },
+    { name = "django-phonenumber-field", extras = ["phonenumbers"], specifier = ">=8.2.0" },
     { name = "djangorestframework", specifier = "==3.16.0" },
     { name = "et-xmlfile", specifier = "==2.0.0" },
     { name = "eval-type-backport", specifier = "==0.2.2" },
@@ -324,6 +326,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/04/9a/27060e8aa491ff2d286054df2e89df481a8dfe0e5e459fa36c0f48e3c10c/django_multiselectfield-1.0.1.tar.gz", hash = "sha256:3f8b4fff3e07d4a91c8bb4b809bc35caeb22b41769b606f4c9edc53b8d72a667", size = 22025, upload-time = "2025-06-12T14:41:21.599Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6d/10/23c0644cf67567bbe4e3a2eeeec0e9c79b701990c0e07c5ee4a4f8897f91/django_multiselectfield-1.0.1-py3-none-any.whl", hash = "sha256:18dc14801f7eca844a48e21cba6d8ec35b9b581f2373bbb2cb75e6994518259a", size = 20481, upload-time = "2025-06-12T14:41:20.107Z" },
+]
+
+[[package]]
+name = "django-phonenumber-field"
+version = "8.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/53/88/c36e484d3b6c91974f491153dd29258256b67b1243c21dcc6cbc89ff483a/django_phonenumber_field-8.2.0.tar.gz", hash = "sha256:a3efb8af49f48ba1e1fbaba778244852772315fc95076e571e20e4572648456b", size = 44770, upload-time = "2025-10-02T15:37:28.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/6e/1625919cf833a28515ad0e5a7c5a7be659703f411176f6fed57ed9525181/django_phonenumber_field-8.2.0-py3-none-any.whl", hash = "sha256:291f5c5e4abb27a9faaa508ef14b27bd307fb3b5b7570b1594a32a696cefb8ec", size = 69256, upload-time = "2025-10-02T15:37:27.27Z" },
+]
+
+[package.optional-dependencies]
+phonenumbers = [
+    { name = "phonenumbers" },
 ]
 
 [[package]]
@@ -729,6 +748,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/15/aa/3fc3181d12b95da71f5c2537c3e3b3af6ab3a8c392ab41ebb766e0929bc6/pandas-2.3.0-cp313-cp313t-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1a881bc1309f3fce34696d07b00f13335c41f5f5a8770a33b09ebe23261cfc67", size = 11966182, upload-time = "2025-06-05T03:27:47.652Z" },
     { url = "https://files.pythonhosted.org/packages/37/e7/e12f2d9b0a2c4a2cc86e2aabff7ccfd24f03e597d770abfa2acd313ee46b/pandas-2.3.0-cp313-cp313t-musllinux_1_2_aarch64.whl", hash = "sha256:e1991bbb96f4050b09b5f811253c4f3cf05ee89a589379aa36cd623f21a31d6f", size = 12547686, upload-time = "2025-06-06T00:00:26.142Z" },
     { url = "https://files.pythonhosted.org/packages/39/c2/646d2e93e0af70f4e5359d870a63584dacbc324b54d73e6b3267920ff117/pandas-2.3.0-cp313-cp313t-musllinux_1_2_x86_64.whl", hash = "sha256:bb3be958022198531eb7ec2008cfc78c5b1eed51af8600c6c5d9160d89d8d249", size = 13231847, upload-time = "2025-06-05T03:27:51.465Z" },
+]
+
+[[package]]
+name = "phonenumbers"
+version = "9.0.15"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/8e/755749f61b93c39493730428cbfe14897198c0151e8b6d832f0a3c71ff16/phonenumbers-9.0.15.tar.gz", hash = "sha256:345ff7f23768332d866f37732f815cdf1d33c7f0961246562a5c5b78c12c3ff3", size = 2298105, upload-time = "2025-09-26T05:32:39.052Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/52/e9bbc1b092bb17b86f56da84a36ca98320330a1904d9b0ca3d685155db2c/phonenumbers-9.0.15-py2.py3-none-any.whl", hash = "sha256:269b73bc05258e8fd57582770b9559307099ea677c8f1dc5272476f661344776", size = 2583916, upload-time = "2025-09-26T05:32:35.736Z" },
 ]
 
 [[package]]

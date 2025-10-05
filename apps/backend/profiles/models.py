@@ -1,6 +1,7 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class ProfileManager(BaseUserManager):
@@ -34,6 +35,7 @@ class Profile(AbstractUser):
     facebook_profile = models.URLField(blank=True, null=True)
     tiktok_profile = models.URLField(blank=True, null=True)
     youtube_profile = models.URLField(blank=True, null=True)
+    phone = PhoneNumberField(blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 

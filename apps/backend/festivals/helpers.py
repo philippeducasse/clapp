@@ -188,14 +188,13 @@ def generate_application_mail_prompt(
 ) -> str:
     # Determine language for email - default to English if country not specified
     language = "English" if not festival.country else f"language of {festival.country}"
-    print("PERFORMANCE IN HELPER: ", performances)
-    performance_objects = [Performance(**perf_data) for perf_data in performances]
+
     # Determine salutation based on contact person
     contact_name = festival.contact_person.strip() if festival.contact_person else None
     if contact_name and contact_name.lower() != "nan":
         salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
     else:
-        salutation = f"Use a standard salutation in {language} addressed to the {festival.festival_name} organizers."
+        salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {festival.festival_name} organizers."
 
     # Build artist identity section
     artist_identity = (
@@ -208,58 +207,69 @@ def generate_application_mail_prompt(
     )
 
     # Build performances section with details
-    # if len(performances) == 1:
-    performance = performance_objects[0]
-    performance_intro = f'your show "{performance.performance_title}"'
-    performances_details = f"""
+    if len(performances) == 1:
+        performance = performances[0]
+        performance_intro = f'your show "{performance.performance_title}"'
+        performances_details = f"""
 Performance Details:
 - Title: {performance.performance_title}
+- Trailer: {performance.trailer}
 - Type: {performance.get_performance_type_display() if performance.performance_type else "Not specified"}
 - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in performance.genres]) if performance.genres else "Not specified"}
 - Duration: {performance.length if performance.length else "Not specified"}
 - Short Description: {performance.short_description if performance.short_description else "Not available"}
+- Dossier: {performance.dossier}
 """
-    #     else:
-    #         performance_intro = "your performances"
-    #         performances_list = []
-    #         for perf in performances:
-    #             perf_details = f"""
-    #   * "{perf.performance_title}"
-    #     - Type: {perf.get_performance_type_display() if perf.performance_type else "Not specified"}
-    #     - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres]) if perf.genres else "Not specified"}
-    #     - Duration: {perf.length if perf.length else "Not specified"}
-    #     - Description: {perf.short_description if perf.short_description else "Not available"}
-    # """
-    # performances_list.append(perf_details)
-    # performances_details = "\nPerformances Details:" + "".join(performances_list)
+    else:
+        performance_intro = "your performances"
+        performances_list = []
+        for perf in performances:
+            perf_details = f"""
+  * "{perf.performance_title}"
+    - Type: {perf.get_performance_type_display() if perf.performance_type else "Not specified"}
+    - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres]) if perf.genres else "Not specified"}
+    - Duration: {perf.length if perf.length else "Not specified"}
+    - Description: {perf.short_description if perf.short_description else "Not available"}
+"""
+            performances_list.append(perf_details)
+        performances_details = "\nPerformances Details:" + "".join(performances_list)
 
     # Build contact information
-    contact_info = []
+    contact_lines = []
     if profile.email:
-        contact_info.append(f"Email: {profile.email}")
+        contact_lines.append(f"<a href='mailto:{profile.email}'>{profile.email}</a>")
     if profile.personal_website:
-        contact_info.append(f"Website: {profile.personal_website}")
-    contact_section = (
-        "\n- ".join(contact_info)
-        if contact_info
-        else "Email: [your email]\nPhone: [your phone]"
-    )
+        contact_lines.append(
+            f"<a href='{profile.personal_website}'>{profile.personal_website}</a>"
+        )
 
-    # Build social media section (optional to mention if relevant)
+    # Build social media line
     social_links = []
     if profile.instagram_profile:
-        social_links.append(f"Instagram: {profile.instagram_profile}")
+        social_links.append(f"<a href='{profile.instagram_profile}'>Instagram</a>")
     if profile.facebook_profile:
-        social_links.append(f"Facebook: {profile.facebook_profile}")
+        social_links.append(f"<a href='{profile.facebook_profile}'>Facebook</a>")
     if profile.youtube_profile:
-        social_links.append(f"YouTube: {profile.youtube_profile}")
-    social_section = "\n- ".join(social_links) if social_links else ""
+        social_links.append(f"<a href='{profile.youtube_profile}'>YouTube</a>")
+
+    social_line = " & ".join(social_links) if social_links else ""
+
+    # Format signature
+    signature = f"{artist_identity}<br><br>"
+    if profile.company_name:
+        signature += f"{profile.company_name}<br>"
+    if profile.phone:
+        signature += f"{profile.phone}<br>"
+    signature += "<br>".join(contact_lines)
+    if social_line:
+        signature += f"<br>{social_line}"
 
     # The full prompt with instructions to return only the email content
     prompt = f"""
-You are {artist_identity}{company_info}, a performer seeking to apply to various festivals with {performance_intro}.
+You are {artist_identity}{company_info}, a performer seeking to apply to various festivals with {performance_intro}. 
 
-Generate ONLY the plain text email content (no additional messages) in {language}. 
+Generate ONLY the plain text email content (no additional messages) in {language} ONLY IF the language is one of these: English, French, Italian, Spanish, or German.
+If the language is another, then use English.
 IMPORTANT: Use the STANDARD written form of the language, NOT regional dialects or colloquial variations.
 Do not include a subject line.
 
@@ -279,31 +289,28 @@ Festival Details:
 - Contact Person: {contact_name}
 - Contact Email: {festival.contact_email}
 
-Email Requirements:
-- Salutation: {salutation}
-- Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences). 
-  This should come immediately after the salutation and before discussing the performances.
-- Body: Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this festival, using the festival description as your main reference.
-  Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the festival's theme and audience.
-  Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
-- Closing: Express enthusiasm and provide contact information using HTML anchor tags for clickable links:
-  Email: {profile.email}
-  {f"Website: <a href='{profile.personal_website}'>{profile.personal_website}</a>" if profile.personal_website else ""}
-  {f"Instagram: <a href='{profile.instagram_profile}'>{profile.instagram_profile}</a>" if profile.instagram_profile else ""}
-  {f"Facebook: <a href='{profile.facebook_profile}'>{profile.facebook_profile}</a>" if profile.facebook_profile else ""}
-  {f"YouTube: <a href='{profile.youtube_profile}'>{profile.youtube_profile}</a>" if profile.youtube_profile else ""}
+    Email Requirements:
+    - Salutation: {salutation}
+    - Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences). 
+    This should come immediately after the salutation and before discussing the performances.
+    - Body:  Make the text very playful and informal. Add exlamation marks. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this festival, using the festival description as your main reference.
+    Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the festival's theme and audience.
+    Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
+    - Closing: If {performance.trailer}, add a link to it following this format: <p>Here you can see the <a href={performance.trailer}>trailer</a>, 
+    making sure the link is well separated from any other text and is clearly visible. If {performance.dossier} included, say that the dossier(s) are attached and that all fruther information and photos are there.
+    Express enthusiasm in awaiting the response and openess to answer any questions or provide more information. Provide contact information using this format: {signature}
 
-Response Format Instructions:
-Return ONLY the email HTML content with <br> tags for line breaks and <a> tags for links. 
-Do not add any preamble message, notes, or formatting indicators. 
-The response should begin immediately with the salutation.
+    Response Format Instructions:
+    Return ONLY the email HTML content with <br> tags for line breaks and <a> tags for links. 
+    Do not add any preamble message, notes, or formatting indicators. 
+    The response should begin immediately with the salutation.
 
-Email Structure:
-1. Salutation (e.g., "Dear [Name],")
-2. Brief self-introduction (1-2 sentences about who you are)
-3. Main pitch about the performance(s) and festival fit
-4. Closing with enthusiasm
-5. Contact information with clickable links
-6. Sign-off (e.g., "Best regards," or equivalent in the target language)
-"""
+    Email Structure:
+    1. Salutation (e.g., "Dear [Name],")
+    2. Brief self-introduction (1-2 sentences about who you are)
+    3. Main pitch about the performance(s) and festival fit
+    4. Closing with enthusiasm
+    6. Sign-off (e.g., "Best regards," or equivalent in the target language)
+    5. {signature}
+    """
     return prompt.strip()

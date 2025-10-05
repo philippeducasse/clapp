@@ -114,7 +114,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 )
                 application.performances.set(performance_objects)
                 for p in performance_objects:
-                    print("Dossier:", p.dossier)
                     attachments.append(p.dossier)
 
             if attachments:
@@ -124,8 +123,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
             try:
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
-
-                print("CONTACT:", festival.contact_email)
 
                 email = EmailMultiAlternatives(
                     subject,
@@ -146,7 +143,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
                                 "application/pdf",
                             )
 
-                print("attachments", attachments)
                 for file in attachments:
                     if hasattr(file, "content_type"):
                         # It's an uploaded file from request.FILES
@@ -190,32 +186,35 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 id=2
             )  # TODO: Use request.user.profile in production
 
-            performances = request.data.get("performances")
-            print("PERFORMANCES:", performances)
+            performance_ids = request.data.get("selected_performance_ids")
 
             # performances = data.performances
             performance_objects = []
 
             # Parse performance IDs and fetch objects if provided
-            # if performances:
-            #     if isinstance(performances, str):
-            #         performance_ids = [
-            #             int(id.strip()) for id in performances.split(",") if id.strip()
-            #         ]
-            #     elif isinstance(performances, list):
-            #         performance_ids = performances
-            #     else:
-            #         performance_ids = [performances]
+            if performance_ids:
+                if isinstance(performance_ids, str):
+                    performance_ids = [
+                        int(id.strip())
+                        for id in performance_ids.split(",")
+                        if id.strip()
+                    ]
+                elif isinstance(performance_ids, list):
+                    performance_ids = performance_ids
+                else:
+                    performance_ids = [performance_ids]
 
-            #     performance_objects = list(
-            #         Performance.objects.filter(id__in=performance_ids)
-            #     )
+                performance_objects = list(
+                    Performance.objects.filter(id__in=performance_ids)
+                )
 
-            #     if not performance_objects:
-            #         pass
+                if not performance_objects:
+                    pass
 
             # Generate email content (works with empty list too)
-            prompt = generate_application_mail_prompt(festival, profile, performances)
+            prompt = generate_application_mail_prompt(
+                festival, profile, performance_objects
+            )
             message = self.mistral_client.chat(prompt=prompt)
 
             return Response({"message": message}, status=status.HTTP_200_OK)
