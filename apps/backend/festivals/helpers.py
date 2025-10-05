@@ -188,7 +188,8 @@ def generate_application_mail_prompt(
 ) -> str:
     # Determine language for email - default to English if country not specified
     language = "English" if not festival.country else f"language of {festival.country}"
-
+    print("PERFORMANCE IN HELPER: ", performances)
+    performance_objects = [Performance(**perf_data) for perf_data in performances]
     # Determine salutation based on contact person
     contact_name = festival.contact_person.strip() if festival.contact_person else None
     if contact_name and contact_name.lower() != "nan":
@@ -207,10 +208,10 @@ def generate_application_mail_prompt(
     )
 
     # Build performances section with details
-    if len(performances) == 1:
-        performance = performances[0]
-        performance_intro = f'your show "{performance.performance_title}"'
-        performances_details = f"""
+    # if len(performances) == 1:
+    performance = performance_objects[0]
+    performance_intro = f'your show "{performance.performance_title}"'
+    performances_details = f"""
 Performance Details:
 - Title: {performance.performance_title}
 - Type: {performance.get_performance_type_display() if performance.performance_type else "Not specified"}
@@ -218,19 +219,19 @@ Performance Details:
 - Duration: {performance.length if performance.length else "Not specified"}
 - Short Description: {performance.short_description if performance.short_description else "Not available"}
 """
-    else:
-        performance_intro = "your performances"
-        performances_list = []
-        for perf in performances:
-            perf_details = f"""
-  * "{perf.performance_title}"
-    - Type: {perf.get_performance_type_display() if perf.performance_type else "Not specified"}
-    - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres]) if perf.genres else "Not specified"}
-    - Duration: {perf.length if perf.length else "Not specified"}
-    - Description: {perf.short_description if perf.short_description else "Not available"}
-"""
-            performances_list.append(perf_details)
-        performances_details = "\nPerformances Details:" + "".join(performances_list)
+    #     else:
+    #         performance_intro = "your performances"
+    #         performances_list = []
+    #         for perf in performances:
+    #             perf_details = f"""
+    #   * "{perf.performance_title}"
+    #     - Type: {perf.get_performance_type_display() if perf.performance_type else "Not specified"}
+    #     - Genres: {", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres]) if perf.genres else "Not specified"}
+    #     - Duration: {perf.length if perf.length else "Not specified"}
+    #     - Description: {perf.short_description if perf.short_description else "Not available"}
+    # """
+    # performances_list.append(perf_details)
+    # performances_details = "\nPerformances Details:" + "".join(performances_list)
 
     # Build contact information
     contact_info = []

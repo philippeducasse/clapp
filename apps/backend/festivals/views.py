@@ -125,11 +125,14 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
 
+                print("CONTACT:", festival.contact_email)
+
                 email = EmailMultiAlternatives(
                     subject,
                     text_content,
-                    "ducassephi@hotmail.fr",
-                    ["info@philippeducasse.com"],
+                    "info@philippeducasse.com",
+                    # ["ducassephi@hotmail.fr"],
+                    [festival.contact_email],
                 )
                 email.attach_alternative(html_content, "text/html")
 
@@ -148,14 +151,16 @@ class FestivalViewSet(viewsets.ModelViewSet):
                     if hasattr(file, "content_type"):
                         # It's an uploaded file from request.FILES
                         email.attach(file.name, file.read(), file.content_type)
-                    else:
-                        # It's a FieldFile from the database
-                        filename = file.name.split("/")[-1]  # Get just the filename
-                        email.attach(
-                            filename,
-                            file.read(),
-                            "application/pdf",
-                        )
+                    # else:
+                    #     # It's a FieldFile from the database
+                    #     print("Attaching dossier: 3", file.name)
+
+                    #     filename = file.name.split("/")[-1]  # Get just the filename
+                    #     email.attach(
+                    #         filename,
+                    #         file.read(),
+                    #         "application/pdf",
+                    #     )
 
                 email.send(fail_silently=False)
                 application.application_status = "APPLIED"
@@ -186,30 +191,31 @@ class FestivalViewSet(viewsets.ModelViewSet):
             )  # TODO: Use request.user.profile in production
 
             performances = request.data.get("performances")
+            print("PERFORMANCES:", performances)
+
+            # performances = data.performances
             performance_objects = []
 
             # Parse performance IDs and fetch objects if provided
-            if performances:
-                if isinstance(performances, str):
-                    performance_ids = [
-                        int(id.strip()) for id in performances.split(",") if id.strip()
-                    ]
-                elif isinstance(performances, list):
-                    performance_ids = performances
-                else:
-                    performance_ids = [performances]
+            # if performances:
+            #     if isinstance(performances, str):
+            #         performance_ids = [
+            #             int(id.strip()) for id in performances.split(",") if id.strip()
+            #         ]
+            #     elif isinstance(performances, list):
+            #         performance_ids = performances
+            #     else:
+            #         performance_ids = [performances]
 
-                performance_objects = list(
-                    Performance.objects.filter(id__in=performance_ids)
-                )
+            #     performance_objects = list(
+            #         Performance.objects.filter(id__in=performance_ids)
+            #     )
 
-                if not performance_objects:
-                    pass
+            #     if not performance_objects:
+            #         pass
 
             # Generate email content (works with empty list too)
-            prompt = generate_application_mail_prompt(
-                festival, profile, performance_objects
-            )
+            prompt = generate_application_mail_prompt(festival, profile, performances)
             message = self.mistral_client.chat(prompt=prompt)
 
             return Response({"message": message}, status=status.HTTP_200_OK)
