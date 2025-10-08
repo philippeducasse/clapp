@@ -44,7 +44,6 @@ class Festival(models.Model):
         blank=True,
         null=True,
     )
-    applied = models.BooleanField(default=False)
     comments = models.TextField(max_length=500, blank=True, null=True)
 
     def __str__(self):
