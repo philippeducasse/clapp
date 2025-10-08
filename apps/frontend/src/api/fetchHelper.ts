@@ -15,6 +15,7 @@ export const fetchRequest = async <T = unknown>(
     throw new Error(`Failed to fetch ${url}: ${res.status}`);
   }
   const json = await res.json();
+  console.log("DATA:", transformKeysToCamelCase(json));
   return transformKeysToCamelCase(json);
 };
 

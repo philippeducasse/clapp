@@ -33,6 +33,21 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       },
     },
     {
+      accessorKey: "currentYearApplications",
+      header: "Applied",
+      size: 100,
+      cell: ({ row }) => {
+        const application = row.original?.currentYearApplication;
+        return (
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
+            <Link href={`/applications/${application.id}`}>
+              {application.applicationDate}
+            </Link>
+          </div>
+        );
+      },
+    },
+    {
       accessorKey: "country",
       header: getSortableHeader("Country"),
       size: 100,
