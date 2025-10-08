@@ -66,7 +66,7 @@ class Application(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.festival.festival_name} {self.application_date.year}"
+        return f"{self.festival.festival_name} {self.application_year}"
 
     @property
     def application_year(self) -> int:
