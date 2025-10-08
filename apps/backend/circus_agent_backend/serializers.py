@@ -54,7 +54,7 @@ class FestivalSerializer(serializers.ModelSerializer):
             "latest_application_status",
             "latest_application_date",
             # Nested applications
-            "current_year_applications",
+            "current_year_application",
         ]
 
     def get_current_year_application(self, obj: Festival):
