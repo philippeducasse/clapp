@@ -28,7 +28,7 @@ class FestivalSerializer(serializers.ModelSerializer):
     )
 
     # will look for this name + get
-    current_year_applications = serializers.SerializerMethodField()
+    current_year_application = serializers.SerializerMethodField()
 
     class Meta:
         model: Type[Festival] = Festival
@@ -57,7 +57,7 @@ class FestivalSerializer(serializers.ModelSerializer):
             "current_year_applications",
         ]
 
-    def get_current_year_applications(self, obj: Festival):
+    def get_current_year_application(self, obj: Festival):
         # application_year = request.application_year
         # Calculate date range for this year
         from datetime import date
