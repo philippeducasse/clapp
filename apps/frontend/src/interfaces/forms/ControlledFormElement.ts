@@ -15,4 +15,5 @@ export interface ControlledFormElement {
   required?: boolean;
   className?: string;
   hidden?: boolean;
+  defaultValue?: string;
 }

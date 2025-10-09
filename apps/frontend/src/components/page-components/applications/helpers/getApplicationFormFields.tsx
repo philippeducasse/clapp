@@ -4,9 +4,13 @@ import {
 } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Performance } from "@/interfaces/entities/Performance";
+import { Festival } from "@/interfaces/entities/Festival";
+import { Profile } from "@/interfaces/entities/Profile";
 
 export const getApplicationFormFields = (
-  performances: Performance[]
+  festival: Festival,
+  performances: Performance[],
+  profile: Profile
 ): ControlledFormElement[] => {
   const performanceOptions: SelectOptions[] = performances.map((p) => ({
     value: String(p.id),
@@ -18,6 +22,7 @@ export const getApplicationFormFields = (
       label: "Email subject",
       fieldName: "emailSubject",
       type: ControlledFormElementType.TEXT,
+      defaultValue: `${profile.firstName} ${profile.lastName} at ${festival.festivalName} 2026`,
     },
     {
       label: "Performance(s)",

@@ -1,7 +1,4 @@
-import {
-  ControlledFormElement,
-  SelectOptions,
-} from "@/interfaces/forms/ControlledFormElement";
+import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { capitalize } from "lodash";
@@ -24,11 +21,7 @@ export const getControlledInputs = (
     switch (formField.type) {
       case ControlledFormElementType.SELECT:
         return formField.options ? (
-          <ControlledSelect
-            field={field}
-            options={formField.options}
-            showLabels={showLabels}
-          />
+          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
         ) : null;
       case ControlledFormElementType.MULTI_SELECT:
         return formField.options ? (
@@ -43,20 +36,12 @@ export const getControlledInputs = (
       case ControlledFormElementType.FILE:
         return <ControlledFile field={field} />;
       default:
-        return (
-          <ControlledText
-            field={field}
-            type={formField.type}
-            showLabels={showLabels}
-          />
-        );
+        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
     }
   }
 };
 
-export const sanitizeFormData = <T extends Record<string, unknown>>(
-  entity: T
-): T => {
+export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {
   const sanitizedData = { ...entity } as T;
 
   for (const key in sanitizedData) {
@@ -105,12 +90,7 @@ export const createZodFormSchema = (
         break;
 
       case ControlledFormElementType.DATE:
-        zodType = z
-          .string()
-          .regex(
-            /^\d{4}-\d{2}-\d{2}$/,
-            "Date must be in the format YYYY-MM-DD"
-          );
+        zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
         break;
 
       case ControlledFormElementType.URL:
@@ -130,9 +110,7 @@ export const createZodFormSchema = (
   return z.object(schema);
 };
 
-export const getOptions = <T extends Record<string, string>>(
-  optionsEnum: T
-): SelectOptions[] => {
+export const getOptions = <T extends Record<string, string>>(optionsEnum: T): SelectOptions[] => {
   const options = Object.values(optionsEnum).map((o) => ({
     value: o.toUpperCase(),
     label: capitalize(o.replace(/_/g, " ").toLowerCase()),
@@ -144,9 +122,7 @@ export const getInitialValues = (
   formFields: ControlledFormElement[],
   entity?: Record<string, unknown>
 ) => {
-  if (entity) {
-    return sanitizeFormData(entity);
-  }
+  if (entity) return sanitizeFormData(entity);
 
   const emptyValues = formFields.reduce((acc, field) => {
     acc[field.fieldName] =
@@ -154,7 +130,7 @@ export const getInitialValues = (
         ? false
         : field.type === ControlledFormElementType.NUMBER
         ? undefined
-        : "";
+        : field.defaultValue ?? "";
     return acc;
   }, {} as Record<string, unknown>);
 
