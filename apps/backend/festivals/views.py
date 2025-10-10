@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.html import strip_tags
 from festivals.models import Festival
-from serializer import FestivalSerializer
+from festivals.serializer import FestivalSerializer
 from applications.models import Application
 from services.gemini_service import GeminiClient
 from .utils import (

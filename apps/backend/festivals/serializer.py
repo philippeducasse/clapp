@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from festivals.models import Festival
 from typing import List, Type
+from applications.serializer import ApplicationSerializer
 
 class BlankToNullDateField(serializers.DateField):
     def to_internal_value(self, data):

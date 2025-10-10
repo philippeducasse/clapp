@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from venues.models import Venue
+from typing import Type
 
 
 class VenueSerializer(serializers.ModelSerializer):

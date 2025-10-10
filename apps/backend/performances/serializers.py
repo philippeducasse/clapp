@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from performances.models import Performance
+from typing import Type
 
 
 class PerformanceSerializer(serializers.ModelSerializer):

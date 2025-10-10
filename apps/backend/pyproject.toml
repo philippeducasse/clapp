@@ -77,10 +77,33 @@ dev = [
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "circus_agent_backend.settings"
-python_files = ["test_*.py", "*_test.py", "tests.py"]
+python_files = ["test_*.py", "*_test.py"]
 addopts = [
     "--reuse-db",
     "--cov=.",
     "--cov-report=html",
     "--cov-report=term-missing",
+    "--cov-config=pyproject.toml",
+]
+
+[tool.coverage.run]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "manage.py",
+    "conftest.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
 ]
