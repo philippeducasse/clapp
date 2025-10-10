@@ -30,8 +30,8 @@ class Festival(models.Model):
         max_length=50, choices=FESTIVAL_TYPES, default="STREET", blank=True, null=True
     )
     website_url = models.URLField(max_length=200, blank=True, null=True)
-    contact_email = models.EmailField(max_length=200, blank=True, null=True)
-    contact_person = models.CharField(max_length=200, blank=True, null=True)
+    # contact_email = models.EmailField(max_length=200, blank=True, null=True)
+    # contact_person = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     approximate_date = models.CharField(max_length=100, blank=True, null=True)
@@ -45,6 +45,22 @@ class Festival(models.Model):
         null=True,
     )
     comments = models.TextField(max_length=500, blank=True, null=True)
+    estimated_start_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Best estimate of start date for sorting. Use start_date if known, otherwise estimate from approximate_date",
+    )
 
     def __str__(self) -> str:
         return self.festival_name
+
+
+class EntityContact(models.Model):
+    festival = models.ForeignKey(
+        Festival, on_delete=models.CASCADE, related_name="contacts"
+    )
+    name = models.CharField(max_length=200, blank=True, null=True)
+    email = models.EmailField(max_length=200)
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.email}"

@@ -54,6 +54,7 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     country: {nv(festival.country)}
     town: {nv(festival.town)}
     approximate_date: {nv(festival.approximate_date)}
+    estimated_start_date: {nv(festival.estimated_start_date)}
     start_date: {nv(festival.start_date)}
     end_date: {nv(festival.end_date)}
     website_url: {nv(festival.website_url)}
@@ -74,6 +75,16 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     - Day 11–20 → "mid <Month>"
     - Day 21–31 → "late <Month>"
     - If the range spans two months, combine, e.g., "late June–early July".
+
+    ESTIMATED START DATE (for sorting):
+    - If exact start_date is known, set estimated_start_date to the same value
+    - If only approximate_date is available, convert to a date:
+    * "early <Month>" → use day 5 of that month
+    * "mid <Month>" → use day 15 of that month
+    * "late <Month>" → use day 25 of that month
+    * "late June–early July" → use June 25
+    - Format: YYYY-MM-DD (e.g., 2025-08-15)
+    - Leave blank only if no date information exists at all
 
     RECOGNITION HINTS
     festival_type (choose one: from {fest_types_str} )

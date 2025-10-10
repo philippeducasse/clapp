@@ -42,7 +42,8 @@ class Performance(models.Model):
         blank=True,
     )
     performance_title = models.CharField(max_length=200)
-    short_description = models.CharField(max_length=1000, blank=True, null=True)
+    short_description = models.TextField(max_length=1000, blank=True, null=True)
+    email_prompt = models.TextField(max_length=10000, blank=True, null=True)
     trailer = models.URLField(max_length=100, blank=True, null=True)
     length = models.DurationField(blank=True, null=True)
     long_description = models.TextField(max_length=10000, blank=True, null=True)

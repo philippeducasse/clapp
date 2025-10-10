@@ -21,12 +21,18 @@ from services.mistral_service import MistralClient
 from django.http import HttpRequest
 from performances.models import Performance
 from profiles.models import Profile
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 # Provides CRUD operations for Festival
 class FestivalViewSet(viewsets.ModelViewSet):
     # Class used to convert JSON into Django Model objects and vice versa
     serializer_class = FestivalSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["country", "festival_type"]
+    search_fields = ["festival_name"]
+    ordering_fields = ["festival_name", "start_date", "application_date_start"]
+    ordering = ["festival_name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
         # annotates all festival objects
