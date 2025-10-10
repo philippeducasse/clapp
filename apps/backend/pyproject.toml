@@ -69,4 +69,18 @@ dev = [
     "tqdm==4.67.1",
     "beautifulsoup4==4.13.4",
     "soupsieve==2.7",
+    "pytest>=8.0.0",
+    "pytest-django>=4.8.0",
+    "pytest-cov>=4.1.0",
+    "factory-boy>=3.3.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "circus_agent_backend.settings"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+addopts = [
+    "--reuse-db",
+    "--cov=.",
+    "--cov-report=html",
+    "--cov-report=term-missing",
 ]
