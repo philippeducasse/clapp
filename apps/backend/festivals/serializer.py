@@ -1,7 +1,8 @@
 from rest_framework import serializers
-from festivals.models import Festival
+from festivals.models import Festival, OrganisationContact
 from typing import List, Type, Any
 from applications.serializer import ApplicationSerializer
+from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
 class BlankToNullDateField(serializers.DateField):
@@ -11,7 +12,15 @@ class BlankToNullDateField(serializers.DateField):
         return super().to_internal_value(data)
 
 
-class FestivalSerializer(serializers.ModelSerializer):
+class FestivalContactSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrganisationContact
+        fields = ["id", "name", "email"]
+
+
+class FestivalSerializer(WritableNestedModelSerializer):
+    contact = FestivalContactSerializer(many=True, required=False)
+
     start_date = BlankToNullDateField(required=False, allow_null=True)
     end_date = BlankToNullDateField(required=False, allow_null=True)
 
@@ -45,6 +54,7 @@ class FestivalSerializer(serializers.ModelSerializer):
             "application_date_end",
             "application_type",
             "comments",
+            "contacts",
             # Annotated fields
             "has_application_this_year",
             "latest_application_status",

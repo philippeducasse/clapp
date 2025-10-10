@@ -1,5 +1,6 @@
 from django.db import models
 from typing import List, Tuple
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Festival(models.Model):
@@ -55,12 +56,13 @@ class Festival(models.Model):
         return self.festival_name
 
 
-class EntityContact(models.Model):
+class OrganisationContact(models.Model):
     festival = models.ForeignKey(
         Festival, on_delete=models.CASCADE, related_name="contacts"
     )
     name = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(max_length=200)
+    phone = PhoneNumberField(blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.name} - {self.email}"
