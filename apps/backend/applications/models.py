@@ -65,11 +65,11 @@ class Application(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.festival.festival_name} {self.application_year}"
 
     @property
-    def application_year(self) -> int:
+    def application_year(self) -> int | None:
         """Derive the festival year based on the application date."""
         if not self.application_date:
             return None

@@ -54,7 +54,7 @@ class Performance(models.Model):
     )
     genres = MultiSelectField(choices=GENRES, blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.performance_title
 
 
@@ -69,7 +69,7 @@ class Dossier(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     # Optional: add validation to ensure only PDFs
-    def clean(self):
+    def clean(self) -> None:
         if self.file and not self.file.name.endswith(".pdf"):
             raise ValidationError("Only PDF files are allowed.")
 

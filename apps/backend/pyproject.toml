@@ -73,6 +73,8 @@ dev = [
     "pytest-django>=4.8.0",
     "pytest-cov>=4.1.0",
     "factory-boy>=3.3.0",
+    "mypy>=1.18.2",
+    "pre-commit>=4.3.0",
 ]
 
 [tool.pytest.ini_options]
@@ -107,3 +109,24 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+exclude = [
+    "^manage\\.py$",
+    "migrations/",
+    ".*/tests/.*",
+    "test_.*\\.py$",
+    "conftest\\.py$",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "*.migrations.*",
+    "*.tests.*",
+    "tests.*",
+    "manage",
+    "conftest",
+]
+ignore_errors = true

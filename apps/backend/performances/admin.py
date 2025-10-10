@@ -56,10 +56,9 @@ class PerformanceAdmin(admin.ModelAdmin):
 
     inlines = [DossierInline]
 
-    def dossier_count(self, obj):
+    @admin.display(description="Number of Dossiers")
+    def dossier_count(self, obj: Performance) -> int:
         return obj.dossiers.count()
-
-    dossier_count.short_description = "Number of Dossiers"
 
 
 @admin.register(Dossier)

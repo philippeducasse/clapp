@@ -36,5 +36,5 @@ class Venue(models.Model):
     contacted = models.BooleanField(default=False)
     comments = models.TextField(max_length=500, blank=True, null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.venue_name

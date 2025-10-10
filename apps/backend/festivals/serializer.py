@@ -1,11 +1,11 @@
-
 from rest_framework import serializers
 from festivals.models import Festival
-from typing import List, Type
+from typing import List, Type, Any
 from applications.serializer import ApplicationSerializer
 
+
 class BlankToNullDateField(serializers.DateField):
-    def to_internal_value(self, data):
+    def to_internal_value(self, data: Any) -> Any:
         if data in ("", None):
             return None
         return super().to_internal_value(data)
@@ -53,7 +53,7 @@ class FestivalSerializer(serializers.ModelSerializer):
             "current_year_application",
         ]
 
-    def get_current_year_application(self, obj: Festival):
+    def get_current_year_application(self, obj: Festival) -> dict[str, Any]:
         # application_year = request.application_year
         # Calculate date range for this year
         from datetime import date

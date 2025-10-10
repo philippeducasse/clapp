@@ -34,5 +34,5 @@ class Residency(models.Model):
     applied = models.BooleanField(default=False)
     comments = models.TextField(max_length=500, blank=True, null=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.residency_name

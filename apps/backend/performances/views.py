@@ -1,15 +1,13 @@
-from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.request import Request, HttpRequest
+from rest_framework.request import Request
 from rest_framework import status
-from rest_framework import viewsets
 from performances.models import Performance
 from performances.serializers import PerformanceSerializer
 from rest_framework.decorators import api_view
 
 
 @api_view(["GET"])
-def get_user_performances(_request, user_id: int):
+def get_user_performances(_request: Request, user_id: int) -> Response:
     all_user_performances = Performance.objects.filter(profile__id=user_id)
 
     serializer = PerformanceSerializer(all_user_performances, many=True)

@@ -8,7 +8,7 @@ client = genai.Client()
 
 
 class GeminiClient:
-    def __init__(self):
+    def __init__(self) -> None:
         load_dotenv(".env")
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:

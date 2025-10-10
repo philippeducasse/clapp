@@ -14,7 +14,7 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     sr = search_results or "No search results provided."
 
     # Small helpers to avoid 'None' textual noise in the prompt
-    def nv(x):
+    def nv(x: Any) -> str:
         return "" if x is None else str(x)
 
     fest_types_str = ", ".join([value for (value, _) in festival_types])
@@ -116,7 +116,7 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     return prompt
 
 
-def extract_search_results(search_results: ConversationResponse):
+def extract_search_results(search_results: ConversationResponse) -> str:
     content = next(
         (o for o in search_results.outputs if o.type == "message.output"), None
     )
