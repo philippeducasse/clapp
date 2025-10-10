@@ -1,5 +1,5 @@
 import csv
-from festivals.models import Festival
+from organisations.festivals.models import Festival
 import os
 import django
 

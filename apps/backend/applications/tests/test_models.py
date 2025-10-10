@@ -1,7 +1,7 @@
 import pytest
 from datetime import date
 from applications.models import Application
-from festivals.models import Festival
+from organisations.festivals.models import Festival
 from profiles.models import Profile
 from performances.models import Performance
 
@@ -12,23 +12,18 @@ class TestApplicationModel:
 
     @pytest.fixture
     def festival(self):
-        return Festival.objects.create(
-            festival_name="Test Festival",
-            country="France"
-        )
+        return Festival.objects.create(festival_name="Test Festival", country="France")
 
     @pytest.fixture
     def profile(self):
         return Profile.objects.create_user(
-            email="test@example.com",
-            password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     @pytest.fixture
     def performance(self, profile):
         return Performance.objects.create(
-            performance_title="Test Performance",
-            profile=profile
+            performance_title="Test Performance", profile=profile
         )
 
     def test_application_creation(self, festival, profile):
@@ -37,7 +32,7 @@ class TestApplicationModel:
             festival=festival,
             profile=profile,
             application_date=date(2025, 3, 15),
-            application_status="DRAFT"
+            application_status="DRAFT",
         )
 
         assert application.id is not None
@@ -49,9 +44,7 @@ class TestApplicationModel:
     def test_application_string_representation(self, festival, profile):
         """Test the __str__ method"""
         application = Application.objects.create(
-            festival=festival,
-            profile=profile,
-            application_date=date(2025, 3, 15)
+            festival=festival, profile=profile, application_date=date(2025, 3, 15)
         )
 
         assert "Test Festival" in str(application)
@@ -60,26 +53,20 @@ class TestApplicationModel:
         """Test application_year property calculation"""
         # Test for date before September (returns same year)
         app1 = Application.objects.create(
-            festival=festival,
-            profile=profile,
-            application_date=date(2025, 3, 15)
+            festival=festival, profile=profile, application_date=date(2025, 3, 15)
         )
         assert app1.application_year == 2025
 
         # Test for date in/after September (returns next year)
         app2 = Application.objects.create(
-            festival=festival,
-            profile=profile,
-            application_date=date(2025, 10, 15)
+            festival=festival, profile=profile, application_date=date(2025, 10, 15)
         )
         assert app2.application_year == 2026
 
     def test_application_with_performances(self, festival, profile, performance):
         """Test application with performances many-to-many relationship"""
         application = Application.objects.create(
-            festival=festival,
-            profile=profile,
-            application_date=date(2025, 3, 15)
+            festival=festival, profile=profile, application_date=date(2025, 3, 15)
         )
         application.performances.add(performance)
 
@@ -92,18 +79,13 @@ class TestApplicationModel:
 
         for status in statuses:
             app = Application.objects.create(
-                festival=festival,
-                profile=profile,
-                application_status=status
+                festival=festival, profile=profile, application_status=status
             )
             assert app.application_status == status
 
     def test_application_optional_fields(self, festival, profile):
         """Test that optional fields can be null"""
-        application = Application.objects.create(
-            festival=festival,
-            profile=profile
-        )
+        application = Application.objects.create(festival=festival, profile=profile)
 
         assert application.email_subject is None
         assert application.message is None

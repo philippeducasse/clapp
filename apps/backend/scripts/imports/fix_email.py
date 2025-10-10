@@ -1,8 +1,8 @@
 import pandas as pd
 from datetime import datetime, date
-from residencies.models import Residency
-from venues.models import Venue
-from festivals.models import Festival
+from organisations.residencies.models import Residency
+from organisations.venues.models import Venue
+from organisations.festivals.models import Festival
 from typing import Optional, Any
 import os
 import sys

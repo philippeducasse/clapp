@@ -45,12 +45,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_extensions",
     "corsheaders",
-    "festivals",
-    "residencies",
-    "venues",
     "applications",
     "performances",
     "profiles",
+    "organisations",
+    "organisations.festivals",
+    "organisations.residencies",
+    "organisations.venues",
 ]
 
 MIDDLEWARE = [

@@ -1,6 +1,7 @@
 from django.db import models
 
-from festivals.models import Festival
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from typing import List, Tuple
 from profiles.models import Profile
 from performances.models import Performance
@@ -26,9 +27,9 @@ class Application(models.Model):
         ("OTHER", "Other"),
     ]
 
-    festival = models.ForeignKey(
-        Festival, on_delete=models.CASCADE, related_name="applications"
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    organisation = GenericForeignKey("content_type", "object_id")
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="applications"
     )
@@ -66,7 +67,7 @@ class Application(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.festival.festival_name} {self.application_year}"
+        return f"{self.organisation.name} {self.application_year}"
 
     @property
     def application_year(self) -> int | None:

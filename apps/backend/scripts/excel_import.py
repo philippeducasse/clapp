@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime, date
-from festivals.models import Festival
+from organisations.festivals.models import Festival
 from typing import Optional, Any
 
 import os

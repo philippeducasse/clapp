@@ -8,11 +8,11 @@ urlpatterns: List[URLPattern] = [
         "api/",
         include(
             [
-                path("festivals/", include("festivals.urls")),
+                path("festivals/", include("organisations.festivals.urls")),
                 path("applications/", include("applications.urls")),
                 path("performances/", include("performances.urls")),
-                path("residencies/", include("residencies.urls")),
-                path("venues/", include("venues.urls")),
+                path("residencies/", include("organisations.residencies.urls")),
+                path("venues/", include("organisations.venues.urls")),
                 path("profiles/", include("profiles.urls")),
             ]
         ),
