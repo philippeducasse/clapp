@@ -4,6 +4,7 @@ from performances.models import Performance, Dossier
 from profiles.models import Profile
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms import ValidationError
+from django.core.files.storage import default_storage
 
 
 @pytest.mark.django_db
@@ -118,9 +119,14 @@ class TestDossierModel:
             file=pdf_file
         )
 
-        assert dossier.id is not None
-        assert dossier.performance == performance
-        assert dossier.uploaded_at is not None
+        try:
+            assert dossier.id is not None
+            assert dossier.performance == performance
+            assert dossier.uploaded_at is not None
+        finally:
+            # Clean up the uploaded file
+            if dossier.file:
+                default_storage.delete(dossier.file.name)
 
     def test_dossier_ordering(self, performance):
         """Test that dossiers are ordered by uploaded_at descending"""
@@ -130,6 +136,13 @@ class TestDossierModel:
         dossier1 = Dossier.objects.create(performance=performance, file=pdf1)
         dossier2 = Dossier.objects.create(performance=performance, file=pdf2)
 
-        dossiers = Dossier.objects.all()
-        assert dossiers[0] == dossier2  # Most recent first
-        assert dossiers[1] == dossier1
+        try:
+            dossiers = Dossier.objects.all()
+            assert dossiers[0] == dossier2  # Most recent first
+            assert dossiers[1] == dossier1
+        finally:
+            # Clean up the uploaded files
+            if dossier1.file:
+                default_storage.delete(dossier1.file.name)
+            if dossier2.file:
+                default_storage.delete(dossier2.file.name)

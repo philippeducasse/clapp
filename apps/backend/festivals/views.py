@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any, Dict
-
+from django.db.models import Exists, OuterRef, Subquery
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
@@ -26,9 +26,30 @@ from profiles.models import Profile
 
 # Provides CRUD operations for Festival
 class FestivalViewSet(viewsets.ModelViewSet):
-    queryset = Festival.objects.all()
     # Class used to convert JSON into Django Model objects and vice versa
     serializer_class = FestivalSerializer
+
+    def get_queryset(self):
+        # annotates all festival objects
+        queryset = Festival.objects.annotate(
+            has_application_this_year=Exists(
+                Application.objects.filter(
+                    festival=OuterRef('pk'),
+                    application_date__year=2026
+                )
+            ),
+            latest_application_status=Subquery(
+                Application.objects.filter(festival=OuterRef('pk'))
+                .order_by('-application_date')
+                .values('status')[:1]
+            ),
+            latest_application_date=Subquery(
+                Application.objects.filter(festival=OuterRef('pk'))
+                .order_by('-application_date')
+                .values('application_date')[:1]
+            )
+        )
+        return queryset
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
