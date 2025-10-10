@@ -4,7 +4,7 @@ from rest_framework.request import Request, HttpRequest
 from rest_framework import status
 from rest_framework import viewsets
 from performances.models import Performance
-from circus_agent_backend.serializers import PerformanceSerializer
+from performances.serializers import PerformanceSerializer
 from rest_framework.decorators import api_view
 
 

@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from applications.models import Application
-from circus_agent_backend.serializers import ApplicationSerializer
+from applications.serializer import ApplicationSerializer
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):

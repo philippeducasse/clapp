@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import viewsets, status, permissions
 from profiles.models import Profile
-from circus_agent_backend.serializers import ProfileSerializer
+from profiles.serializers import ProfileSerializer
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

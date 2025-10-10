@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.html import strip_tags
 from festivals.models import Festival
-from circus_agent_backend.serializers import FestivalSerializer
+from serializer import FestivalSerializer
 from applications.models import Application
 from services.gemini_service import GeminiClient
-from .helpers import (
+from .utils import (
     generate_application_mail_prompt,
     extract_fields_from_llm,
     clean_festival_data,

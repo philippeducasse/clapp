@@ -1,5 +1,5 @@
 from venues.models import Venue
-from circus_agent_backend.serializers import VenueSerializer
+from venues.serializers import VenueSerializer
 from rest_framework import viewsets
 
 
