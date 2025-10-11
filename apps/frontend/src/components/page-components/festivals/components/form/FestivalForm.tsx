@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/entities/Festival";
-import {
-  createZodFormSchema,
-  sanitizeFormData,
-  getInitialValues,
-} from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -32,9 +28,7 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   const router = useRouter();
   const params = useParams();
   const festivalId = Number(params?.id);
-  const festival = useSelector((state: RootState) =>
-    selectFestival(state, festivalId)
-  );
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +51,6 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   // Reset form when festival data changes (but only once)
   useEffect(() => {
     if (festival && initialDataLoaded) {
-      console.log("resetting form data");
       form.reset(sanitizeFormData(festival));
       setInitialDataLoaded(false);
     }
@@ -72,9 +65,7 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        const newFestival = await festivalApiService.createFestival(
-          values as Festival
-        );
+        const newFestival = await festivalApiService.createFestival(values as Festival);
         router.push(`/festivals/${newFestival?.id}`);
       }
     } catch (error) {

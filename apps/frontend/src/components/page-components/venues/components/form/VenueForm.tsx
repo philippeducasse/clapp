@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Venue } from "@/interfaces/entities/Venue";
-import {
-  createZodFormSchema,
-  sanitizeFormData,
-  getInitialValues,
-} from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getVenueFormFields } from "../../helpers/getVenueFormFields";
 import { venueApiService } from "@/api/venueApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -55,7 +51,6 @@ const VenueForm = ({ action }: VenueFormProps) => {
   // Reset form when venue data changes (but only once)
   useEffect(() => {
     if (venue && initialDataLoaded) {
-      console.log("resetting form data");
       form.reset(sanitizeFormData(venue));
       setInitialDataLoaded(false);
     }

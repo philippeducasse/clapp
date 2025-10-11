@@ -7,7 +7,7 @@ export const store = configureStore({
 });
 
 store.subscribe(() => {
-  console.log("State updated:", store.getState());
+  // console.log("State updated:", store.getState());
 });
 
 export type AppStore = typeof store;
