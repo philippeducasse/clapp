@@ -264,7 +264,7 @@ class TestFestivalApplyAction:
         assert Application.objects.count() == 1
 
         application = Application.objects.first()
-        assert application.festival == festival
+        assert application.organisation == festival
         assert application.message == "<p>Test application message</p>"
         assert application.email_subject == "Application to Test Festival"
         assert application.application_status == "APPLIED"
@@ -299,7 +299,7 @@ class TestFestivalApplyAction:
 
         # Create first application
         Application.objects.create(
-            festival=festival,
+            organisation=festival,
             application_date=timezone.now().date(),
             application_status="APPLIED",
             message="First application",

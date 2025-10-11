@@ -1,6 +1,6 @@
 from django.urls import path, include, URLPattern
 from rest_framework.routers import DefaultRouter
-from venues.views import VenueViewSet
+from organisations.venues.views import VenueViewSet
 from typing import List
 
 router: DefaultRouter = DefaultRouter()

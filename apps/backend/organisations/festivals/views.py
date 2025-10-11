@@ -7,6 +7,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.utils.html import strip_tags
+from django.contrib.contenttypes.models import ContentType
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
 from applications.models import Application
@@ -36,19 +37,28 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self) -> QuerySet[Festival]:
         # annotates all festival objects
+        festival_content_type = ContentType.objects.get_for_model(Festival)
         queryset = Festival.objects.annotate(
             has_application_this_year=Exists(
                 Application.objects.filter(
-                    festival=OuterRef("pk"), application_date__year=2026
+                    content_type=festival_content_type,
+                    object_id=OuterRef("pk"),
+                    application_date__year=2026
                 )
             ),
             latest_application_status=Subquery(
-                Application.objects.filter(festival=OuterRef("pk"))
+                Application.objects.filter(
+                    content_type=festival_content_type,
+                    object_id=OuterRef("pk")
+                )
                 .order_by("-application_date")
-                .values("status")[:1]
+                .values("application_status")[:1]
             ),
             latest_application_date=Subquery(
-                Application.objects.filter(festival=OuterRef("pk"))
+                Application.objects.filter(
+                    content_type=festival_content_type,
+                    object_id=OuterRef("pk")
+                )
                 .order_by("-application_date")
                 .values("application_date")[:1]
             ),
@@ -112,7 +122,11 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 application_year += 1
 
             # Check if an application already exists for the festival and year
-            applications = Application.objects.filter(festival=festival)
+            festival_content_type = ContentType.objects.get_for_model(Festival)
+            applications = Application.objects.filter(
+                content_type=festival_content_type,
+                object_id=festival.pk
+            )
             existing_application = next(
                 (a for a in applications if a.application_year == application_year),
                 None,
