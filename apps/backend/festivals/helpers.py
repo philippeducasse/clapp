@@ -269,9 +269,7 @@ def generate_application_mail_prompt(
             }
                     - Duration: {perf.length if perf.length else "Not specified"}
                     - Description: {
-                performance.short_description
-                if performance.short_description
-                else "Not available" + performance.long_description
+                performance.long_description
                 if performance.long_description
                 else "Not available"
             }
