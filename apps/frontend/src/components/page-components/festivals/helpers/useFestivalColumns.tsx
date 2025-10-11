@@ -19,14 +19,14 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
 
   return [
     {
-      accessorKey: "festivalName",
+      accessorKey: "name",
       header: getSortableHeader("Name"),
       size: 100,
       cell: ({ row }) => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/festivals/${festival.id}`}>{festival.festivalName}</Link>
+            <Link href={`/festivals/${festival.id}`}>{festival.name}</Link>
           </div>
         );
       },

@@ -12,7 +12,7 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
     },
     {
       label: "Venue Name",
-      fieldName: "venueName",
+      fieldName: "name",
       type: ControlledFormElementType.TEXT,
       required: true,
     },

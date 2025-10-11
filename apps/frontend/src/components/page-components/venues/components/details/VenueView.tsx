@@ -46,11 +46,9 @@ const VenueView = () => {
   return (
     <DetailsViewWrapper href="/venues">
       <DetailsViewHeader
-        title={venue.venueName}
+        title={venue.name}
         subtitle={`${venue.town && `${venue.town}`}, ${venue.country}`}
-        icon={
-          <Flag className="text-emerald-600 dark:text-emerald-400" size={32} />
-        }
+        icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
         actionElements={
           <>
             <SendButton
@@ -70,9 +68,7 @@ const VenueView = () => {
       />
       <DetailsViewSection
         title="Venue details"
-        icon={
-          <NotebookTabs className="text-emerald-600 dark:text-emerald-400" />
-        }
+        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
         data={getVenueDetails(venue)}
       />
     </DetailsViewWrapper>

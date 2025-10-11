@@ -16,16 +16,14 @@ const useResidencyColumns = (): ColumnDef<Residency>[] => {
   };
   return [
     {
-      accessorKey: "residencyName",
+      accessorKey: "name",
       header: getSortableHeader("Name"),
       size: 200,
       cell: ({ row }) => {
         const residency = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/residencies/${residency.id}`}>
-              {residency.residencyName}
-            </Link>
+            <Link href={`/residencies/${residency.id}`}>{residency.name}</Link>
           </div>
         );
       },
@@ -43,11 +41,7 @@ const useResidencyColumns = (): ColumnDef<Residency>[] => {
         const residency = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link
-              href={residency.website ?? "#"}
-              target="_blank"
-              title={residency.websiteUrl}
-            >
+            <Link href={residency.website ?? "#"} target="_blank" title={residency.websiteUrl}>
               {residency.websiteUrl}
             </Link>
           </div>
@@ -86,11 +80,7 @@ const useResidencyColumns = (): ColumnDef<Residency>[] => {
             >
               <Send />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 hover:text-red-500"
-            >
+            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
               <Trash />
             </Button>
           </div>

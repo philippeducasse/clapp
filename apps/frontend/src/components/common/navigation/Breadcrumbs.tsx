@@ -24,7 +24,7 @@ const Breadcrumbs = () => {
   let entityPath = "";
 
   if (pathname.includes("/festivals/")) {
-    entityName = festival?.festivalName ?? "Festival";
+    entityName = festival?.name ?? "Festival";
     entityPath = `/festivals/${festival?.id ?? ""}`;
   } else if (pathname.includes("/applications/")) {
     // entityName = application?.name || "Application";
@@ -34,7 +34,9 @@ const Breadcrumbs = () => {
   // Build breadcrumbs based on current route
   const buildBreadcrumbs = () => {
     const pathSegments = pathname.split("/").filter(Boolean);
-    const breadcrumbs = [{ path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> }];
+    const breadcrumbs = [
+      { path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> },
+    ];
 
     if (pathSegments.includes("festivals")) {
       breadcrumbs.push({ path: "/festivals", label: <span>Festivals</span> });

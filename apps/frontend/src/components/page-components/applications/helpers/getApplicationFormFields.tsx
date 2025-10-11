@@ -1,7 +1,4 @@
-import {
-  ControlledFormElement,
-  SelectOptions,
-} from "@/interfaces/forms/ControlledFormElement";
+import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
@@ -22,15 +19,14 @@ export const getApplicationFormFields = (
       label: "Email subject",
       fieldName: "emailSubject",
       type: ControlledFormElementType.TEXT,
-      defaultValue: `${profile.firstName} ${profile.lastName} at ${festival.festivalName} 2026`,
+      defaultValue: `${profile.firstName} ${profile.lastName} at ${festival.name} 2026`,
     },
     {
       label: "Performance(s)",
       fieldName: "performances",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
-      helpText:
-        "Select with which performances you want to apply to this festival",
+      helpText: "Select with which performances you want to apply to this festival",
     },
     {
       label: "Message",

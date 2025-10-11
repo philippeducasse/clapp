@@ -1,7 +1,7 @@
 export interface Residency {
   [key: string]: unknown;
   id: number;
-  residencyName: string;
+  name: string;
   websiteUrl?: string;
   country?: string;
   town?: string;

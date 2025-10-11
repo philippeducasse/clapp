@@ -16,14 +16,14 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
   };
   return [
     {
-      accessorKey: "venueName",
+      accessorKey: "name",
       header: getSortableHeader("Name"),
       size: 200,
       cell: ({ row }) => {
         const venue = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/venues/${venue.id}`}>{venue.venueName}</Link>
+            <Link href={`/venues/${venue.id}`}>{venue.name}</Link>
           </div>
         );
       },
@@ -41,11 +41,7 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
         const venue = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link
-              href={venue.websiteUrl ?? "#"}
-              target="_blank"
-              title={venue.websiteUrl}
-            >
+            <Link href={venue.websiteUrl ?? "#"} target="_blank" title={venue.websiteUrl}>
               {venue.websiteUrl}
             </Link>
           </div>
@@ -57,9 +53,7 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
       id: "actions",
       cell: ({ row }) => {
         const venue = row.original;
-        const applyRoute = venue.applied
-          ? `/application/${1}`
-          : `/venues/${venue.id}/apply`; // find way to reference application id
+        const applyRoute = venue.applied ? `/application/${1}` : `/venues/${venue.id}/apply`; // find way to reference application id
         const onApply = () => {
           router.push(applyRoute);
         };
@@ -81,11 +75,7 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
             >
               <Send />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 hover:text-red-500"
-            >
+            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
               <Trash />
             </Button>
           </div>

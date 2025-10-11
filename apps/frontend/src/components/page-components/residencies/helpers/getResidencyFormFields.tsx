@@ -10,7 +10,7 @@ export const getResidencyFormFields = (): ControlledFormElement[] => {
     },
     {
       label: "Residency Name",
-      fieldName: "residencyName",
+      fieldName: "name",
       type: ControlledFormElementType.TEXT,
       required: true,
     },
@@ -63,8 +63,7 @@ export const getResidencyFormFields = (): ControlledFormElement[] => {
       label: "Application start",
       fieldName: "applicationStart",
       type: ControlledFormElementType.TEXT,
-      helpText:
-        "Approximate or exact date of when residency begins accepting applications",
+      helpText: "Approximate or exact date of when residency begins accepting applications",
     },
     {
       label: "Application end",

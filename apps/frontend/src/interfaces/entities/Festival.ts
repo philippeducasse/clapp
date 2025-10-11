@@ -1,7 +1,7 @@
 export interface Festival {
   [key: string]: unknown;
   id: number;
-  festivalName: string;
+  name: string;
   websiteUrl?: string;
   country?: string;
   town?: string;

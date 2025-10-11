@@ -12,7 +12,7 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
     },
     {
       label: "Festival Name",
-      fieldName: "festivalName",
+      fieldName: "name",
       type: ControlledFormElementType.TEXT,
       required: true,
     },
@@ -71,8 +71,7 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       label: "Application start",
       fieldName: "applicationStart",
       type: ControlledFormElementType.TEXT,
-      helpText:
-        "Approximate or exact date of when festival begins accepting applications",
+      helpText: "Approximate or exact date of when festival begins accepting applications",
     },
     {
       label: "Application end",

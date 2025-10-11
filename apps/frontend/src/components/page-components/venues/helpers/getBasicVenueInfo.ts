@@ -6,7 +6,7 @@ export const getVenueBasicInfo = (venue: Venue): SectionCellProps[] => {
   if (!venue) return [];
 
   return [
-    { title: "Venue Name", value: venue.venueName },
+    { title: "Venue Name", value: venue.name },
     { title: "Country", value: venue.country },
     { title: "Town", value: venue.town },
     {

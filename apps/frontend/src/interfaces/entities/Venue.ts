@@ -1,7 +1,7 @@
 export interface Venue {
   [key: string]: unknown;
   id: number;
-  venueName: string;
+  name: string;
   websiteUrl?: string;
   country?: string;
   town?: string;
