@@ -43,21 +43,19 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 Application.objects.filter(
                     content_type=festival_content_type,
                     object_id=OuterRef("pk"),
-                    application_date__year=2026
+                    application_date__year=2026,
                 )
             ),
             latest_application_status=Subquery(
                 Application.objects.filter(
-                    content_type=festival_content_type,
-                    object_id=OuterRef("pk")
+                    content_type=festival_content_type, object_id=OuterRef("pk")
                 )
                 .order_by("-application_date")
                 .values("application_status")[:1]
             ),
             latest_application_date=Subquery(
                 Application.objects.filter(
-                    content_type=festival_content_type,
-                    object_id=OuterRef("pk")
+                    content_type=festival_content_type, object_id=OuterRef("pk")
                 )
                 .order_by("-application_date")
                 .values("application_date")[:1]
@@ -88,11 +86,33 @@ class FestivalViewSet(viewsets.ModelViewSet):
         llm_response: str = self.mistral_client.chat(prompt=prompt)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
+
+        # Handle contacts separately since they're a related model
+        contacts_data = updated_fields.pop("contacts", None)
+
+        # Update direct festival fields
         for field, value in updated_fields.items():
-            setattr(festival, field, value)
+            if field not in ["sources", "updated_fields"]:  # Skip meta fields
+                setattr(festival, field, value)
+
+        # Update contacts if provided
+        if contacts_data and isinstance(contacts_data, list):
+            from organisations.festivals.models import FestivalContact
+
+            # Clear existing contacts and create new ones
+
+            for contact_info in contacts_data:
+                if "email" in contact_info:  # email is required
+                    FestivalContact.objects.create(
+                        festival=festival,
+                        email=contact_info["email"],
+                        name=contact_info.get("name", ""),
+                        role=contact_info.get("role", ""),
+                        phone=contact_info.get("phone", None),
+                    )
 
         clean_festival_data(festival)
-
+        print(FestivalSerializer(festival).data)
         return Response(FestivalSerializer(festival).data)
 
     @action(detail=True, methods=["post"])
@@ -124,8 +144,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
             # Check if an application already exists for the festival and year
             festival_content_type = ContentType.objects.get_for_model(Festival)
             applications = Application.objects.filter(
-                content_type=festival_content_type,
-                object_id=festival.pk
+                content_type=festival_content_type, object_id=festival.pk
             )
             existing_application = next(
                 (a for a in applications if a.application_year == application_year),
@@ -163,12 +182,21 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
 
+                # Get all contact emails from the festival
+                recipient_emails = [
+                    contact.email for contact in festival.contacts.all()
+                ]
+                if not recipient_emails:
+                    return Response(
+                        {"error": "No contact emails found for this festival"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
                 email = EmailMultiAlternatives(
                     subject,
                     text_content,
                     "info@philippeducasse.com",
-                    # ["ducassephi@hotmail.fr"],
-                    [festival.contact_email],
+                    recipient_emails,
                     bcc=["info@philippeducasse.com"],
                 )
                 email.attach_alternative(html_content, "text/html")

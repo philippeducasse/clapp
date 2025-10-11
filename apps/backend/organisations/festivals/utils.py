@@ -20,6 +20,17 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     fest_types_str = ", ".join([value for (value, _) in festival_types])
     app_types_str = ", ".join([value for (value, _) in application_types])
 
+    # Format contacts for the prompt
+    contacts_list = []
+    for contact in festival.contacts.all():
+        contact_str = f"{contact.email}"
+        if contact.name:
+            contact_str = f"{contact.name} ({contact.email})"
+        if contact.role:
+            contact_str += f" - {contact.role}"
+        contacts_list.append(contact_str)
+    contacts_display = "; ".join(contacts_list) if contacts_list else "No contacts"
+
     prompt = f"""
     You are enriching festival data for a cultural booking app.
 
@@ -46,9 +57,11 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     - Valid JSON. No comments. No trailing commas.
     - Exactly these keys (strings):
       country, town, approximate_date, start_date, end_date, website_url,
-      festival_type, description, contact_person, contact_email,
+      festival_type, description,
       application_date_start, application_date_end, application_type,
-      sources, updated_fields
+      contacts, sources, updated_fields
+    - contacts should be an array of objects with: email (required), name (optional), role (optional). 
+        Provide at least one contact with an email.
 
     CURRENT RECORD
     country: {nv(festival.country)}
@@ -60,8 +73,7 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
     website_url: {nv(festival.website_url)}
     festival_type: {nv(festival.festival_type)}
     description: {nv(festival.description)}
-    contact_person: {nv(festival.contact_person)}
-    contact_email: {nv(festival.contact_email)}
+    contacts: {contacts_display}
     application_date_start: {nv(festival.application_date_start)}
     application_date_end: {nv(festival.application_date_end)}
     application_type: {nv(festival.application_type)}
@@ -116,11 +128,13 @@ def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) ->
       "website_url": "https://examplefest.be",
       "festival_type": "STREET",
       "description": "Annual festival showcasing contemporary circus arts.",
-      "contact_person": "Jane Doe",
-      "contact_email": "info@examplefest.be",
       "application_date_start": "2026-05-01",
       "application_date_end": "2026-06-15",
       "application_type": "FORM",
+      "contacts": [
+        {{"email": "info@examplefest.be"}},
+        {{"email": "programming@examplefest.be", "name": "John Smith", "role": "Programming Manager"}},
+      ],
       "comments": "this is a comment."
     }}
     """
@@ -172,11 +186,13 @@ def clean_festival_data(festival: Festival) -> None:
     if festival.country:
         festival.country = clean_nan(festival.country.title())
 
-    if festival.contact_person:
-        festival.contact_person = clean_nan(festival.contact_person.title())
-
-    if festival.contact_email:
-        festival.contact_email = clean_nan(festival.contact_email.strip().lower())
+    # Clean contact data
+    for contact in festival.contacts.all():
+        if contact.name:
+            contact.name = clean_nan(contact.name.title())
+        if contact.email:
+            contact.email = clean_nan(contact.email.strip().lower())
+        contact.save()
 
     if festival.comments:
         festival.comments = clean_nan(festival.comments.strip().lower())
@@ -200,9 +216,17 @@ def generate_application_mail_prompt(
     # Determine language for email - default to English if country not specified
     language = "English" if not festival.country else f"language of {festival.country}"
 
-    # Determine salutation based on contact person
-    contact_name = festival.contact_person.strip() if festival.contact_person else None
-    if contact_name and contact_name.lower() != "nan":
+    # Determine salutation based on primary contact person
+    primary_contact = festival.contacts.first()
+    contact_name = None
+    contact_emails = []
+
+    if primary_contact:
+        if primary_contact.name and primary_contact.name.strip().lower() != "nan":
+            contact_name = primary_contact.name.strip()
+        contact_emails = [c.email for c in festival.contacts.all()]
+
+    if contact_name:
         salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
     else:
         salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {festival.name} organizers."
@@ -297,8 +321,8 @@ Festival Details:
 - Festival Name: {festival.name}
 - Festival Type: {festival.festival_type}
 - Description: {festival.description}
-- Contact Person: {contact_name}
-- Contact Email: {festival.contact_email}
+- Contact Person: {contact_name if contact_name else "Not specified"}
+- Contact Emails: {", ".join(contact_emails) if contact_emails else "Not specified"}
 
     Email Requirements:
     - Salutation: {salutation}
