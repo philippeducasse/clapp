@@ -1,3 +1,5 @@
+import { OrganisationContact } from "./OrganisationContact";
+
 export interface Festival {
   [key: string]: unknown;
   id: number;
@@ -6,8 +8,7 @@ export interface Festival {
   country?: string;
   town?: string;
   approximateDate?: string;
-  contactEmail?: string;
-  contactPerson?: string;
+  contact?: OrganisationContact[];
   startDate?: Date;
   endDate?: Date;
   festivalType?: FestivalType;

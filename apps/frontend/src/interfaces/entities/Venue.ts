@@ -1,3 +1,5 @@
+import { OrganisationContact } from "./OrganisationContact";
+
 export interface Venue {
   [key: string]: unknown;
   id: number;
@@ -6,8 +8,7 @@ export interface Venue {
   country?: string;
   town?: string;
   approximateDate?: string;
-  contactEmail?: string;
-  contactPerson?: string;
+  contact?: OrganisationContact[];
   venueType?: VenueType;
   contacted?: boolean;
   description?: string;

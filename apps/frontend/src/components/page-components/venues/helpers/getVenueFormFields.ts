@@ -39,7 +39,7 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
     },
     {
       label: "Contact Email",
-      fieldName: "contactEmail",
+      fieldName: "contact.email",
       type: ControlledFormElementType.EMAIL,
       helpText: "Email of main person of contact",
     },
