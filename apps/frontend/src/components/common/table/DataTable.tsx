@@ -26,19 +26,35 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   entityName: EntityName;
+  pagination?: {
+    pageIndex: number;
+    pageSize: number;
+  };
+  setPagination?: (pagination: { pageIndex: number; pageSize: number }) => void;
+  totalCount?: number;
+  isLoading?: boolean;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   entityName,
+  pagination: externalPagination,
+  setPagination: setExternalPagination,
+  totalCount,
+  isLoading = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [pagination, setPagination] = useState({
+  const [internalPagination, setInternalPagination] = useState({
     pageIndex: 0,
     pageSize: 30,
   });
+
+  // Use external pagination if provided, otherwise use internal
+  const pagination = externalPagination || internalPagination;
+  const setPagination = setExternalPagination || setInternalPagination;
+  const isServerSide = !!externalPagination;
 
   const table = useReactTable({
     data,
@@ -50,6 +66,8 @@ export function DataTable<TData, TValue>({
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
+    manualPagination: isServerSide,
+    pageCount: isServerSide && totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
     state: {
       sorting,
       globalFilter,
@@ -124,6 +142,8 @@ export function DataTable<TData, TValue>({
         table={table}
         pagination={pagination}
         entityName={entityName}
+        totalCount={totalCount}
+        isServerSide={isServerSide}
       />
     </div>
   );

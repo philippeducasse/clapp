@@ -11,11 +11,17 @@ import {
 } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { Performance } from "@/interfaces/entities/Performance";
+import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
-const getAllFestivals = (): Promise<Festival[]> => {
-  return fetchRequest<Festival[]>(endpoint);
+const getAllFestivals = (
+  limit: number = 50,
+  offset: number = 0
+): Promise<PaginatedResponse<Festival>> => {
+  return fetchRequest<PaginatedResponse<Festival>>(
+    `${endpoint}?limit=${limit}&offset=${offset}`
+  );
 };
 
 const getFestival = (festivalId: number): Promise<Festival> => {

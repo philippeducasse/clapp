@@ -18,14 +18,29 @@ interface TablePaginationProps<TData> {
     pageIndex: number;
     pageSize: number;
   };
+  totalCount?: number;
+  isServerSide?: boolean;
 }
 
-function TablePagination<TData>({ table, pagination, entityName }: TablePaginationProps<TData>) {
+function TablePagination<TData>({
+  table,
+  pagination,
+  entityName,
+  totalCount,
+  isServerSide = false
+}: TablePaginationProps<TData>) {
   // Calculate the current page number (1-based)
   const currentPage = pagination.pageIndex + 1;
 
   // Calculate the total number of pages
-  const totalPages = Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
+  const totalPages = isServerSide && totalCount
+    ? Math.ceil(totalCount / pagination.pageSize)
+    : Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
+
+  // Calculate total items count
+  const totalItems = isServerSide && totalCount
+    ? totalCount
+    : table.getFilteredRowModel().rows.length;
 
   // Generate page numbers to display
   const getPageNumbers = () => {
@@ -48,7 +63,7 @@ function TablePagination<TData>({ table, pagination, entityName }: TablePaginati
   return (
     <Pagination className="justify-between mt-8">
       <div className="">
-        Page {currentPage} of {totalPages} | Total {entityName}s: {table.getFilteredRowModel().rows.length}
+        Page {currentPage} of {totalPages} | Total {entityName}s: {totalItems}
       </div>
       <PaginationContent>
         <PaginationItem>
