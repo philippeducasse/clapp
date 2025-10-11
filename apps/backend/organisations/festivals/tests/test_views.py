@@ -20,7 +20,7 @@ def api_client():
 def festival():
     """Fixture to create a test festival"""
     return Festival.objects.create(
-        festival_name="Test Festival",
+        name="Test Festival",
         description="Test Description",
         country="France",
         town="Paris",
@@ -66,12 +66,12 @@ class TestFestivalViewSet:
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.data) == 1
-        assert response.data[0]["festival_name"] == "Test Festival"
+        assert response.data[0]["name"] == "Test Festival"
 
     def test_create_festival(self, api_client):
         """Test creating a new festival"""
         data = {
-            "festival_name": "New Festival",
+            "name": "New Festival",
             "country": "Spain",
             "town": "Barcelona",
             "festival_type": "CIRCUS",
@@ -81,20 +81,20 @@ class TestFestivalViewSet:
 
         assert response.status_code == status.HTTP_201_CREATED
         assert Festival.objects.count() == 1
-        assert Festival.objects.first().festival_name == "New Festival"
+        assert Festival.objects.first().name == "New Festival"
 
     def test_retrieve_festival(self, api_client, festival):
         """Test retrieving a specific festival"""
         response = api_client.get(f"/api/festivals/{festival.id}/")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["festival_name"] == "Test Festival"
+        assert response.data["name"] == "Test Festival"
         assert response.data["country"] == "France"
 
     def test_update_festival(self, api_client, festival):
         """Test updating a festival"""
         data = {
-            "festival_name": "Updated Festival",
+            "name": "Updated Festival",
             "country": "Germany",
             "town": "Berlin",
         }
@@ -103,7 +103,7 @@ class TestFestivalViewSet:
 
         assert response.status_code == status.HTTP_200_OK
         festival.refresh_from_db()
-        assert festival.festival_name == "Updated Festival"
+        assert festival.name == "Updated Festival"
         assert festival.country == "Germany"
 
     def test_delete_festival(self, api_client, festival):

@@ -31,9 +31,9 @@ class FestivalViewSet(viewsets.ModelViewSet):
     serializer_class = FestivalSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["country", "festival_type"]
-    search_fields = ["festival_name"]
-    ordering_fields = ["festival_name", "start_date", "application_date_start"]
-    ordering = ["festival_name"]
+    search_fields = ["name"]
+    ordering_fields = ["name", "start_date", "application_date_start"]
+    ordering = ["name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
         # annotates all festival objects
@@ -76,7 +76,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
 
-        query = f"{festival.website_url} {festival.festival_name} {festival.country} {datetime.now().year}"
+        query = f"{festival.website_url} {festival.name} {festival.country} {datetime.now().year}"
 
         # search_results: ConversationResponse = self.mistral_client.search(query=query)
         # parsed_results: str = extract_search_results(search_results)

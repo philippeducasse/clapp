@@ -163,8 +163,8 @@ def clean_festival_data(festival: Festival) -> None:
     def clean_nan(value: str) -> str:
         return "" if str(value).strip().lower() == "nan" else str(value).strip()
 
-    if festival.festival_name:
-        festival.festival_name = festival.festival_name.title()
+    if festival.name:
+        festival.name = festival.name.title()
 
     if festival.town:
         festival.town = clean_nan(festival.town.title())
@@ -205,7 +205,7 @@ def generate_application_mail_prompt(
     if contact_name and contact_name.lower() != "nan":
         salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
     else:
-        salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {festival.festival_name} organizers."
+        salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {festival.name} organizers."
 
     # Build artist identity section
     artist_identity = (
@@ -294,7 +294,7 @@ Artist Profile:
 {performances_details}
 
 Festival Details:
-- Festival Name: {festival.festival_name}
+- Festival Name: {festival.name}
 - Festival Type: {festival.festival_type}
 - Description: {festival.description}
 - Contact Person: {contact_name}

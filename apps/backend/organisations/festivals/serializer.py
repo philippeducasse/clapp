@@ -40,14 +40,14 @@ class FestivalSerializer(WritableNestedModelSerializer):
         model: Type[Festival] = Festival
         fields: List[str] = [
             "id",
-            "festival_name",
+            "name",
             "description",
             "country",
             "town",
             "festival_type",
             "website_url",
-            "contact_email",
-            "contact_person",
+            # "contact_email",
+            # "contact_person",
             "start_date",
             "end_date",
             "approximate_date",
@@ -55,7 +55,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
             "application_date_end",
             "application_type",
             "comments",
-            "contacts",
+            "contact",
             # Annotated fields
             "has_application_this_year",
             "latest_application_status",
@@ -68,11 +68,19 @@ class FestivalSerializer(WritableNestedModelSerializer):
         # application_year = request.application_year
         # Calculate date range for this year
         from datetime import date
+        from django.contrib.contenttypes.models import ContentType
+        from applications.models import Application
 
         year_start = date(2026 - 1, 9, 1)
         year_end = date(2026, 8, 31)
-        application = obj.applications.filter(
-            application_date__gte=year_start, application_date__lte=year_end
+
+        # Get applications for this specific festival using GenericForeignKey
+        festival_content_type = ContentType.objects.get_for_model(Festival)
+        application = Application.objects.filter(
+            content_type=festival_content_type,
+            object_id=obj.pk,
+            application_date__gte=year_start,
+            application_date__lte=year_end
         ).first()
 
         # Reuse your existing ApplicationSerializer

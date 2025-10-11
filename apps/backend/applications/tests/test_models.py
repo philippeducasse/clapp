@@ -12,7 +12,7 @@ class TestApplicationModel:
 
     @pytest.fixture
     def festival(self):
-        return Festival.objects.create(festival_name="Test Festival", country="France")
+        return Festival.objects.create(name="Test Festival", country="France")
 
     @pytest.fixture
     def profile(self):

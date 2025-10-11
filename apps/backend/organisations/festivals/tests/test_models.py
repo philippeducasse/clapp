@@ -10,11 +10,11 @@ class TestFestivalModel:
     def test_festival_creation(self):
         """Test creating a festival with required fields"""
         festival = Festival.objects.create(
-            festival_name="Test Festival", country="France", town="Paris"
+            name="Test Festival", country="France", town="Paris"
         )
 
         assert festival.id is not None
-        assert festival.festival_name == "Test Festival"
+        assert festival.name == "Test Festival"
         assert festival.country == "France"
         assert festival.town == "Paris"
         assert festival.festival_type == "STREET"  # default value
@@ -22,13 +22,13 @@ class TestFestivalModel:
 
     def test_festival_string_representation(self):
         """Test the __str__ method returns the festival name"""
-        festival = Festival.objects.create(festival_name="Summer Festival")
+        festival = Festival.objects.create(name="Summer Festival")
         assert str(festival) == "Summer Festival"
 
     def test_festival_with_all_fields(self):
         """Test creating a festival with all fields populated"""
         festival = Festival.objects.create(
-            festival_name="Complete Festival",
+            name="Complete Festival",
             description="A comprehensive test festival",
             country="Spain",
             town="Barcelona",
@@ -45,7 +45,7 @@ class TestFestivalModel:
             comments="Test comments",
         )
 
-        assert festival.festival_name == "Complete Festival"
+        assert festival.name == "Complete Festival"
         assert festival.description == "A comprehensive test festival"
         assert festival.festival_type == "CIRCUS"
         assert festival.application_type == "FORM"
@@ -56,7 +56,7 @@ class TestFestivalModel:
 
     def test_festival_optional_fields_null(self):
         """Test that optional fields can be null"""
-        festival = Festival.objects.create(festival_name="Minimal Festival")
+        festival = Festival.objects.create(name="Minimal Festival")
 
         assert festival.description is None
         assert festival.country is None
@@ -81,7 +81,7 @@ class TestFestivalModel:
 
         for fest_type in valid_types:
             festival = Festival.objects.create(
-                festival_name=f"Festival {fest_type}", festival_type=fest_type
+                name=f"Festival {fest_type}", festival_type=fest_type
             )
             assert festival.festival_type == fest_type
 
@@ -91,21 +91,21 @@ class TestFestivalModel:
 
         for app_type in valid_types:
             festival = Festival.objects.create(
-                festival_name=f"Festival {app_type}", application_type=app_type
+                name=f"Festival {app_type}", application_type=app_type
             )
             assert festival.application_type == app_type
 
     def test_festival_email_validation(self):
         """Test that contact_email field validates email format"""
         festival = Festival.objects.create(
-            festival_name="Email Test", contact_email="valid@email.com"
+            name="Email Test", contact_email="valid@email.com"
         )
         assert festival.contact_email == "valid@email.com"
 
     def test_festival_url_validation(self):
         """Test that website_url field validates URL format"""
         festival = Festival.objects.create(
-            festival_name="URL Test", website_url="https://valid-url.com"
+            name="URL Test", website_url="https://valid-url.com"
         )
         assert festival.website_url == "https://valid-url.com"
 
@@ -113,7 +113,7 @@ class TestFestivalModel:
         """Test description field max length"""
         long_description = "A" * 1000
         festival = Festival.objects.create(
-            festival_name="Description Test", description=long_description
+            name="Description Test", description=long_description
         )
         assert len(festival.description) == 1000
 
@@ -121,6 +121,6 @@ class TestFestivalModel:
         """Test comments field max length"""
         long_comments = "B" * 500
         festival = Festival.objects.create(
-            festival_name="Comments Test", comments=long_comments
+            name="Comments Test", comments=long_comments
         )
         assert len(festival.comments) == 500
