@@ -68,52 +68,79 @@ class FestivalViewSet(viewsets.ModelViewSet):
         self.mistral_client = MistralClient()
         self.gemini_client = GeminiClient()
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        # Extract and handle contacts separately
+        contacts_data = request.data.pop("contacts", None)
+        print("ctact data:", contacts_data, request.data)
+        # Update festival fields
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        # Handle contacts
+        if contacts_data is not None:
+            from organisations.festivals.models import FestivalContact
+
+            for contact_info in contacts_data:
+                if "email" in contact_info and contact_info["email"]:
+                    email = contact_info["email"].strip().lower()
+
+                    existing = FestivalContact.objects.filter(
+                        festival=instance, email=email
+                    ).first()
+
+                    if existing:
+                        existing.name = contact_info.get("name", "")
+                        existing.role = contact_info.get("role", "")
+                        existing.phone = contact_info.get("phone", None)
+                        existing.save()
+                        print("updated", contact_info)
+
+                    else:
+                        FestivalContact.objects.create(
+                            festival=instance,
+                            email=email,
+                            name=contact_info.get("name", ""),
+                            role=contact_info.get("role", ""),
+                            phone=contact_info.get("phone", None),
+                        )
+                        print("created", contact_info)
+
+        return Response(self.get_serializer(instance).data)
+
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
         # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
         festival: Festival = self.get_object()
-
         query = f"{festival.website_url} {festival.name} {festival.country} {datetime.now().year}"
-
-        # search_results: ConversationResponse = self.mistral_client.search(query=query)
-        # parsed_results: str = extract_search_results(search_results)
-        # prompt: str = generate_enrich_prompt(festival, parsed_results)
 
         search_results = self.gemini_client.search(query=query)
         prompt: str = generate_enrich_prompt(festival, search_results)
-
         llm_response: str = self.mistral_client.chat(prompt=prompt)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
 
-        # Handle contacts separately since they're a related model
-        contacts_data = updated_fields.pop("contacts", None)
-
-        # Update direct festival fields
+        # Update the fields with LLM-provided values (including contacts)
         for field, value in updated_fields.items():
-            if field not in ["sources", "updated_fields"]:  # Skip meta fields
+            if field not in [
+                "sources",
+                "updated_fields",
+                "contacts",
+            ]:  # Skip meta fields & contact field
                 setattr(festival, field, value)
 
-        # Update contacts if provided
-        if contacts_data and isinstance(contacts_data, list):
-            from organisations.festivals.models import FestivalContact
-
-            # Clear existing contacts and create new ones
-
-            for contact_info in contacts_data:
-                if "email" in contact_info:  # email is required
-                    FestivalContact.objects.create(
-                        festival=festival,
-                        email=contact_info["email"],
-                        name=contact_info.get("name", ""),
-                        role=contact_info.get("role", ""),
-                        phone=contact_info.get("phone", None),
-                    )
-
         clean_festival_data(festival)
-        print(FestivalSerializer(festival).data)
-        return Response(FestivalSerializer(festival).data)
+        enriched_data = FestivalSerializer(festival).data
+
+        if "contacts" in updated_fields:
+            enriched_data["contacts"] = updated_fields["contacts"]
+
+        print(enriched_data)
+        return Response(enriched_data)
 
     @action(detail=True, methods=["post"])
     def apply(self, request: HttpRequest, pk: int) -> Response:

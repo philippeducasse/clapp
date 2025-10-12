@@ -186,14 +186,6 @@ def clean_festival_data(festival: Festival) -> None:
     if festival.country:
         festival.country = clean_nan(festival.country.title())
 
-    # Clean contact data
-    for contact in festival.contacts.all():
-        if contact.name:
-            contact.name = clean_nan(contact.name.title())
-        if contact.email:
-            contact.email = clean_nan(contact.email.strip().lower())
-        contact.save()
-
     if festival.comments:
         festival.comments = clean_nan(festival.comments.strip().lower())
 
