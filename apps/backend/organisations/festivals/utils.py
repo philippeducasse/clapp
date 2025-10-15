@@ -276,7 +276,7 @@ def generate_application_mail_prompt(
             if performance.long_description
             else "Not available"
         }
-            - Dossier: {performance.dossier}
+            - Dossier: {performance.dossiers.all()[0]}
             """
     else:
         performance_intro = "your performances"
@@ -371,7 +371,7 @@ Festival Details:
                 it’s a show full of imagination, laughter, and wonder, perfectly suited to the lively and diverse spirit of your festival. 
                 Audiences are invited to dream, share, and rediscover the carefree joy of being a child again".
             - Closing: If {performance.trailer}, add a link to it following this format: <p>Here you can see the <a href={performance.trailer}>trailer</a>, 
-            making sure the link is well separated from any other text and is clearly visible. If {performance.dossier} included, say that the dossier(s) are attached and that all fruther information and photos are there.
+            making sure the link is well separated from any other text and is clearly visible. If {performance.dossiers.all()[0]} included, say that the dossier(s) are attached and that all fruther information and photos are there.
             Express enthusiasm in awaiting the response and openess to answer any questions or provide more information. Provide contact information using this format: {signature}
 
             Response Format Instructions:

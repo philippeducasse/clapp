@@ -49,7 +49,7 @@ class Performance(models.Model):
     long_description = models.TextField(max_length=10000, blank=True, null=True)
     creation_date = models.DateField(blank=True, null=True)
     # TODO only for dev, in production should switch to some bucket storage
-    dossier = models.FileField(upload_to="pdfs/", blank=True, null=True)
+
     performance_type = models.CharField(
         max_length=50, choices=PERFORMANCE_TYPES, null=True, blank=True
     )

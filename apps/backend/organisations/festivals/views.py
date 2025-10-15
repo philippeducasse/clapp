@@ -199,7 +199,9 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 )
                 application.performances.set(performance_objects)
                 for p in performance_objects:
-                    attachments.append(p.dossier)
+                    for dossier in p.dossiers.all():
+                        print("attaching")
+                        attachments.append(dossier.file)
 
             if attachments:
                 application.attachments_sent = [file.name for file in attachments]
@@ -230,32 +232,27 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
                 if performances:
                     for p in performance_objects:
-                        if p.dossier:
-                            # Open and attach the file from storage
-                            email.attach(
-                                p.dossier.name.split("/")[-1],
-                                p.dossier.read(),
-                                "application/pdf",
-                            )
+                        if p.dossiers:
+                            for dossier in p.dossiers.all():
+                                print("attaching 2")
+                                attachments.append(dossier.file)
+                                filename = dossier.file.name.split("/")[-1]
+                                # Open and attach the file from storage
+                                email.attach(
+                                    filename,
+                                    dossier.file.read(),
+                                    "application/pdf",
+                                )
 
                 for file in attachments:
+                    print("file:", file)
                     if hasattr(file, "content_type"):
                         # It's an uploaded file from request.FILES
                         email.attach(file.name, file.read(), file.content_type)
-                    # else:
-                    #     # It's a FieldFile from the database
-                    #     print("Attaching dossier: 3", file.name)
-
-                    #     filename = file.name.split("/")[-1]  # Get just the filename
-                    #     email.attach(
-                    #         filename,
-                    #         file.read(),
-                    #         "application/pdf",
-                    #     )
 
                 email.send(fail_silently=False)
-                application.application_status = "APPLIED"
-                application.save()
+                # application.application_status = "APPLIED"
+                # application.save()
                 return Response(
                     {"message": "Application sent successfully"}, status=200
                 )
