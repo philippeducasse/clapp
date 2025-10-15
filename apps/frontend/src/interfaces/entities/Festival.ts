@@ -8,7 +8,7 @@ export interface Festival {
   country?: string;
   town?: string;
   approximateDate?: string;
-  contact?: OrganisationContact[];
+  contacts?: OrganisationContact[];
   startDate?: Date;
   endDate?: Date;
   festivalType?: FestivalType;

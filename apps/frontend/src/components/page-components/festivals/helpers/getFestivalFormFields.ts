@@ -45,15 +45,17 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
     },
     {
       label: "Contact Email",
-      fieldName: "contact.email",
+      fieldName: "contacts[0].email",
       type: ControlledFormElementType.EMAIL,
       helpText: "Email of main person of contact",
+      multiple: true,
     },
     {
       label: "Contact Person",
-      fieldName: "contact.name",
+      fieldName: "contacts[0].name",
       type: ControlledFormElementType.TEXT,
       helpText: "Name of main person of contact",
+      multiple: true,
     },
     {
       label: "Start Date",

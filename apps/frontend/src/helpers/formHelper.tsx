@@ -63,7 +63,7 @@ export const createZodFormSchema = (
   const schema: Record<string, ZodType> = {};
 
   formFields.forEach((field) => {
-    const { fieldName, type, required } = field;
+    const { fieldName, type, required, multiple } = field;
     let zodType: ZodType;
 
     switch (type) {
@@ -75,7 +75,11 @@ export const createZodFormSchema = (
       case ControlledFormElementType.TEXT:
       case ControlledFormElementType.TEXT_AREA:
       case ControlledFormElementType.TEXT_EDITOR:
-        zodType = z.string();
+        if (multiple) {
+          zodType = z.array(z.string());
+        } else {
+          zodType = z.string();
+        }
         break;
 
       case ControlledFormElementType.MULTI_SELECT:

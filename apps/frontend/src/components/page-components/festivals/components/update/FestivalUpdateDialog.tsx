@@ -38,7 +38,7 @@ export const FestivalUpdateDialog = () => {
     try {
       if (festival && !updatedFields) {
         const response = await festivalApiService.enrichFestival(festival.id);
-        console.log(response);
+        console.log("response:", response);
         setUpdatedFields(response);
       }
     } catch (error) {
@@ -52,6 +52,8 @@ export const FestivalUpdateDialog = () => {
     if (updatedFields) {
       setLoading(true);
       try {
+        console.log("submitting:", updatedFields);
+
         await festivalApiService.updateFestival(updatedFields);
         dispatch(updateFestival(updatedFields));
         setOpen(false);
