@@ -4,9 +4,9 @@ from typing import Type
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    organisation_type = serializers.SerializerMethodField()
+    # organisation_type = serializers.SerializerMethodField()
     organisation_id = serializers.IntegerField(source="object_id", read_only=True)
-    organisation_name = serializers.SerializerMethodField()
+    # organisation_name = serializers.SerializerMethodField()
 
     class Meta:
         model: Type[Application] = Application

@@ -68,13 +68,12 @@ class FestivalViewSet(viewsets.ModelViewSet):
         self.mistral_client = MistralClient()
         self.gemini_client = GeminiClient()
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
 
         # Extract and handle contacts separately
         contacts_data = request.data.pop("contacts", None)
-        print("ctact data:", contacts_data, request.data)
         # Update festival fields
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
@@ -119,8 +118,10 @@ class FestivalViewSet(viewsets.ModelViewSet):
         query = f"{festival.website_url} {festival.name} {festival.country} {datetime.now().year}"
 
         search_results = self.gemini_client.search(query=query)
+
         prompt: str = generate_enrich_prompt(festival, search_results)
         llm_response: str = self.mistral_client.chat(prompt=prompt)
+        print("RESPONSE", llm_response)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
 
@@ -139,7 +140,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
         if "contacts" in updated_fields:
             enriched_data["contacts"] = updated_fields["contacts"]
 
-        print(enriched_data)
         return Response(enriched_data)
 
     @action(detail=True, methods=["post"])

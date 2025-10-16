@@ -1,17 +1,15 @@
 # mypy: ignore-errors
 
-from dotenv import load_dotenv
 from mistralai import Mistral, ConversationResponse
 import os
 
 
 class MistralClient:
     def __init__(self) -> None:
-        load_dotenv(".env")
         self.client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self.model = os.getenv("MISTRAL_DEFAULT_MODEL")
         self.search_agent = self.client.beta.agents.create(
-            model="mistral-medium-2505",
+            model="mistral-medium-2508",
             description="Agent able to search information regarding circus and street festivals over the web",
             name="Websearch Agent",
             instructions="You have the ability to perform web searches with `web_search` to find up-to-date information.",
@@ -33,7 +31,7 @@ class MistralClient:
 
         except Exception as e:
             # Handle any errors that occur during the API call
-            print(f"An error occurred: {e}")
+            print(f"An error occurred with Mistral: {e}")
             return str(e)
 
     def search(self, query: str) -> ConversationResponse:
