@@ -1,5 +1,5 @@
 import { applicationApiService } from "@/api/applicationApiService";
-import { ApplicationsTable } from "@/components/page-components/applications/table/ApplicationsTable";
+import { ApplicationsTable } from "@/components/page-components/applications/components/table/ApplicationsTable";
 const ApplicationsPage = async () => {
   const data = await applicationApiService.getAllApplications();
   return (

@@ -1,8 +1,6 @@
-// import ApplicationView from "../../../components/page-components/application-page/components/details-view/ApplicationView";
-
+import ApplicationView from "@/components/page-components/applications/components/details/ApplicationView";
 const ApplicationDetailPage = async () => {
-  // return <ApplicationView />;
-  return <p>Application View</p>;
+  return <ApplicationView />;
 };
 
 export default ApplicationDetailPage;

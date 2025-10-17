@@ -8,6 +8,8 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import { capitalize } from "lodash";
+import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/StatusBadge";
 
 const useApplicationColumns = (): ColumnDef<Application>[] => {
   const router = useRouter();
@@ -32,12 +34,17 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       },
     },
     {
+      accessorKey: "createdAt",
+      header: "Application date",
+      size: 110,
+    },
+    {
       accessorKey: "applicationStatus",
       header: getSortableHeader("Status"),
       size: 110,
       cell: ({ row }) => {
         const application = row.original;
-        return capitalize(application.applicationStatus);
+        return <StatusBadge status={application.applicationStatus} />;
       },
     },
     {

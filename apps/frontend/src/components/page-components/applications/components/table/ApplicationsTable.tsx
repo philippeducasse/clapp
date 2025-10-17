@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Application } from "@/interfaces/entities/Application";
-import { useApplicationColumns } from "../helpers/useApplicationColumns";
+import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
@@ -27,9 +27,8 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     router.push(`/applications/${id}/edit`);
   };
 
-  const columns =
-    useApplicationColumns();
-    // onEdit
+  const columns = useApplicationColumns();
+  // onEdit
   return (
     <DataTable
       columns={columns}

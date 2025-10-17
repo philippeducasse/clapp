@@ -1,0 +1,65 @@
+"use client";
+
+import React, { useEffect } from "react";
+import { Clipboard } from "lucide-react";
+import EditButton from "@/components/common/buttons/EditButton";
+import { useSelector } from "react-redux";
+import {
+  selectApplication,
+  setSelectedApplication,
+} from "@/redux/slices/applicationSlice";
+import { useParams } from "next/navigation";
+import { RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { getApplicationBasicInfo } from "../../helpers/getApplicationDetails";
+import { useRouter } from "next/navigation";
+import { Info, NotebookTabs } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import SendButton from "@/components/common/buttons/GenericButton";
+import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
+import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
+import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
+
+const ApplicationView = () => {
+  const params = useParams();
+  const dispatch = useDispatch();
+  const applicationId = Number(params.id);
+  const application = useSelector((state: RootState) =>
+    selectApplication(state, applicationId)
+  );
+  const router = useRouter();
+
+  console.log("application", application);
+
+  if (!application) {
+    return <Skeleton />;
+  }
+
+  const goToApplyPage = async () => {
+    router.push(`${applicationId}/apply`);
+  };
+
+  return (
+    <DetailsViewWrapper href="/applications">
+      <DetailsViewHeader
+        title={application.emailSubject ?? ""}
+        icon={
+          <Clipboard
+            className="text-emerald-600 dark:text-emerald-400"
+            size={32}
+          />
+        }
+        actionElements={
+          <EditButton href={`/applications/${application.id}/edit`} />
+        }
+      />
+      <DetailsViewSection
+        title="Application information"
+        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+        data={getApplicationBasicInfo(application)}
+      />
+    </DetailsViewWrapper>
+  );
+};
+
+export default ApplicationView;
