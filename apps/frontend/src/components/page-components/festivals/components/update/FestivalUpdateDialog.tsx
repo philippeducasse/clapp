@@ -31,14 +31,15 @@ export const FestivalUpdateDialog = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
+  );
 
   const handleUpdate = async () => {
     setLoading(true);
     try {
       if (festival && !updatedFields) {
         const response = await festivalApiService.enrichFestival(festival.id);
-        console.log("response:", response);
         setUpdatedFields(response);
       }
     } catch (error) {
@@ -52,7 +53,7 @@ export const FestivalUpdateDialog = () => {
     if (updatedFields) {
       setLoading(true);
       try {
-        console.log("submitting:", updatedFields);
+        // console.log("submitting:", updatedFields);
 
         await festivalApiService.updateFestival(updatedFields);
         dispatch(updateFestival(updatedFields));
@@ -99,7 +100,11 @@ export const FestivalUpdateDialog = () => {
               <X className="text-red-500" /> Cancel
             </Button>
           </DialogClose>
-          <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />
+          <SubmitButton
+            isLoading={loading}
+            onClick={handleSubmit}
+            label="Save changes"
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

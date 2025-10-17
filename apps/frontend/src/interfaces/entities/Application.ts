@@ -1,9 +1,12 @@
 import { Festival } from "./Festival";
 import { Profile } from "./Profile";
+import { Residency } from "./Residency";
+import { Venue } from "./Venue";
 
 export interface Application {
   id?: number;
-  festival: number | Festival;
+  organisation: Festival|Venue|Residency;
+  organisationType: "Festival" | "Residency" | "Venue";
   profile: number | Profile;
   applicationDate: string | null;
   applicationMethod: ApplicationMethod | null;

@@ -16,19 +16,25 @@ interface ApplicationsTableProps {
 export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [applicationData, setApplicationData] = useState<PaginatedResponse<Application>>(initialData);
+  const [applicationData, setApplicationData] =
+    useState<PaginatedResponse<Application>>(initialData);
 
   useEffect(() => {
     dispatch(setApplications(initialData.results));
-    console.log("apps", applicationData.results)
   }, [dispatch, initialData]);
 
   const onEdit = (id: string) => {
     router.push(`/applications/${id}/edit`);
   };
 
-  const columns = useApplicationColumns(
+  const columns =
+    useApplicationColumns();
     // onEdit
+  return (
+    <DataTable
+      columns={columns}
+      data={applicationData.results}
+      entityName={EntityName.APPLICATION}
+    />
   );
-  return <DataTable columns={columns} data={applicationData.results} entityName={EntityName.APPLICATION}/>;
 };
