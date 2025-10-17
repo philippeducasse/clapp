@@ -16,11 +16,12 @@ import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 const endpoint = "http://localhost:8000/api/festivals/";
 
 const getAllFestivals = (
-  limit: number = 50,
-  offset: number = 0
+  // limit: number = 500,
+  // offset: number = 0
 ): Promise<PaginatedResponse<Festival>> => {
   return fetchRequest<PaginatedResponse<Festival>>(
-    `${endpoint}?limit=${limit}&offset=${offset}`
+    // `${endpoint}?limit=${limit}&offset=${offset}`
+      endpoint
   );
 };
 

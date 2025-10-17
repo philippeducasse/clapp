@@ -58,7 +58,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
     {
       accessorKey: "websiteUrl",
       header: "Website",
-      size: 50,
+      size: 100,
       cell: ({ row }) => {
         const festival = row.original;
         return (

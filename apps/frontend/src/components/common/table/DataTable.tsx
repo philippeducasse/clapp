@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import TablePagination from "./TablePagination";
 import { EntityName } from "@/interfaces/Enums";
 import DataTableHeader from "./DataTableHeader";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -83,7 +84,7 @@ export function DataTable<TData, TValue>({
           setGlobalFilter={setGlobalFilter}
           entityName={entityName}
         />
-        <Table className="">
+        <Table style={{ tableLayout: "fixed" }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -113,16 +114,17 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{ width: `${cell.column.getSize()}px` }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+                        <TableCell
+                            key={cell.id}
+                            style={{width: `${cell.column.getSize()}px`}}
+                        >
+                          {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                          )}
+                        </TableCell>
+                    ))
+                  }
                 </TableRow>
               ))
             ) : (
