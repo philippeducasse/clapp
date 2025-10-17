@@ -1,5 +1,5 @@
 from organisations.venues.models import Venue
-from organisations.venues.serializers import VenueSerializer
+from organisations.venues.serializer import VenueSerializer
 from rest_framework import viewsets
 
 

@@ -251,8 +251,8 @@ class FestivalViewSet(viewsets.ModelViewSet):
                         email.attach(file.name, file.read(), file.content_type)
 
                 email.send(fail_silently=False)
-                # application.application_status = "APPLIED"
-                # application.save()
+                application.application_status = "APPLIED"
+                application.save()
                 return Response(
                     {"message": "Application sent successfully"}, status=200
                 )

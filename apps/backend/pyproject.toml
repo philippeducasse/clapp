@@ -120,6 +120,7 @@ exclude = [
     ".*/tests/.*",
     "test_.*\\.py$",
     "conftest\\.py$",
+    "scripts/"
 ]
 
 [[tool.mypy.overrides]]
@@ -129,5 +130,6 @@ module = [
     "tests.*",
     "manage",
     "conftest",
+    "scripts"
 ]
 ignore_errors = true

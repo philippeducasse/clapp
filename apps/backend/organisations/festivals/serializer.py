@@ -2,7 +2,6 @@ from rest_framework import serializers
 from organisations.festivals.models import Festival
 from organisations.models import OrganisationContact
 from typing import List, Type, Any
-from applications.serializer import ApplicationSerializer
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
@@ -70,6 +69,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
         from datetime import date
         from django.contrib.contenttypes.models import ContentType
         from applications.models import Application
+        from applications.serializer import MinimalApplicationSerializer
 
         year_start = date(2026 - 1, 9, 1)
         year_end = date(2026, 8, 31)
@@ -80,8 +80,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
             content_type=festival_content_type,
             object_id=obj.pk,
             application_date__gte=year_start,
-            application_date__lte=year_end
+            application_date__lte=year_end,
         ).first()
 
-        # Reuse your existing ApplicationSerializer
-        return ApplicationSerializer(application, context=self.context).data
+        return MinimalApplicationSerializer(application, context=self.context).data

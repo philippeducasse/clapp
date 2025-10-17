@@ -1,5 +1,5 @@
 from organisations.residencies.models import Residency
-from organisations.residencies.serializers import ResidencySerializer
+from organisations.residencies.serializer import ResidencySerializer
 from rest_framework import viewsets
 
 

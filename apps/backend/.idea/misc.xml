@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.9 (circus_agent_backend)" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (circus-agent-backend)" project-jdk-type="Python SDK" />
 </project>
