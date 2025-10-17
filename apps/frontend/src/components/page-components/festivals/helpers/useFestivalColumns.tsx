@@ -39,7 +39,9 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         const application = row.original?.currentYearApplication;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link href={`/applications/${application.id}`}>{application.applicationDate}</Link>
+            <Link href={`/applications/${application.id}`}>
+              {application.applicationDate}
+            </Link>
           </div>
         );
       },
@@ -47,12 +49,12 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
     {
       accessorKey: "country",
       header: getSortableHeader("Country"),
-      size: 100,
+      size: 50,
     },
     {
       accessorKey: "festivalType",
       header: getSortableHeader("Type"),
-      size: 100,
+      size: 50,
       cell: ({ row }) => capitalize(row.original.festivalType),
     },
     {
@@ -63,7 +65,11 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
+            <Link
+              href={festival.websiteUrl ?? "#"}
+              target="_blank"
+              title={festival.websiteUrl}
+            >
               {festival.websiteUrl}
             </Link>
           </div>
@@ -104,7 +110,11 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
             >
               <Send />
             </Button>
-            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 hover:text-red-500"
+            >
               <Trash />
             </Button>
           </div>
