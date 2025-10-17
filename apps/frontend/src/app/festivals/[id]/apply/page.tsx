@@ -1,5 +1,5 @@
 import React from "react";
-import ApplicationForm from "@/components/page-components/applications/form/ApplicationForm";
+import ApplicationForm from "@/components/page-components/applications/components/form/ApplicationForm";
 
 const FestivalApplicationPage = () => {
   return <ApplicationForm />;
