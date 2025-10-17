@@ -1,28 +1,34 @@
 "use client";
-import { useEffect } from "react";
-import { Festival } from "@/interfaces/entities/Festival";
-// import { getFestivalColumns } from "../../helpers/getFestivalColumns";
-// import { DataTable } from "@/components/common/table/DataTable";
-// import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Application } from "@/interfaces/entities/Application";
+import { useApplicationColumns } from "../helpers/useApplicationColumns";
+import { DataTable } from "@/components/common/table/DataTable";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setFestivals } from "@/redux/slices/festivalSlice";
+import { setApplications } from "@/redux/slices/applicationSlice";
+import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { EntityName } from "@/interfaces/Enums";
 
-interface FestivalsTableProps {
-  festivals: Festival[];
+interface ApplicationsTableProps {
+  initialData: PaginatedResponse<Application>;
 }
 
-export const FestivalsTable = ({ festivals }: FestivalsTableProps) => {
-  // const router = useRouter();
+export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
+  const router = useRouter();
   const dispatch = useDispatch();
+  const [applicationData, setApplicationData] = useState<PaginatedResponse<Application>>(initialData);
 
   useEffect(() => {
-    dispatch(setFestivals(festivals));
-  }, [dispatch, festivals]);
+    dispatch(setApplications(initialData.results));
+    console.log("apps", applicationData.results)
+  }, [dispatch, initialData]);
 
-  // const onEdit = (id: string) => {
-  //   router.push(`/festivals/${id}/edit`);
-  // };
+  const onEdit = (id: string) => {
+    router.push(`/applications/${id}/edit`);
+  };
 
-  // const columns = getFestivalColumns(onEdit);
-  // return <DataTable columns={columns} data={festivals} />;
+  const columns = useApplicationColumns(
+    // onEdit
+  );
+  return <DataTable columns={columns} data={applicationData.results} entityName={EntityName.APPLICATION}/>;
 };

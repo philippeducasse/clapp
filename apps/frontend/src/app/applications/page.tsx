@@ -1,12 +1,11 @@
-// import applicationApiService from "@/api/applicationApiService";
-// import { ApplicationTable } from "../../components/page-components/application-page/components/view/ApplicationTable";
-
+import { applicationApiService } from "@/api/applicationApiService";
+import { ApplicationsTable } from "@/components/page-components/applications/table/ApplicationsTable";
 const ApplicationsPage = async () => {
-  // const data = await applicationApiService.getAllApplications();
+  const data = await applicationApiService.getAllApplications();
+  console.log("data:", data)
   return (
     <div className="container mx-auto py-10">
-      applications page
-      {/* <ApplicationTable applications={data} /> */}
+      <ApplicationsTable initialData={data} />
     </div>
   );
 };

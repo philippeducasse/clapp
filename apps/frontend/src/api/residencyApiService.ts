@@ -1,10 +1,11 @@
 import { Residency } from "@/interfaces/entities/Residency";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/residencies/";
 
-const getResidencies = async (): Promise<Residency[]> => {
-  return await fetchRequest(endpoint);
+const getResidencies = async (): Promise<PaginatedResponse<Residency>> => {
+  return await fetchRequest<PaginatedResponse<Residency>>(endpoint);
 };
 
 const getResidency = async (id: number): Promise<Residency> => {

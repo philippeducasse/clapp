@@ -15,7 +15,7 @@ interface FestivalsTableProps {
 
 export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   const dispatch = useDispatch();
-  const [festivals, setFestivalsData] = useState<PaginatedResponse<Festival>>(initialData);
+  const [festivalData, setFestivalData] = useState<PaginatedResponse<Festival>>(initialData);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,
@@ -24,8 +24,8 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
 
   // Update Redux store when data changes
   useEffect(() => {
-    dispatch(setFestivals(festivals.results));
-  }, [dispatch, festivals.results]);
+    dispatch(setFestivals(festivalData.results));
+  }, [dispatch, festivalData.results]);
 
   // Fetch new data when pagination changes (but not on initial mount)
   useEffect(() => {
@@ -38,7 +38,7 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
         // pagination.pageSize,
         // offset
       );
-      setFestivalsData(data);
+      setFestivalData(data);
       setIsLoading(false);
     };
 
@@ -50,11 +50,11 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   return (
     <DataTable
       columns={columns}
-      data={festivals.results}
+      data={festivalData.results}
       entityName={EntityName.FESTIVAL}
       pagination={pagination}
       setPagination={setPagination}
-      totalCount={festivals.count}
+      totalCount={festivalData.count}
       isLoading={isLoading}
     />
   );

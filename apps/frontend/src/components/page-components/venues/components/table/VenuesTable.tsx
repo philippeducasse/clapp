@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { Venue } from "@/interfaces/entities/Venue";
-import { useVenueColumns } from "../../helpers/useVenueColumns";
+import {useVenueColumns } from "../../helpers/useVenueColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
 import { setVenues } from "@/redux/slices/venueSlice";

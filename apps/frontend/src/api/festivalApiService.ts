@@ -10,7 +10,6 @@ import {
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
-import { Performance } from "@/interfaces/entities/Performance";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/festivals/";

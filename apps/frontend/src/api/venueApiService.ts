@@ -9,11 +9,12 @@ import {
   Application,
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
+import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/venues/";
 
-const getAllVenues = (): Promise<Venue[]> => {
-  return fetchRequest<Venue[]>(endpoint);
+const getAllVenues = (): Promise<PaginatedResponse<Venue>> => {
+  return fetchRequest<PaginatedResponse<Venue>>(endpoint);
 };
 
 const getVenue = (venueId: number): Promise<Venue> => {
