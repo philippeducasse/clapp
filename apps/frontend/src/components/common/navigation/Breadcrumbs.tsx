@@ -17,7 +17,7 @@ const Breadcrumbs = () => {
 
   // Get data from Redux slices if needed
   const festival = useSelector((state: RootState) => state.festivals.selectedFestival);
-  // const application = useSelector((state: RootState) => state.applications.currentApplication);
+  const application = useSelector((state: RootState) => state.applications.selectedApplication);
 
   // Determine which entity we're dealing with
   let entityName = "";
@@ -27,8 +27,8 @@ const Breadcrumbs = () => {
     entityName = festival?.name ?? "Festival";
     entityPath = `/festivals/${festival?.id ?? ""}`;
   } else if (pathname.includes("/applications/")) {
-    // entityName = application?.name || "Application";
-    // entityPath = `/applications/${application?.id || ""}`;
+    entityName = application?.emailSubject ?? `Application for ${application?.organisation.name}`;
+    entityPath = `/applications/${application?.id ?? ""}`;
   }
 
   // Build breadcrumbs based on current route
@@ -53,21 +53,21 @@ const Breadcrumbs = () => {
       } else if (pathSegments.includes("create")) {
         breadcrumbs.push({ path: pathname, label: <span>Create</span> });
       }
+    } else if (pathSegments.includes("applications")) {
+      breadcrumbs.push({ path: "/applications", label: <span>Applications</span> });
+
+      if (application?.id) {
+        console.log("HEllo");
+        breadcrumbs.push({ path: entityPath, label: <span>entityName</span> });
+
+        // Add action if we're on an edit/new page
+        if (pathSegments.includes("edit")) {
+          breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
+        } else if (pathSegments.includes("new")) {
+          breadcrumbs.push({ path: pathname, label: <span>New</span> });
+        }
+      }
     }
-    // else if (pathSegments.includes("applications")) {
-    //   breadcrumbs.push({ path: "/applications", label: "Applications" });
-
-    //   if (application?.id) {
-    //     breadcrumbs.push({ path: entityPath, label: entityName });
-
-    //     // Add action if we're on an edit/new page
-    //     if (pathSegments.includes("edit")) {
-    //       breadcrumbs.push({ path: pathname, label: "Edit" });
-    //     } else if (pathSegments.includes("new")) {
-    //       breadcrumbs.push({ path: pathname, label: "New" });
-    //     }
-    //   }
-    // }
 
     return breadcrumbs;
   };
