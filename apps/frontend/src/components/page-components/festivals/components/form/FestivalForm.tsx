@@ -17,7 +17,6 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
-// import GenericButton from "@/components/common/buttons/GenericButton";
 
 interface FestivalFormProps {
   action: string;
@@ -80,8 +79,6 @@ const FestivalForm = ({ action }: FestivalFormProps) => {
   }
 
   const onCancelHref = festivalId ? `/festivals/${festival?.id}` : "/festivals";
-
-  // const updateButton = GenericButton
 
   return (
     <>

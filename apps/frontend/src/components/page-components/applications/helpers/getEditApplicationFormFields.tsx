@@ -18,6 +18,11 @@ ControlledFormElement[] => {
       type: ControlledFormElementType.SELECT,
       options: ApplicationStatusOptions,
     },
+    {
+      label: "Comments",
+      fieldName: "comments",
+      type: ControlledFormElementType.TEXT_EDITOR,
+    },
     // {
     //   label: "Performance(s)",
     //   fieldName: "performances",

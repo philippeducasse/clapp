@@ -5,7 +5,7 @@ import { Venue } from "./Venue";
 
 export interface Application {
   id?: number;
-  organisation: Festival|Venue|Residency;
+  organisation: Festival | Venue | Residency;
   organisationType: "Festival" | "Residency" | "Venue";
   profile: number | Profile;
   applicationDate: string | null;
@@ -54,4 +54,5 @@ export enum ApplicationStatus {
   POSTPONED = "POSTPONED",
   CANCELLED = "CANCELLED",
   OTHER = "OTHER",
+  DRAFT = "DRAFT",
 }

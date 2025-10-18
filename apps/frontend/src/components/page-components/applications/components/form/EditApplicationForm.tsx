@@ -1,7 +1,100 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useEffect, useState } from "react";
+import { Application } from "@/interfaces/entities/Application";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import { applicationApiService } from "@/api/applicationApiService";
+import { useRouter, useParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { updateApplication, selectApplication } from "@/redux/slices/applicationSlice";
+import { AppDispatch, RootState } from "@/redux/store";
+// import { refreshApplication } from "../../helpers/refreshApplication";
+import { getEditApplicationFormFields } from "../../helpers/getEditApplicationFormFields";
+import { Skeleton } from "@/components/ui/skeleton";
+import FormHeader from "@/components/common/form/FormHeader";
+import BasicForm from "@/components/common/form/BasicForm";
+import { Action } from "@/interfaces/Enums";
+import { EntityName } from "@/interfaces/Enums";
 
-import React, { useEffect, useState } from "react";
+interface ApplicationFormProps {
+  action: string;
+}
 
-const EditApplicationForm = () => {};
+const ApplicationForm = ({ action }: ApplicationFormProps) => {
+  const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
+  const params = useParams();
+  const applicationId = Number(params?.id);
+  const application = useSelector((state: RootState) => selectApplication(state, applicationId));
+  const formFields = getEditApplicationFormFields();
+  const formSchema = createZodFormSchema(formFields);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
-export default EditApplicationForm;
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: getInitialValues(formFields, application as unknown as Record<string, unknown>),
+    mode: "onSubmit",
+  });
+
+  // Fetch application data if not available
+  //   useEffect(() => {
+  //     if (!application && applicationId) {
+  //       refreshApplication(applicationId, dispatch);
+  //       setInitialDataLoaded(true);
+  //     }
+  //   }, [applicationId, application, dispatch]);
+
+  // Reset form when application data changes (but only once)
+  useEffect(() => {
+    if (application && initialDataLoaded) {
+      form.reset(sanitizeFormData(application as unknown as Record<string, unknown>));
+      setInitialDataLoaded(false);
+    }
+  }, [application, form, initialDataLoaded]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      if (action === Action.EDIT) {
+        const updatedApplication = { ...application, ...values, id: applicationId } as Application;
+        console.log("APPLICATION: ", updateApplication, values, application);
+        await applicationApiService.updateApplication(updatedApplication);
+        dispatch(updateApplication(updatedApplication));
+        router.push(`/applications/${application?.id}`);
+      } else {
+        const newApplication = await applicationApiService.createApplication(values as Application);
+        router.push(`/applications/${newApplication?.id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!application && applicationId) {
+    return <Skeleton />;
+  }
+
+  const onCancelHref = applicationId ? `/applications/${application?.id}` : "/applications";
+
+  // const updateButton = GenericButton
+
+  return (
+    <>
+      <FormHeader action={action} entityName={EntityName.APPLICATION} />
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={onCancelHref}
+        isLoading={isLoading}
+        entity={application}
+      />
+    </>
+  );
+};
+export default ApplicationForm;

@@ -1,11 +1,8 @@
 import { Application } from "@/interfaces/entities/Application";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
-import { capitalize } from "lodash";
-import { StatusBadge } from "@/components/common/StatusBadge";
+import _ from "lodash";
 
-export const getApplicationBasicInfo = (
-  application: Application
-): SectionCellProps[] => {
+export const getApplicationBasicInfo = (application: Application): SectionCellProps[] => {
   if (!application) return [];
 
   return [
@@ -17,7 +14,7 @@ export const getApplicationBasicInfo = (
     },
     {
       title: "Status",
-      value: capitalize(application.applicationStatus),
+      value: _.capitalize(_.lowerCase(application.applicationStatus)),
       //   element: <StatusBadge capitalize(application.applicationStatus) />,
     },
     {
@@ -29,8 +26,12 @@ export const getApplicationBasicInfo = (
       value: application.message,
     },
     {
+      title: "Comments",
+      value: application.comments as string,
+    },
+    {
       title: "Application type",
-      value: capitalize(application.applicationMethod as string),
+      value: _.capitalize(application.applicationMethod as string),
     },
   ];
 };
