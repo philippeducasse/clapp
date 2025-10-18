@@ -1,9 +1,9 @@
 import React from "react";
-// import ApplicationForm from "../../../../components/page-components/application-page/components/form/ApplicationForm";
+import EditApplicationForm from "@/components/page-components/applications/components/form/EditApplicationForm";
+import { Action } from "@/interfaces/Enums";
 
 const EditApplicationPage = () => {
-  // return <ApplicationForm showLabels={true} />;
-  return <p>applicationForm</p>;
+  return <EditApplicationForm action={Action.EDIT} />;
 };
 
 export default EditApplicationPage;
