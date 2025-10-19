@@ -351,62 +351,48 @@ def generate_application_mail_prompt(
 
         {performances_details}
 
-Festival Details:
-- Festival Name: {festival.name}
-- Festival Type: {festival.festival_type}
-- Description: {festival.description}
-- Contact Person: {contact_name if contact_name else "Not specified"}
-- Contact Emails: {", ".join(contact_emails) if contact_emails else "Not specified"}
+        Festival Details:
+        - Festival Name: {festival.name}
+        - Festival Type: {festival.festival_type}
+        - Description: {festival.description}
+        - Contact Person: {contact_name if contact_name else "Not specified"}
+        - Contact Emails: {", ".join(contact_emails) if contact_emails else "Not specified"}
 
-            Email Requirements:
-            - Salutation: {salutation}
-            - Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences). 
-            This should come immediately after the salutation and before discussing the performances.
-            - Body:  Make the text very playful and informal. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this festival, using the festival description as your main reference.
-            Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the festival's theme and audience.
-            Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
+        Email Requirements:
+        - Salutation: {salutation}
+        - Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences). 
+        This should come immediately after the salutation and before discussing the performances.
+        - Body: Make the text very playful and informal. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this festival, using the festival description as your main reference.
+        Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the festival's theme and audience.
+        Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
 
-            Example body: 
-                "Ah Bah Bravo! is a magical mix of world-class juggling — from butt and nose hooping to spinning a flaming staff with my feet while in a handstand!
-                it’s a show full of imagination, laughter, and wonder, perfectly suited to the lively and diverse spirit of your festival. 
-                Audiences are invited to dream, share, and rediscover the carefree joy of being a child again".
-            - Closing: If {performance.trailer}, add a link to it following this format: <p>Here you can see the <a href={performance.trailer}>trailer</a>, 
-            making sure the link is well separated from any other text and is clearly visible. If {performance.dossiers.all()[0]} included, say that the dossier(s) are attached and that all fruther information and photos are there.
-            Express enthusiasm in awaiting the response and openess to answer any questions or provide more information. Provide contact information using this format: {signature}
+        Example body: 
+            "Ah Bah Bravo! is a magical mix of world-class juggling — from butt and nose hooping to spinning a flaming staff with my feet while in a handstand!
+            it's a show full of imagination, laughter, and wonder, perfectly suited to the lively and diverse spirit of your festival. 
+            Audiences are invited to dream, share, and rediscover the carefree joy of being a child again".
+        - Closing: If {performance.trailer}, add a link to it following this format: <p>Here you can see the <a href={performance.trailer}>trailer</a>, 
+        making sure the link is well separated from any other text and is clearly visible. If {performance.dossiers.all()[0]} included, say that the dossier(s) are attached and that all fruther information and photos are there.
+        Express enthusiasm in awaiting the response and openess to answer any questions or provide more information. Provide contact information using this format: {signature}
 
-            Response Format Instructions:
-            Return ONLY the email HTML content with <br> tags for line breaks and <a> tags for links. 
-            Do not add any preamble message, notes, or formatting indicators. 
-            The response should begin immediately with the salutation.
+        Response Format Instructions:
+        Return ONLY the email HTML content. 
+        CRITICAL: Use <br><br> tags for paragraph breaks (empty lines between sections).
+        Use <a> tags for links.
+        Do NOT use newlines, \n characters, or any other line break methods.
+        Do not add any preamble message, notes, or formatting indicators. 
+        The response should begin immediately with the salutation.
 
-            Email Structure (each section should be its own paragraph with an empty line between the previous section):
-            1. Salutation (e.g., "Dear [Name],")
-            2. Brief self-introduction (1-2 sentences about who you are)
-            3. Main pitch about the performance(s) and festival fit
-            4. Closing with enthusiasm
-            6. Sign-off (e.g., "Best regards," or equivalent in the target language)
-            5. {signature}
+        Email Structure (separate each section with <br><br>):
+        1. Salutation (e.g., "Dear [Name],")
+        2. Brief self-introduction (1-2 sentences about who you are)
+        3. Main pitch about the performance(s) and festival fit
+        4. Closing with enthusiasm
+        5. Sign-off (e.g., "Best regards," or equivalent in the target language)
+        6. {signature}
 
-            EXAMPLE MAIL:
+        EXAMPLE OUTPUT FORMAT:
 
-            Dear Carnaval Sztukmistrzów Team,
+        Dear Carnaval Sztukmistrzów Team,<br><br>I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant, family-friendly performances.<br><br>"Ah Bah Bravo!" is a whirlwind of acrobatic butt hullahooping, flaming staff juggling (while handstanding!), and playful storytelling—perfect for your festival's theme of *running away with the circus*. It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment. With its street-show energy and universal appeal, it would be a fantastic addition to your free outdoor program or buskers' competition.<br><br>Here you can see the <a href="https://example.com/trailer">trailer</a><br><br>The dossier is attached with full details, photos, and technical requirements. I'd love to bring this show to Lublin and can't wait to hear your thoughts—feel free to reach out for any questions!<br><br>Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com<br>Instagram & Facebook
 
-            I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant, family-friendly performances.
-
-            "Ah Bah Bravo!" is a whirlwind of acrobatic butt hullahooping, flaming staff juggling (while handstanding!), and playful storytelling—perfect for your festival’s theme of *running away with the circus*. It’s a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment. With its street-show energy and universal appeal, it would be a fantastic addition to your free outdoor program or buskers’ competition. 
-
-            Here you can see the trailer 
-
-            The dossier is attached with full details, photos, and technical requirements. I’d love to bring this show to Lublin and can’t wait to hear your thoughts—feel free to reach out for any questions! 
-
-            Best regards, 
-
-            Philippe Ducasse
-
-            +4915203723753
-            info@philippeducasse.com
-            https://www.philippeducasse.com
-            Instagram & Facebook
-
-            """
+        """
     return prompt.strip()
