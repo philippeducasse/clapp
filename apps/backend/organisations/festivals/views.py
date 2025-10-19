@@ -226,6 +226,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
                     text_content,
                     "info@philippeducasse.com",
                     recipient_emails,
+                    # ["ducassephi@hotmail.fr"],
                     bcc=["info@philippeducasse.com"],
                 )
                 email.attach_alternative(html_content, "text/html")

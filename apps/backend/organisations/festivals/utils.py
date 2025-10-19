@@ -259,7 +259,7 @@ def generate_application_mail_prompt(
         performances_details = f"""
             Performance Details:
             - Title: {performance.performance_title}
-            - Trailer: {performance.trailer}
+            - Trailer: {performance.trailer if performance.trailer else "Not available"}
             - Type: {
             performance.get_performance_type_display()
             if performance.performance_type
@@ -276,11 +276,23 @@ def generate_application_mail_prompt(
             if performance.long_description
             else "Not available"
         }
-            - Dossier: {performance.dossiers.all()[0]}
+            - Dossier: {
+            performance.dossiers.first()
+            if performance.dossiers.exists()
+            else "Not available"
+        }
             """
+
+        # Build trailer and dossier instructions for single performance
+        trailer_instruction = f'If the trailer is available ({performance.trailer}), add a link to it following this format: Here you can see the <a href="{performance.trailer}">trailer</a>, making sure the link is well separated from any other text and is clearly visible.'
+        dossier_instruction = f"If a dossier is available ({performance.dossiers.first() if performance.dossiers.exists() else 'none'}), say that the dossier is attached and that all further information and photos are there."
+
     else:
         performance_intro = "your performances"
         performances_list = []
+        trailers = []
+        has_dossiers = False
+
         for perf in performances:
             perf_details = f"""
                 * "{perf.performance_title}"
@@ -296,13 +308,34 @@ def generate_application_mail_prompt(
             }
                     - Duration: {perf.length if perf.length else "Not specified"}
                     - Description: {
-                performance.long_description
-                if performance.long_description
-                else "Not available"
+                perf.long_description if perf.long_description else "Not available"
+            }
+                    - Trailer: {perf.trailer if perf.trailer else "Not available"}
+                    - Dossier: {
+                perf.dossiers.first() if perf.dossiers.exists() else "Not available"
             }
                 """
             performances_list.append(perf_details)
+
+            if perf.trailer:
+                trailers.append(
+                    f'<a href="{perf.trailer}">{perf.performance_title} trailer</a>'
+                )
+            if perf.dossiers.exists():
+                has_dossiers = True
+
         performances_details = "\nPerformances Details:" + "".join(performances_list)
+
+        # Build trailer and dossier instructions for multiple performances
+        if trailers:
+            trailer_instruction = f"Add links to the available trailers: {', '.join(trailers)}, making sure the links are well separated from any other text and clearly visible."
+        else:
+            trailer_instruction = "No trailers are available to link."
+
+        if has_dossiers:
+            dossier_instruction = "Say that the dossiers are attached and that all further information and photos are there."
+        else:
+            dossier_instruction = "No dossiers to mention."
 
     # Build contact information
     contact_lines = []
@@ -370,9 +403,8 @@ def generate_application_mail_prompt(
             "Ah Bah Bravo! is a magical mix of world-class juggling — from butt and nose hooping to spinning a flaming staff with my feet while in a handstand!
             it's a show full of imagination, laughter, and wonder, perfectly suited to the lively and diverse spirit of your festival. 
             Audiences are invited to dream, share, and rediscover the carefree joy of being a child again".
-        - Closing: If {performance.trailer}, add a link to it following this format: <p>Here you can see the <a href={performance.trailer}>trailer</a>, 
-        making sure the link is well separated from any other text and is clearly visible. If {performance.dossiers.all()[0]} included, say that the dossier(s) are attached and that all fruther information and photos are there.
-        Express enthusiasm in awaiting the response and openess to answer any questions or provide more information. Provide contact information using this format: {signature}
+        - Closing: {trailer_instruction} {dossier_instruction}
+        Express enthusiasm in awaiting the response and openness to answer any questions or provide more information. Provide contact information using this format: {signature}
 
         Response Format Instructions:
         Return ONLY the email HTML content. 
