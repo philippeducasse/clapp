@@ -39,11 +39,7 @@ const ControlledSelect = ({
       </SelectContent>
     </Select>
   ) : (
-    <select
-      className="pb-0.5 max-w-fit"
-      {...field}
-      value={field.value as string}
-    >
+    <select className="max-w-fit" {...field} value={field.value as string}>
       {options.map((o, i) => (
         <option key={`${o.label}/${i}`} value={o.value}>
           {o.label}

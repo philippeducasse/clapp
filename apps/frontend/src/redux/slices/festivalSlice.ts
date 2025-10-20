@@ -57,6 +57,15 @@ const festivalSlice = createSlice({
         Object.assign(existingFestival, action.payload);
       }
     },
+    deleteFestival(state, action: PayloadAction<number>) {
+      state.festivals = state.festivals.filter(
+        (festival) => festival.id !== action.payload
+      );
+      // Clear selectedFestival if it's the one being deleted
+      if (state.selectedFestival?.id === action.payload) {
+        state.selectedFestival = undefined;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -80,6 +89,7 @@ export const {
   addFestival,
   updateFestival,
   setSelectedFestival,
+  deleteFestival,
 } = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) =>

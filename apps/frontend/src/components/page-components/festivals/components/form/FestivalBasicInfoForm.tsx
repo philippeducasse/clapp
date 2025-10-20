@@ -74,14 +74,8 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        values.contacts = [];
         dispatch(setSelectedFestival(values as Festival));
-
-        // const newFestival = await festivalApiService.createFestival(
-        //   values as Festival
-        // );
-        // router.push(`/festivals/${newFestival?.id}`);
-        router.push(`/festivals/create/contacts`);
+        router.push(`/festivals/create/contact`);
       }
     } catch (error) {
       console.error(error);

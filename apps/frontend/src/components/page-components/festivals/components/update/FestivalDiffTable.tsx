@@ -22,7 +22,7 @@ export const FestivalDiffTable = ({
   updated,
   setUpdated,
 }: DiffViewProps) => {
-  const formFields = getFestivalFormFields();
+  const formFields = getFestivalFormFields(true);
   const changedFields = formFields
     .map((f) => f.fieldName)
     .filter(

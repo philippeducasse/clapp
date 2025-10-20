@@ -32,7 +32,7 @@ const FestivalDiffForm: React.FC<FestivalDiffFormProps> = ({
   changedFields = [],
   setUpdated,
 }) => {
-  const formFields = getFestivalFormFields();
+  const formFields = getFestivalFormFields(true);
   const formSchema = createZodFormSchema(formFields);
 
   const form = useForm<z.infer<typeof formSchema>>({

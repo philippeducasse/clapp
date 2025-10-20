@@ -2,8 +2,11 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
 import { FestivalType, ApplicationType } from "@/interfaces/entities/Festival";
-export const getFestivalFormFields = (): ControlledFormElement[] => {
-  return [
+
+export const getFestivalFormFields = (
+  isDiffForm: Boolean = false
+): ControlledFormElement[] => {
+  const fields: ControlledFormElement[] = [
     {
       label: "Festival ID",
       fieldName: "id",
@@ -43,6 +46,28 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.SELECT,
       options: getOptions(FestivalType),
     },
+  ];
+
+  // Insert contact fields after Festival Type if needed
+  if (isDiffForm) {
+    fields.push(
+      {
+        label: "Contact Person",
+        fieldName: "contacts[0].name",
+        type: ControlledFormElementType.TEXT,
+        helpText: "Name of main person of contact",
+      },
+      {
+        label: "Contact Email",
+        fieldName: "contacts[0].email",
+        type: ControlledFormElementType.EMAIL,
+        helpText: "Email of main person of contact",
+      }
+    );
+  }
+
+  // Add remaining fields
+  fields.push(
     {
       label: "Start Date",
       fieldName: "startDate",
@@ -88,6 +113,8 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       label: "Description",
       fieldName: "description",
       type: ControlledFormElementType.TEXT_AREA,
-    },
-  ];
+    }
+  );
+
+  return fields;
 };

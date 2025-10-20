@@ -25,12 +25,13 @@ const ContactsViewSection = ({
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
 
-  const handleDeleteClick = (index: number) => {
+  const handleDelete = (index: number) => {
     setDeleteIndex(index);
     setOpenDeleteDialog(true);
   };
 
   const handleConfirmDelete = () => {
+    console.log("deleting:", deleteIndex);
     onDelete(deleteIndex);
   };
 
@@ -39,9 +40,8 @@ const ContactsViewSection = ({
       <DeleteModal
         open={openDeleteDialog}
         onOpenChange={setOpenDeleteDialog}
-        title="Are you sure you want to delete this contact?"
-        description="This cannot be undone"
         onConfirm={handleConfirmDelete}
+        itemName="contact"
       />
       <Card className="mb-6 relative">
         <CardContent>
@@ -62,7 +62,7 @@ const ContactsViewSection = ({
                   />
                   <DeleteButton
                     variant="outline"
-                    onDelete={() => handleDeleteClick(idx)}
+                    onDelete={() => handleDelete(idx)}
                   />
                 </div>
               </div>

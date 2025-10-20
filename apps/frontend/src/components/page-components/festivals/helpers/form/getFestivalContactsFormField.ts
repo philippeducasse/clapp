@@ -6,7 +6,7 @@ export const getFestivalContactFormFields = (): ControlledFormElement[] => {
     {
       label: "Email",
       fieldName: "email",
-      type: ControlledFormElementType.TEXT,
+      type: ControlledFormElementType.EMAIL,
       required: true,
     },
     {

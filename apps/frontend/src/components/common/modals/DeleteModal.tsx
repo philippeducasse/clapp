@@ -13,18 +13,16 @@ import { Button } from "@/components/ui/button";
 interface DeleteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (index?: number) => void | Promise<void>;
-  title?: string;
+  onConfirm: (id?: number) => void | Promise<void>;
   description?: string;
-  itemName?: string;
+  itemName: string;
 }
 
 export const DeleteModal = ({
   open,
   onOpenChange,
   onConfirm,
-  title,
-  description,
+  description = "This cannot be undone",
   itemName,
 }: DeleteModalProps) => {
   const [loading, setLoading] = useState(false);
@@ -43,10 +41,14 @@ export const DeleteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+      <DialogContent className="w-1/3 border-2 border-red-500">
+        <DialogHeader className="items-center">
+          <DialogTitle>
+            Are you sure you want to delete this {itemName}?
+          </DialogTitle>
+          <DialogDescription className="text-md mt-6">
+            {description}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>

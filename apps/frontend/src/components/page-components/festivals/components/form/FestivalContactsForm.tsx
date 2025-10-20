@@ -38,6 +38,9 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const festival = useSelector((state: RootState) =>
     selectFestival(state, festivalId)
   );
+  const selectedFestival = useSelector(
+    (state: RootState) => state.festivals.selectedFestival
+  );
 
   const formFields = getFestivalContactFormFields();
   const formSchema = createZodFormSchema(formFields);
@@ -93,13 +96,18 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        const existingContacts = festival?.contacts ?? [];
+        console.log("selected festival:", selectedFestival);
+        const existingContacts = selectedFestival?.contacts ?? [];
         const updatedContacts = [...existingContacts, values];
-        const festivalWithContacts = { ...festival, contacts: updatedContacts };
+        const festivalWithContacts = {
+          ...selectedFestival,
+          contacts: updatedContacts,
+        };
 
         const newFestival = await festivalApiService.createFestival(
           festivalWithContacts as unknown as Festival
         );
+        console.log(newFestival);
         router.push(`/festivals/${newFestival?.id}`);
       }
     } catch (error) {

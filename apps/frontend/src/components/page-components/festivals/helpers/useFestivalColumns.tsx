@@ -1,5 +1,5 @@
 "use client";
-
+import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Pencil, Trash, Send } from "lucide-react";
@@ -8,13 +8,22 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import { capitalize } from "lodash";
-import { Application } from "@/interfaces/entities/Application";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
+import { festivalApiService } from "@/api/festivalApiService";
+import { deleteFestival } from "@/redux/slices/festivalSlice";
+import { useDispatch } from "react-redux";
 
 const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const router = useRouter();
-
+  const [openDeleteModel, setOpenDeleteModal] = useState(false);
   const onEdit = (id: string) => {
     router.push(`/festivals/${id}/edit`);
+  };
+  const dispatch = useDispatch();
+
+  const onConfirmDelete = async (id: number) => {
+    await festivalApiService.deleteFestival(id as number);
+    dispatch(deleteFestival(id as number));
   };
 
   return [
@@ -94,6 +103,12 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         };
         return (
           <div className="flex gap-2 align-middle">
+            <DeleteModal
+              onConfirm={() => onConfirmDelete(festival.id)}
+              open={openDeleteModel}
+              onOpenChange={setOpenDeleteModal}
+              itemName="Festival"
+            />
             <Button
               variant="outline"
               size="icon"
@@ -114,6 +129,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
               variant="outline"
               size="icon"
               className="size-8 hover:text-red-500"
+              onClick={() => setOpenDeleteModal(true)}
             >
               <Trash />
             </Button>
