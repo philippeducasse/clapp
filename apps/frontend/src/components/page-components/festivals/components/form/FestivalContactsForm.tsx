@@ -13,11 +13,7 @@ import { getFestivalContactFormFields } from "../../helpers/form/getFestivalCont
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateFestival,
-  selectFestival,
-  setFestival,
-} from "@/redux/slices/festivalSlice";
+import { updateFestival, selectFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +21,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
+import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 
 interface FestivalContactsFormProps {
   action: string;
@@ -34,21 +31,27 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
-  const festivalId = Number(params?.id);
-  //   const festival = useSelector((state: RootState) =>
-  //     selectFestival(state, festivalId)
-  //   );
-  const festival = useSelector(
-    (state: RootState) => state.festivals.selectedFestival
+  const [festivalId, contactIndex] = [
+    Number(params?.id),
+    Number(params?.index),
+  ];
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId)
   );
+
   const formFields = getFestivalContactFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
+  const contactToEdit =
+    action === Action.EDIT && festival?.contacts?.[contactIndex]
+      ? festival.contacts[contactIndex]
+      : undefined;
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, festival?.contacts),
+    defaultValues: getInitialValues(formFields, contactToEdit),
     mode: "onSubmit",
   });
 
@@ -68,19 +71,31 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
     }
   }, [festival, form, initialDataLoaded]);
 
+  // Reset form when contact data is loaded (edit mode only)
+  useEffect(() => {
+    if (action === Action.EDIT && contactToEdit) {
+      form.reset(contactToEdit);
+    }
+  }, [contactToEdit, form, action]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
-        const updatedFestival = { ...values, id: festivalId } as Festival;
-        // await festivalApiService.updateFestival(updatedFestival);
+        const updatedContacts = [...(festival?.contacts ?? [])];
+        updatedContacts[contactIndex] = values as OrganisationContact;
+
+        const updatedFestival = {
+          ...festival,
+          contacts: updatedContacts,
+        };
+        await festivalApiService.updateFestival(updatedFestival);
         dispatch(updateFestival(updatedFestival));
-        // router.push(`/festivals/${festival?.id}`);
+        router.push(`/festivals/${festival?.id}`);
       } else {
         const existingContacts = festival?.contacts ?? [];
         const updatedContacts = [...existingContacts, values];
         const festivalWithContacts = { ...festival, contacts: updatedContacts };
-        console.log("created contact: ", values, festivalWithContacts);
 
         const newFestival = await festivalApiService.createFestival(
           festivalWithContacts as unknown as Festival

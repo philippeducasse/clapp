@@ -23,7 +23,6 @@ import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeade
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
 import ContactsViewSection from "@/components/common/details-view/ContactsSection";
-import CreateButton from "@/components/common/buttons/CreateButton";
 import AddSection from "@/components/common/buttons/AddSection";
 
 const FestivalView = () => {
@@ -86,7 +85,11 @@ const FestivalView = () => {
         data={getFestivalDetails(festival)}
       />
       {festival.contacts && (
-        <ContactsViewSection title="Contacts" contacts={festival.contacts} />
+        <ContactsViewSection
+          title="Contacts"
+          contacts={festival.contacts}
+          entityId={festivalId}
+        />
       )}
       <AddSection label="contact" />
     </DetailsViewWrapper>

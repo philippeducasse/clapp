@@ -5,9 +5,10 @@ import { Pencil } from "lucide-react";
 interface EditButtonProps {
   href: string;
   label?: string;
+  className?: string;
 }
 
-const EditButton = ({ label, href }: EditButtonProps) => {
+const EditButton = ({ label, href, className }: EditButtonProps) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -15,7 +16,7 @@ const EditButton = ({ label, href }: EditButtonProps) => {
   };
 
   return (
-    <Button className="" variant="tertiary" onClick={handleClick}>
+    <Button className={className} variant="tertiary" onClick={handleClick}>
       <Pencil />
       {label ?? "Edit"}
     </Button>

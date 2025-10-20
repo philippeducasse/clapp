@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/common/navigation/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -25,9 +25,7 @@ export const metadata: Metadata = {
     "Your personal assistant for your career in the performance arts",
 };
 
-const RootLayout = ({
-  children,
-}: Readonly<{ children: React.ReactNode }>) => {
+const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
   return (
     <html lang="en" suppressHydrationWarning>
       <body

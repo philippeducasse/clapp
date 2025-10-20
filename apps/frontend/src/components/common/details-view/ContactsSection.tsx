@@ -4,28 +4,41 @@ import DetailsView from "./DetailsView";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { getFestivalContacts } from "@/components/page-components/festivals/helpers/getFestivaContacts";
 import { Contact2 } from "lucide-react";
+import EditButton from "../buttons/EditButton";
+import DeleteButton from "../buttons/DeleteButton";
 
 interface ContactsViewSectionProps {
   title: string;
   contacts: OrganisationContact[];
+  entityId: number;
 }
 
-const ContactsViewSection = ({ title, contacts }: ContactsViewSectionProps) => {
+const ContactsViewSection = ({
+  title,
+  contacts,
+  entityId,
+}: ContactsViewSectionProps) => {
   return (
     <Card className="mb-6 relative">
-      <CardContent className="grid-cols-2 ">
+      <CardContent>
         <div className="flex items-center gap-2 mb-6">
           <Contact2 className="text-emerald-600 dark:text-emerald-400" />
           <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
             {title}
           </CardTitle>
         </div>
-        <div className="col-span-2">
+        <div className="">
           {contacts.map((contact: OrganisationContact, idx) => (
-            <DetailsView
-              data={getFestivalContacts(contact)}
-              key={`${contact.email}_idx`}
-            />
+            <div key={`${contact.email}_${idx}`} className="flex flex-col">
+              <DetailsView data={getFestivalContacts(contact)} />
+              <div className="flex my-6 self-end mr-6 gap-2">
+                <EditButton
+                  href={`${entityId}/edit/contacts/${idx}`}
+                  className=""
+                />
+                <DeleteButton variant="outline" onDelete={} />
+              </div>
+            </div>
           ))}
         </div>
       </CardContent>
