@@ -24,6 +24,9 @@ import DetailsViewSection from "@/components/common/details-view/DetailsViewSect
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
 import ContactsViewSection from "@/components/common/details-view/ContactsSection";
 import AddSection from "@/components/common/buttons/AddSection";
+import { festivalApiService } from "@/api/festivalApiService";
+import { updateFestival } from "@/redux/slices/festivalSlice";
+import { toast } from "sonner";
 
 const FestivalView = () => {
   const params = useParams();
@@ -48,6 +51,28 @@ const FestivalView = () => {
 
   const goToApplyPage = async () => {
     router.push(`${festivalId}/apply`);
+  };
+
+  const onConfirmDeleteContact = async (index?: number) => {
+    if (!festival) return;
+
+    try {
+      // Remove contact at the given index
+      const updatedContacts =
+        festival.contacts?.filter((_, i) => i !== index) ?? [];
+
+      const updatedFestival = {
+        ...festival,
+        contacts: updatedContacts,
+      };
+
+      await festivalApiService.updateFestival(updatedFestival);
+      dispatch(updateFestival(updatedFestival));
+      toast.success("Contact deleted successfully");
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      toast.error("Failed to delete contact");
+    }
   };
 
   return (
@@ -89,6 +114,7 @@ const FestivalView = () => {
           title="Contacts"
           contacts={festival.contacts}
           entityId={festivalId}
+          onDelete={onConfirmDeleteContact}
         />
       )}
       <AddSection label="contact" />

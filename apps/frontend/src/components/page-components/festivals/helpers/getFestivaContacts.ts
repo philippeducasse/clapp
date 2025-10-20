@@ -4,7 +4,6 @@ import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 export const getFestivalContacts = (
   contact: OrganisationContact
 ): SectionCellProps[] => {
-  console.log(contact);
   if (!contact) return [];
 
   return [
