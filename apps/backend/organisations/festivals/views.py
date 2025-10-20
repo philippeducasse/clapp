@@ -68,48 +68,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
         self.mistral_client = MistralClient()
         self.gemini_client = GeminiClient()
 
-    def update(self, request: HttpRequest, *args: Any, **kwargs: Any) -> Response:
-        partial = kwargs.pop("partial", False)
-        instance = self.get_object()
-
-        # Extract and handle contacts separately
-        contacts_data = request.data.pop("contacts", None)
-        # Update festival fields
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        # Handle contacts
-        if contacts_data is not None:
-            from organisations.festivals.models import FestivalContact
-
-            for contact_info in contacts_data:
-                if "email" in contact_info and contact_info["email"]:
-                    email = contact_info["email"].strip().lower()
-
-                    existing = FestivalContact.objects.filter(
-                        festival=instance, email=email
-                    ).first()
-
-                    if existing:
-                        existing.name = contact_info.get("name", "")
-                        existing.role = contact_info.get("role", "")
-                        existing.phone = contact_info.get("phone", None)
-                        existing.save()
-                        print("updated", contact_info)
-
-                    else:
-                        FestivalContact.objects.create(
-                            festival=instance,
-                            email=email,
-                            name=contact_info.get("name", ""),
-                            role=contact_info.get("role", ""),
-                            phone=contact_info.get("phone", None),
-                        )
-                        print("created", contact_info)
-
-        return Response(self.get_serializer(instance).data)
-
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
