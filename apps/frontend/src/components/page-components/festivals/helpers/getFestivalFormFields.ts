@@ -44,20 +44,6 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       options: getOptions(FestivalType),
     },
     {
-      label: "Contact Email",
-      fieldName: "contacts[0].email",
-      type: ControlledFormElementType.EMAIL,
-      helpText: "Email of main person of contact",
-      multiple: true,
-    },
-    {
-      label: "Contact Person",
-      fieldName: "contacts[0].name",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Name of main person of contact",
-      multiple: true,
-    },
-    {
       label: "Start Date",
       fieldName: "startDate",
       type: ControlledFormElementType.DATE,
@@ -73,7 +59,8 @@ export const getFestivalFormFields = (): ControlledFormElement[] => {
       label: "Application start",
       fieldName: "applicationStart",
       type: ControlledFormElementType.TEXT,
-      helpText: "Approximate or exact date of when festival begins accepting applications",
+      helpText:
+        "Approximate or exact date of when festival begins accepting applications",
     },
     {
       label: "Application end",
