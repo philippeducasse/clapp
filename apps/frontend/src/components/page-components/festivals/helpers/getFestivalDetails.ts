@@ -12,7 +12,5 @@ export const getFestivalDetails = (festival: Festival): SectionCellProps[] => {
     { title: "Application start", value: festival.applicationStart },
     { title: "Application end", value: festival.applicationEnd },
     { title: "Application type", value: capitalize(festival.applicationType) },
-    // { title: "Contact person", value: festival.contact?.name },
-    // { title: "Contact email", value: festival.contact?.email },
   ];
 };

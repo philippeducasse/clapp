@@ -9,7 +9,7 @@ import {
   sanitizeFormData,
   getInitialValues,
 } from "@/helpers/formHelper";
-import { getFestivalContactFormFields } from "../../helpers/getFestivalContactsFormField";
+import { getFestivalContactFormFields } from "../../helpers/form/getFestivalContactsFormField";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,7 +25,6 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
-import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 
 interface FestivalContactsFormProps {
   action: string;
@@ -49,7 +48,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, festival),
+    defaultValues: getInitialValues(formFields, festival?.contacts),
     mode: "onSubmit",
   });
 
@@ -59,7 +58,6 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
       refreshFestival(festivalId, dispatch);
       setInitialDataLoaded(true);
     }
-    console.log("Saved festival in redux: ", festival);
   }, [festivalId, festival, dispatch]);
 
   // Reset form when festival data changes (but only once)
@@ -78,9 +76,10 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         // await festivalApiService.updateFestival(updatedFestival);
         dispatch(updateFestival(updatedFestival));
         // router.push(`/festivals/${festival?.id}`);
-        // router.push(`/festivals/${festival?.id}`);
       } else {
-        const festivalWithContacts = { ...festival, contacts: [values] };
+        const existingContacts = festival?.contacts ?? [];
+        const updatedContacts = [...existingContacts, values];
+        const festivalWithContacts = { ...festival, contacts: updatedContacts };
         console.log("created contact: ", values, festivalWithContacts);
 
         const newFestival = await festivalApiService.createFestival(

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Festival } from "@/interfaces/entities/Festival";
 import FestivalDiffForm from "@/components/page-components/festivals/components/form/FestivalDiffForm";
-import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
+import { getFestivalFormFields } from "../../helpers/form/getFestivalFormFields";
 import { Dispatch, SetStateAction } from "react";
 
 export interface DiffViewProps {

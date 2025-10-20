@@ -9,7 +9,7 @@ import {
   sanitizeFormData,
   getInitialValues,
 } from "@/helpers/formHelper";
-import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
+import { getFestivalFormFields } from "../../helpers/form/getFestivalFormFields";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";

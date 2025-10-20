@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEqual } from "lodash";
-import { getFestivalFormFields } from "../../helpers/getFestivalFormFields";
+import { getFestivalFormFields } from "../../helpers/form/getFestivalFormFields";
 import {
   createZodFormSchema,
   sanitizeFormData,

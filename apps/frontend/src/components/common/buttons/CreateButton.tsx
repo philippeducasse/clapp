@@ -6,9 +6,10 @@ import { Plus } from "lucide-react";
 interface CreateButtonProps {
   href: string;
   label?: string;
+  className: string;
 }
 
-const CreateButton = ({ label, href }: CreateButtonProps) => {
+const CreateButton = ({ label, href, className }: CreateButtonProps) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -16,7 +17,7 @@ const CreateButton = ({ label, href }: CreateButtonProps) => {
   };
 
   return (
-    <Button variant="default" onClick={handleClick}>
+    <Button variant="default" onClick={handleClick} className={className}>
       <Plus />
       {label ?? "Create"}
     </Button>
