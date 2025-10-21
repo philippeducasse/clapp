@@ -77,8 +77,8 @@ const applyToFestival = (
   application: Application,
   files: File[],
   fileFieldName: string
-): Promise<Application> => {
-  return sendFormDataRequest<ApplicationCreate, Application>(
+): Promise<{ message: string; applicationId: number }> => {
+  return sendFormDataRequest<ApplicationCreate, { message: string; applicationId: number }>(
     `${endpoint}${festivalId}/apply/`,
     application,
     files,
