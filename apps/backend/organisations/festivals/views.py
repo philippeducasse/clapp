@@ -189,20 +189,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
                     profile=default_profile,
                 )
 
-            # if performances:
-            #     performance_objects = Performance.objects.filter(
-            #         id__in=performances.split(",")
-            #     )
-            #     application.performances.set(performance_objects)
-            #     for p in performance_objects:
-            #         for dossier in p.dossiers.all():
-            #             print("attaching")
-            #             attachments.append(dossier.file)
-
-            # if attachments:
-            #     application.attachments_sent = [file.name for file in attachments]
-            #     application.save()
-
             try:
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
@@ -319,3 +305,24 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 {"error": f"Failed to generate email: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    @action(detail=True, methods=["patch"], url_path="mark/(?P<mark_action>[^/.]+)")
+    def mark(self, request: HttpRequest, pk: int, mark_action: str) -> Response:
+        print("NEW PATCH: ", mark_action)
+        festival = self.get_object()
+        valid_actions = ["STAR", "WARNING", "DANGER", "WATCH", "OTHER"]
+
+        if mark_action not in valid_actions:
+            return Response(
+                {
+                    "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        festival.tag = "" if mark_action == festival.tag else mark_action
+        festival.save()
+        print("NEW FESTIVAL mark: ", festival.tag)
+
+        serializer = self.get_serializer(festival)
+        return Response(serializer.data)

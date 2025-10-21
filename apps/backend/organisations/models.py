@@ -5,7 +5,7 @@ from typing import List, Tuple
 
 class Organisation(models.Model):
     TAGS: List[Tuple[str, str]] = [
-        ("STARRED", "Starred"),
+        ("STAR", "Star"),
         ("WARNING", "Warning"),
         ("INACTIVE", "Inactive"),
         ("WATCH", "Watch"),
@@ -17,7 +17,7 @@ class Organisation(models.Model):
     town = models.CharField(max_length=100, blank=True)
     website_url = models.URLField(max_length=200, blank=True)
     comments = models.TextField(max_length=500, blank=True)
-    # tag = models.CharField(max_length=20, choices= TAGS, blank=True)
+    tag = models.CharField(max_length=20, choices=TAGS, blank=True)
 
     class Meta:
         abstract = True
