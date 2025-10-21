@@ -411,6 +411,7 @@ def generate_application_mail_prompt(
         CRITICAL: Use <br><br> tags for paragraph breaks (empty lines between sections).
         Use <a> tags for links.
         Do NOT use newlines, \n characters, or any other line break methods.
+        Do NOT use asterisks (*) for emphasis (*like this*).
         Do not add any preamble message, notes, or formatting indicators. 
         The response should begin immediately with the salutation.
 

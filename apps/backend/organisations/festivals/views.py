@@ -242,7 +242,11 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 application.application_status = "APPLIED"
                 application.save()
                 return Response(
-                    {"message": "Application sent successfully"}, status=200
+                    {
+                        "message": "Application sent successfully",
+                        "applicationId": application.id,
+                    },
+                    status=200,
                 )
             except Exception as e:
                 return Response(
