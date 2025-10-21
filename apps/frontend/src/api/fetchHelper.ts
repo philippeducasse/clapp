@@ -96,3 +96,24 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
   toast.success(toastMessage ?? "Success");
   return json;
 };
+
+export const patchRequest = async <TRes>(url: string, toastMessage?: string): Promise<TRes> => {
+  const res = await fetch(url, {
+    method: "PATCH",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.text();
+    toast.error(`Error: ${error}`);
+    throw new Error(`Failed to PATCH ${url}: ${res.status} - ${error}`);
+  }
+
+  const json = await res.json();
+  if (toastMessage) {
+    toast.success(toastMessage);
+  }
+  return transformKeysToCamelCase(json);
+};

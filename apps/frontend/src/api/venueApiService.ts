@@ -10,6 +10,7 @@ import {
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/venues/";
 
@@ -30,15 +31,12 @@ const createVenue = (venue: Venue): Promise<Venue> => {
   );
 };
 
-const deleteVenue = (venueId: number) => {
+const deleteVenue = (venueId: number): Promise<void> => {
   return deleteRequest(`${endpoint}${venueId}`, "Venue successfully deleted");
 };
 
-const enrichVenue = (venue: Venue): Promise<Venue> => {
-  return fetchRequest<Venue>(`${endpoint}${venue.id}/enrich/`, {
-    method: "POST",
-    body: JSON.stringify(venue),
-  });
+const enrichVenue = (id: number): Promise<Venue> => {
+  return fetchRequest<Venue>(`${endpoint}${id}/enrich/`);
 };
 
 const updateVenue = (venue: Venue): Promise<Venue> => {
@@ -75,13 +73,31 @@ const applyToVenue = (
   );
 };
 
-export const venueApiService = {
+export const venueApiService: EntityApiService<Venue> & {
+  getAllVenues: typeof getAllVenues;
+  getVenue: typeof getVenue;
+  createVenue: typeof createVenue;
+  updateVenue: typeof updateVenue;
+  deleteVenue: typeof deleteVenue;
+  enrichVenue: typeof enrichVenue;
+  generateEmail: typeof generateEmail;
+  applyToVenue: typeof applyToVenue;
+} = {
+  // Interface methods
+  getAll: getAllVenues,
+  get: getVenue,
+  create: createVenue,
+  update: updateVenue,
+  delete: deleteVenue,
+  enrich: enrichVenue,
+  // Legacy method names for backwards compatibility
   getAllVenues,
   getVenue,
   createVenue,
-  generateEmail,
-  enrichVenue,
-  applyToVenue,
   updateVenue,
   deleteVenue,
+  enrichVenue,
+  // Entity-specific methods
+  generateEmail,
+  applyToVenue,
 };

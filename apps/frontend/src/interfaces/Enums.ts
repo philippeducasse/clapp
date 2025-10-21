@@ -10,3 +10,11 @@ export enum EntityName {
   RESIDENCY = "residency",
   VENUE = "venue",
 }
+
+export enum MarkAction {
+  STAR = "STAR",
+  WATCH = "WATCH",
+  INACTIVE = "INACTIVE",
+  WARNING = "WARNING",
+  OTHER = "OTHER",
+}

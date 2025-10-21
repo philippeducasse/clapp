@@ -48,6 +48,7 @@ const ResidencyView = () => {
         title={residency.name}
         subtitle={`${residency.town && `${residency.town}`}, ${residency.country}`}
         icon={<University className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        entityId={residency.id}
         actionElements={
           <>
             <GenericButton onClick={goToApplyPage} label={"Apply to residency"} isLoading={false} />
