@@ -109,9 +109,37 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 {"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST
             )
 
+        recipients_input = request.data.get("recipients", "")
+
+        # Parse recipients (assuming comma-separated emails)
+        recipient_emails = [
+            email.strip() for email in recipients_input.split(",") if email.strip()
+        ]
+
+        # Validate we have at least one recipient
+        if not recipient_emails:
+            return Response(
+                {"error": "At least one recipient email is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Optional: Validate email format
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+
+        try:
+            for email in recipient_emails:
+                validate_email(email)
+        except ValidationError:
+            return Response(
+                {"error": "Invalid email address format"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             message = request.data.get("message")
             subject = request.data.get("email_subject")
+
             attachments = request.FILES.getlist("attachments_sent")
             performances = request.data.get("performances")
             if not message or not subject:
@@ -131,53 +159,53 @@ class FestivalViewSet(viewsets.ModelViewSet):
             applications = Application.objects.filter(
                 content_type=festival_content_type, object_id=festival.pk
             )
-            existing_application = next(
+
+            # Check if an application already exists
+            application = next(
                 (a for a in applications if a.application_year == application_year),
                 None,
             )
 
-            if existing_application:
-                return Response(
-                    "Application already exists for this festival and year",
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            default_profile = Profile.objects.get(id=2)
-            application = Application.objects.create(
-                organisation=festival,
-                application_date=timezone.now().date(),
-                application_status="DRAFT",
-                message=message,
-                email_subject=subject,
-                profile=default_profile,
-            )
+            if application:
+                if application.application_status != "DRAFT":
+                    return Response(
+                        "Application already exists for this festival and year",
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+                else:
+                    application.message = message
+                    application.email_subject = subject
+                    application.save()
+            else:
+                # TODO: refactor this once more than one user
+                default_profile = Profile.objects.get(id=2)
 
-            if performances:
-                performance_objects = Performance.objects.filter(
-                    id__in=performances.split(",")
+                application = Application.objects.create(
+                    organisation=festival,
+                    application_date=timezone.now().date(),
+                    application_status="DRAFT",
+                    message=message,
+                    email_subject=subject,
+                    profile=default_profile,
                 )
-                application.performances.set(performance_objects)
-                for p in performance_objects:
-                    for dossier in p.dossiers.all():
-                        print("attaching")
-                        attachments.append(dossier.file)
 
-            if attachments:
-                application.attachments_sent = [file.name for file in attachments]
-                application.save()
+            # if performances:
+            #     performance_objects = Performance.objects.filter(
+            #         id__in=performances.split(",")
+            #     )
+            #     application.performances.set(performance_objects)
+            #     for p in performance_objects:
+            #         for dossier in p.dossiers.all():
+            #             print("attaching")
+            #             attachments.append(dossier.file)
+
+            # if attachments:
+            #     application.attachments_sent = [file.name for file in attachments]
+            #     application.save()
 
             try:
                 text_content = strip_tags(application.message)  # plain text fallback
                 html_content = application.message  # Tiptap HTML
-
-                # Get all contact emails from the festival
-                recipient_emails = [
-                    contact.email for contact in festival.contacts.all()
-                ]
-                if not recipient_emails:
-                    return Response(
-                        {"error": "No contact emails found for this festival"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
 
                 email = EmailMultiAlternatives(
                     subject,
@@ -190,6 +218,9 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 email.attach_alternative(html_content, "text/html")
 
                 if performances:
+                    performance_objects = Performance.objects.filter(
+                        id__in=performances.split(",")
+                    )
                     for p in performance_objects:
                         if p.dossiers:
                             for dossier in p.dossiers.all():
