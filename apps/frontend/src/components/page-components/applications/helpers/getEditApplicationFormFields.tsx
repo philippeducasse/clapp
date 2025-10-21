@@ -1,4 +1,4 @@
-import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
+import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 // import { Performance } from "@/interfaces/entities/Performance";
 import { ApplicationStatusOptions } from "@/interfaces/forms/StatusOptions";

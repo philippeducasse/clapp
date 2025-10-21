@@ -15,7 +15,8 @@ interface FestivalsTableProps {
 
 export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   const dispatch = useDispatch();
-  const [festivalData, setFestivalData] = useState<PaginatedResponse<Festival>>(initialData);
+  const [festivalData, setFestivalData] =
+    useState<PaginatedResponse<Festival>>(initialData);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 50,
@@ -33,11 +34,12 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
 
     const fetchFestivals = async () => {
       setIsLoading(true);
-      const offset = pagination.pageIndex * pagination.pageSize;
-      const data = await festivalApiService.getAllFestivals(
+      // const offset = pagination.pageIndex * pagination.pageSize;
+      const data = await festivalApiService
+        .getAllFestivals
         // pagination.pageSize,
         // offset
-      );
+        ();
       setFestivalData(data);
       setIsLoading(false);
     };

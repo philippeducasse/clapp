@@ -31,7 +31,7 @@ import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 
 const ApplicationForm = () => {
-  const useAsyncDispatch = useAppDispatch();
+  const asyncDispatch = useAppDispatch();
   const params = useParams();
   const festivalId = Number(params.id);
   const festival = useSelector((state: RootState) =>
@@ -76,11 +76,11 @@ const ApplicationForm = () => {
 
   useEffect(() => {
     if (profile?.id) {
-      useAsyncDispatch(fetchPerformances(profile.id));
+      asyncDispatch(fetchPerformances(profile.id));
     }
-  }, [profile, useAsyncDispatch]);
+  }, [profile, asyncDispatch]);
 
-  const onSubmit = async (values: Application) => {
+  const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);
     const { attachmentsSent, ...vals } = values;
     if (profile) {
@@ -132,7 +132,7 @@ const ApplicationForm = () => {
       <BasicForm
         form={form}
         formFields={formFields}
-        onSubmit={onSubmit as any}
+        onSubmit={onSubmit}
         onCancelHref={`/festivals/${festival?.id}`}
         isLoading={isLoading}
         entity={festival}

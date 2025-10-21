@@ -43,8 +43,8 @@ export function DataTable<TData, TValue>({
   pagination: externalPagination,
   setPagination: setExternalPagination,
   totalCount,
-  isLoading = false,
-}: DataTableProps<TData, TValue>) {
+}: // isLoading = false,
+DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [internalPagination, setInternalPagination] = useState({
@@ -68,7 +68,10 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
     manualPagination: isServerSide,
-    pageCount: isServerSide && totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
+    pageCount:
+      isServerSide && totalCount
+        ? Math.ceil(totalCount / pagination.pageSize)
+        : undefined,
     state: {
       sorting,
       globalFilter,
@@ -88,21 +91,19 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      style={{ width: `${header.getSize()}px` }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    style={{ width: `${header.getSize()}px` }}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -114,17 +115,16 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                            key={cell.id}
-                            style={{width: `${cell.column.getSize()}px`}}
-                        >
-                          {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                          )}
-                        </TableCell>
-                    ))
-                  }
+                    <TableCell
+                      key={cell.id}
+                      style={{ width: `${cell.column.getSize()}px` }}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))
             ) : (

@@ -4,7 +4,7 @@ import { getOptions } from "@/helpers/formHelper";
 import { FestivalType, ApplicationType } from "@/interfaces/entities/Festival";
 
 export const getFestivalFormFields = (
-  isDiffForm: Boolean = false
+  isDiffForm: boolean = false
 ): ControlledFormElement[] => {
   const fields: ControlledFormElement[] = [
     {

@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
-import { capitalize } from "lodash";
-import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/common/StatusBadge";
 
 const useApplicationColumns = (): ColumnDef<Application>[] => {

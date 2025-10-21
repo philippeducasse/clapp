@@ -5,9 +5,7 @@ import { useSelector } from "react-redux";
 import { selectApplication } from "@/redux/slices/applicationSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
-import { useDispatch } from "react-redux";
 import { getApplicationBasicInfo } from "../../helpers/getApplicationDetails";
-import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
@@ -16,10 +14,10 @@ import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrap
 
 const ApplicationView = () => {
   const params = useParams();
-  const dispatch = useDispatch();
   const applicationId = Number(params.id);
-  const application = useSelector((state: RootState) => selectApplication(state, applicationId));
-  const router = useRouter();
+  const application = useSelector((state: RootState) =>
+    selectApplication(state, applicationId)
+  );
 
   if (!application) {
     return <Skeleton />;
@@ -29,8 +27,15 @@ const ApplicationView = () => {
     <DetailsViewWrapper href="/applications">
       <DetailsViewHeader
         title={application.emailSubject ?? ""}
-        icon={<Clipboard className="text-emerald-600 dark:text-emerald-400" size={32} />}
-        actionElements={<EditButton href={`/applications/${application.id}/edit`} />}
+        icon={
+          <Clipboard
+            className="text-emerald-600 dark:text-emerald-400"
+            size={32}
+          />
+        }
+        actionElements={
+          <EditButton href={`/applications/${application.id}/edit`} />
+        }
       />
       <DetailsViewSection
         title="Application information"
