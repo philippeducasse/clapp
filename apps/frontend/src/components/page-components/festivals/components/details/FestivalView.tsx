@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Flag } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
@@ -26,6 +26,8 @@ import ContactsViewSection from "@/components/common/details-view/ContactsSectio
 import AddSection from "@/components/common/buttons/AddSection";
 import { festivalApiService } from "@/api/festivalApiService";
 import { updateFestival } from "@/redux/slices/festivalSlice";
+import DeleteButton from "@/components/common/buttons/DeleteButton";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
 
 const FestivalView = () => {
   const params = useParams();
@@ -35,6 +37,9 @@ const FestivalView = () => {
     selectFestival(state, festivalId)
   );
   const router = useRouter();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemName, setItemName] = useState<"festival" | "contact">("festival");
+  const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
 
   useEffect(() => {
     if (!festival) {
@@ -52,27 +57,44 @@ const FestivalView = () => {
     router.push(`${festivalId}/apply`);
   };
 
-  const onConfirmDeleteContact = async (index?: number) => {
+  const handleDelete = (entity: "festival" | "contact", index?: number) => {
+    setDeleteIndex(index);
+    setItemName(entity);
+    setOpenDeleteDialog(true);
+  };
+
+  const onConfirmDelete = async () => {
     if (!festival) return;
 
     try {
-      // Remove contact at the given index
-      const updatedContacts =
-        festival.contacts?.filter((_, i) => i !== index) ?? [];
+      if (itemName === "festival") {
+        await festivalApiService.deleteFestival(festivalId);
+        router.push("/festivals");
+      } else if (itemName === "contact" && deleteIndex !== undefined) {
+        // Remove contact at the given index
+        const updatedContacts =
+          festival.contacts?.filter((_, i) => i !== deleteIndex) ?? [];
 
-      const updatedFestival = {
-        ...festival,
-        contacts: updatedContacts,
-      };
-      await festivalApiService.updateFestival(updatedFestival);
-      dispatch(updateFestival(updatedFestival));
+        const updatedFestival = {
+          ...festival,
+          contacts: updatedContacts,
+        };
+        await festivalApiService.updateFestival(updatedFestival);
+        dispatch(updateFestival(updatedFestival));
+      }
     } catch (error) {
-      console.error("Error deleting contact:", error);
+      console.error(`Error deleting ${itemName}:`, error);
     }
   };
 
   return (
     <DetailsViewWrapper href="/festivals">
+      <DeleteModal
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        onConfirm={onConfirmDelete}
+        itemName={itemName}
+      />
       <DetailsViewHeader
         title={festival.name}
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
@@ -90,6 +112,11 @@ const FestivalView = () => {
             />
             <FestivalUpdateDialog />
             <EditButton href={`/festivals/${festival.id}/edit`} />
+            <DeleteButton
+              variant={"outline"}
+              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
+              onDelete={() => handleDelete("festival", festivalId)}
+            />
           </>
         }
       />
@@ -110,7 +137,7 @@ const FestivalView = () => {
           title="Contacts"
           contacts={festival.contacts}
           entityId={festivalId}
-          onDelete={onConfirmDeleteContact}
+          onDelete={(index) => handleDelete("contact", index)}
         />
       )}
       <AddSection

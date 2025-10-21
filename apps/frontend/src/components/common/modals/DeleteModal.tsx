@@ -9,11 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import DeleteButton from "../buttons/DeleteButton";
 
 interface DeleteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (id?: number) => void | Promise<void>;
+  onConfirm: () => void | Promise<void>;
   description?: string;
   itemName: string;
 }
@@ -54,13 +55,12 @@ export const DeleteModal = ({
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button
+          <DeleteButton
             variant="destructive"
-            onClick={handleConfirm}
-            disabled={loading}
-          >
-            {loading ? "Deleting..." : "Delete"}
-          </Button>
+            onDelete={handleConfirm}
+            loading={loading}
+            label={loading ? "Deleting..." : "Delete"}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

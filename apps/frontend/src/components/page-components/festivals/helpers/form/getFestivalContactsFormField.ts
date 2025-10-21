@@ -1,13 +1,15 @@
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 
-export const getFestivalContactFormFields = (): ControlledFormElement[] => {
+export const getFestivalContactFormFields = (
+  isEdit: boolean = false
+): ControlledFormElement[] => {
   return [
     {
       label: "Email",
       fieldName: "email",
       type: ControlledFormElementType.EMAIL,
-      required: true,
+      required: isEdit,
     },
     {
       label: "Name",

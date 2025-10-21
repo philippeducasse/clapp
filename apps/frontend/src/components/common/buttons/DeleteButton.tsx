@@ -7,6 +7,8 @@ interface DeleteButtonProps {
   label?: string;
   icon?: boolean;
   variant?: "destructive" | "outline";
+  className?: string;
+  loading?: boolean;
 }
 
 const DeleteButton = ({
@@ -14,9 +16,18 @@ const DeleteButton = ({
   onDelete,
   icon = true,
   variant = "destructive",
+  className,
+  loading,
 }: DeleteButtonProps) => {
   return (
-    <Button size="default" variant={variant} onClick={onDelete} type="button">
+    <Button
+      size="default"
+      variant={variant}
+      onClick={onDelete}
+      type="button"
+      className={className}
+      disabled={loading}
+    >
       {icon && <Trash2 />}
       {label ?? "Delete"}
     </Button>

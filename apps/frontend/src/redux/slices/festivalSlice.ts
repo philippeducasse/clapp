@@ -58,6 +58,7 @@ const festivalSlice = createSlice({
       }
     },
     deleteFestival(state, action: PayloadAction<number>) {
+      console.log("deleting", action.payload);
       state.festivals = state.festivals.filter(
         (festival) => festival.id !== action.payload
       );

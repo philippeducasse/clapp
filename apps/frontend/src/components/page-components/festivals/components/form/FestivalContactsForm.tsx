@@ -42,7 +42,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
     (state: RootState) => state.festivals.selectedFestival
   );
 
-  const formFields = getFestivalContactFormFields();
+  const formFields = getFestivalContactFormFields(action === Action.EDIT);
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
@@ -84,6 +84,9 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
+      const isContactEmpty =
+        !values.email && !values.name && !values.role && !values.phone;
+
       if (action === Action.EDIT) {
         const updatedContacts = [...(festival?.contacts ?? [])];
         updatedContacts[contactIndex] = values as OrganisationContact;
@@ -96,13 +99,22 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        console.log("selected festival:", selectedFestival);
         const existingContacts = selectedFestival?.contacts ?? [];
-        const updatedContacts = [...existingContacts, values];
+
+        const updatedContacts = isContactEmpty
+          ? existingContacts
+          : [...existingContacts, values];
+
         const festivalWithContacts = {
           ...selectedFestival,
           contacts: updatedContacts,
         };
+        // console.log(
+        //   "selected festival:",
+        //   existingContacts,
+        //   selectedFestival,
+        //   festivalWithContacts
+        // );
 
         const newFestival = await festivalApiService.createFestival(
           festivalWithContacts as unknown as Festival
@@ -121,7 +133,12 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
     return <Skeleton />;
   }
 
-  const onCancelHref = festivalId ? `/festivals/${festival?.id}` : "/festivals";
+  const onCancelHref =
+    action === Action.CREATE
+      ? `/festivals/create`
+      : festivalId
+      ? `/festivals/${festival?.id}`
+      : "/festivals";
 
   return (
     <>
@@ -133,6 +150,8 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         onCancelHref={onCancelHref}
         isLoading={isLoading}
         entity={festival}
+        formTitle="Contacts"
+        formSubtitle="here you can provide contact information"
       />
     </>
   );

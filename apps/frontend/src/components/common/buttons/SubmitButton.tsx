@@ -8,9 +8,16 @@ interface SubmitButtonProps {
   onClick?: () => void;
   label?: string;
   submissionLabel?: string;
+  showIcon?: boolean;
 }
 
-const SubmitButton = ({ onClick, isLoading, label, submissionLabel }: SubmitButtonProps) => {
+const SubmitButton = ({
+  onClick,
+  isLoading,
+  label,
+  submissionLabel,
+  showIcon = true,
+}: SubmitButtonProps) => {
   return (
     <Button size="default" disabled={isLoading} onClick={onClick}>
       {isLoading ? (
@@ -20,8 +27,7 @@ const SubmitButton = ({ onClick, isLoading, label, submissionLabel }: SubmitButt
         </>
       ) : (
         <>
-          <Save />
-          {label ?? "Submit"}
+          {showIcon && <Save />} {label ?? "Submit"}
         </>
       )}
     </Button>

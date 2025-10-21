@@ -27,7 +27,7 @@ import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
 
 interface FestivalBasicInfoFormProps {
-  action: string;
+  action: Action;
 }
 
 const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
@@ -100,6 +100,9 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         onCancelHref={onCancelHref}
         isLoading={isLoading}
         entity={festival}
+        action={action}
+        formTitle="Basic Information"
+        formSubtitle="Please provide basic festival information. You will provide contact information next."
       />
     </>
   );

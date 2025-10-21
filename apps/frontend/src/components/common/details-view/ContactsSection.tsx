@@ -6,8 +6,6 @@ import { getFestivalContacts } from "@/components/page-components/festivals/help
 import { Contact2 } from "lucide-react";
 import EditButton from "../buttons/EditButton";
 import DeleteButton from "../buttons/DeleteButton";
-import { DeleteModal } from "../modals/DeleteModal";
-import { useState } from "react";
 
 interface ContactsViewSectionProps {
   title: string;
@@ -22,27 +20,8 @@ const ContactsViewSection = ({
   entityId,
   onDelete,
 }: ContactsViewSectionProps) => {
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
-
-  const handleDelete = (index: number) => {
-    setDeleteIndex(index);
-    setOpenDeleteDialog(true);
-  };
-
-  const handleConfirmDelete = () => {
-    console.log("deleting:", deleteIndex);
-    onDelete(deleteIndex);
-  };
-
   return (
     <>
-      <DeleteModal
-        open={openDeleteDialog}
-        onOpenChange={setOpenDeleteDialog}
-        onConfirm={handleConfirmDelete}
-        itemName="contact"
-      />
       <Card className="mb-6 relative">
         <CardContent>
           <div className="flex items-center gap-2 mb-6">
@@ -62,7 +41,7 @@ const ContactsViewSection = ({
                   />
                   <DeleteButton
                     variant="outline"
-                    onDelete={() => handleDelete(idx)}
+                    onDelete={() => onDelete(idx)}
                   />
                 </div>
               </div>

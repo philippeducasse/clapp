@@ -20,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Circus Agent",
+  title: "caf",
   description:
     "Your personal assistant for your career in the performance arts",
 };
