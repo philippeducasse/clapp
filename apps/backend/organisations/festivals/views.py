@@ -65,8 +65,20 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.mistral_client = MistralClient()
-        self.gemini_client = GeminiClient()
+        self._mistral_client = None
+        self._gemini_client = None
+
+    @property
+    def mistral_client(self) -> MistralClient:
+        if self._mistral_client is None:
+            self._mistral_client = MistralClient()
+        return self._mistral_client
+
+    @property
+    def gemini_client(self) -> GeminiClient:
+        if self._gemini_client is None:
+            self._gemini_client = GeminiClient()
+        return self._gemini_client
 
     # Adds an endpoint to default queryset. Detail means it affects only one entity
     @action(detail=True, methods=["get"])

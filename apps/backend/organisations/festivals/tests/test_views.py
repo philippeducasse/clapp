@@ -26,8 +26,6 @@ def festival():
         town="Paris",
         festival_type="STREET",
         website_url="https://testfestival.com",
-        contact_email="contact@testfestival.com",
-        contact_person="John Doe",
         start_date=date(2025, 7, 15),
         end_date=date(2025, 7, 20),
         application_type="EMAIL",
@@ -119,8 +117,8 @@ class TestFestivalViewSet:
 class TestFestivalEnrichAction:
     """Test cases for the enrich action"""
 
-    @patch("festivals.views.MistralClient")
-    @patch("festivals.views.GeminiClient")
+    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.festivals.views.GeminiClient")
     def test_enrich_festival_success(
         self, mock_gemini_client, mock_mistral_client, api_client, festival
     ):
@@ -134,7 +132,6 @@ class TestFestivalEnrichAction:
         mock_mistral.chat.return_value = """
         {
             "description": "Enriched description",
-            "contact_person": "Jane Smith",
             "start_date": "2025-07-15",
             "end_date": "2025-07-20"
         }
@@ -147,8 +144,8 @@ class TestFestivalEnrichAction:
         assert mock_gemini.search.called
         assert mock_mistral.chat.called
 
-    @patch("festivals.views.MistralClient")
-    @patch("festivals.views.GeminiClient")
+    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.festivals.views.GeminiClient")
     def test_enrich_festival_not_found(
         self, mock_gemini_client, mock_mistral_client, api_client
     ):
@@ -162,7 +159,7 @@ class TestFestivalEnrichAction:
 class TestFestivalGenerateEmailAction:
     """Test cases for the generate_email action"""
 
-    @patch("festivals.views.MistralClient")
+    @patch("organisations.festivals.views.MistralClient")
     def test_generate_email_without_performances(
         self, mock_mistral_client, api_client, festival, profile
     ):
@@ -177,7 +174,7 @@ class TestFestivalGenerateEmailAction:
         assert "message" in response.data
         assert response.data["message"] == "Generated email content"
 
-    @patch("festivals.views.MistralClient")
+    @patch("organisations.festivals.views.MistralClient")
     def test_generate_email_with_performances(
         self, mock_mistral_client, api_client, festival, profile, performance
     ):
@@ -195,7 +192,7 @@ class TestFestivalGenerateEmailAction:
         assert response.status_code == status.HTTP_200_OK
         assert "message" in response.data
 
-    @patch("festivals.views.MistralClient")
+    @patch("organisations.festivals.views.MistralClient")
     def test_generate_email_with_multiple_performances(
         self, mock_mistral_client, api_client, festival, profile
     ):
@@ -219,7 +216,7 @@ class TestFestivalGenerateEmailAction:
 
         assert response.status_code == status.HTTP_200_OK
 
-    @patch("festivals.views.MistralClient")
+    @patch("organisations.festivals.views.MistralClient")
     def test_generate_email_festival_not_found(self, mock_mistral_client, api_client):
         """Test generating email for non-existent festival"""
         response = api_client.post("/api/festivals/9999/generate_email/", {})
@@ -247,7 +244,7 @@ class TestFestivalApplyAction:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    @patch("festivals.views.EmailMultiAlternatives")
+    @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_creates_application(self, mock_email, api_client, festival, profile):
         """Test that applying creates an application"""
         mock_email_instance = Mock()
@@ -269,7 +266,7 @@ class TestFestivalApplyAction:
         assert application.email_subject == "Application to Test Festival"
         assert application.application_status == "APPLIED"
 
-    @patch("festivals.views.EmailMultiAlternatives")
+    @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_with_performances(
         self, mock_email, api_client, festival, profile, performance
     ):
@@ -289,7 +286,7 @@ class TestFestivalApplyAction:
         application = Application.objects.first()
         assert application.performances.count() == 1
 
-    @patch("festivals.views.EmailMultiAlternatives")
+    @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_duplicate_application_same_year(
         self, mock_email, api_client, festival, profile
     ):
@@ -318,7 +315,7 @@ class TestFestivalApplyAction:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "already exists" in response.data
 
-    @patch("festivals.views.EmailMultiAlternatives")
+    @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_email_sending_failure(
         self, mock_email, api_client, festival, profile
     ):
@@ -334,7 +331,7 @@ class TestFestivalApplyAction:
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert "Email failed to send" in response.data["error"]
 
-    @patch("festivals.views.EmailMultiAlternatives")
+    @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_calculates_correct_application_year(
         self, mock_email, api_client, festival, profile
     ):

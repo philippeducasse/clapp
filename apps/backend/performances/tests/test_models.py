@@ -3,7 +3,6 @@ from datetime import date, timedelta
 from performances.models import Performance, Dossier
 from profiles.models import Profile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import ValidationError
 from django.core.files.storage import default_storage
 
 
@@ -14,15 +13,13 @@ class TestPerformanceModel:
     @pytest.fixture
     def profile(self):
         return Profile.objects.create_user(
-            email="performer@example.com",
-            password="testpass123"
+            email="performer@example.com", password="testpass123"
         )
 
     def test_performance_creation(self, profile):
         """Test creating a performance with required fields"""
         performance = Performance.objects.create(
-            performance_title="Amazing Show",
-            profile=profile
+            performance_title="Amazing Show", profile=profile
         )
 
         assert performance.id is not None
@@ -32,8 +29,7 @@ class TestPerformanceModel:
     def test_performance_string_representation(self, profile):
         """Test the __str__ method"""
         performance = Performance.objects.create(
-            performance_title="My Performance",
-            profile=profile
+            performance_title="My Performance", profile=profile
         )
 
         assert str(performance) == "My Performance"
@@ -48,7 +44,7 @@ class TestPerformanceModel:
             length=timedelta(minutes=45),
             long_description="A very long description",
             creation_date=date(2024, 1, 1),
-            performance_type="STREET"
+            performance_type="STREET",
         )
 
         assert performance.short_description == "A short description"
@@ -58,25 +54,31 @@ class TestPerformanceModel:
 
     def test_performance_type_choices(self, profile):
         """Test valid performance type choices"""
-        types = ["STREET", "INDOOR_STAGE", "OUTDOOR", "INSTALLATION", "WALK_ACT", "FIRE_SHOW"]
+        types = [
+            "STREET",
+            "INDOOR_STAGE",
+            "OUTDOOR",
+            "INSTALLATION",
+            "WALK_ACT",
+            "FIRE_SHOW",
+        ]
 
         for perf_type in types:
             performance = Performance.objects.create(
                 performance_title=f"Show {perf_type}",
                 profile=profile,
-                performance_type=perf_type
+                performance_type=perf_type,
             )
             assert performance.performance_type == perf_type
 
     def test_performance_optional_fields_null(self, profile):
-        """Test that optional fields can be null"""
+        """Test that optional fields can be blank or null"""
         performance = Performance.objects.create(
-            performance_title="Minimal Show",
-            profile=profile
+            performance_title="Minimal Show", profile=profile
         )
 
-        assert performance.short_description is None
-        assert performance.trailer is None
+        assert performance.short_description == ""
+        assert performance.trailer == ""
         assert performance.length is None
         assert performance.creation_date is None
 
@@ -85,7 +87,7 @@ class TestPerformanceModel:
         performance = Performance.objects.create(
             performance_title="Multi-Genre Show",
             profile=profile,
-            genres=["CIRCUS", "JUGGLING", "COMEDY"]
+            genres=["CIRCUS", "JUGGLING", "COMEDY"],
         )
 
         assert "CIRCUS" in performance.genres
@@ -100,24 +102,21 @@ class TestDossierModel:
     @pytest.fixture
     def profile(self):
         return Profile.objects.create_user(
-            email="test@example.com",
-            password="testpass123"
+            email="test@example.com", password="testpass123"
         )
 
     @pytest.fixture
     def performance(self, profile):
         return Performance.objects.create(
-            performance_title="Test Performance",
-            profile=profile
+            performance_title="Test Performance", profile=profile
         )
 
     def test_dossier_creation(self, performance):
         """Test creating a dossier"""
-        pdf_file = SimpleUploadedFile("test.pdf", b"file_content", content_type="application/pdf")
-        dossier = Dossier.objects.create(
-            performance=performance,
-            file=pdf_file
+        pdf_file = SimpleUploadedFile(
+            "test.pdf", b"file_content", content_type="application/pdf"
         )
+        dossier = Dossier.objects.create(performance=performance, file=pdf_file)
 
         try:
             assert dossier.id is not None
@@ -130,8 +129,12 @@ class TestDossierModel:
 
     def test_dossier_ordering(self, performance):
         """Test that dossiers are ordered by uploaded_at descending"""
-        pdf1 = SimpleUploadedFile("test1.pdf", b"content1", content_type="application/pdf")
-        pdf2 = SimpleUploadedFile("test2.pdf", b"content2", content_type="application/pdf")
+        pdf1 = SimpleUploadedFile(
+            "test1.pdf", b"content1", content_type="application/pdf"
+        )
+        pdf2 = SimpleUploadedFile(
+            "test2.pdf", b"content2", content_type="application/pdf"
+        )
 
         dossier1 = Dossier.objects.create(performance=performance, file=pdf1)
         dossier2 = Dossier.objects.create(performance=performance, file=pdf2)

@@ -84,10 +84,10 @@ class TestApplicationModel:
             assert app.application_status == status
 
     def test_application_optional_fields(self, festival, profile):
-        """Test that optional fields can be null"""
+        """Test that optional fields can be blank or null"""
         application = Application.objects.create(organisation=festival, profile=profile)
 
-        assert application.email_subject is None
-        assert application.message is None
+        assert application.email_subject == ""
+        assert application.message == ""
         assert application.answer_date is None
         assert application.payment_amount is None

@@ -12,7 +12,7 @@ class TestProfileModel:
             email="test@example.com",
             password="testpass123",
             first_name="John",
-            last_name="Doe"
+            last_name="Doe",
         )
 
         assert profile.id is not None
@@ -24,23 +24,18 @@ class TestProfileModel:
     def test_profile_string_representation(self):
         """Test the __str__ method returns email"""
         profile = Profile.objects.create_user(
-            email="artist@example.com",
-            password="testpass123"
+            email="artist@example.com", password="testpass123"
         )
 
         assert str(profile) == "artist@example.com"
 
     def test_profile_email_is_unique(self):
         """Test that email must be unique"""
-        Profile.objects.create_user(
-            email="unique@example.com",
-            password="testpass123"
-        )
+        Profile.objects.create_user(email="unique@example.com", password="testpass123")
 
         with pytest.raises(Exception):  # Will raise IntegrityError
             Profile.objects.create_user(
-                email="unique@example.com",
-                password="anotherpass"
+                email="unique@example.com", password="anotherpass"
             )
 
     def test_profile_username_field_is_email(self):
@@ -64,7 +59,7 @@ class TestProfileModel:
             facebook_profile="https://facebook.com/jane",
             tiktok_profile="https://tiktok.com/@jane",
             youtube_profile="https://youtube.com/@jane",
-            phone="+33123456789"
+            phone="+33123456789",
         )
 
         assert profile.artist_name == "Amazing Jane"
@@ -75,23 +70,21 @@ class TestProfileModel:
         assert profile.nationality == "French"
 
     def test_profile_optional_fields_null(self):
-        """Test that optional fields can be null"""
+        """Test that optional fields can be blank or null"""
         profile = Profile.objects.create_user(
-            email="minimal@example.com",
-            password="testpass123"
+            email="minimal@example.com", password="testpass123"
         )
 
-        # first_name and last_name default to empty string in Django's AbstractUser
-        assert profile.artist_name is None
-        assert profile.company_name is None
+        # CharField fields with blank=True default to empty string
+        assert profile.artist_name == ""
+        assert profile.company_name == ""
         assert profile.age is None
-        assert profile.location is None
+        assert profile.location == ""
 
     def test_create_superuser(self):
         """Test creating a superuser"""
         superuser = Profile.objects.create_superuser(
-            email="admin@example.com",
-            password="adminpass123"
+            email="admin@example.com", password="adminpass123"
         )
 
         assert superuser.is_staff is True
@@ -101,8 +94,7 @@ class TestProfileModel:
     def test_profile_password_hashing(self):
         """Test that passwords are hashed"""
         profile = Profile.objects.create_user(
-            email="secure@example.com",
-            password="mypassword"
+            email="secure@example.com", password="mypassword"
         )
 
         # Password should be hashed, not stored in plain text

@@ -1,6 +1,6 @@
 import pytest
 from datetime import date
-from organisations.festivals.models import Festival
+from organisations.festivals.models import Festival, FestivalContact
 
 
 @pytest.mark.django_db
@@ -34,8 +34,6 @@ class TestFestivalModel:
             town="Barcelona",
             festival_type="CIRCUS",
             website_url="https://example.com",
-            contact_email="contact@example.com",
-            contact_person="John Doe",
             start_date=date(2025, 7, 15),
             end_date=date(2025, 7, 20),
             approximate_date="Mid July 2025",
@@ -45,24 +43,29 @@ class TestFestivalModel:
             comments="Test comments",
         )
 
+        FestivalContact.objects.create(
+            festival=festival, name="John Doe", email="contact@example.com"
+        )
+
         assert festival.name == "Complete Festival"
         assert festival.description == "A comprehensive test festival"
         assert festival.festival_type == "CIRCUS"
         assert festival.application_type == "FORM"
         assert festival.website_url == "https://example.com"
-        assert festival.contact_email == "contact@example.com"
+        assert festival.contacts.count() == 1
+        assert festival.contacts.first().email == "contact@example.com"
         assert festival.start_date == date(2025, 7, 15)
         assert festival.end_date == date(2025, 7, 20)
 
     def test_festival_optional_fields_null(self):
-        """Test that optional fields can be null"""
+        """Test that optional fields can be blank"""
         festival = Festival.objects.create(name="Minimal Festival")
 
-        assert festival.description is None
-        assert festival.country is None
-        assert festival.town is None
-        assert festival.website_url is None
-        assert festival.contact_email is None
+        assert festival.description == ""
+        assert festival.country == ""
+        assert festival.town == ""
+        assert festival.website_url == ""
+        assert festival.contacts.count() == 0
         assert festival.start_date is None
         assert festival.end_date is None
 
@@ -95,12 +98,13 @@ class TestFestivalModel:
             )
             assert festival.application_type == app_type
 
-    def test_festival_email_validation(self):
-        """Test that contact_email field validates email format"""
-        festival = Festival.objects.create(
-            name="Email Test", contact_email="valid@email.com"
+    def test_festival_contact_email_validation(self):
+        """Test that contact email field validates email format"""
+        festival = Festival.objects.create(name="Email Test")
+        contact = FestivalContact.objects.create(
+            festival=festival, name="Test Contact", email="valid@email.com"
         )
-        assert festival.contact_email == "valid@email.com"
+        assert contact.email == "valid@email.com"
 
     def test_festival_url_validation(self):
         """Test that website_url field validates URL format"""
@@ -120,7 +124,5 @@ class TestFestivalModel:
     def test_festival_comments_max_length(self):
         """Test comments field max length"""
         long_comments = "B" * 500
-        festival = Festival.objects.create(
-            name="Comments Test", comments=long_comments
-        )
+        festival = Festival.objects.create(name="Comments Test", comments=long_comments)
         assert len(festival.comments) == 500
