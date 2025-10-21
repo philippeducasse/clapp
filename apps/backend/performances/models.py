@@ -42,16 +42,16 @@ class Performance(models.Model):
         blank=True,
     )
     performance_title = models.CharField(max_length=200)
-    short_description = models.TextField(max_length=1000, blank=True, null=True)
-    email_prompt = models.TextField(max_length=10000, blank=True, null=True)
-    trailer = models.URLField(max_length=100, blank=True, null=True)
+    short_description = models.TextField(max_length=1000, blank=True)
+    email_prompt = models.TextField(max_length=10000, blank=True)
+    trailer = models.URLField(max_length=100, blank=True)
     length = models.DurationField(blank=True, null=True)
-    long_description = models.TextField(max_length=10000, blank=True, null=True)
+    long_description = models.TextField(max_length=10000, blank=True)
     creation_date = models.DateField(blank=True, null=True)
     # TODO only for dev, in production should switch to some bucket storage
 
     performance_type = models.CharField(
-        max_length=50, choices=PERFORMANCE_TYPES, null=True, blank=True
+        max_length=50, choices=PERFORMANCE_TYPES, blank=True
     )
     genres = MultiSelectField(choices=GENRES, blank=True)
 

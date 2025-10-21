@@ -44,10 +44,9 @@ class Application(models.Model):
         choices=APPLICATION_TYPE,
         default="EMAIL",
         blank=True,
-        null=True,
     )
-    email_subject = models.CharField(max_length=100, blank=True, null=True)
-    message = models.CharField(max_length=2000, blank=True, null=True)
+    email_subject = models.CharField(max_length=100, blank=True)
+    message = models.CharField(max_length=2000, blank=True)
     attachments_sent = models.JSONField(blank=True, null=True)
     attachments_received = models.JSONField(blank=True, null=True)
     answer_received = models.BooleanField(default=False)
@@ -56,15 +55,15 @@ class Application(models.Model):
         max_length=50, choices=APPLICATION_STATUS, default="NOT_APPLIED"
     )
     follow_up_date = models.DateField(blank=True, null=True)
-    response_details = models.TextField(blank=True, null=True)
-    performance_details = models.TextField(blank=True, null=True)
+    response_details = models.TextField(blank=True)
+    performance_details = models.TextField(blank=True)
     contract_received = models.BooleanField(default=False, blank=True, null=True)
     contract_signed = models.BooleanField(default=False, blank=True, null=True)
     payment_received = models.BooleanField(default=False, blank=True, null=True)
     payment_amount = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
-    comments = models.TextField(blank=True, null=True)
+    comments = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

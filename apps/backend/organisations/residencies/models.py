@@ -15,15 +15,14 @@ class Residency(Organisation):
 
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
-    approximate_date = models.CharField(max_length=100, blank=True, null=True)
-    application_date_start = models.CharField(max_length=100, blank=True, null=True)
-    application_date_end = models.CharField(max_length=100, blank=True, null=True)
+    approximate_date = models.CharField(max_length=100, blank=True)
+    application_date_start = models.CharField(max_length=100, blank=True)
+    application_date_end = models.CharField(max_length=100, blank=True)
     application_type = models.CharField(
         max_length=50,
         choices=APPLICATION_TYPE,
         default="UNKNOWN",
         blank=True,
-        null=True,
     )
     applied = models.BooleanField(default=False)
 

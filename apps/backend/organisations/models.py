@@ -1,14 +1,23 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from typing import List, Tuple
 
 
 class Organisation(models.Model):
+    TAGS: List[Tuple[str, str]] = [
+        ("STARRED", "Starred"),
+        ("WARNING", "Warning"),
+        ("INACTIVE", "Inactive"),
+        ("WATCH", "Watch"),
+        ("OTHER", "Other"),
+    ]
     name = models.CharField(max_length=200)
-    description = models.CharField(max_length=1000, blank=True, null=True)
-    country = models.CharField(max_length=100, blank=True, null=True)
-    town = models.CharField(max_length=100, blank=True, null=True)
-    website_url = models.URLField(max_length=200, blank=True, null=True)
-    comments = models.TextField(max_length=500, blank=True, null=True)
+    description = models.CharField(max_length=1000, blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    town = models.CharField(max_length=100, blank=True)
+    website_url = models.URLField(max_length=200, blank=True)
+    comments = models.TextField(max_length=500, blank=True)
+    # tag = models.CharField(max_length=20, choices= TAGS, blank=True)
 
     class Meta:
         abstract = True
@@ -19,9 +28,9 @@ class Organisation(models.Model):
 
 
 class OrganisationContact(models.Model):
-    name = models.CharField(max_length=200, blank=True, null=True)
-    email = models.EmailField(max_length=200)
-    role = models.CharField(max_length=100, blank=True, null=True)
+    name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(max_length=200, blank=True)
+    role = models.CharField(max_length=100, blank=True)
     phone = PhoneNumberField(blank=True, null=True)
 
     class Meta:

@@ -25,7 +25,6 @@ class Venue(Organisation):
         choices=VENUE_TYPE,
         default="UNKNOWN",
         blank=True,
-        null=True,
     )
     contacted = models.BooleanField(default=False)
 
