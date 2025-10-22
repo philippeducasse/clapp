@@ -2,16 +2,19 @@ import React from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import DetailsView from "./DetailsView";
 import { SectionCellProps } from "@/interfaces/DetailsView";
+import Ribbon from "../Ribbon";
 
 interface DetailsViewSectionProps {
   title: string;
   icon: React.ReactNode;
   data: SectionCellProps[];
+  tag?: string;
 }
 
-const DetailsViewSection = ({ title, icon, data }: DetailsViewSectionProps) => {
+const DetailsViewSection = ({ title, icon, data, tag }: DetailsViewSectionProps) => {
   return (
-    <Card className="mb-6 relative">
+    <Card className="mb-6 relative overflow-hidden">
+      {tag && <Ribbon tag={tag} />}
       <CardContent className="grid-cols-2 ">
         <div className="flex items-center gap-2 mb-6">
           {icon}

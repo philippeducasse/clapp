@@ -112,6 +112,7 @@ const FestivalView = () => {
         title="Basic information"
         icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
         data={getFestivalBasicInfo(festival)}
+        tag={festival.tag}
       />
       <DetailsViewSection
         title="Festival details"
