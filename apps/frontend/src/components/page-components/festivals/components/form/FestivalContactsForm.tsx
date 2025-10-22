@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/entities/Festival";
-import {
-  createZodFormSchema,
-  sanitizeFormData,
-  getInitialValues,
-} from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getFestivalContactFormFields } from "../../helpers/form/getFestivalContactsFormField";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -31,16 +27,9 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
-  const [festivalId, contactIndex] = [
-    Number(params?.id),
-    Number(params?.index),
-  ];
-  const festival = useSelector((state: RootState) =>
-    selectFestival(state, festivalId)
-  );
-  const selectedFestival = useSelector(
-    (state: RootState) => state.festivals.selectedFestival
-  );
+  const [festivalId, contactIndex] = [Number(params?.id), Number(params?.index)];
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const selectedFestival = useSelector((state: RootState) => state.festivals.selectedFestival);
 
   const formFields = getFestivalContactFormFields(action === Action.EDIT);
   const formSchema = createZodFormSchema(formFields);
@@ -84,8 +73,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      const isContactEmpty =
-        !values.email && !values.name && !values.role && !values.phone;
+      const isContactEmpty = !values.email && !values.name && !values.role && !values.phone;
 
       if (action === Action.EDIT) {
         const updatedContacts = [...(festival?.contacts ?? [])];
@@ -101,25 +89,16 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
       } else {
         const existingContacts = selectedFestival?.contacts ?? [];
 
-        const updatedContacts = isContactEmpty
-          ? existingContacts
-          : [...existingContacts, values];
+        const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
 
         const festivalWithContacts = {
           ...selectedFestival,
           contacts: updatedContacts,
         };
-        // console.log(
-        //   "selected festival:",
-        //   existingContacts,
-        //   selectedFestival,
-        //   festivalWithContacts
-        // );
 
         const newFestival = await festivalApiService.create(
           festivalWithContacts as unknown as Festival
         );
-        console.log(newFestival);
         router.push(`/festivals/${newFestival?.id}`);
       }
     } catch (error) {

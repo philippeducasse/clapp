@@ -4,13 +4,13 @@ import _ from "lodash";
 
 export const getApplicationBasicInfo = (application: Application): SectionCellProps[] => {
   if (!application) return [];
-
   return [
     {
       title: "Organisation Name",
       value: application.organisation.name,
       type: SectionCellType.Link,
-      linkTo: `application.organisation.id`,
+      linkTo: `/${application.organisationType.toLowerCase()}s/${application.organisation.id}`,
+      target: "_self",
     },
     {
       title: "Status",

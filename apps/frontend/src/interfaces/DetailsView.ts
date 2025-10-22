@@ -11,9 +11,17 @@ export interface SectionCellProps {
   disabled?: boolean;
   valueClassName?: string;
   id?: string;
+  target?: "_self" | "_blank";
 }
 
-export type SectionCellValueType = string | number | boolean | number[] | string[] | undefined | Date;
+export type SectionCellValueType =
+  | string
+  | number
+  | boolean
+  | number[]
+  | string[]
+  | undefined
+  | Date;
 
 export const enum SectionCellType {
   Text = "text",

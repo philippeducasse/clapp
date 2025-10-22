@@ -3,18 +3,19 @@ import { SectionCellValueType, SectionCellType } from "@/interfaces/DetailsView"
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UrlObject } from "url";
 
 interface RowProps {
   value: SectionCellValueType;
   type?: SectionCellType;
   title: string;
-  linkTo?: string;
-  target?: string;
+  linkTo?: UrlObject | string;
+  target?: "_self" | "_blank";
   isLoading: boolean;
   disabled?: boolean;
 }
 
-const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowProps) => {
+const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoading }: RowProps) => {
   const renderContent = () => {
     if (value instanceof Date) {
       return value.toLocaleDateString();
@@ -28,7 +29,7 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
           <Link
             href={(linkTo as string) ?? value}
             className="text-sky-600 hover:text-sky-500 font-medium"
-            target={target ?? "_blank"}
+            target={target}
           >
             {value as React.ReactNode}
           </Link>
@@ -57,13 +58,17 @@ const Row = ({ value, type, title, disabled, linkTo, target, isLoading }: RowPro
       {title && (
         <dt
           className={`${
-            disabled ? "text-gray-400" : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium self-start"
+            disabled
+              ? "text-gray-400"
+              : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium self-start"
           }`}
         >
           {title}
         </dt>
       )}
-      <dd className="text-gray-700 dark:text-foreground">{isLoading ? <Skeleton /> : renderContent()}</dd>
+      <dd className="text-gray-700 dark:text-foreground">
+        {isLoading ? <Skeleton /> : renderContent()}
+      </dd>
     </div>
   );
 };

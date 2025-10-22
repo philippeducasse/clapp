@@ -11,7 +11,7 @@ export enum EntityName {
   VENUE = "venue",
 }
 
-export enum MarkAction {
+export enum TagAction {
   STAR = "STAR",
   WATCH = "WATCH",
   INACTIVE = "INACTIVE",

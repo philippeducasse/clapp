@@ -35,14 +35,13 @@ const FestivalView = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemName, setItemName] = useState<"festival" | "contact">("festival");
   const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
-
   useEffect(() => {
     if (!festival) {
       refreshFestival(festivalId, dispatch);
     } else {
       dispatch(setSelectedFestival(festival));
     }
-  }, [festivalId, festival, dispatch]);
+  }, [festivalId, dispatch]);
 
   if (!festival) {
     return <Skeleton />;

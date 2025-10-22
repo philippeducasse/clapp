@@ -53,7 +53,6 @@ const festivalSlice = createSlice({
       }
     },
     deleteFestival(state, action: PayloadAction<number>) {
-      console.log("deleting", action.payload);
       state.festivals = state.festivals.filter((festival) => festival.id !== action.payload);
       // Clear selectedFestival if it's the one being deleted
       if (state.selectedFestival?.id === action.payload) {

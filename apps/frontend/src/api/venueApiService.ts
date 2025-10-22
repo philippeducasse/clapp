@@ -6,12 +6,9 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
-import {
-  Application,
-  ApplicationCreate,
-} from "@/interfaces/entities/Application";
+import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
-import { MarkAction } from "@/interfaces/Enums";
+import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/venues/";
@@ -25,23 +22,15 @@ const get = (venueId: number): Promise<Venue> => {
 };
 
 const create = (venue: Venue): Promise<Venue> => {
-  return sendRequest<Venue, Venue>(
-    `${endpoint}`,
-    venue,
-    "POST",
-    "Venue successfully created"
-  );
+  return sendRequest<Venue, Venue>(`${endpoint}`, venue, "POST", "Venue successfully created");
 };
 
 const remove = (venueId: number): Promise<void> => {
   return deleteRequest(`${endpoint}${venueId}`, "Venue successfully deleted");
 };
 
-const mark = (venueId: number, action: MarkAction): Promise<Venue> => {
-  return patchRequest<Venue>(
-    `${endpoint}${venueId}/mark/${action}/`,
-    "Venue successfully marked"
-  );
+const tag = (venueId: number, action: TagAction): Promise<Venue> => {
+  return patchRequest<Venue>(`${endpoint}${venueId}/tag/${action}/`, "Venue successfully tagged");
 };
 
 const enrich = (id: number): Promise<Venue> => {
@@ -88,7 +77,7 @@ export const venueApiService: EntityApiService<Venue> = {
   create,
   update,
   remove,
-  mark,
+  tag,
   enrich,
   apply,
   generateEmail,

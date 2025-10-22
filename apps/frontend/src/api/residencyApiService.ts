@@ -8,7 +8,7 @@ import {
 } from "./fetchHelper";
 import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
-import { MarkAction } from "@/interfaces/Enums";
+import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/residencies/";
@@ -26,21 +26,23 @@ const create = (residency: Residency): Promise<Residency> => {
 };
 
 const remove = (residencyId: number): Promise<void> => {
-  return deleteRequest(
-    `${endpoint}${residencyId}`,
-    "Residency successfully deleted"
-  );
+  return deleteRequest(`${endpoint}${residencyId}`, "Residency successfully deleted");
 };
 
-const mark = (residencyId: number, action: MarkAction): Promise<Residency> => {
+const tag = (residencyId: number, action: TagAction): Promise<Residency> => {
   return patchRequest<Residency>(
-    `${endpoint}${residencyId}/mark/${action}/`,
-    "Residency successfully marked"
+    `${endpoint}${residencyId}/tag/${action}/`,
+    "Residency successfully tagged"
   );
 };
 
 const update = (residency: Residency): Promise<Residency> => {
-  return sendRequest(`${endpoint}${residency.id}/`, residency, "PUT", "Residency successfully updated");
+  return sendRequest(
+    `${endpoint}${residency.id}/`,
+    residency,
+    "PUT",
+    "Residency successfully updated"
+  );
 };
 
 const enrich = (id: number): Promise<Residency> => {
@@ -78,7 +80,7 @@ export const residencyApiService: EntityApiService<Residency> = {
   create,
   update,
   remove,
-  mark,
+  tag,
   enrich,
   apply,
   generateEmail,

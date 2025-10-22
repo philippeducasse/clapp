@@ -2,6 +2,7 @@ import React from "react";
 import { CardTitle, CardDescription } from "@/components/ui/card";
 import { TagsButton } from "../buttons/TagsButton";
 import { festivalApiService } from "@/api/festivalApiService";
+import { updateFestival } from "@/redux/slices/festivalSlice";
 
 interface DetailsViewHeaderProps {
   title: string;
@@ -30,7 +31,13 @@ const DetailsViewHeader = ({
       {actionElements && (
         <div className="flex gap-6 self-end mx-8 items-stretch">
           {actionElements}
-          {entityId && <TagsButton mark={festivalApiService.mark} entityId={entityId} />}
+          {entityId && (
+            <TagsButton
+              tag={festivalApiService.tag}
+              entityId={entityId}
+              updateSlice={updateFestival}
+            />
+          )}
         </div>
       )}
     </div>

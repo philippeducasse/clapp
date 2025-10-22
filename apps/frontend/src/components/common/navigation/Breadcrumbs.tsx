@@ -57,7 +57,6 @@ const Breadcrumbs = () => {
       breadcrumbs.push({ path: "/applications", label: <span>Applications</span> });
 
       if (application?.id) {
-        console.log("HEllo");
         breadcrumbs.push({ path: entityPath, label: <span>entityName</span> });
 
         // Add action if we're on an edit/new page

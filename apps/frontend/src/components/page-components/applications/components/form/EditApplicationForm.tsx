@@ -60,7 +60,6 @@ const ApplicationForm = ({ action }: ApplicationFormProps) => {
     try {
       if (action === Action.EDIT) {
         const updatedApplication = { ...application, ...values, id: applicationId } as Application;
-        console.log("APPLICATION: ", updateApplication, values, application);
         await applicationApiService.updateApplication(updatedApplication);
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);

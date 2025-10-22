@@ -9,7 +9,7 @@ import {
 import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
-import { MarkAction } from "@/interfaces/Enums";
+import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/festivals/";
@@ -31,10 +31,10 @@ const create = (festival: Festival): Promise<Festival> => {
   );
 };
 
-const mark = (festivalId: number, action: MarkAction): Promise<Festival> => {
+const tag = (festivalId: number, action: TagAction): Promise<Festival> => {
   return patchRequest<Festival>(
-    `${endpoint}${festivalId}/mark/${action}/`,
-    "Festival successfully marked"
+    `${endpoint}${festivalId}/tag/${action}/`,
+    "Festival successfully tagged"
   );
 };
 
@@ -89,7 +89,7 @@ export const festivalApiService: EntityApiService<Festival> = {
   create,
   update,
   remove,
-  mark,
+  tag,
   enrich,
   apply,
   generateEmail,

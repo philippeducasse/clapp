@@ -1,5 +1,5 @@
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
-import { MarkAction } from "@/interfaces/Enums";
+import { TagAction } from "@/interfaces/Enums";
 import { Application } from "@/interfaces/entities/Application";
 import { Profile } from "../entities/Profile";
 
@@ -9,7 +9,7 @@ export interface EntityApiService<T> {
   create: (entity: T) => Promise<T>;
   update: (entity: T) => Promise<T>;
   remove: (id: number) => Promise<void>;
-  mark: (entityId: number, action: MarkAction) => Promise<T>;
+  tag: (entityId: number, action: TagAction) => Promise<T>;
   enrich: (id: number) => Promise<T>;
   apply: (
     entityId: number,

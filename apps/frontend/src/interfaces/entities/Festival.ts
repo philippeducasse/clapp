@@ -17,6 +17,7 @@ export interface Festival {
   applicationEnd?: string;
   applied?: boolean;
   description?: string;
+  tag?: string;
 }
 
 export enum FestivalType {

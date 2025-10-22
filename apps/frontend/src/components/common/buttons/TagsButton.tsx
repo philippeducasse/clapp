@@ -6,15 +6,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MarkAction } from "@/interfaces/Enums";
+import { TagAction } from "@/interfaces/Enums";
 import { Bookmark, Eye, Star, TriangleAlert, X, CircleQuestionMark } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 interface TagsButtonProps<T> {
   entityId: number;
-  mark: (entityId: number, action: MarkAction) => Promise<T>;
+  tag: (entityId: number, action: TagAction) => Promise<T>;
+  updateSlice: (entity: T) => PayloadAction<T>;
 }
 
-export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
+export const TagsButton = <T,>({ entityId, tag, updateSlice }: TagsButtonProps<T>) => {
+  const dispatch = useDispatch();
+  const markEntity = async (action: TagAction) => {
+    const updatedEntity = await tag(entityId, action);
+    dispatch(updateSlice(updatedEntity));
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,7 +36,7 @@ export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
           <Button
             variant={"ghost"}
             className="text-yellow-500"
-            onClick={() => mark(entityId, MarkAction.STAR)}
+            onClick={() => markEntity(TagAction.STAR)}
           >
             <Star /> Star
           </Button>
@@ -37,7 +46,7 @@ export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
           <Button
             variant={"ghost"}
             className="text-blue-700"
-            onClick={() => mark(entityId, MarkAction.WATCH)}
+            onClick={() => markEntity(TagAction.WATCH)}
           >
             <Eye /> Watch
           </Button>
@@ -48,7 +57,7 @@ export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
           <Button
             variant={"ghost"}
             className="text-orange-700"
-            onClick={() => mark(entityId, MarkAction.WARNING)}
+            onClick={() => markEntity(TagAction.WARNING)}
           >
             <TriangleAlert /> Warning
           </Button>
@@ -58,7 +67,7 @@ export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
           <Button
             variant={"ghost"}
             className="text-gray-700"
-            onClick={() => mark(entityId, MarkAction.INACTIVE)}
+            onClick={() => markEntity(TagAction.INACTIVE)}
           >
             <X /> Inactive
           </Button>
@@ -68,7 +77,7 @@ export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
           <Button
             variant={"ghost"}
             className="text-purple-700"
-            onClick={() => mark(entityId, MarkAction.OTHER)}
+            onClick={() => markEntity(TagAction.OTHER)}
           >
             <CircleQuestionMark /> Other
           </Button>
