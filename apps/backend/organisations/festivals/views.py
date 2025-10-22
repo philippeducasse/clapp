@@ -322,13 +322,13 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    @action(detail=True, methods=["patch"], url_path="mark/(?P<mark_action>[^/.]+)")
-    def mark(self, request: HttpRequest, pk: int, mark_action: str) -> Response:
-        print("NEW PATCH: ", mark_action)
+    @action(detail=True, methods=["patch"], url_path="tag/(?P<tag_action>[^/.]+)")
+    def tag(self, request: HttpRequest, pk: int, tag_action: str) -> Response:
+        print("NEW PATCH: ", tag_action)
         festival = self.get_object()
         valid_actions = ["STAR", "WARNING", "DANGER", "WATCH", "OTHER"]
 
-        if mark_action not in valid_actions:
+        if tag_action not in valid_actions:
             return Response(
                 {
                     "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
@@ -336,7 +336,7 @@ class FestivalViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        festival.tag = "" if mark_action == festival.tag else mark_action
+        festival.tag = "" if tag_action == festival.tag else tag_action
         festival.save()
         print("NEW FESTIVAL mark: ", festival.tag)
 
