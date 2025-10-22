@@ -324,9 +324,8 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["patch"], url_path="tag/(?P<tag_action>[^/.]+)")
     def tag(self, request: HttpRequest, pk: int, tag_action: str) -> Response:
-        print("NEW PATCH: ", tag_action)
         festival = self.get_object()
-        valid_actions = ["STAR", "WARNING", "DANGER", "WATCH", "OTHER"]
+        valid_actions = ["STAR", "WARNING", "INACTIVE", "WATCH", "OTHER"]
 
         if tag_action not in valid_actions:
             return Response(
@@ -338,7 +337,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
 
         festival.tag = "" if tag_action == festival.tag else tag_action
         festival.save()
-        print("NEW FESTIVAL mark: ", festival.tag)
 
         serializer = self.get_serializer(festival)
         return Response(serializer.data)
