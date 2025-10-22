@@ -61,11 +61,11 @@ const VenueForm = ({ action }: VenueFormProps) => {
     try {
       if (action === Action.EDIT) {
         const updatedVenue = { ...values, id: venueId } as Venue;
-        await venueApiService.updateVenue(updatedVenue);
+        await venueApiService.update(updatedVenue);
         dispatch(updateVenue(updatedVenue));
         router.push(`/venues/${venue?.id}`);
       } else {
-        const newVenue = await venueApiService.createVenue(values as Venue);
+        const newVenue = await venueApiService.create(values as Venue);
         router.push(`/venues/${newVenue?.id}`);
       }
     } catch (error) {

@@ -20,7 +20,7 @@ const initialState: ResidenciesState = {
 export const fetchResidencies = createAsyncThunk(
   "residencies/fetchResidencies",
   async () => {
-    const response = await residencyApiService.getResidencies();
+    const response = await residencyApiService.getAll();
     return response;
   }
 );

@@ -95,7 +95,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
           ...festival,
           contacts: updatedContacts,
         };
-        await festivalApiService.updateFestival(updatedFestival);
+        await festivalApiService.update(updatedFestival);
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
@@ -116,7 +116,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         //   festivalWithContacts
         // );
 
-        const newFestival = await festivalApiService.createFestival(
+        const newFestival = await festivalApiService.create(
           festivalWithContacts as unknown as Festival
         );
         console.log(newFestival);

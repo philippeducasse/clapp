@@ -7,7 +7,7 @@ export const refreshFestival = async (
   dispatch: AppDispatch
 ) => {
   try {
-    const newFestival = await festivalApiService.getFestival(festivalId);
+    const newFestival = await festivalApiService.get(festivalId);
     if (newFestival) {
       dispatch(setFestival(newFestival));
       dispatch(setSelectedFestival(newFestival));

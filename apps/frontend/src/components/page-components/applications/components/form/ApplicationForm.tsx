@@ -74,7 +74,7 @@ const ApplicationForm = () => {
     const { attachmentsSent, ...vals } = values;
     if (profile) {
       try {
-        const response = await festivalApiService.applyToFestival(
+        const response = await festivalApiService.apply(
           festivalId,
           vals as Application,
           attachmentsSent as File[],

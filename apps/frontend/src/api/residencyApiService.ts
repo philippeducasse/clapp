@@ -1,39 +1,66 @@
 import { Residency } from "@/interfaces/entities/Residency";
-import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import {
+  fetchRequest,
+  sendRequest,
+  deleteRequest,
+  sendFormDataRequest,
+  patchRequest,
+} from "./fetchHelper";
+import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { MarkAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/residencies/";
 
-const getResidencies = async (): Promise<PaginatedResponse<Residency>> => {
-  return await fetchRequest<PaginatedResponse<Residency>>(endpoint);
+const getAll = (): Promise<PaginatedResponse<Residency>> => {
+  return fetchRequest<PaginatedResponse<Residency>>(endpoint);
 };
 
-const getResidency = async (id: number): Promise<Residency> => {
-  return await fetchRequest(`${endpoint}${id}/`);
+const get = (id: number): Promise<Residency> => {
+  return fetchRequest(`${endpoint}${id}/`);
 };
 
-const createResidency = async (
-  residency: Residency
-): Promise<Residency> => {
-  return await sendRequest(`${endpoint}`, residency);
+const create = (residency: Residency): Promise<Residency> => {
+  return sendRequest(`${endpoint}`, residency, "POST", "Residency successfully created");
 };
 
-const deleteResidency = (residencyId: number): Promise<void> => {
+const remove = (residencyId: number): Promise<void> => {
   return deleteRequest(
     `${endpoint}${residencyId}`,
     "Residency successfully deleted"
   );
 };
 
-const updateResidency = async (
-  residency: Residency
-): Promise<Residency> => {
-  return await sendRequest(`${endpoint}/${residency.id}`, residency);
+const mark = (residencyId: number, action: MarkAction): Promise<Residency> => {
+  return patchRequest<Residency>(
+    `${endpoint}${residencyId}/mark/${action}/`,
+    "Residency successfully marked"
+  );
 };
 
-const enrichResidency = async (id: number): Promise<Residency> => {
+const update = (residency: Residency): Promise<Residency> => {
+  return sendRequest(`${endpoint}${residency.id}/`, residency, "PUT", "Residency successfully updated");
+};
+
+const enrich = (id: number): Promise<Residency> => {
   return fetchRequest(`${endpoint}${id}/enrich/`);
+};
+
+const apply = (
+  residencyId: number,
+  application: Application,
+  files: File[],
+  fileFieldName: string
+): Promise<{ message: string; applicationId: number }> => {
+  return sendFormDataRequest<ApplicationCreate, { message: string; applicationId: number }>(
+    `${endpoint}${residencyId}/apply/`,
+    application,
+    files,
+    fileFieldName,
+    "POST",
+    "Application successfully sent"
+  );
 };
 
 const generateEmail = (residencyId: number): Promise<{ message: string }> => {
@@ -45,29 +72,14 @@ const generateEmail = (residencyId: number): Promise<{ message: string }> => {
   );
 };
 
-export const residencyApiService: EntityApiService<Residency> & {
-  getResidencies: typeof getResidencies;
-  getResidency: typeof getResidency;
-  createResidency: typeof createResidency;
-  updateResidency: typeof updateResidency;
-  deleteResidency: typeof deleteResidency;
-  enrichResidency: typeof enrichResidency;
-  generateEmail: typeof generateEmail;
-} = {
-  // Interface methods
-  getAll: getResidencies,
-  get: getResidency,
-  create: createResidency,
-  update: updateResidency,
-  delete: deleteResidency,
-  enrich: enrichResidency,
-  // Legacy method names for backwards compatibility
-  getResidencies,
-  getResidency,
-  createResidency,
-  updateResidency,
-  deleteResidency,
-  enrichResidency,
-  // Entity-specific methods
+export const residencyApiService: EntityApiService<Residency> = {
+  getAll,
+  get,
+  create,
+  update,
+  remove,
+  mark,
+  enrich,
+  apply,
   generateEmail,
 };

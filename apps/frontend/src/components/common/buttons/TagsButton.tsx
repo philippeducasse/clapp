@@ -6,20 +6,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EntityApiService } from "@/interfaces/api/ApiService";
 import { MarkAction } from "@/interfaces/Enums";
 import { Bookmark, Eye, Star, TriangleAlert, X, CircleQuestionMark } from "lucide-react";
 
 interface TagsButtonProps<T> {
   entityId: number;
-  apiService: EntityApiService<T>;
+  mark: (entityId: number, action: MarkAction) => Promise<T>;
 }
 
-export const TagsButton = <T,>({ entityId, apiService }: TagsButtonProps<T>) => {
-  const patch = async (action: MarkAction) => {
-    await apiService.mark(entityId, action);
-  };
-
+export const TagsButton = <T,>({ entityId, mark }: TagsButtonProps<T>) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,33 +27,49 @@ export const TagsButton = <T,>({ entityId, apiService }: TagsButtonProps<T>) => 
           <Button
             variant={"ghost"}
             className="text-yellow-500"
-            onClick={() => patch(MarkAction.STAR)}
+            onClick={() => mark(entityId, MarkAction.STAR)}
           >
             <Star /> Star
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Button variant={"ghost"} className="text-blue-700">
+          <Button
+            variant={"ghost"}
+            className="text-blue-700"
+            onClick={() => mark(entityId, MarkAction.WATCH)}
+          >
             <Eye /> Watch
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
 
         <DropdownMenuItem>
-          <Button variant={"ghost"} className="text-orange-700">
+          <Button
+            variant={"ghost"}
+            className="text-orange-700"
+            onClick={() => mark(entityId, MarkAction.WARNING)}
+          >
             <TriangleAlert /> Warning
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Button variant={"ghost"} className="text-gray-700">
+          <Button
+            variant={"ghost"}
+            className="text-gray-700"
+            onClick={() => mark(entityId, MarkAction.INACTIVE)}
+          >
             <X /> Inactive
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <Button variant={"ghost"} className="text-purple-700">
+          <Button
+            variant={"ghost"}
+            className="text-purple-700"
+            onClick={() => mark(entityId, MarkAction.OTHER)}
+          >
             <CircleQuestionMark /> Other
           </Button>
         </DropdownMenuItem>

@@ -14,20 +14,15 @@ import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/festivals/";
 
-const getAllFestivals = (): // limit: number = 500,
-// offset: number = 0
-Promise<PaginatedResponse<Festival>> => {
-  return fetchRequest<PaginatedResponse<Festival>>(
-    // `${endpoint}?limit=${limit}&offset=${offset}`
-    endpoint
-  );
+const getAll = (): Promise<PaginatedResponse<Festival>> => {
+  return fetchRequest<PaginatedResponse<Festival>>(endpoint);
 };
 
-const getFestival = (festivalId: number): Promise<Festival> => {
+const get = (festivalId: number): Promise<Festival> => {
   return fetchRequest<Festival>(`${endpoint}${festivalId}/`);
 };
 
-const createFestival = (festival: Festival): Promise<Festival> => {
+const create = (festival: Festival): Promise<Festival> => {
   return sendRequest<Festival, Festival>(
     `${endpoint}`,
     festival,
@@ -36,22 +31,22 @@ const createFestival = (festival: Festival): Promise<Festival> => {
   );
 };
 
-const markFestival = (festivalId: number, action: MarkAction): Promise<Festival> => {
+const mark = (festivalId: number, action: MarkAction): Promise<Festival> => {
   return patchRequest<Festival>(
     `${endpoint}${festivalId}/mark/${action}/`,
     "Festival successfully marked"
   );
 };
 
-const deleteFestival = (festivalId: number): Promise<void> => {
+const remove = (festivalId: number): Promise<void> => {
   return deleteRequest(`${endpoint}${festivalId}`, "Festival successfully deleted");
 };
 
-const enrichFestival = (festivalId: number): Promise<Festival> => {
+const enrich = (festivalId: number): Promise<Festival> => {
   return fetchRequest<Festival>(`${endpoint}${festivalId}/enrich/`);
 };
 
-const updateFestival = (festival: Festival): Promise<Festival> => {
+const update = (festival: Festival): Promise<Festival> => {
   return sendRequest<Festival, Festival>(
     `${endpoint}${festival.id}/`,
     festival,
@@ -62,9 +57,9 @@ const updateFestival = (festival: Festival): Promise<Festival> => {
 
 const generateEmail = (
   festivalId: number,
-  data: { profile: Profile; selectedPerformanceIds: number[] }
+  data: { profile: Profile; selectedPerformanceIds?: number[] }
 ): Promise<{ message: string }> => {
-  return sendRequest<{ profile: Profile; selectedPerformanceIds: number[] }, { message: string }>(
+  return sendRequest<{ profile: Profile; selectedPerformanceIds?: number[] }, { message: string }>(
     `${endpoint}${festivalId}/generate_email/`,
     data,
     "POST",
@@ -72,7 +67,7 @@ const generateEmail = (
   );
 };
 
-const applyToFestival = (
+const apply = (
   festivalId: number,
   application: Application,
   files: File[],
@@ -88,34 +83,14 @@ const applyToFestival = (
   );
 };
 
-export const festivalApiService: EntityApiService<Festival> & {
-  getAllFestivals: typeof getAllFestivals;
-  getFestival: typeof getFestival;
-  createFestival: typeof createFestival;
-  updateFestival: typeof updateFestival;
-  deleteFestival: typeof deleteFestival;
-  markFestival: typeof markFestival;
-  enrichFestival: typeof enrichFestival;
-  generateEmail: typeof generateEmail;
-  applyToFestival: typeof applyToFestival;
-} = {
-  // Interface methods
-  getAll: getAllFestivals,
-  get: getFestival,
-  create: createFestival,
-  update: updateFestival,
-  delete: deleteFestival,
-  mark: markFestival,
-  enrich: enrichFestival,
-  // Legacy method names for backwards compatibility
-  getAllFestivals,
-  getFestival,
-  createFestival,
-  updateFestival,
-  deleteFestival,
-  markFestival,
-  enrichFestival,
-  // Entity-specific methods
+export const festivalApiService: EntityApiService<Festival> = {
+  getAll,
+  get,
+  create,
+  update,
+  remove,
+  mark,
+  enrich,
+  apply,
   generateEmail,
-  applyToFestival,
 };

@@ -30,7 +30,7 @@ const DetailsViewHeader = ({
       {actionElements && (
         <div className="flex gap-6 self-end mx-8 items-stretch">
           {actionElements}
-          {entityId && <TagsButton apiService={festivalApiService} entityId={entityId} />}
+          {entityId && <TagsButton mark={festivalApiService.mark} entityId={entityId} />}
         </div>
       )}
     </div>

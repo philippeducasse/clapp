@@ -4,25 +4,27 @@ import {
   sendRequest,
   deleteRequest,
   sendFormDataRequest,
+  patchRequest,
 } from "./fetchHelper";
 import {
   Application,
   ApplicationCreate,
 } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { MarkAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "http://localhost:8000/api/venues/";
 
-const getAllVenues = (): Promise<PaginatedResponse<Venue>> => {
+const getAll = (): Promise<PaginatedResponse<Venue>> => {
   return fetchRequest<PaginatedResponse<Venue>>(endpoint);
 };
 
-const getVenue = (venueId: number): Promise<Venue> => {
+const get = (venueId: number): Promise<Venue> => {
   return fetchRequest<Venue>(`${endpoint}${venueId}/`);
 };
 
-const createVenue = (venue: Venue): Promise<Venue> => {
+const create = (venue: Venue): Promise<Venue> => {
   return sendRequest<Venue, Venue>(
     `${endpoint}`,
     venue,
@@ -31,15 +33,22 @@ const createVenue = (venue: Venue): Promise<Venue> => {
   );
 };
 
-const deleteVenue = (venueId: number): Promise<void> => {
+const remove = (venueId: number): Promise<void> => {
   return deleteRequest(`${endpoint}${venueId}`, "Venue successfully deleted");
 };
 
-const enrichVenue = (id: number): Promise<Venue> => {
+const mark = (venueId: number, action: MarkAction): Promise<Venue> => {
+  return patchRequest<Venue>(
+    `${endpoint}${venueId}/mark/${action}/`,
+    "Venue successfully marked"
+  );
+};
+
+const enrich = (id: number): Promise<Venue> => {
   return fetchRequest<Venue>(`${endpoint}${id}/enrich/`);
 };
 
-const updateVenue = (venue: Venue): Promise<Venue> => {
+const update = (venue: Venue): Promise<Venue> => {
   return sendRequest<Venue, Venue>(
     `${endpoint}${venue.id}/`,
     venue,
@@ -57,7 +66,7 @@ const generateEmail = (venueId: number): Promise<{ message: string }> => {
   );
 };
 
-const applyToVenue = (
+const apply = (
   venueId: number,
   application: Application,
   files: File[],
@@ -73,31 +82,14 @@ const applyToVenue = (
   );
 };
 
-export const venueApiService: EntityApiService<Venue> & {
-  getAllVenues: typeof getAllVenues;
-  getVenue: typeof getVenue;
-  createVenue: typeof createVenue;
-  updateVenue: typeof updateVenue;
-  deleteVenue: typeof deleteVenue;
-  enrichVenue: typeof enrichVenue;
-  generateEmail: typeof generateEmail;
-  applyToVenue: typeof applyToVenue;
-} = {
-  // Interface methods
-  getAll: getAllVenues,
-  get: getVenue,
-  create: createVenue,
-  update: updateVenue,
-  delete: deleteVenue,
-  enrich: enrichVenue,
-  // Legacy method names for backwards compatibility
-  getAllVenues,
-  getVenue,
-  createVenue,
-  updateVenue,
-  deleteVenue,
-  enrichVenue,
-  // Entity-specific methods
+export const venueApiService: EntityApiService<Venue> = {
+  getAll,
+  get,
+  create,
+  update,
+  remove,
+  mark,
+  enrich,
+  apply,
   generateEmail,
-  applyToVenue,
 };

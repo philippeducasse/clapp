@@ -36,7 +36,7 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
       setIsLoading(true);
       // const offset = pagination.pageIndex * pagination.pageSize;
       const data = await festivalApiService
-        .getAllFestivals
+        .getAll
         // pagination.pageSize,
         // offset
         ();

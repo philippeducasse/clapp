@@ -6,6 +6,6 @@ export const refreshResidency = async (
   residencyId: number,
   dispatch: AppDispatch
 ) => {
-  const newResidency = await residencyApiService.getResidency(residencyId);
+  const newResidency = await residencyApiService.get(residencyId);
   dispatch(setResidency(newResidency));
 };

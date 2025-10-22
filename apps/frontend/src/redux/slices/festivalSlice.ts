@@ -17,13 +17,10 @@ const initialState: FestivalsState = {
   selectedFestival: undefined,
 };
 
-export const fetchFestivals = createAsyncThunk(
-  "festivals/fetchFestivals",
-  async () => {
-    const response = await festivalApiService.getAllFestivals();
-    return response;
-  }
-);
+export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
+  const response = await festivalApiService.getAll();
+  return response;
+});
 
 const festivalSlice = createSlice({
   name: "festivals",
@@ -50,18 +47,14 @@ const festivalSlice = createSlice({
     },
     updateFestival(state, action: PayloadAction<Festival>) {
       const { id } = action.payload;
-      const existingFestival = state.festivals.find(
-        (festival) => festival.id === id
-      );
+      const existingFestival = state.festivals.find((festival) => festival.id === id);
       if (existingFestival) {
         Object.assign(existingFestival, action.payload);
       }
     },
     deleteFestival(state, action: PayloadAction<number>) {
       console.log("deleting", action.payload);
-      state.festivals = state.festivals.filter(
-        (festival) => festival.id !== action.payload
-      );
+      state.festivals = state.festivals.filter((festival) => festival.id !== action.payload);
       // Clear selectedFestival if it's the one being deleted
       if (state.selectedFestival?.id === action.payload) {
         state.selectedFestival = undefined;
@@ -93,13 +86,9 @@ export const {
   deleteFestival,
 } = festivalSlice.actions;
 
-export const selectAllFestivals = (state: RootState) =>
-  state.festivals.festivals;
-export const selectFestivalsStatus = (state: RootState) =>
-  state.festivals.status;
+export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
+export const selectFestivalsStatus = (state: RootState) => state.festivals.status;
 export const selectFestival = (state: RootState, festivalId: number) =>
-  state.festivals.festivals.find(
-    (festival: Festival) => festival.id === festivalId
-  );
+  state.festivals.festivals.find((festival: Festival) => festival.id === festivalId);
 
 export default festivalSlice.reducer;

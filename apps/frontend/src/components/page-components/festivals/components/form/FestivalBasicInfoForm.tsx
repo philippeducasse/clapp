@@ -70,7 +70,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
     try {
       if (action === Action.EDIT) {
         const updatedFestival = { ...values, id: festivalId } as Festival;
-        await festivalApiService.updateFestival(updatedFestival);
+        await festivalApiService.update(updatedFestival);
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {

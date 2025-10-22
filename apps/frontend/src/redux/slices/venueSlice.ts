@@ -18,7 +18,7 @@ const initialState: VenuesState = {
 };
 
 export const fetchVenues = createAsyncThunk("venues/fetchVenues", async () => {
-  const response = await venueApiService.getAllVenues();
+  const response = await venueApiService.getAll();
   return response;
 });
 

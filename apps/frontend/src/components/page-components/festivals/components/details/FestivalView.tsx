@@ -63,7 +63,7 @@ const FestivalView = () => {
 
     try {
       if (itemName === "festival") {
-        await festivalApiService.deleteFestival(festivalId);
+        await festivalApiService.remove(festivalId);
         router.push("/festivals");
       } else if (itemName === "contact" && deleteIndex !== undefined) {
         // Remove contact at the given index
@@ -73,7 +73,7 @@ const FestivalView = () => {
           ...festival,
           contacts: updatedContacts,
         };
-        await festivalApiService.updateFestival(updatedFestival);
+        await festivalApiService.update(updatedFestival);
         dispatch(updateFestival(updatedFestival));
       }
     } catch (error) {

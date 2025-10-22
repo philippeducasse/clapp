@@ -69,14 +69,14 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
     try {
       if (action === Action.EDIT) {
         const updatedResidency = { ...values, id: residencyId } as Residency;
-        await residencyApiService.updateResidency(
+        await residencyApiService.update(
           residencyId,
           updatedResidency
         );
         dispatch(updateResidency(updatedResidency));
         router.push(`/residencies/${residency?.id}`);
       } else {
-        const newResidency = await residencyApiService.createResidency(
+        const newResidency = await residencyApiService.create(
           values as Residency
         );
         dispatch(addResidency(newResidency));

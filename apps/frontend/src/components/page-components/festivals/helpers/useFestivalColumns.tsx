@@ -22,7 +22,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const dispatch = useDispatch();
 
   const onConfirmDelete = async (id: number) => {
-    await festivalApiService.deleteFestival(id as number);
+    await festivalApiService.remove(id as number);
     dispatch(deleteFestival(id as number));
   };
 
