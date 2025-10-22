@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Flag } from "lucide-react";
+import { Flag, MessageSquare } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getFestivalBasicInfo } from "../../helpers/getBasicFestivalInfo";
-import { getFestivalDetails } from "../../helpers/getFestivalDetails";
+import { getFestivalDetails, getFestivalComments } from "../../helpers/getFestivalDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
@@ -114,6 +114,13 @@ const FestivalView = () => {
         data={getFestivalBasicInfo(festival)}
         tag={festival.tag}
       />
+      {festival.comments && (
+        <DetailsViewSection
+          title="Comments"
+          icon={<MessageSquare className="text-emerald-600 dark:text-emerald-400" />}
+          data={getFestivalComments(festival)}
+        />
+      )}
       <DetailsViewSection
         title="Festival details"
         icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}

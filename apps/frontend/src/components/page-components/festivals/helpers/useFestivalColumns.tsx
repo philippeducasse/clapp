@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
-import { capitalize } from "lodash";
+import _ from "lodash";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { festivalApiService } from "@/api/festivalApiService";
 import { deleteFestival } from "@/redux/slices/festivalSlice";
 import { useDispatch } from "react-redux";
+import { TagBadge } from "@/components/common/TagBadge";
 
 const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const router = useRouter();
@@ -43,14 +44,12 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
     {
       accessorKey: "currentYearApplications",
       header: getSortableHeader("Applied"),
-      size: 100,
+      size: 70,
       cell: ({ row }) => {
         const application = row.original?.currentYearApplication;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link href={`/applications/${application.id}`}>
-              {application.applicationDate}
-            </Link>
+            <Link href={`/applications/${application.id}`}>{application.applicationDate}</Link>
           </div>
         );
       },
@@ -58,13 +57,22 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
     {
       accessorKey: "country",
       header: getSortableHeader("Country"),
+      size: 70,
+    },
+    {
+      accessorKey: "tag",
+      header: getSortableHeader("Tag"),
       size: 50,
+      cell: ({ row }) => {
+        const tag = row.original?.tag;
+        return <TagBadge tag={tag} />;
+      },
     },
     {
       accessorKey: "festivalType",
       header: getSortableHeader("Type"),
-      size: 50,
-      cell: ({ row }) => capitalize(row.original.festivalType),
+      size: 70,
+      cell: ({ row }) => _.capitalize(_.lowerCase(row.original.festivalType)),
     },
     {
       accessorKey: "websiteUrl",
@@ -74,11 +82,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         const festival = row.original;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link
-              href={festival.websiteUrl ?? "#"}
-              target="_blank"
-              title={festival.websiteUrl}
-            >
+            <Link href={festival.websiteUrl ?? "#"} target="_blank" title={festival.websiteUrl}>
               {festival.websiteUrl}
             </Link>
           </div>

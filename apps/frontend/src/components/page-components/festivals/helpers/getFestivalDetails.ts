@@ -14,3 +14,9 @@ export const getFestivalDetails = (festival: Festival): SectionCellProps[] => {
     { title: "Application type", value: capitalize(festival.applicationType) },
   ];
 };
+
+export const getFestivalComments = (festival: Festival): SectionCellProps[] => {
+  if (!festival) return [];
+
+  return [{ title: "", value: festival?.comments }];
+};

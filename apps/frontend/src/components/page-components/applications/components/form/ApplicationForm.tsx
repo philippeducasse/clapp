@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useAppDispatch } from "@/redux/hook";
 import { RootState } from "@/redux/reducers";
-import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
+import { selectFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { refreshFestival } from "@/components/page-components/festivals/helpers/refreshFestival";
 import FormHeader from "@/components/common/form/FormHeader";
@@ -58,8 +58,6 @@ const ApplicationForm = () => {
   useEffect(() => {
     if (!festival) {
       refreshFestival(festivalId, dispatch);
-    } else {
-      dispatch(setSelectedFestival(festival));
     }
   }, [festivalId, festival, dispatch]);
 

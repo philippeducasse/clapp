@@ -48,27 +48,35 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
         return value.toString() || <span className="text-gray-400">-</span>;
     }
   };
-
   return (
     <div
       className={
         "grid grid-cols-2 py-3 gap-x-2 items-center border-gray-200 border-b last:border-b-0 text-sm leading-5 font-medium mx-8 my-2"
       }
     >
-      {title && (
-        <dt
-          className={`${
-            disabled
-              ? "text-gray-400"
-              : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium self-start"
-          }`}
-        >
-          {title}
-        </dt>
+      {title ? (
+        <>
+          <dt
+            className={`${
+              disabled
+                ? "text-gray-400"
+                : "text-gray-800 dark:text-foreground text-sm leading-5 font-medium self-start"
+            }`}
+          >
+            {title}
+          </dt>
+          <dd className="text-gray-700 dark:text-foreground">
+            {isLoading ? <Skeleton /> : renderContent()}
+          </dd>
+        </>
+      ) : (
+        <>
+          <div /> {/* Empty first column */}
+          <dd className="text-gray-700 dark:text-foreground">
+            {isLoading ? <Skeleton /> : renderContent()}
+          </dd>
+        </>
       )}
-      <dd className="text-gray-700 dark:text-foreground">
-        {isLoading ? <Skeleton /> : renderContent()}
-      </dd>
     </div>
   );
 };

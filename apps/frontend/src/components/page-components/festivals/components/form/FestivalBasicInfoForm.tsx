@@ -4,20 +4,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/entities/Festival";
-import {
-  createZodFormSchema,
-  sanitizeFormData,
-  getInitialValues,
-} from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/form/getFestivalFormFields";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateFestival,
-  selectFestival,
-  setSelectedFestival,
-} from "@/redux/slices/festivalSlice";
+import { updateFestival, selectFestival, setFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,9 +27,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
   const router = useRouter();
   const params = useParams();
   const festivalId = Number(params?.id);
-  const festival = useSelector((state: RootState) =>
-    selectFestival(state, festivalId)
-  );
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +64,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        dispatch(setSelectedFestival(values as Festival));
+        dispatch(setFestival(values as Festival));
         router.push(`/festivals/create/contact`);
       }
     } catch (error) {
@@ -102,7 +92,11 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         entity={festival}
         action={action}
         formTitle="Basic Information"
-        formSubtitle="Please provide basic festival information. You will provide contact information next."
+        formSubtitle={
+          action === Action.CREATE
+            ? "Please provide basic festival information. You will provide contact information next."
+            : ""
+        }
       />
     </>
   );
