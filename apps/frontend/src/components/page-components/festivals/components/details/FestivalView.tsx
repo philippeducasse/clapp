@@ -5,7 +5,7 @@ import { Flag } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectFestival, setSelectedFestival } from "@/redux/slices/festivalSlice";
+import { selectFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
@@ -38,10 +38,8 @@ const FestivalView = () => {
   useEffect(() => {
     if (!festival) {
       refreshFestival(festivalId, dispatch);
-    } else {
-      dispatch(setSelectedFestival(festival));
     }
-  }, [festivalId, dispatch]);
+  }, [festivalId, festival, dispatch]);
 
   if (!festival) {
     return <Skeleton />;

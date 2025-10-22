@@ -5,16 +5,10 @@ import { festivalApiService } from "@/api/festivalApiService";
 
 interface FestivalsState {
   festivals: Festival[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-  selectedFestival?: Festival;
 }
 
 const initialState: FestivalsState = {
   festivals: [],
-  status: "idle",
-  error: null,
-  selectedFestival: undefined,
 };
 
 export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
@@ -39,9 +33,6 @@ const festivalSlice = createSlice({
         state.festivals.push(action.payload);
       }
     },
-    setSelectedFestival(state, action: PayloadAction<Festival>) {
-      state.selectedFestival = action.payload;
-    },
     addFestival(state, action: PayloadAction<Festival>) {
       state.festivals.push(action.payload);
     },
@@ -54,39 +45,20 @@ const festivalSlice = createSlice({
     },
     deleteFestival(state, action: PayloadAction<number>) {
       state.festivals = state.festivals.filter((festival) => festival.id !== action.payload);
-      // Clear selectedFestival if it's the one being deleted
-      if (state.selectedFestival?.id === action.payload) {
-        state.selectedFestival = undefined;
-      }
     },
   },
+
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchFestivals.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchFestivals.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.festivals = action.payload;
-      })
-      .addCase(fetchFestivals.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchFestivals.fulfilled, (state, action) => {
+      state.festivals = action.payload.results;
+    });
   },
 });
 
-export const {
-  setFestivals,
-  setFestival,
-  addFestival,
-  updateFestival,
-  setSelectedFestival,
-  deleteFestival,
-} = festivalSlice.actions;
+export const { setFestivals, setFestival, addFestival, updateFestival, deleteFestival } =
+  festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
-export const selectFestivalsStatus = (state: RootState) => state.festivals.status;
 export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival: Festival) => festival.id === festivalId);
 
