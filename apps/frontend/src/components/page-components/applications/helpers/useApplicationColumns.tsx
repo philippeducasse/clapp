@@ -36,7 +36,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       cell: ({ row }) => {
         const date = row.original.createdAt;
         return (
-          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap ">
             <span>{new Date(date).toLocaleString()}</span>
           </div>
         );
