@@ -3,22 +3,23 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { TagAction } from "@/interfaces/Enums";
 import { Star, Eye, TriangleAlert, X, CircleQuestionMark } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 const tagBadgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "text-md [&>svg]:size-4",
   {
     variants: {
       tag: {
         [TagAction.STAR]:
-          "border-transparent bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/40",
         [TagAction.WATCH]:
-          "border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/40",
         [TagAction.WARNING]:
-          "border-transparent bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/40",
         [TagAction.INACTIVE]:
-          "border-transparent bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
+          "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600",
         [TagAction.OTHER]:
-          "border-transparent bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+          "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/40",
       },
     },
   }
@@ -42,13 +43,13 @@ function TagBadge({ className, tag, ...props }: TagBadgeProps) {
   const Icon = TAG_ICONS[tag as TagAction];
 
   return (
-    <span
+    <Badge
       data-slot="tag-badge"
       className={cn(tagBadgeVariants({ tag: tag as TagAction }), className)}
       {...props}
     >
       {Icon && <Icon />}
-    </span>
+    </Badge>
   );
 }
 

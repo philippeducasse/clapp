@@ -3,29 +3,30 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { ApplicationStatus } from "@/interfaces/entities/Application";
 import { capitalize } from "lodash";
+import { Badge } from "../ui/badge";
 const statusBadgeVariants = cva(
-  "inline-flex items-center justify-center rounded-md border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "",
   {
     variants: {
       status: {
         [ApplicationStatus.NOT_APPLIED]:
-          "border-transparent bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
+          "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600",
         [ApplicationStatus.APPLIED]:
-          "border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/40",
         [ApplicationStatus.IN_DISCUSSION]:
-          "border-transparent bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+          "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/40",
         [ApplicationStatus.REJECTED]:
-          "border-transparent bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+          "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800/40",
         [ApplicationStatus.IGNORED]:
-          "border-transparent bg-gray-300 text-gray-800 dark:bg-gray-600 dark:text-gray-400",
+          "bg-gray-300 text-gray-800 dark:bg-gray-600 dark:text-gray-400 border-gray-400 dark:border-gray-500",
         [ApplicationStatus.ACCEPTED]:
-          "border-transparent bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+          "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800/40",
         [ApplicationStatus.POSTPONED]:
-          "border-transparent bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/40",
         [ApplicationStatus.CANCELLED]:
-          "border-transparent bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/40",
         [ApplicationStatus.OTHER]:
-          "border-transparent bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
+          "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800/40",
       },
     },
     defaultVariants: {
@@ -46,13 +47,13 @@ function StatusBadge({ className, status, ...props }: StatusBadgeProps) {
   };
 
   return (
-    <span
+    <Badge
       data-slot="status-badge"
       className={cn(statusBadgeVariants({ status }), className)}
       {...props}
     >
       {formatStatus(status)}
-    </span>
+    </Badge>
   );
 }
 
