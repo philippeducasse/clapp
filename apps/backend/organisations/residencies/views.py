@@ -1,9 +1,11 @@
 from organisations.residencies.models import Residency
 from organisations.residencies.serializer import ResidencySerializer
-from rest_framework import viewsets
+from organisations.views import OrganisationViewSet
 
 
-class ResidencyViewSet(viewsets.ModelViewSet):
+class ResidencyViewSet(OrganisationViewSet):
     queryset = Residency.objects.all()
-    # Class used to convert JSON into Django Model objects and vice versa
     serializer_class = ResidencySerializer
+
+    def get_organisation_type_name(self) -> str:
+        return "residency"

@@ -1,33 +1,16 @@
-from datetime import datetime
-from typing import Any, Dict
+from typing import Optional
 from django.db.models import Exists, OuterRef, Subquery, QuerySet
-from django.core.mail import EmailMultiAlternatives
-from django.utils import timezone
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.utils.html import strip_tags
 from django.contrib.contenttypes.models import ContentType
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
+from organisations.views import OrganisationViewSet
+from organisations.models import Organisation
 from applications.models import Application
-from services.gemini_service import GeminiClient
-from .utils import (
-    generate_application_mail_prompt,
-    extract_fields_from_llm,
-    clean_festival_data,
-    generate_enrich_prompt,
-)
-from services.mistral_service import MistralClient
-from django.http import HttpRequest
-from performances.models import Performance
-from profiles.models import Profile
 from django_filters.rest_framework import DjangoFilterBackend
+from .utils import generate_enrich_prompt as generate_festival_enrich_prompt
 
 
-# Provides CRUD operations for Festival
-class FestivalViewSet(viewsets.ModelViewSet):
-    # Class used to convert JSON into Django Model objects and vice versa
+class FestivalViewSet(OrganisationViewSet):
     serializer_class = FestivalSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["country", "festival_type"]
@@ -36,7 +19,6 @@ class FestivalViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
-        # annotates all festival objects
         festival_content_type = ContentType.objects.get_for_model(Festival)
         queryset = Festival.objects.annotate(
             has_application_this_year=Exists(
@@ -63,280 +45,11 @@ class FestivalViewSet(viewsets.ModelViewSet):
         )
         return queryset
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self._mistral_client = None
-        self._gemini_client = None
+    def get_organisation_type_name(self) -> str:
+        return "festival"
 
-    @property
-    def mistral_client(self) -> MistralClient:
-        if self._mistral_client is None:
-            self._mistral_client = MistralClient()
-        return self._mistral_client
-
-    @property
-    def gemini_client(self) -> GeminiClient:
-        if self._gemini_client is None:
-            self._gemini_client = GeminiClient()
-        return self._gemini_client
-
-    # Adds an endpoint to default queryset. Detail means it affects only one entity
-    @action(detail=True, methods=["get"])
-    def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
-        # Retrieves the Festival instance corresponding to the given pk (primary key) from the URL.
-        festival: Festival = self.get_object()
-        query = f"{festival.website_url} {festival.name} {festival.country} {datetime.now().year}"
-
-        search_results = self.gemini_client.search(query=query)
-
-        prompt: str = generate_enrich_prompt(festival, search_results)
-        llm_response: str = self.mistral_client.chat(prompt=prompt)
-        print("RESPONSE", llm_response)
-
-        updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
-
-        # Update the fields with LLM-provided values (including contacts)
-        for field, value in updated_fields.items():
-            if field not in [
-                "sources",
-                "updated_fields",
-                "contacts",
-            ]:  # Skip meta fields & contact field
-                setattr(festival, field, value)
-
-        clean_festival_data(festival)
-        enriched_data = FestivalSerializer(festival).data
-
-        if "contacts" in updated_fields:
-            enriched_data["contacts"] = updated_fields["contacts"]
-
-        return Response(enriched_data)
-
-    @action(detail=True, methods=["post"])
-    def apply(self, request: HttpRequest, pk: int) -> Response:
-        try:
-            festival = Festival.objects.get(pk=pk)
-        except Festival.DoesNotExist:
-            return Response(
-                {"error": "Festival not found"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        recipients_input = request.data.get("recipients", "")
-
-        # Parse recipients (assuming comma-separated emails)
-        recipient_emails = [
-            email.strip() for email in recipients_input.split(",") if email.strip()
-        ]
-
-        # Validate we have at least one recipient
-        if not recipient_emails:
-            return Response(
-                {"error": "At least one recipient email is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Optional: Validate email format
-        from django.core.validators import validate_email
-        from django.core.exceptions import ValidationError
-
-        try:
-            for email in recipient_emails:
-                validate_email(email)
-        except ValidationError:
-            return Response(
-                {"error": "Invalid email address format"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            message = request.data.get("message")
-            subject = request.data.get("email_subject")
-
-            attachments = request.FILES.getlist("attachments_sent")
-            performances = request.data.get("performances")
-            if not message or not subject:
-                return Response(
-                    {"error": "Message and/or subject not found"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            # Calculate the application year
-            current_date = timezone.now().date()
-            application_year = current_date.year
-            if current_date.month >= 9:
-                application_year += 1
-
-            # Check if an application already exists for the festival and year
-            festival_content_type = ContentType.objects.get_for_model(Festival)
-            applications = Application.objects.filter(
-                content_type=festival_content_type, object_id=festival.pk
-            )
-
-            # Check if an application already exists
-            application = next(
-                (a for a in applications if a.application_year == application_year),
-                None,
-            )
-
-            if application:
-                if application.application_status != "DRAFT":
-                    return Response(
-                        "Application already exists for this festival and year",
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-                else:
-                    application.message = message
-                    application.email_subject = subject
-                    application.save()
-            else:
-                # TODO: refactor this once more than one user
-                default_profile = Profile.objects.get(id=2)
-
-                application = Application.objects.create(
-                    organisation=festival,
-                    application_date=timezone.now().date(),
-                    application_status="DRAFT",
-                    message=message,
-                    email_subject=subject,
-                    profile=default_profile,
-                )
-
-            try:
-                text_content = strip_tags(application.message)  # plain text fallback
-                html_content = application.message  # Tiptap HTML
-
-                email = EmailMultiAlternatives(
-                    subject,
-                    text_content,
-                    "info@philippeducasse.com",
-                    recipient_emails,
-                    # ["ducassephi@hotmail.fr"],
-                    bcc=["info@philippeducasse.com"],
-                )
-                email.attach_alternative(html_content, "text/html")
-
-                if performances:
-                    performance_objects = Performance.objects.filter(
-                        id__in=performances.split(",")
-                    )
-                    for p in performance_objects:
-                        if p.dossiers:
-                            for dossier in p.dossiers.all():
-                                print("attaching 2")
-                                attachments.append(dossier.file)
-                                filename = dossier.file.name.split("/")[-1]
-                                # Open and attach the file from storage
-                                email.attach(
-                                    filename,
-                                    dossier.file.read(),
-                                    "application/pdf",
-                                )
-
-                for file in attachments:
-                    print("file:", file)
-                    if hasattr(file, "content_type"):
-                        # It's an uploaded file from request.FILES
-                        email.attach(file.name, file.read(), file.content_type)
-
-                email.send(fail_silently=False)
-                application.application_status = "APPLIED"
-                application.save()
-                return Response(
-                    {
-                        "message": "Application sent successfully",
-                        "applicationId": application.id,
-                    },
-                    status=200,
-                )
-            except Exception as e:
-                return Response(
-                    {"error": f"Email failed to send: {str(e)}"}, status=500
-                )
-
-        except Exception as e:
-            return Response(
-                {
-                    "error": "Failed to process application",
-                    "details": str(e),
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    @action(detail=True, methods=["post"])
-    def generate_email(self, request: HttpRequest, pk: int) -> Response:
-        try:
-            festival = Festival.objects.get(pk=pk)
-            profile = Profile.objects.get(
-                id=2
-            )  # TODO: Use request.user.profile in production
-
-            performance_ids = request.data.get("selected_performance_ids")
-
-            # performances = data.performances
-            performance_objects = []
-
-            # Parse performance IDs and fetch objects if provided
-            if performance_ids:
-                if isinstance(performance_ids, str):
-                    performance_ids = [
-                        int(id.strip())
-                        for id in performance_ids.split(",")
-                        if id.strip()
-                    ]
-                elif isinstance(performance_ids, list):
-                    performance_ids = performance_ids
-                else:
-                    performance_ids = [performance_ids]
-
-                performance_objects = list(
-                    Performance.objects.filter(id__in=performance_ids)
-                )
-
-                if not performance_objects:
-                    pass
-
-            # Generate email content (works with empty list too)
-            prompt = generate_application_mail_prompt(
-                festival, profile, performance_objects
-            )
-            message = self.mistral_client.chat(prompt=prompt)
-
-            return Response({"message": message}, status=status.HTTP_200_OK)
-
-        except Festival.DoesNotExist:
-            return Response(
-                {"error": "Festival not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-        except Profile.DoesNotExist:
-            return Response(
-                {"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-        except ValueError as e:
-            return Response(
-                {"error": f"Invalid performance ID format: {str(e)}"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            return Response(
-                {"error": f"Failed to generate email: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    @action(detail=True, methods=["patch"], url_path="tag/(?P<tag_action>[^/.]+)")
-    def tag(self, request: HttpRequest, pk: int, tag_action: str) -> Response:
-        festival = self.get_object()
-        valid_actions = ["STAR", "WARNING", "INACTIVE", "WATCH", "OTHER"]
-
-        if tag_action not in valid_actions:
-            return Response(
-                {
-                    "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        festival.tag = "" if tag_action == festival.tag else tag_action
-        festival.save()
-
-        serializer = self.get_serializer(festival)
-        return Response(serializer.data)
+    def get_enrich_prompt(
+        self, organisation: Organisation, search_results: Optional[str]
+    ) -> str:
+        """Use festival-specific enrichment prompt."""
+        return generate_festival_enrich_prompt(organisation, search_results)
