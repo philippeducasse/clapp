@@ -24,17 +24,23 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
         const application = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/applications/${application.id}`}>
-              {application.emailSubject}
-            </Link>
+            <Link href={`/applications/${application.id}`}>{application.emailSubject}</Link>
           </div>
         );
       },
     },
     {
       accessorKey: "createdAt",
-      header: "Application date",
+      header: getSortableHeader("Application date"),
       size: 110,
+      cell: ({ row }) => {
+        const date = row.original.createdAt;
+        return (
+          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+            <span>{new Date(date).toLocaleString()}</span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "applicationStatus",
@@ -85,11 +91,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
             >
               <Pencil />
             </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 hover:text-red-500"
-            >
+            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
               <Trash />
             </Button>
           </div>

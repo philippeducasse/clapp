@@ -12,7 +12,7 @@ interface DataTableHeaderProps<TData> {
   setGlobalFilter: (value: string) => void;
   entityName: string;
   table: Table<TData>;
-  filters: FilterConfig[];
+  filters?: FilterConfig[];
 }
 
 const DataTableHeader = <TData,>({
@@ -47,12 +47,14 @@ const DataTableHeader = <TData,>({
           />
         </div>
       </div>
-      <TableFilters
-        table={table}
-        filters={filters}
-        open={openFilterDialog}
-        onOpenChange={setOpenFilterDialog}
-      />
+      {filters && (
+        <TableFilters
+          table={table}
+          filters={filters}
+          open={openFilterDialog}
+          onOpenChange={setOpenFilterDialog}
+        />
+      )}
     </div>
   );
 };
