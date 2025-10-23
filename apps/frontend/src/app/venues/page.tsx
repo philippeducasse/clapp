@@ -5,7 +5,7 @@ const VenuesPage = async () => {
   const data = await venueApiService.getAll();
   return (
     <div className="container mx-auto py-10">
-      <VenuesTable venues={data} />
+      <VenuesTable venues={data.results} />
     </div>
   );
 };
