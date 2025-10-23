@@ -5,7 +5,7 @@ import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
 import { setApplications } from "@/redux/slices/applicationSlice";
-import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { EntityName } from "@/interfaces/Enums";
 
 interface ApplicationsTableProps {
@@ -26,10 +26,6 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const columns = useApplicationColumns();
   // onEdit
   return (
-    <DataTable
-      columns={columns}
-      data={initialData.results}
-      entityName={EntityName.APPLICATION}
-    />
+    <DataTable columns={columns} data={initialData.results} entityName={EntityName.APPLICATION} />
   );
 };

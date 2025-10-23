@@ -6,6 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
+  ColumnFiltersState,
   getFilteredRowModel,
   SortingState,
   getSortedRowModel,
@@ -22,6 +23,7 @@ import { Card } from "@/components/ui/card";
 import TablePagination from "./TablePagination";
 import { EntityName } from "@/interfaces/Enums";
 import DataTableHeader from "./DataTableHeader";
+import { FilterConfig } from "@/interfaces/table/FilterCongig";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,6 +36,7 @@ interface DataTableProps<TData, TValue> {
   setPagination?: (pagination: { pageIndex: number; pageSize: number }) => void;
   totalCount?: number;
   isLoading?: boolean;
+  filters?: FilterConfig[];
 }
 
 export function DataTable<TData, TValue>({
@@ -43,10 +46,12 @@ export function DataTable<TData, TValue>({
   pagination: externalPagination,
   setPagination: setExternalPagination,
   totalCount,
+  filters,
 }: // isLoading = false,
 DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [internalPagination, setInternalPagination] = useState({
     pageIndex: 0,
     pageSize: 30,
@@ -65,16 +70,15 @@ DataTableProps<TData, TValue>) {
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
+    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
     manualPagination: isServerSide,
-    pageCount:
-      isServerSide && totalCount
-        ? Math.ceil(totalCount / pagination.pageSize)
-        : undefined,
+    pageCount: isServerSide && totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
     state: {
       sorting,
       globalFilter,
+      columnFilters,
       pagination,
     },
   });
@@ -86,22 +90,18 @@ DataTableProps<TData, TValue>) {
           globalFilter={globalFilter}
           setGlobalFilter={setGlobalFilter}
           entityName={entityName}
+          table={table}
+          filters={filters}
         />
         <Table style={{ tableLayout: "fixed" }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{ width: `${header.getSize()}px` }}
-                  >
+                  <TableHead key={header.id} style={{ width: `${header.getSize()}px` }}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -110,29 +110,17 @@ DataTableProps<TData, TValue>) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      style={{ width: `${cell.column.getSize()}px` }}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                    <TableCell key={cell.id} style={{ width: `${cell.column.getSize()}px` }}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results
                 </TableCell>
               </TableRow>

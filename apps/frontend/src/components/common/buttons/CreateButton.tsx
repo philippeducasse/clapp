@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 interface CreateButtonProps {
   href: string;
   label?: string;
-  className: string;
+  className?: string;
 }
 
 const CreateButton = ({ label, href, className }: CreateButtonProps) => {

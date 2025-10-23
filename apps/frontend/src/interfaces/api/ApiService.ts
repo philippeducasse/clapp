@@ -1,4 +1,4 @@
-import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { Application } from "@/interfaces/entities/Application";
 import { Profile } from "../entities/Profile";

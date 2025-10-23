@@ -1,12 +1,6 @@
-import {
-  fetchRequest,
-  sendRequest,
-  deleteRequest,
-} from "./fetchHelper";
-import {
-  Application,
-} from "@/interfaces/entities/Application";
-import { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import { Application } from "@/interfaces/entities/Application";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/applications/";
 
@@ -39,7 +33,6 @@ const updateApplication = (application: Application): Promise<Application> => {
     "Application successfully updated"
   );
 };
-
 
 export const applicationApiService = {
   getAllApplications,

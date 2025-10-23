@@ -13,6 +13,7 @@ import { festivalApiService } from "@/api/festivalApiService";
 import { deleteFestival } from "@/redux/slices/festivalSlice";
 import { useDispatch } from "react-redux";
 import { TagBadge } from "@/components/common/TagBadge";
+import { Application } from "@/interfaces/entities/Application";
 
 const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const router = useRouter();
@@ -46,7 +47,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       header: getSortableHeader("Applied"),
       size: 70,
       cell: ({ row }) => {
-        const application = row.original?.currentYearApplication;
+        const application = row.original?.currentYearApplication as Application;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
             <Link href={`/applications/${application.id}`}>{application.applicationDate}</Link>
