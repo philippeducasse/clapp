@@ -9,9 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
+import { getFilterInput } from "@/helpers/FilterHelper";
 
 interface TableFiltersProps<TData> {
   table: Table<TData>;
@@ -20,7 +20,7 @@ interface TableFiltersProps<TData> {
   onOpenChange: () => void;
 }
 
-const TableFilters = <TData,>({ table, filters, open, onOpenChange }: TableFiltersProps<TData>) => {
+function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFiltersProps<TData>) {
   const hasActiveFilters = filters.some((filter) => {
     const column = table.getColumn(filter.column);
     return column?.getFilterValue();
@@ -39,12 +39,8 @@ const TableFilters = <TData,>({ table, filters, open, onOpenChange }: TableFilte
               return (
                 <div key={filter.column} className="flex items-center gap-1">
                   <div className="relative">
-                    <Input
-                      placeholder={`Filter by ${filter.label.toLowerCase()}`}
-                      value={value}
-                      onChange={(event) => column?.setFilterValue(event.target.value || undefined)}
-                      className="h-8 w-[200px] pr-8"
-                    />
+                    {getFilterInput(filter, value, column)}
+
                     {value && (
                       <Button
                         variant="ghost"
@@ -80,6 +76,6 @@ const TableFilters = <TData,>({ table, filters, open, onOpenChange }: TableFilte
       </DialogContent>
     </Dialog>
   );
-};
+}
 
 export default TableFilters;

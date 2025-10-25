@@ -11,3 +11,12 @@ export enum ControlledFormElementType {
   TEXT_EDITOR = "TEXT_EDITOR",
   MULTI_SELECT = "MULTI_SELECT",
 }
+
+export enum FilterType {
+  NUMBER = "NUMBER",
+  SELECT = "SELECT",
+  DATE = "DATE",
+  TEXT = "TEXT",
+  BOOLEAN = "BOOLEAN",
+  MULTI_SELECT = "MULTI_SELECT",
+}

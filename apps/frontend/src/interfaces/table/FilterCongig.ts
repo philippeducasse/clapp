@@ -1,9 +1,10 @@
 import { SelectOptions } from "../forms/ControlledFormElement";
+import { FilterType} from "@/interfaces/forms/ControlledFormElementType";
 
 export interface FilterConfig {
   column: string;
   label: string;
-  type: "string" | "date" | "select" | "boolean" | "number";
+  type: FilterType
   options?: SelectOptions[];
   multiple: boolean;
 }
