@@ -44,17 +44,17 @@ const DataTableHeader = <TData,>({
     if (reduxGlobalFilter) {
       table.setGlobalFilter(reduxGlobalFilter);
     }
-  }, []);
+  }, [reduxFilters, reduxGlobalFilter]);
 
   useEffect(() => {
     const columnFilters = table.getState().columnFilters;
     dispatch(setColumnFilters(columnFilters));
-  }, [table]);
+  }, [table, dispatch]);
 
   useEffect(() => {
     const globalFilter = table.getState().globalFilter ?? "";
     dispatch(setReduxGlobalFilter(globalFilter));
-  }, [table]);
+  }, [table, dispatch]);
 
   const activeFilters =
     filters
