@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Table } from "@tanstack/react-table";
+import { Column, Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
@@ -29,16 +29,16 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-1/3 border-2 ">
-        <DialogHeader className="items-center">
+        <DialogHeader className="items-center w-full">
           <DialogTitle>Set filters</DialogTitle>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex gap-2 flex-col w-full mt-8">
             {filters.map((filter) => {
-              const column = table.getColumn(filter.column);
+              const column = table.getColumn(filter.column) as Column<TData>;
               const value = (column?.getFilterValue() as string) ?? "";
 
               return (
-                <div key={filter.column} className="flex items-center gap-1">
-                  <div className="relative">
+                <div key={filter.column} className="flex gap-1">
+                  <div className="flex relative w-full justify-evenly items-center">
                     {getFilterInput(filter, value, column)}
 
                     {value && (
@@ -69,9 +69,8 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Close</Button>
           </DialogClose>
-          <Button>Set</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
