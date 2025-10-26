@@ -12,20 +12,16 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { getFilterInput } from "@/helpers/FilterHelper";
+import { Dispatch, SetStateAction } from "react";
 
 interface TableFiltersProps<TData> {
   table: Table<TData>;
   filters: FilterConfig[];
   open: boolean;
-  onOpenChange: () => void;
+  onOpenChange: Dispatch<SetStateAction<boolean>>;
 }
 
 function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFiltersProps<TData>) {
-  const hasActiveFilters = filters.some((filter) => {
-    const column = table.getColumn(filter.column);
-    return column?.getFilterValue();
-  });
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-1/3 border-2 ">
@@ -55,16 +51,6 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
                 </div>
               );
             })}
-            {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 px-2 text-xs"
-                onClick={() => table.resetColumnFilters()}
-              >
-                Clear all
-              </Button>
-            )}
           </div>
         </DialogHeader>
         <DialogFooter>

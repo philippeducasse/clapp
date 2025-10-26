@@ -88,7 +88,6 @@ DataTableProps<TData, TValue>) {
       <Card className="rounded-md border px-6">
         <DataTableHeader
           globalFilter={globalFilter}
-          setGlobalFilter={setGlobalFilter}
           entityName={entityName}
           table={table}
           filters={filters}

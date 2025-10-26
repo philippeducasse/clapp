@@ -2,13 +2,18 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Festival } from "@/interfaces/entities/Festival";
 import { RootState } from "../store";
 import { festivalApiService } from "@/api/festivalApiService";
+import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 
 interface FestivalsState {
   festivals: Festival[];
+  filters: ColumnFilter[];
+  globalFilter: string;
 }
 
 const initialState: FestivalsState = {
   festivals: [],
+  filters: [],
+  globalFilter: "",
 };
 
 export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
@@ -46,6 +51,31 @@ const festivalSlice = createSlice({
     deleteFestival(state, action: PayloadAction<number>) {
       state.festivals = state.festivals.filter((festival) => festival.id !== action.payload);
     },
+    setColumnFilters(state, action: PayloadAction<ColumnFilter[]>) {
+      state.filters = action.payload;
+    },
+    setColumnFilter(state, action: PayloadAction<ColumnFilter>) {
+      const existingIndex = state.filters.findIndex((filter) => filter.id === action.payload.id);
+      if (existingIndex >= 0) {
+        if (action.payload.value === undefined || action.payload.value === "") {
+          // Remove filter if value is undefined or empty
+          state.filters.splice(existingIndex, 1);
+        } else {
+          state.filters[existingIndex] = action.payload;
+        }
+      } else if (action.payload.value !== undefined && action.payload.value !== "") {
+        state.filters.push(action.payload);
+      }
+    },
+    removeColumnFilter(state, action: PayloadAction<string>) {
+      state.filters = state.filters.filter((filter) => filter.id !== action.payload);
+    },
+    clearColumnFilters(state) {
+      state.filters = [];
+    },
+    setGlobalFilter(state, action: PayloadAction<string>) {
+      state.globalFilter = action.payload;
+    },
   },
 
   extraReducers: (builder) => {
@@ -55,11 +85,23 @@ const festivalSlice = createSlice({
   },
 });
 
-export const { setFestivals, setFestival, addFestival, updateFestival, deleteFestival } =
-  festivalSlice.actions;
+export const {
+  setFestivals,
+  setFestival,
+  addFestival,
+  updateFestival,
+  deleteFestival,
+  setColumnFilters,
+  setColumnFilter,
+  removeColumnFilter,
+  clearColumnFilters,
+  setGlobalFilter,
+} = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
 export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival: Festival) => festival.id === festivalId);
+export const selectColumnFilters = (state: RootState) => state.festivals.filters;
+export const selectGlobalFilter = (state: RootState) => state.festivals.globalFilter;
 
 export default festivalSlice.reducer;

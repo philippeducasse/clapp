@@ -16,8 +16,6 @@ export const getFilterInput = <TData,>(
   value: string,
   column: Column<TData>
 ) => {
-  console.log("FILTER:", filterConfig, "VAL:", value);
-
   const renderInput = () => {
     switch (filterConfig.type) {
       case FilterType.SELECT:
