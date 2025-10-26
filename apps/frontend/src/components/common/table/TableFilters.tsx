@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { getFilterInput } from "@/helpers/FilterHelper";
 import { Dispatch, SetStateAction } from "react";
+import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
 
 interface TableFiltersProps<TData> {
   table: Table<TData>;
@@ -30,14 +31,16 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
           <div className="flex gap-2 flex-col w-full mt-8">
             {filters.map((filter) => {
               const column = table.getColumn(filter.column) as Column<TData>;
-              const value = (column?.getFilterValue() as string) ?? "";
+              const value = filter.type === FilterType.MULTI_SELECT
+                ? (column?.getFilterValue() as string[]) ?? []
+                : (column?.getFilterValue() as string) ?? "";
 
               return (
-                <div key={filter.column} className="flex gap-1">
+                <div key={filter.column} className=" gap-1">
                   <div className="flex relative w-full justify-evenly items-center">
                     {getFilterInput(filter, value, column)}
 
-                    {value && (
+                    {value && filter.type !== FilterType.MULTI_SELECT && (
                       <Button
                         variant="ghost"
                         size="sm"

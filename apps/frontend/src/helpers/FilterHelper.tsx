@@ -11,10 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Column } from "@tanstack/table-core";
 import { Switch } from "@/components/ui/switch";
+import { MultiSelect } from "@/components/ui/multi-select";
 
 export const getFilterInput = <TData,>(
   filterConfig: FilterConfig,
-  value: string,
+  value: string | string[],
   column: Column<TData>
 ) => {
   const renderInput = () => {
@@ -22,7 +23,7 @@ export const getFilterInput = <TData,>(
       case FilterType.SELECT:
         return filterConfig.options ? (
           <Select
-            value={value}
+            value={typeof value === "string" ? value : ""}
             onValueChange={(event) => column?.setFilterValue(event || undefined)}
           >
             <SelectTrigger>
@@ -40,21 +41,14 @@ export const getFilterInput = <TData,>(
 
       case FilterType.MULTI_SELECT:
         return filterConfig.options ? (
-          <Select
-            value={value}
-            onValueChange={(event) => column?.setFilterValue(event || undefined)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={`Select ${filterConfig.label}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {filterConfig.options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <MultiSelect
+            options={filterConfig.options}
+            defaultValue={Array.isArray(value) ? value : []}
+            onValueChange={(values) => {
+              console.log("VALUES:", values);
+              column?.setFilterValue(values.length > 0 ? values : undefined);
+            }}
+          />
         ) : null;
 
       case FilterType.NUMBER:
@@ -101,8 +95,8 @@ export const getFilterInput = <TData,>(
   if (!input) return null;
 
   return (
-    <div className=" flex w-full justify-evenly items-center">
-      <Label className="text-sm font-medium">{filterConfig.label}</Label>
+    <div className="grid gap-2 w-full">
+      <Label className="text-emerald-700 dark:text-emerald-400">{filterConfig.label}</Label>
       {input}
     </div>
   );
