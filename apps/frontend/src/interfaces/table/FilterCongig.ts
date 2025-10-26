@@ -6,7 +6,7 @@ export interface FilterConfig {
   label: string;
   type: FilterType;
   options?: SelectOptions[];
-  multiple: boolean;
+  multiple?: boolean;
 }
 
 export interface ColumnFilter {

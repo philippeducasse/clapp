@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Column } from "@tanstack/table-core";
+import { Switch } from "@/components/ui/switch";
 
 export const getFilterInput = <TData,>(
   filterConfig: FilterConfig,
@@ -73,6 +74,13 @@ export const getFilterInput = <TData,>(
             value={value || ""}
             onChange={(event) => column?.setFilterValue(event || undefined)}
             placeholder={filterConfig.label}
+          />
+        );
+      case FilterType.BOOLEAN:
+        return (
+          <Switch
+            value={value || ""}
+            onChange={(event) => column?.setFilterValue(event || undefined)}
           />
         );
 

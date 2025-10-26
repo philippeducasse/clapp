@@ -1,7 +1,7 @@
-import {getOptions} from "@/helpers/formHelper";
-import {TagAction} from "@/interfaces/Enums";
-import {FilterConfig} from "@/interfaces/table/FilterCongig";
-import {FilterType} from "@/interfaces/forms/ControlledFormElementType";
+import { getOptions } from "@/helpers/formHelper";
+import { TagAction } from "@/interfaces/Enums";
+import { FilterConfig } from "@/interfaces/table/FilterCongig";
+import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
 
 export const getFestivalFilters = (): FilterConfig[] => {
   return [
@@ -16,8 +16,22 @@ export const getFestivalFilters = (): FilterConfig[] => {
       column: "country",
       label: "Country",
       type: FilterType.MULTI_SELECT,
-      options: [{label: "France", value:"france"}, {label: "Germany", value:"germany"}],
+      options: [
+        { label: "France", value: "france" },
+        { label: "Germany", value: "germany" },
+        { label: "Italy", value: "italy" },
+        { label: "Poland", value: "poland" },
+        { label: "Netherlands", value: "netherlands" },
+        { label: "Switzerland", value: "switzerland" },
+        { label: "Austria", value: "austria" },
+        { label: "Denmark", value: "denmark" },
+      ],
       multiple: true,
+    },
+    {
+      column: "currentYearApplications",
+      label: "Applied?",
+      type: FilterType.BOOLEAN,
     },
   ];
 };
