@@ -1,12 +1,10 @@
 # TODOS
 
 - Add update button to editfestival page
-- add rerouting after application submission
-- fix display on festivals tableS
 - add filtering to festivals slice
-- add multiple entries for emailcontact []
-- fix generate email promt: language , content
-  This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+- add redux update on festival delete (from table)
+
+  This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).#
 
 ## Getting Started
 
