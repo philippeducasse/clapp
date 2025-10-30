@@ -426,7 +426,19 @@ def generate_application_mail_prompt(
 
         EXAMPLE OUTPUT FORMAT:
 
-        Dear Carnaval Sztukmistrzów Team,<br><br>I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant, family-friendly performances.<br><br>"Ah Bah Bravo!" is a whirlwind of acrobatic butt hullahooping, flaming staff juggling (while handstanding!), and playful storytelling—perfect for your festival's theme of *running away with the circus*. It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment. With its street-show energy and universal appeal, it would be a fantastic addition to your free outdoor program or buskers' competition.<br><br>Here you can see the <a href="https://example.com/trailer">trailer</a><br><br>The dossier is attached with full details, photos, and technical requirements. I'd love to bring this show to Lublin and can't wait to hear your thoughts—feel free to reach out for any questions!<br><br>Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com<br>Instagram & Facebook
+        Dear Carnaval Sztukmistrzów Team,<br><br>I am Philippe Ducasse,
+        a circus artist based in Berlin with a passion for blending juggling,
+        mime, and clowning into vibrant, family-friendly performances.<br><br>
+        "Ah Bah Bravo!" is a whirlwind of acrobatic butt hullahooping, flaming staff juggling (while handstanding!),
+        and playful storytelling—perfect for your festival's theme of running away with the circus.
+        It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace
+        the magic of the moment. With its street-show energy and universal appeal,
+        it would be a fantastic addition to your free outdoor program or buskers' competition.
+        <br><br>Here you can see the <a href="https://example.com/trailer">trailer</a><br><br>
+        The dossier is attached with full details, photos, and technical requirements.
+        I'd love to bring this show to Lublin and can't wait to hear your thoughts—feel free to reach out for any questions!<br><br>
+        Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com
+        <br>Instagram & Facebook
 
         """
     return prompt.strip()
