@@ -28,7 +28,7 @@ export const getApplicationFormFields = (
     {
       label: "Recipients",
       fieldName: "recipients",
-      type: ControlledFormElementType.MULTI_SELECT,
+      type: ControlledFormElementType.TEXT,
       defaultValue: festival?.contacts?.[0]?.email ?? "",
       helpText: "Please separate emails by a comma",
     },
