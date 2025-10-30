@@ -191,7 +191,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 text_content,
                 "info@philippeducasse.com",
                 recipient_emails,
-                bcc=["info@philippeducasse.com"],
+                # bcc=["info@philippeducasse.com"],
             )
             email.attach_alternative(html_content, "text/html")
 
