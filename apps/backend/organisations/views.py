@@ -293,7 +293,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     def tag(self, request: HttpRequest, pk: int, tag_action: str) -> Response:
         """Add or remove tags from organisation."""
         organisation = self.get_object()
-        valid_actions = ["STAR", "WARNING", "INACTIVE", "WATCH", "OTHER"]
+        valid_actions = ["STAR", "WARNING", "INACTIVE", "WATCH", "IRRELEVANT", "OTHER"]
 
         if tag_action not in valid_actions:
             return Response(
