@@ -64,6 +64,10 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       accessorKey: "tag",
       header: getSortableHeader("Tag"),
       size: 50,
+      filterFn: (row, columnId, filterValue) => {
+        if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+        return filterValue.includes(row.getValue(columnId));
+      },
       cell: ({ row }) => {
         const tag = row.original?.tag;
         return <TagBadge tag={tag} />;
