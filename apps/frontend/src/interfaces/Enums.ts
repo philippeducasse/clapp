@@ -16,5 +16,6 @@ export enum TagAction {
   WATCH = "WATCH",
   INACTIVE = "INACTIVE",
   WARNING = "WARNING",
+  IRRELEVANT = "IRRELEVANT",
   OTHER = "OTHER",
 }

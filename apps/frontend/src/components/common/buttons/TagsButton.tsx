@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { TagAction } from "@/interfaces/Enums";
-import { Bookmark, Eye, Star, TriangleAlert, X, CircleQuestionMark } from "lucide-react";
+import { Bookmark, Eye, Star, TriangleAlert, X, CircleQuestionMark, EyeOff } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { PayloadAction } from "@reduxjs/toolkit";
 
@@ -70,6 +70,15 @@ export const TagsButton = <T,>({ entityId, tag, updateSlice }: TagsButtonProps<T
             onClick={() => markEntity(TagAction.INACTIVE)}
           >
             <X /> Inactive
+          </Button>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Button
+            variant={"ghost"}
+            className="text-gray-700"
+            onClick={() => markEntity(TagAction.IRRELEVANT)}
+          >
+            <EyeOff /> Irrelevant
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

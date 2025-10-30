@@ -1,6 +1,6 @@
 import React from "react";
 import { TagAction } from "@/interfaces/Enums";
-import { Star, Eye, TriangleAlert, X, CircleQuestionMark } from "lucide-react";
+import { Star, Eye, TriangleAlert, X, CircleQuestionMark, EyeOff } from "lucide-react";
 
 interface RibbonProps {
   tag: string;
@@ -11,6 +11,7 @@ const TAG_CONFIG = {
   [TagAction.WATCH]: { color: "bg-blue-700", icon: Eye },
   [TagAction.WARNING]: { color: "bg-orange-700", icon: TriangleAlert },
   [TagAction.INACTIVE]: { color: "bg-gray-700", icon: X },
+  [TagAction.IRRELEVANT]: { color: "bg-gray-700", icon: EyeOff },
   [TagAction.OTHER]: { color: "bg-purple-700", icon: CircleQuestionMark },
 };
 
