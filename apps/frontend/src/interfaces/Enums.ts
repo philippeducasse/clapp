@@ -19,3 +19,9 @@ export enum TagAction {
   IRRELEVANT = "IRRELEVANT",
   OTHER = "OTHER",
 }
+
+export enum OrganisationType {
+  FESTIVAL = "FESTIVAL",
+  VENUE = "VENUE",
+  RESIDENCY = "RESIDENCY",
+}

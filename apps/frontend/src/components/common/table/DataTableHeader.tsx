@@ -107,7 +107,7 @@ const DataTableHeader = <TData,>({
       <div className="flex items-center justify-between">
         <div className="flex gap-6">
           <div className="flex max-w-sm h-10 items-center rounded-md border border-input bg-white pl-3 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2 dark:bg-background dark:border-gray-700">
-            <Search className="h-[16px] w-[16px]" />
+            <Search className="h-[16px] w-[16px] text-emerald-600" />
             <input
               placeholder="Search"
               value={globalFilter}
@@ -128,8 +128,8 @@ const DataTableHeader = <TData,>({
                       className="h-7 px-2 text-xs gap-1"
                       onClick={() => handleRemoveFilter(filter?.column as string, filter?.value)}
                     >
-                      <span>{_.capitalize(String(filter?.value))}</span>
-                      <X className="h-3 w-3 ml-1" />
+                      <span>{_.capitalize(_.lowerCase(String(filter?.value)))}</span>
+                      <X className="h-3 w-3 ml-1 text-emerald-600" />
                     </Button>
                   );
                 })}
@@ -139,10 +139,12 @@ const DataTableHeader = <TData,>({
         </div>
 
         <div className="flex gap-4">
-          <Button variant={"tertiary"} onClick={() => setOpenFilterDialog(true)}>
-            <SlidersHorizontal />
-            Filters
-          </Button>
+          {filters && (
+            <Button variant={"tertiary"} onClick={() => setOpenFilterDialog(true)}>
+              <SlidersHorizontal />
+              Filters
+            </Button>
+          )}
           <CreateButton
             label={`Create new ${entityName}`}
             href={entityName !== "residency" ? `${entityName}s/create` : "residencies/create"}

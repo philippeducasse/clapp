@@ -46,6 +46,10 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       accessorKey: "applicationStatus",
       header: getSortableHeader("Status"),
       size: 110,
+      filterFn: (row, columnId, filterValue) => {
+        if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+        return filterValue.includes(row.getValue(columnId));
+      },
       cell: ({ row }) => {
         const application = row.original;
         return <StatusBadge status={application.applicationStatus} />;

@@ -2,12 +2,10 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Festival } from "@/interfaces/entities/Festival";
 import { RootState } from "../store";
 import { festivalApiService } from "@/api/festivalApiService";
-import { ColumnFilter } from "@/interfaces/table/FilterCongig";
+import { createFilterReducers, FilterableState } from "../shared/filterReducers";
 
-interface FestivalsState {
+interface FestivalsState extends FilterableState {
   festivals: Festival[];
-  filters: ColumnFilter[];
-  globalFilter: string;
 }
 
 const initialState: FestivalsState = {
@@ -51,31 +49,7 @@ const festivalSlice = createSlice({
     deleteFestival(state, action: PayloadAction<number>) {
       state.festivals = state.festivals.filter((festival) => festival.id !== action.payload);
     },
-    setColumnFilters(state, action: PayloadAction<ColumnFilter[]>) {
-      state.filters = action.payload;
-    },
-    setColumnFilter(state, action: PayloadAction<ColumnFilter>) {
-      const existingIndex = state.filters.findIndex((filter) => filter.id === action.payload.id);
-      if (existingIndex >= 0) {
-        if (action.payload.value === undefined || action.payload.value === "") {
-          // Remove filter if value is undefined or empty
-          state.filters.splice(existingIndex, 1);
-        } else {
-          state.filters[existingIndex] = action.payload;
-        }
-      } else if (action.payload.value !== undefined && action.payload.value !== "") {
-        state.filters.push(action.payload);
-      }
-    },
-    removeColumnFilter(state, action: PayloadAction<string>) {
-      state.filters = state.filters.filter((filter) => filter.id !== action.payload);
-    },
-    clearColumnFilters(state) {
-      state.filters = [];
-    },
-    setGlobalFilter(state, action: PayloadAction<string>) {
-      state.globalFilter = action.payload;
-    },
+    ...createFilterReducers<FestivalsState>(),
   },
 
   extraReducers: (builder) => {

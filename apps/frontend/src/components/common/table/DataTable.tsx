@@ -37,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   totalCount?: number;
   isLoading?: boolean;
   filters?: FilterConfig[];
+  defaultSorting?: SortingState;
 }
 
 export function DataTable<TData, TValue>({
@@ -47,9 +48,10 @@ export function DataTable<TData, TValue>({
   setPagination: setExternalPagination,
   totalCount,
   filters,
+  defaultSorting = [],
 }: // isLoading = false,
 DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [internalPagination, setInternalPagination] = useState({

@@ -1,5 +1,5 @@
 import React from "react";
-import ApplicationForm from "@/components/page-components/applications/components/form/EditApplicationForm";
+import ApplicationForm from "@/components/page-components/applications/components/form/ManualApplicationForm";
 import { Action } from "@/interfaces/Enums";
 
 const VenueApplicationPage = () => {

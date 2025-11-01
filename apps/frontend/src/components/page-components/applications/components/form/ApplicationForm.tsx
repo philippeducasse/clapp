@@ -11,7 +11,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import { Action, EntityName } from "@/interfaces/Enums";
 import BasicForm from "@/components/common/form/BasicForm";
 import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
-import { getApplicationFormFields } from "../../helpers/getApplicationFormFields";
+import { getApplicationFormFields } from "../../helpers/form/getApplicationFormFields";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

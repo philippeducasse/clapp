@@ -22,14 +22,12 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Update Redux store when data changes
   useEffect(() => {
     dispatch(setFestivals(festivalData.results));
   }, [dispatch, festivalData.results]);
 
-  // Fetch new data when pagination changes (but not on initial mount)
   useEffect(() => {
-    if (pagination.pageIndex === 0) return; // Skip initial mount
+    if (pagination.pageIndex === 0) return;
 
     const fetchFestivals = async () => {
       setIsLoading(true);

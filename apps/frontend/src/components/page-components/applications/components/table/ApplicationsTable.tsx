@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { setApplications } from "@/redux/slices/applicationSlice";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { EntityName } from "@/interfaces/Enums";
+import { getApplicationFilters } from "../../helpers/getApplicationFilters";
 
 interface ApplicationsTableProps {
   initialData: PaginatedResponse<Application>;
@@ -23,9 +24,14 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   //   router.push(`/applications/${id}/edit`);
   // };
 
-  const columns = useApplicationColumns();
   // onEdit
   return (
-    <DataTable columns={columns} data={initialData.results} entityName={EntityName.APPLICATION} />
+    <DataTable
+      columns={useApplicationColumns()}
+      data={initialData.results}
+      entityName={EntityName.APPLICATION}
+      filters={getApplicationFilters()}
+      defaultSorting={[{ id: "createdAt", desc: true }]}
+    />
   );
 };

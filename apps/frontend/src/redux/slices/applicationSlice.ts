@@ -2,28 +2,22 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Application } from "@/interfaces/entities/Application";
 import { RootState } from "../store";
 import { applicationApiService } from "@/api/applicationApiService";
+import { createFilterReducers, FilterableState } from "../shared/filterReducers";
 
-interface ApplicationsState {
+interface ApplicationsState extends FilterableState {
   applications: Application[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-  selectedApplication?: Application;
 }
 
 const initialState: ApplicationsState = {
   applications: [],
-  status: "idle",
-  error: null,
-  selectedApplication: undefined,
+  filters: [],
+  globalFilter: "",
 };
 
-export const fetchApplications = createAsyncThunk(
-  "applications/fetchApplications",
-  async () => {
-    const response = await applicationApiService.getAllApplications();
-    return response;
-  }
-);
+export const fetchApplications = createAsyncThunk("applications/fetchApplications", async () => {
+  const response = await applicationApiService.getAllApplications();
+  return response;
+});
 
 const applicationSlice = createSlice({
   name: "applications",
@@ -42,35 +36,22 @@ const applicationSlice = createSlice({
         state.applications.push(action.payload);
       }
     },
-    setSelectedApplication(state, action: PayloadAction<Application>) {
-      state.selectedApplication = action.payload;
-    },
     addApplication(state, action: PayloadAction<Application>) {
       state.applications.push(action.payload);
     },
     updateApplication(state, action: PayloadAction<Application>) {
       const { id } = action.payload;
-      const existingApplication = state.applications.find(
-        (application) => application.id === id
-      );
+      const existingApplication = state.applications.find((application) => application.id === id);
       if (existingApplication) {
         Object.assign(existingApplication, action.payload);
       }
     },
+    ...createFilterReducers<ApplicationsState>(),
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchApplications.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchApplications.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.applications = action.payload;
-      })
-      .addCase(fetchApplications.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchApplications.fulfilled, (state, action) => {
+      state.applications = action.payload.results;
+    });
   },
 });
 
@@ -79,16 +60,19 @@ export const {
   setApplication,
   addApplication,
   updateApplication,
-  setSelectedApplication,
+  setColumnFilters,
+  setColumnFilter,
+  removeColumnFilter,
+  clearColumnFilters,
+  setGlobalFilter,
 } = applicationSlice.actions;
 
-export const selectAllApplications = (state: RootState) =>
-  state.applications.applications;
-export const selectApplicationsStatus = (state: RootState) =>
-  state.applications.status;
+export const selectAllApplications = (state: RootState) => state.applications.applications;
 export const selectApplication = (state: RootState, applicationId: number) =>
   state.applications.applications.find(
     (application: Application) => application.id === applicationId
   );
+export const selectColumnFilters = (state: RootState) => state.applications.filters;
+export const selectGlobalFilter = (state: RootState) => state.applications.globalFilter;
 
 export default applicationSlice.reducer;

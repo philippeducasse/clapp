@@ -1,9 +1,9 @@
 import React from "react";
-import EditApplicationForm from "@/components/page-components/applications/components/form/EditApplicationForm";
+import ManualApplicationForm from "@/components/page-components/applications/components/form/ManualApplicationForm";
 import { Action } from "@/interfaces/Enums";
 
-const EditApplicationPage = () => {
-  return <EditApplicationForm action={Action.EDIT} />;
+const ManualApplicationPage = () => {
+  return <ManualApplicationForm action={Action.EDIT} />;
 };
 
-export default EditApplicationPage;
+export default ManualApplicationPage;
