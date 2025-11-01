@@ -4,39 +4,95 @@
 - add filtering to festivals slice
 - add redux update on festival delete (from table)
 
-  This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).#
+● Plan: Add Organization Search Field to Manual Application Form
 
-## Getting Started
+Overview
 
-First, run the development server:
+The goal is to replace the simple text field for "Organisation" with a searchable autocomplete/combobox that:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Searches across ALL organization types (Festivals, Venues, Residencies)
+- Displays results in a dropdown as the user types
+- Allows selection of an organization
+- Sets both organisation and organisationType fields in the Application
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Implementation Steps
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Create a unified organization search API endpoint/service
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Create a new API service or extend existing ones to search across all organization types
+- The endpoint should:
+  - Accept a search query parameter
+  - Search festivals, venues, and residencies simultaneously
+  - Return unified results with: id, name, type ("Festival" | "Venue" | "Residency")
+- Could use parallel API calls to all three services and merge results
+- Files to create/modify:
+  - /src/api/organisationSearchService.ts (new file)
 
-## Learn More
+2. Add new form element type: AUTOCOMPLETE
 
-To learn more about Next.js, take a look at the following resources:
+- Add AUTOCOMPLETE = "AUTOCOMPLETE" to ControlledFormElementType enum
+- File: /src/interfaces/forms/ControlledFormElementType.ts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Create ControlledAutocomplete component
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Build a new form field component using shadcn/ui Combobox or Command components
+- Features:
+  - Debounced search input (300-500ms delay)
+  - Loading state while searching
+  - Display organization name and type in dropdown
+  - Handle selection to update form value
+- File to create: /src/components/common/form/form-fields/ControlledAutocomplete.tsx
+- Reference shadcn Combobox: https://ui.shadcn.com/docs/components/combobox
 
-## Deploy on Vercel
+4. Update form helper to support AUTOCOMPLETE type
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Modify getControlledInputs function in /src/helpers/formHelper.tsx
+- Add case for ControlledFormElementType.AUTOCOMPLETE that returns <ControlledAutocomplete />
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. Update ManualApplicationFormFields
+
+- Replace the "Organisation" text field with AUTOCOMPLETE type
+- Update /src/components/page-components/applications/helpers/form/getManualApplicationFormFields.tsx:
+  {
+  label: "Organisation",
+  fieldName: "organisation",
+  type: ControlledFormElementType.AUTOCOMPLETE,
+  // Additional config for autocomplete
+  }
+
+6. Handle form submission
+
+- When user selects an organization from autocomplete:
+  - Store the organization ID in the form (or the full object)
+  - Separately track the organisationType
+- Options:
+  - Option A: Store as nested object: { organisationId: number, organisationType: string }
+  - Option B: Add a hidden field for organisationType that gets set when organization is selected
+- Update form submission logic in ManualApplicationForm.tsx to properly format the data for the API
+
+7. Update ControlledFormElement interface (if needed)
+
+- Add properties to support autocomplete configuration:
+  - searchFunction?: (query: string) => Promise<SearchResult[]>
+  - onSelect?: (value: unknown) => void
+- File: /src/interfaces/forms/ControlledFormElement.ts
+
+Questions to Consider
+
+1. How should the selected organization be stored?
+
+
+    - Just the ID, or the full object?
+    - Do we need a separate hidden field for organisationType?
+
+2. Should there be a minimum character count before searching?
+
+
+    - e.g., only search after user types 2+ characters
+
+3. How should results be displayed in the dropdown?
+
+
+    - Format: "Festival Name (Festival)" or "Festival Name - Festival"?
+
+4. Should we show an indicator (badge/icon) for organization type in dropdown?
