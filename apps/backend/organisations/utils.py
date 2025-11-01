@@ -47,7 +47,8 @@ def generate_enrich_prompt(
       country, town, website_url, description,
       contacts, sources, updated_fields
     - contacts should be an array of objects with: email (required), name (optional), role (optional).
-        Provide at least one contact with an email.
+      **IMPORTANT: Only include contacts if you find actual email addresses in the search results. 
+      If no email addresses are found, return an empty array []. Do NOT invent or guess email addresses.**
 
     CURRENT RECORD
     country: {nv(organisation.country)}
