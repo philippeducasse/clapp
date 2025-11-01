@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from applications.models import Application
 from typing import Type, Optional, Dict, Any
+from performances.serializers import PerformanceSerializer
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
     organisation_type = serializers.SerializerMethodField(read_only=True)
     organisation = serializers.SerializerMethodField(read_only=True)
+    performances = PerformanceSerializer(many=True, read_only=True)
 
     # For writes
     content_type_id = serializers.IntegerField(write_only=True, required=False)
