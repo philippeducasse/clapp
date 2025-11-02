@@ -1,16 +1,20 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, List
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.request import Request
+from rest_framework.decorators import action, api_view, permission_classes
 from django.utils.html import strip_tags
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpRequest
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-
+from django.db.models import Q
+from organisations.festivals.models import Festival
+from organisations.residencies.models import Residency
+from organisations.venues.models import Venue
 from applications.models import Application
 from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
@@ -23,6 +27,54 @@ from .utils import (
     clean_organisation_data,
     generate_enrich_prompt,
 )
+
+
+@api_view(["GET"])
+# todo: add authentication?
+# @permission_classes([])
+def search(request: Request) -> Response:
+    """
+    Unified search endpoint for all organisation types
+    GET /api/organisations/search/?q=search_term
+    Returns array of organizations matching search query
+    """
+    search_query = request.query_params.get("q", "")
+
+    if len(search_query) < 2:
+        return Response([], status=200)
+
+    search_filter = (
+        Q(name__icontains=search_query)
+        | Q(website_url__icontains=search_query)
+        | Q(description__icontains=search_query)
+    )
+
+    festivals = Festival.objects.filter(search_filter).values(
+        "id", "name", "country", "town"
+    )[:20]
+    venues = Venue.objects.filter(search_filter).values(
+        "id", "name", "country", "town"
+    )[:20]
+    residencies = Residency.objects.filter(search_filter).values(
+        "id", "name", "country", "town"
+    )[:20]
+
+    results: List[Dict[str, Any]] = []
+
+    for festival in festivals:
+        results.append({**festival, "type": "festival"})
+
+    for venue in venues:
+        results.append({**venue, "type": "venue"})
+
+    for residency in residencies:
+        results.append({**residency, "type": "residency"})
+
+    results.sort(key=lambda x: x["name"].lower())
+
+    results = results[:15]
+
+    return Response(results, status=200)
 
 
 class OrganisationViewSet(viewsets.ModelViewSet):
