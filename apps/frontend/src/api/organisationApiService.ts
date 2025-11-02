@@ -1,0 +1,22 @@
+import { fetchRequest } from "./fetchHelper";
+
+const endpoint = "http://localhost:8000/api/organisations";
+
+export interface OrganisationSearchResponse {
+  id: number;
+  name: string;
+  country: string;
+  town: string;
+  type: string;
+}
+
+const search = async (searchQuery: string): Promise<OrganisationSearchResponse[]> => {
+  if (!searchQuery || searchQuery.length < 2) {
+    return [];
+  }
+  return await fetchRequest(`${endpoint}/search/?q=${searchQuery}`);
+};
+
+export const organisationApiService = {
+  search,
+};

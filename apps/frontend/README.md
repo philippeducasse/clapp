@@ -4,6 +4,8 @@
 - add filtering to festivals slice
 - add redux update on festival delete (from table)
 
+# SEARCH
+
 ● Plan: Add Organization Search Field to Manual Application Form
 
 Overview
@@ -81,18 +83,15 @@ Questions to Consider
 
 1. How should the selected organization be stored?
 
-
-    - Just the ID, or the full object?
-    - Do we need a separate hidden field for organisationType?
+   - Just the ID, or the full object?
+   - Do we need a separate hidden field for organisationType?
 
 2. Should there be a minimum character count before searching?
 
-
-    - e.g., only search after user types 2+ characters
+   - e.g., only search after user types 2+ characters
 
 3. How should results be displayed in the dropdown?
 
-
-    - Format: "Festival Name (Festival)" or "Festival Name - Festival"?
+   - Format: "Festival Name (Festival)" or "Festival Name - Festival"?
 
 4. Should we show an indicator (badge/icon) for organization type in dropdown?

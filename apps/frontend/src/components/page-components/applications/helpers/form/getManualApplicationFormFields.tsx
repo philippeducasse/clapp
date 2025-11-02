@@ -14,7 +14,7 @@ export const getManualApplicationFormFields = (
     {
       label: "Organisation",
       fieldName: "organisation",
-      type: ControlledFormElementType.TEXT,
+      type: ControlledFormElementType.SEARCH,
     },
     {
       label: "Method",

@@ -10,6 +10,7 @@ import { ControllerRenderProps } from "react-hook-form";
 import { ControlledTextEditor } from "@/components/common/form/form-fields/ControlledTextEditor";
 import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
 import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
+import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
@@ -35,6 +36,8 @@ export const getControlledInputs = (
         return <ControlledTextEditor field={field} />;
       case ControlledFormElementType.FILE:
         return <ControlledFile field={field} />;
+      case ControlledFormElementType.SEARCH:
+        return <ControlledSearch field={field} />;
       default:
         return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
     }
@@ -71,17 +74,6 @@ export const createZodFormSchema = (
         zodType = z.number().optional();
         break;
 
-      case ControlledFormElementType.SELECT:
-      case ControlledFormElementType.TEXT:
-      case ControlledFormElementType.TEXT_AREA:
-      case ControlledFormElementType.TEXT_EDITOR:
-        if (multiple) {
-          zodType = z.array(z.string());
-        } else {
-          zodType = z.string();
-        }
-        break;
-
       case ControlledFormElementType.MULTI_SELECT:
         zodType = z.array(z.string());
         break;
@@ -102,6 +94,18 @@ export const createZodFormSchema = (
         break;
       case ControlledFormElementType.EMAIL:
         zodType = z.email();
+        break;
+      case ControlledFormElementType.TEXT:
+      case ControlledFormElementType.SEARCH:
+      case ControlledFormElementType.SELECT:
+      case ControlledFormElementType.TEXT_AREA:
+      case ControlledFormElementType.TEXT_EDITOR:
+      default:
+        if (multiple) {
+          zodType = z.array(z.string());
+        } else {
+          zodType = z.string();
+        }
         break;
     }
 
