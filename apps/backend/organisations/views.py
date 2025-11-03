@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.apps import apps
 from typing import Any, Dict, List
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
@@ -38,7 +39,10 @@ def search(request: Request) -> Response:
     GET /api/organisations/search/?q=search_term
     Returns array of organizations matching search query
     """
+    ORGANISATION_SEARCH_FIELDS = ["id", "name", "country", "town"]
+
     search_query = request.query_params.get("q", "")
+    organisation_type = request.query_params.get("type", None)
 
     if len(search_query) < 2:
         return Response([], status=200)
@@ -49,30 +53,51 @@ def search(request: Request) -> Response:
         | Q(description__icontains=search_query)
     )
 
-    festivals = Festival.objects.filter(search_filter).values(
-        "id", "name", "country", "town"
-    )[:20]
-    venues = Venue.objects.filter(search_filter).values(
-        "id", "name", "country", "town"
-    )[:20]
-    residencies = Residency.objects.filter(search_filter).values(
-        "id", "name", "country", "town"
-    )[:20]
+    if organisation_type:
+        MODEL_MAP = {
+            "festival": ("festivals", "Festival"),
+            "residency": ("residencies", "Residency"),
+            "venue": ("venues", "Venue"),
+        }
+        model_info = MODEL_MAP.get(organisation_type)
+        if not model_info:
+            return Response({"error": "Invalid organisation type"}, status=400)
 
-    results: List[Dict[str, Any]] = []
+        app_label, model_name = model_info
 
-    for festival in festivals:
-        results.append({**festival, "type": "festival"})
+        try:
+            Entity = apps.get_model(app_label, model_name)
+            results = Entity.objects.filter(search_filter).values(
+                *ORGANISATION_SEARCH_FIELDS
+            )[:20]
+        except LookupError:
+            return Response({"error": "Model not found"}, status=400)
 
-    for venue in venues:
-        results.append({**venue, "type": "venue"})
+    else:
+        festivals = Festival.objects.filter(search_filter).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
+        venues = Venue.objects.filter(search_filter).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
+        residencies = Residency.objects.filter(search_filter).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
 
-    for residency in residencies:
-        results.append({**residency, "type": "residency"})
+        results: List[Dict[str, Any]] = []
 
-    results.sort(key=lambda x: x["name"].lower())
+        for festival in festivals:
+            results.append({**festival, "type": "festival"})
 
-    results = results[:15]
+        for venue in venues:
+            results.append({**venue, "type": "venue"})
+
+        for residency in residencies:
+            results.append({**residency, "type": "residency"})
+
+        results.sort(key=lambda x: x["name"].lower())
+
+        results = results[:15]
 
     return Response(results, status=200)
 
@@ -124,9 +149,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         search_results = self.gemini_client.search(query=query)
 
         prompt: str = self.get_enrich_prompt(organisation, search_results)
-        print("prompt: ", prompt)
+        # print("prompt: ", prompt)
         llm_response: str = self.mistral_client.chat(prompt=prompt)
-        print("RESPONSE", llm_response)
+        # print("RESPONSE", llm_response)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
 
