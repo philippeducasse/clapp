@@ -15,7 +15,8 @@ import ControlledSearch from "@/components/common/form/form-fields/ControlledSea
 export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
-  showLabels: boolean
+  showLabels: boolean,
+  organisationType?: string
 ) => {
   if (formField.hidden) return;
   {
@@ -37,7 +38,7 @@ export const getControlledInputs = (
       case ControlledFormElementType.FILE:
         return <ControlledFile field={field} />;
       case ControlledFormElementType.SEARCH:
-        return <ControlledSearch field={field} />;
+        return <ControlledSearch field={field} organisationType={organisationType} />;
       default:
         return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
     }
@@ -95,8 +96,10 @@ export const createZodFormSchema = (
       case ControlledFormElementType.EMAIL:
         zodType = z.email();
         break;
-      case ControlledFormElementType.TEXT:
       case ControlledFormElementType.SEARCH:
+        zodType = z.number();
+        break;
+      case ControlledFormElementType.TEXT:
       case ControlledFormElementType.SELECT:
       case ControlledFormElementType.TEXT_AREA:
       case ControlledFormElementType.TEXT_EDITOR:

@@ -6,9 +6,10 @@ import { organisationApiService, OrganisationSearchResponse } from "@/api/organi
 import _ from "lodash";
 interface ControlledTextProps {
   field: ControllerRenderProps<Record<string, unknown>, string>;
+  organisationType?: string;
 }
 
-const ControlledSearch = ({ field }: ControlledTextProps) => {
+const ControlledSearch = ({ field, organisationType }: ControlledTextProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<OrganisationSearchResponse[]>([]);
   const [isLoading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ const ControlledSearch = ({ field }: ControlledTextProps) => {
       }
       setLoading(true);
       try {
-        const searchResponse = await organisationApiService.search(searchQuery);
+        const searchResponse = await organisationApiService.search(searchQuery, organisationType);
         setSearchResults(searchResponse);
       } catch (error) {
         console.error("Search failed:", error);
@@ -48,20 +49,29 @@ const ControlledSearch = ({ field }: ControlledTextProps) => {
       searchOrganisations();
     }, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, organisationType]);
+
+  useEffect(() => {
+    if (searchQuery && !isSelected) {
+      setSearchQuery("");
+      field.onChange("");
+      setSearchResults([]);
+    }
+  }, [organisationType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
+    setShowDropdown(true);
     field.onChange(value);
     setIsSelected(false);
   };
   const handleSelectOrganisation = (org: OrganisationSearchResponse) => {
     field.onChange(org.id);
-    setSearchQuery(`${_.capitalize(org.type)}: ${org.name}`);
-    setShowDropdown(false);
+    setSearchQuery(`${_.capitalize(org.type ?? organisationType)}: ${org.name}`);
     setSearchResults([]);
     setIsSelected(true);
+    setShowDropdown(false);
   };
 
   return (
@@ -73,7 +83,7 @@ const ControlledSearch = ({ field }: ControlledTextProps) => {
         placeholder="Search organisations..."
         className={isSelected ? "font-bold text-emerald-600" : ""}
       />
-      {searchQuery.length >= 2 && searchResults.length === 0 && !isLoading && (
+      {searchQuery.length >= 2 && searchResults.length === 0 && showDropdown && !isLoading && (
         <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
           <div className="p-2 text-gray-500">No results found</div>
         </div>

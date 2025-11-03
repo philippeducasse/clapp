@@ -5,12 +5,18 @@ import { ApplicationStatusOptions } from "@/interfaces/forms/StatusOptions";
 import { getPerformanceOptions } from "./getApplicationFormFields";
 import { getOptions } from "@/helpers/formHelper";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
+import { OrganisationType } from "@/interfaces/Enums";
 export const getManualApplicationFormFields = (
   performances: Performance[]
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
-  console.log("p", performances);
   return [
+    {
+      label: "Organisation type",
+      fieldName: "organisationType",
+      type: ControlledFormElementType.SELECT,
+      options: getOptions(OrganisationType),
+    },
     {
       label: "Organisation",
       fieldName: "organisation",
@@ -28,6 +34,7 @@ export const getManualApplicationFormFields = (
       fieldName: "applicationStatus",
       type: ControlledFormElementType.SELECT,
       options: ApplicationStatusOptions,
+      required: true,
     },
     {
       label: "Comments",

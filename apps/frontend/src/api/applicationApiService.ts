@@ -13,6 +13,7 @@ const getApplication = (applicationId: number): Promise<Application> => {
 };
 
 const createApplication = (application: Application): Promise<Application> => {
+  console.log("APP: ", application);
   return sendRequest<Application, Application>(
     `${endpoint}`,
     application,

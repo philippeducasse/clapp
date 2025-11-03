@@ -10,11 +10,12 @@ export interface OrganisationSearchResponse {
   type: string;
 }
 
-const search = async (searchQuery: string): Promise<OrganisationSearchResponse[]> => {
+const search = async (searchQuery: string, type?: string): Promise<OrganisationSearchResponse[]> => {
   if (!searchQuery || searchQuery.length < 2) {
     return [];
   }
-  return await fetchRequest(`${endpoint}/search/?q=${searchQuery}`);
+  const typeParam = type ? `&type=${type.toLowerCase()}` : "";
+  return await fetchRequest(`${endpoint}/search/?q=${searchQuery}${typeParam}`);
 };
 
 export const organisationApiService = {
