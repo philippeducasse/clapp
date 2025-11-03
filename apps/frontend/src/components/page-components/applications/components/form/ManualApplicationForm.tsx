@@ -74,8 +74,11 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);
       } else {
-        const newApplication = await applicationApiService.createApplication(values as Application);
-        router.push(`/applications/${newApplication?.id}`);
+        if (profile) {
+          const application: Application = { ...values, profile: profile?.id };
+          const newApplication = await applicationApiService.createApplication(application);
+          router.push(`/applications/${newApplication?.id}`);
+        }
       }
     } catch (error) {
       console.error(error);

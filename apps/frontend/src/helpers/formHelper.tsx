@@ -113,7 +113,16 @@ export const createZodFormSchema = (
     }
 
     if (required) {
-      schema[fieldName] = zodType;
+      if (
+        type === ControlledFormElementType.TEXT ||
+        type === ControlledFormElementType.SELECT ||
+        type === ControlledFormElementType.TEXT_AREA ||
+        type === ControlledFormElementType.TEXT_EDITOR
+      ) {
+        schema[fieldName] = z.string().min(1, "This field is required");
+      } else {
+        schema[fieldName] = zodType;
+      }
     } else {
       schema[fieldName] = zodType.optional().or(z.literal(""));
     }

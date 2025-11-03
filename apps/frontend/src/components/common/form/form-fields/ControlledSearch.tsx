@@ -57,7 +57,7 @@ const ControlledSearch = ({ field, organisationType }: ControlledTextProps) => {
       field.onChange("");
       setSearchResults([]);
     }
-  }, [organisationType]);
+  }, [field, searchQuery, isSelected, organisationType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
