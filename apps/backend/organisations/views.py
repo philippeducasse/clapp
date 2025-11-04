@@ -222,7 +222,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         if current_date.month >= 9:
             application_year += 1
 
-        # Get or create application
         organisation_content_type = ContentType.objects.get_for_model(
             organisation.__class__
         )
