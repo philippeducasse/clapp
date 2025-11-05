@@ -26,11 +26,13 @@ class Application(models.Model):
         ("CANCELLED", "Cancelled"),
         ("OTHER", "Other"),
     ]
-
+    # what type of model is this?
     content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, null=True, blank=True
     )
+    # which specific instance of the model?
     object_id = models.PositiveIntegerField(null=True, blank=True)
+    # combine both
     organisation = GenericForeignKey("content_type", "object_id")
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="applications"
@@ -68,7 +70,8 @@ class Application(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.organisation.name} {self.application_year}"
+        org_name = self.organisation.name if self.organisation else "No organisation"
+        return f"{org_name} {self.application_year}"
 
     @property
     def application_year(self) -> int | None:
