@@ -34,7 +34,7 @@ export interface Application {
 export type ApplicationCreate = Partial<
   Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">
 > & {
-  // profileId: number;
+  profileId: number;
 };
 
 export enum ApplicationMethod {

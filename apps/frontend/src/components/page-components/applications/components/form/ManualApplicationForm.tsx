@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { Application } from "@/interfaces/entities/Application";
+import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
 import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { applicationApiService } from "@/api/applicationApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -75,7 +75,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
-          const application: Application = { ...values, profile: profile?.id };
+          const application: ApplicationCreate = { ...values, profileId: profile?.id };
           const newApplication = await applicationApiService.createApplication(application);
           router.push(`/applications/${newApplication?.id}`);
         }
