@@ -27,6 +27,8 @@ const deleteApplication = (applicationId: number) => {
 };
 
 const updateApplication = (application: Application): Promise<Application> => {
+  console.log("APP: ", application);
+
   return sendRequest<Application, Application>(
     `${endpoint}${application.id}/`,
     application,

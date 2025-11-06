@@ -35,6 +35,8 @@ export type ApplicationCreate = Partial<
   Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">
 > & {
   profileId: number;
+  objectType: string;
+  objectId: number;
 };
 
 export enum ApplicationMethod {

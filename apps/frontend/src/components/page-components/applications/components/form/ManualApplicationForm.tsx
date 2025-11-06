@@ -21,6 +21,7 @@ import { refreshApplication } from "../../helpers/refreshApplication";
 import { selectProfile } from "@/redux/slices/authSlice";
 import { fetchPerformances } from "@/redux/slices/performanceSlice";
 import { useAppDispatch } from "@/redux/hook";
+
 interface ManualApplicationFormProps {
   action: string;
 }
@@ -45,7 +46,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-
+  // console.log("app: ", applicationId, application)
   useEffect(() => {
     if (action !== Action.CREATE && !application) {
       refreshApplication(applicationId, dispatch);
@@ -69,13 +70,15 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
-        const updatedApplication = { ...application, ...values, id: applicationId } as Application;
+        const updatedApplication = { ...application, ...values, id: applicationId, profileId: profile?.id} as Application;
+        console.log("updated:",updatedApplication)
         await applicationApiService.updateApplication(updatedApplication);
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
-          const application: ApplicationCreate = { ...values, profileId: profile?.id };
+          const application: ApplicationCreate = { ...values, profileId: profile?.id,  };
+          console.log("application: ", application)
           const newApplication = await applicationApiService.createApplication(application);
           router.push(`/applications/${newApplication?.id}`);
         }

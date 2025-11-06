@@ -19,7 +19,7 @@ export const getManualApplicationFormFields = (
     },
     {
       label: "Organisation",
-      fieldName: "organisation",
+      fieldName: "organisationId",
       type: ControlledFormElementType.SEARCH,
     },
     {
@@ -43,7 +43,7 @@ export const getManualApplicationFormFields = (
     },
     {
       label: "Performance(s)",
-      fieldName: "performances",
+      fieldName: "performanceIds",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
       helpText: "Select with which performances you want to apply to this festival",

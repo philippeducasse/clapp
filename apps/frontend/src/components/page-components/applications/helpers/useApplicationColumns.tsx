@@ -17,14 +17,14 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
   };
   return [
     {
-      accessorKey: "emailSubject",
-      header: "Application",
+      accessorKey: "organisation.name",
+      header: "Organisation",
       size: 200,
       cell: ({ row }) => {
         const application = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/applications/${application.id}`}>{application.emailSubject}</Link>
+            <Link href={`/applications/${application.id}`}>{application.organisation.name}</Link>
           </div>
         );
       },
@@ -60,26 +60,6 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       header: "Organisation type",
       size: 110,
     },
-    {
-      accessorKey: "organisation.name",
-      header: "Organisation",
-      size: 200,
-      cell: ({ row }) => {
-        const application = row.original;
-        return (
-          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link
-              href={`/${application.organisationType.toLowerCase()}s/${
-                application.organisation.id
-              }`}
-            >
-              {application.organisation?.name}
-            </Link>
-          </div>
-        );
-      },
-    },
-
     {
       header: "Actions",
       id: "actions",
