@@ -1,10 +1,11 @@
-from django.db import models
+from typing import List, Tuple
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from typing import List, Tuple
-from profiles.models import Profile
+from django.db import models
+
 from performances.models import Performance
+from profiles.models import Profile
 
 
 class Application(models.Model):
@@ -34,6 +35,7 @@ class Application(models.Model):
     object_id = models.PositiveIntegerField(null=True, blank=True)
     # combine both
     organisation = GenericForeignKey("content_type", "object_id")
+
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="applications"
     )
@@ -71,7 +73,7 @@ class Application(models.Model):
 
     def __str__(self) -> str:
         org_name = self.organisation.name if self.organisation else "No organisation"
-        return f"{org_name} {self.application_year}"
+        return f"{self.id}:{org_name} {self.application_year}"
 
     @property
     def application_year(self) -> int | None:

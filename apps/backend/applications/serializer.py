@@ -1,25 +1,30 @@
+from typing import Optional, Type
+
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
+
 from applications.models import Application
-from typing import Type, Optional, Dict, Any
+from organisations.festivals.models import Festival
+from organisations.festivals.serializer import FestivalSerializer
+from organisations.residencies.models import Residency
+from organisations.residencies.serializer import ResidencySerializer
+from organisations.venues.models import Venue
+from organisations.venues.serializer import VenueSerializer
 from performances.serializers import PerformanceSerializer
-from profiles.models import Profile
 from profiles.serializers import ProfileSerializer
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    # read fields: returns nested objects
-    organisation_type = serializers.SerializerMethodField(read_only=True)
-    organisation = serializers.SerializerMethodField(read_only=True)
+    # Read: returns organization type as string, Write: accepts organization type as string
+    organisation_type = serializers.CharField(required=False)
+
+    # Read: returns nested organization object, Write: accepts organization ID
+    organisation = serializers.IntegerField(source="object_id", required=False)
+
     performances = PerformanceSerializer(many=True, read_only=True)
-    profile = ProfileSerializer(read_only=True, required=False)
-
-    # write fields - accepts Ids; not nested objects.
+    profile = ProfileSerializer(read_only=True)
     profile_id = serializers.IntegerField(write_only=True, required=True)
-
-    # accepts organisation type as string (eg "festival", "venue", "residency")
-    content_type = serializers.CharField(write_only=True, required=False)
-    # references the specific instance of the organisation
-    object_id = serializers.IntegerField(write_only=True, required=False)
 
     performance_ids = serializers.ListField(
         child=serializers.IntegerField(),
@@ -29,15 +34,13 @@ class ApplicationSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model: Type[Application] = Application
+        model = Application
         fields = [
             "id",
             "created_at",
             "updated_at",
             "organisation_type",
             "organisation",
-            "content_type",
-            "object_id",
             "profile_id",
             "profile",
             "performance_ids",
@@ -62,71 +65,63 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ("id", "created_at", "updated_at")
 
+    def to_representation(self, instance):
+        """Convert model instance to dict - customize organisation fields"""
+        data = super().to_representation(instance)
+
+        # Replace organisation ID with nested object
+        if instance.organisation:
+            if isinstance(instance.organisation, Festival):
+                data["organisation"] = FestivalSerializer(instance.organisation).data
+            elif isinstance(instance.organisation, Venue):
+                data["organisation"] = VenueSerializer(instance.organisation).data
+            elif isinstance(instance.organisation, Residency):
+                data["organisation"] = ResidencySerializer(instance.organisation).data
+
+        # Set organisation_type from content_type
+        if instance.content_type:
+            data["organisation_type"] = instance.content_type.model.upper()
+
+        return data
+
     def create(self, validated_data):
-        content_type_str = validated_data.pop("content_type", None)
-        object_id = validated_data.pop("object_id", None)
+        organisation_type = validated_data.pop("organisation_type", None)
+        organisation_id = validated_data.pop("object_id", None)
 
-        application = super().create(validated_data)
+        if organisation_type and organisation_id:
+            try:
+                content_type = ContentType.objects.get(model=organisation_type.lower())
+            except ContentType.DoesNotExist:
+                raise ValidationError(
+                    {
+                        "organisation_type": f"Invalid organisation type: {organisation_type}"
+                    }
+                )
 
-        if content_type_str and object_id:
-            # Look up the ContentType based on the model name
-            from django.contrib.contenttypes.models import ContentType
-            content_type = ContentType.objects.get(model=content_type_str.lower())
-            application.content_type = content_type
-            application.object_id = object_id
-            application.save()
+            validated_data["content_type"] = content_type
+            validated_data["object_id"] = organisation_id
 
-        return application
+        return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        content_type_str = validated_data.pop("content_type", None)
-        object_id = validated_data.pop("object_id", None)
+        organisation_type = validated_data.pop("organisation_type", None)
+        organisation_id = validated_data.pop("object_id", None)
 
-        instance = super().update(instance, validated_data)
+        if organisation_type:
+            try:
+                content_type = ContentType.objects.get(model=organisation_type.lower())
+                validated_data["content_type"] = content_type
+            except ContentType.DoesNotExist:
+                raise ValidationError(
+                    {
+                        "organisation_type": f"Invalid organisation type: {organisation_type}"
+                    }
+                )
 
-        if content_type_str is not None:
-            from django.contrib.contenttypes.models import ContentType
-            content_type = ContentType.objects.get(model=content_type_str.lower())
-            instance.content_type = content_type
-        if object_id is not None:
-            instance.object_id = object_id
+        if organisation_id is not None:
+            validated_data["object_id"] = organisation_id
 
-        if content_type_str is not None or object_id is not None:
-            instance.save()
-
-        return instance
-
-    def get_organisation_type(self, obj: Application) -> Optional[str]:
-        """Return the type of organisation (festival, venue, residency)"""
-        if obj.content_type:
-            return obj.content_type.model.capitalize()
-        return None
-
-    def get_organisation(self, obj: Application) -> Optional[Dict[str, Any]]:
-        """Return the full nested organisation object"""
-        if not obj.organisation:
-            return None
-
-        if not obj.content_type:
-            return None
-
-        from organisations.festivals.serializer import FestivalSerializer
-        from organisations.venues.serializer import VenueSerializer
-        from organisations.residencies.serializer import ResidencySerializer
-
-        serializer_map = {
-            "festival": FestivalSerializer,
-            "venue": VenueSerializer,
-            "residency": ResidencySerializer,
-        }
-
-        model_name = obj.content_type.model
-        serializer_class = serializer_map.get(model_name)
-
-        if serializer_class:
-            return serializer_class(obj.organisation).data  # type: ignore[attr-defined]
-
-        return None
+        return super().update(instance, validated_data)
 
 
 class MinimalApplicationSerializer(serializers.ModelSerializer):
