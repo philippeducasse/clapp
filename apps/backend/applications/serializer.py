@@ -17,8 +17,7 @@ from profiles.serializers import ProfileSerializer
 
 class ApplicationSerializer(serializers.ModelSerializer):
     # Read: returns organization type as string, Write: accepts organization type as string
-    organisation_type = serializers.CharField(required=False)
-
+    organisation_type = serializers.CharField(required=False, write_only=True)
     # Read: returns nested organization object, Write: accepts organization ID
     organisation = serializers.IntegerField(source="object_id", required=False)
 
@@ -65,9 +64,19 @@ class ApplicationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ("id", "created_at", "updated_at")
 
+    def get_organisation_type_display(self, object):
+        if object.content_type:
+            return object.content_type.model.upper()
+        return None
+
     def to_representation(self, instance):
         """Convert model instance to dict - customize organisation fields"""
         data = super().to_representation(instance)
+
+        if instance.content_type:
+            data["organisation_type"] = instance.content_type.model.upper()
+        else:
+            data["organisation_type"] = None
 
         # Replace organisation ID with nested object
         if instance.organisation:
@@ -77,10 +86,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 data["organisation"] = VenueSerializer(instance.organisation).data
             elif isinstance(instance.organisation, Residency):
                 data["organisation"] = ResidencySerializer(instance.organisation).data
-
-        # Set organisation_type from content_type
-        if instance.content_type:
-            data["organisation_type"] = instance.content_type.model.upper()
 
         return data
 
