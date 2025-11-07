@@ -11,14 +11,16 @@ import { ControlledTextEditor } from "@/components/common/form/form-fields/Contr
 import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
 import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
 import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
+import { Action } from "@/interfaces/Enums";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
   showLabels: boolean,
-  organisationType?: string
+  organisationType?: string,
+  action?: Action
 ) => {
-  if (formField.hidden) return;
+  if (formField.hidden || action !== formField.action) return;
   {
     switch (formField.type) {
       case ControlledFormElementType.SELECT:

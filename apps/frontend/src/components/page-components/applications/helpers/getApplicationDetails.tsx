@@ -15,7 +15,6 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
     {
       title: "Status",
       value: _.capitalize(_.lowerCase(application.applicationStatus)),
-      //   element: <StatusBadge capitalize(application.applicationStatus) />,
     },
     {
       title: "Email Subject",

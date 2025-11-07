@@ -1,5 +1,5 @@
 import { ControlledFormElementType } from "./ControlledFormElementType";
-
+import { Action } from "../Enums";
 export interface SelectOptions {
   label: string;
   value: string;
@@ -17,4 +17,5 @@ export interface ControlledFormElement {
   hidden?: boolean;
   defaultValue?: string;
   multiple?: boolean;
+  action?: Action;
 }

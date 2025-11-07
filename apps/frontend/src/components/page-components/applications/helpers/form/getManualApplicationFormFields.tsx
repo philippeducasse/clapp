@@ -5,7 +5,9 @@ import { ApplicationStatusOptions } from "@/interfaces/forms/StatusOptions";
 import { getPerformanceOptions } from "./getApplicationFormFields";
 import { getOptions } from "@/helpers/formHelper";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
-import { OrganisationType } from "@/interfaces/Enums";
+import { OrganisationType, Action} from "@/interfaces/Enums";
+
+
 export const getManualApplicationFormFields = (
   performances: Performance[]
 ): ControlledFormElement[] => {
@@ -16,11 +18,13 @@ export const getManualApplicationFormFields = (
       fieldName: "organisationType",
       type: ControlledFormElementType.SELECT,
       options: getOptions(OrganisationType),
+      action:Action.CREATE,
     },
     {
       label: "Organisation",
-      fieldName: "organisationId",
+      fieldName: "organisation",
       type: ControlledFormElementType.SEARCH,
+      action:Action.CREATE,
     },
     {
       label: "Method",
@@ -47,6 +51,7 @@ export const getManualApplicationFormFields = (
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
       helpText: "Select with which performances you want to apply to this festival",
+      action: Action.CREATE
     },
   ];
 };

@@ -37,7 +37,6 @@ const BasicForm = ({
   isLoading,
   formTitle,
   formSubtitle,
-
   additionalActions,
   action,
 }: BasicFormProps) => {
@@ -61,7 +60,7 @@ const BasicForm = ({
               key={formField.fieldName}
               render={({ field }) => (
                 <FormItem>
-                  {!formField.hidden && (
+                  {!formField.hidden && formField.action === action &&(
                     <FormLabel className="text-emerald-700 dark:text-emerald-400">
                       {formField.label}
                       {formField.required && (
@@ -78,7 +77,7 @@ const BasicForm = ({
                     </FormLabel>
                   )}
                   <FormControl className="">
-                    {getControlledInputs(formField, field, true, organisationType)}
+                    {getControlledInputs(formField, field, true, organisationType, action)}
                   </FormControl>
                   <FormDescription>{formField.helpText}</FormDescription>
                   <FormMessage />

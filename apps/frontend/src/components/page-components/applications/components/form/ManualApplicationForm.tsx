@@ -60,10 +60,18 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   });
 
   useEffect(() => {
-    if (application && initialDataLoaded) {
-      form.reset(sanitizeFormData(application as unknown as Record<string, unknown>));
-      setInitialDataLoaded(false);
-    }
+    if (application && !initialDataLoaded) {
+    const formData = {
+      ...application,
+      organisation: typeof application.organisation === 'object' 
+        ? application.organisation?.id 
+        : application.organisation,
+      performances: application.performances?.map(p => p.id) ?? [],
+    };
+    
+    form.reset(sanitizeFormData(formData as unknown as Record<string, unknown>));
+    setInitialDataLoaded(true);
+  }
   }, [application, form, initialDataLoaded]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
