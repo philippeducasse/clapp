@@ -60,7 +60,7 @@ const BasicForm = ({
               key={formField.fieldName}
               render={({ field }) => (
                 <FormItem>
-                  {!formField.hidden && formField.action === action &&(
+                  {!formField.hidden && (
                     <FormLabel className="text-emerald-700 dark:text-emerald-400">
                       {formField.label}
                       {formField.required && (
