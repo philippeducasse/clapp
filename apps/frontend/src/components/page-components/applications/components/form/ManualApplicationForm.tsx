@@ -23,7 +23,7 @@ import { fetchPerformances } from "@/redux/slices/performanceSlice";
 import { useAppDispatch } from "@/redux/hook";
 
 interface ManualApplicationFormProps {
-  action: string;
+  action: Action;
 }
 
 const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
@@ -61,32 +61,38 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
 
   useEffect(() => {
     if (application && !initialDataLoaded) {
-    const formData = {
-      ...application,
-      organisation: typeof application.organisation === 'object' 
-        ? application.organisation?.id 
-        : application.organisation,
-      performances: application.performances?.map(p => p.id) ?? [],
-    };
-    
-    form.reset(sanitizeFormData(formData as unknown as Record<string, unknown>));
-    setInitialDataLoaded(true);
-  }
+      const formData = {
+        ...application,
+        organisation:
+          typeof application.organisation === "object"
+            ? application.organisation?.id
+            : application.organisation,
+        performances: application.performances?.map((p) => p.id) ?? [],
+      };
+
+      form.reset(sanitizeFormData(formData as unknown as Record<string, unknown>));
+      setInitialDataLoaded(true);
+    }
   }, [application, form, initialDataLoaded]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
-        const updatedApplication = { ...application, ...values, id: applicationId, profileId: profile?.id} as Application;
-        console.log("updated:",updatedApplication)
+        const updatedApplication = {
+          ...application,
+          ...values,
+          id: applicationId,
+          profileId: profile?.id,
+        } as Application;
+        console.log("updated:", updatedApplication);
         await applicationApiService.updateApplication(updatedApplication);
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
-          const application: ApplicationCreate = { ...values, profileId: profile?.id,  };
-          console.log("application: ", application)
+          const application: ApplicationCreate = { ...values, profileId: profile?.id };
+          console.log("application: ", application);
           const newApplication = await applicationApiService.createApplication(application);
           router.push(`/applications/${newApplication?.id}`);
         }
@@ -114,6 +120,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
         onCancelHref={onCancelHref}
         isLoading={isLoading}
         entity={application}
+        action={action}
       />
     </>
   );

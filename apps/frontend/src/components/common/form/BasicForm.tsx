@@ -53,38 +53,40 @@ const BasicForm = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full caption-bottom text-sm space-y-6 max-w-4xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
         >
-          {formFields.map((formField) => (
-            <FormField
-              control={form.control}
-              name={formField.fieldName as string}
-              key={formField.fieldName}
-              render={({ field }) => (
-                <FormItem>
-                  {!formField.hidden && (
-                    <FormLabel className="text-emerald-700 dark:text-emerald-400">
-                      {formField.label}
-                      {formField.required && (
-                        <span
-                          className={`-ml-1 ${
-                            form.formState.errors[formField.fieldName]
-                              ? "text-red-600"
-                              : "text-emerald-700"
-                          }`}
-                        >
-                          *
-                        </span>
-                      )}
-                    </FormLabel>
+          {formFields.map(
+            (formField) =>
+              !formField.hidden &&
+              (!formField.action || action === formField.action) && (
+                <FormField
+                  control={form.control}
+                  name={formField.fieldName as string}
+                  key={formField.fieldName}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-emerald-700 dark:text-emerald-400">
+                        {formField.label}
+                        {formField.required && (
+                          <span
+                            className={`-ml-1 ${
+                              form.formState.errors[formField.fieldName]
+                                ? "text-red-600"
+                                : "text-emerald-700"
+                            }`}
+                          >
+                            *
+                          </span>
+                        )}
+                      </FormLabel>
+                      <FormControl className="">
+                        {getControlledInputs(formField, field, true, organisationType, action)}
+                      </FormControl>
+                      <FormDescription>{formField.helpText}</FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  <FormControl className="">
-                    {getControlledInputs(formField, field, true, organisationType, action)}
-                  </FormControl>
-                  <FormDescription>{formField.helpText}</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+                />
+              )
+          )}
           <div className="flex justify-between mt-6">
             <BackButton href={onCancelHref} />
             <div className="flex gap-4">
