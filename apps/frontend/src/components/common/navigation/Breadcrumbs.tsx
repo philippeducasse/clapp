@@ -11,29 +11,39 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { selectFestival } from "@/redux/slices/festivalSlice";
+import { selectApplication } from "@/redux/slices/applicationSlice";
 
 const Breadcrumbs = () => {
   const pathname = usePathname();
 
-  // Get data from Redux slices if needed
-  const festival = useSelector((state: RootState) => state.festivals.selectedFestival);
-  const application = useSelector((state: RootState) => state.applications.selectedApplication);
+  // Extract IDs from URL path
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const festivalId = pathname.includes("/festivals/") ? Number(pathSegments[1]) : undefined;
+  const applicationId = pathname.includes("/applications/") ? Number(pathSegments[1]) : undefined;
+
+  // Get data from Redux slices using selectors
+  const festival = useSelector((state: RootState) =>
+    festivalId ? selectFestival(state, festivalId) : undefined
+  );
+  const application = useSelector((state: RootState) =>
+    applicationId ? selectApplication(state, applicationId) : undefined
+  );
 
   // Determine which entity we're dealing with
   let entityName = "";
   let entityPath = "";
 
-  if (pathname.includes("/festivals/")) {
-    entityName = festival?.name ?? "Festival";
-    entityPath = `/festivals/${festival?.id ?? ""}`;
-  } else if (pathname.includes("/applications/")) {
-    entityName = application?.emailSubject ?? `Application for ${application?.organisation.name}`;
-    entityPath = `/applications/${application?.id ?? ""}`;
+  if (pathname.includes("/festivals/") && festival) {
+    entityName = festival.name ?? "Festival";
+    entityPath = `/festivals/${festival.id}`;
+  } else if (pathname.includes("/applications/") && application) {
+    entityName = application.emailSubject ?? `Application for ${typeof application.organisation === 'object' ? application.organisation.name : 'Unknown'}`;
+    entityPath = `/applications/${application.id}`;
   }
 
   // Build breadcrumbs based on current route
   const buildBreadcrumbs = () => {
-    const pathSegments = pathname.split("/").filter(Boolean);
     const breadcrumbs = [
       { path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> },
     ];

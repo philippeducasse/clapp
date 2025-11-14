@@ -7,14 +7,12 @@ interface ResidenciesState {
   residencies: Residency[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-  selectedResidency?: Residency;
 }
 
 const initialState: ResidenciesState = {
   residencies: [],
   status: "idle",
   error: null,
-  selectedResidency: undefined,
 };
 
 export const fetchResidencies = createAsyncThunk(
@@ -42,9 +40,6 @@ const residencySlice = createSlice({
         state.residencies.push(action.payload);
       }
     },
-    setSelectedResidency(state, action: PayloadAction<Residency>) {
-      state.selectedResidency = action.payload;
-    },
     addResidency(state, action: PayloadAction<Residency>) {
       state.residencies.push(action.payload);
     },
@@ -65,7 +60,7 @@ const residencySlice = createSlice({
       })
       .addCase(fetchResidencies.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.residencies = action.payload;
+        state.residencies = action.payload.results;
       })
       .addCase(fetchResidencies.rejected, (state, action) => {
         state.status = "failed";
@@ -79,7 +74,6 @@ export const {
   setResidency,
   addResidency,
   updateResidency,
-  setSelectedResidency,
 } = residencySlice.actions;
 
 export const selectAllResidencies = (state: RootState) =>

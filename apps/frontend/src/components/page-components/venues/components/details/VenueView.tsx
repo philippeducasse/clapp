@@ -5,7 +5,7 @@ import { Flag } from "lucide-react";
 import { VenueUpdateDialog } from "../update/VenueUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectVenue, setSelectedVenue } from "@/redux/slices/venueSlice";
+import { selectVenue } from "@/redux/slices/venueSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
@@ -30,8 +30,6 @@ const VenueView = () => {
   useEffect(() => {
     if (!venue) {
       refreshVenue(venueId, dispatch);
-    } else {
-      dispatch(setSelectedVenue(venue));
     }
   }, [venueId, venue, dispatch]);
 

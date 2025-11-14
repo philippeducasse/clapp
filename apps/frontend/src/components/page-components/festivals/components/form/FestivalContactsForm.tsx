@@ -29,7 +29,6 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const params = useParams();
   const [festivalId, contactIndex] = [Number(params?.id), Number(params?.index)];
   const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
-  const selectedFestival = useSelector((state: RootState) => state.festivals.selectedFestival);
 
   const formFields = getFestivalContactFormFields(action === Action.EDIT);
   const formSchema = createZodFormSchema(formFields);
@@ -87,12 +86,12 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        const existingContacts = selectedFestival?.contacts ?? [];
+        const existingContacts = festival?.contacts ?? [];
 
         const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
 
         const festivalWithContacts = {
-          ...selectedFestival,
+          ...festival,
           contacts: updatedContacts,
         };
 

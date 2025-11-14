@@ -7,14 +7,12 @@ interface VenuesState {
   venues: Venue[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-  selectedVenue?: Venue;
 }
 
 const initialState: VenuesState = {
   venues: [],
   status: "idle",
   error: null,
-  selectedVenue: undefined,
 };
 
 export const fetchVenues = createAsyncThunk("venues/fetchVenues", async () => {
@@ -39,9 +37,6 @@ const venueSlice = createSlice({
         state.venues.push(action.payload);
       }
     },
-    setSelectedVenue(state, action: PayloadAction<Venue>) {
-      state.selectedVenue = action.payload;
-    },
     addVenue(state, action: PayloadAction<Venue>) {
       state.venues.push(action.payload);
     },
@@ -60,7 +55,7 @@ const venueSlice = createSlice({
       })
       .addCase(fetchVenues.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.venues = action.payload;
+        state.venues = action.payload.results;
       })
       .addCase(fetchVenues.rejected, (state, action) => {
         state.status = "failed";
@@ -69,7 +64,7 @@ const venueSlice = createSlice({
   },
 });
 
-export const { setVenues, setVenue, addVenue, updateVenue, setSelectedVenue } =
+export const { setVenues, setVenue, addVenue, updateVenue } =
   venueSlice.actions;
 
 export const selectAllVenues = (state: RootState) => state.venues.venues;

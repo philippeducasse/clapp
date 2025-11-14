@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { University } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectResidency, setSelectedResidency } from "@/redux/slices/residencySlice";
+import { selectResidency } from "@/redux/slices/residencySlice";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getResidencyBasicInfo } from "../../helpers/getResidencyBasicInfo";
@@ -29,8 +29,6 @@ const ResidencyView = () => {
   useEffect(() => {
     if (!residency) {
       refreshResidency(residencyId, dispatch);
-    } else {
-      dispatch(setSelectedResidency(residency));
     }
   }, [residencyId, residency, dispatch]);
 
