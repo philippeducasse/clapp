@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import { festivalApiService } from "@/api/festivalApiService";
-import { Application } from "@/interfaces/entities/Application";
+import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { selectProfile } from "@/redux/slices/authSlice";
 import { selectAllPerformances, fetchPerformances } from "@/redux/slices/performanceSlice";
 import { Festival } from "@/interfaces/entities/Festival";
@@ -72,14 +72,21 @@ const ApplicationForm = () => {
     const { attachmentsSent, ...vals } = values;
     if (profile) {
       try {
+        const applicationData = {
+          ...vals,
+          profileId: profile.id,
+          objectType: "Festival",
+          objectId: festivalId,
+        };
         const response = await festivalApiService.apply(
           festivalId,
-          vals as Application,
+          applicationData as ApplicationCreate,
           attachmentsSent as File[],
           "attachments_sent"
         );
-        const { applicationId } = response;
-        router.push(`/applications/${applicationId}`);
+        if ("applicationId" in response) {
+          router.push(`/applications/${response.applicationId}`);
+        }
       } catch (error) {
         console.error(error);
       } finally {

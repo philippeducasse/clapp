@@ -37,7 +37,7 @@ export const VenueUpdateDialog = () => {
     setLoading(true);
     try {
       if (venue && !updatedFields) {
-        const response = await venueApiService.enrich(venue);
+        const response = await venueApiService.enrich(venue.id);
         setUpdatedFields(response);
       }
     } catch (error) {

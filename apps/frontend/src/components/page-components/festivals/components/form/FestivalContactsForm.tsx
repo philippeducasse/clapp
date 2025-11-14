@@ -43,7 +43,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, contactToEdit),
+    defaultValues: getInitialValues(formFields, contactToEdit as unknown as Record<string, unknown>),
     mode: "onSubmit",
   });
 
@@ -66,7 +66,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   // Reset form when contact data is loaded (edit mode only)
   useEffect(() => {
     if (action === Action.EDIT && contactToEdit) {
-      form.reset(contactToEdit);
+      form.reset(contactToEdit as unknown as Record<string, unknown>);
     }
   }, [contactToEdit, form, action]);
 
@@ -77,12 +77,12 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
 
       if (action === Action.EDIT) {
         const updatedContacts = [...(festival?.contacts ?? [])];
-        updatedContacts[contactIndex] = values as OrganisationContact;
+        updatedContacts[contactIndex] = values as unknown as OrganisationContact;
 
         const updatedFestival = {
           ...festival,
           contacts: updatedContacts,
-        };
+        } as Festival;
         await festivalApiService.update(updatedFestival);
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);

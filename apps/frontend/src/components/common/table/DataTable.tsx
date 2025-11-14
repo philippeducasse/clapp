@@ -10,6 +10,8 @@ import {
   getFilteredRowModel,
   SortingState,
   getSortedRowModel,
+  PaginationState,
+  OnChangeFn,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -29,11 +31,8 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   entityName: EntityName;
-  pagination?: {
-    pageIndex: number;
-    pageSize: number;
-  };
-  setPagination?: (pagination: { pageIndex: number; pageSize: number }) => void;
+  pagination?: PaginationState;
+  setPagination?: OnChangeFn<PaginationState>;
   totalCount?: number;
   isLoading?: boolean;
   filters?: FilterConfig[];

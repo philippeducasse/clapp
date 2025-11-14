@@ -91,9 +91,14 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
-          const application: ApplicationCreate = { ...values, profileId: profile?.id };
+          const application: ApplicationCreate = {
+            ...values,
+            profileId: profile.id,
+            objectType: (values as Record<string, unknown>).organisationType as string,
+            objectId: (values as Record<string, unknown>).organisation as number,
+          };
           console.log("application: ", application);
-          const newApplication = await applicationApiService.createApplication(application);
+          const newApplication = await applicationApiService.createApplication(application as unknown as Application);
           router.push(`/applications/${newApplication?.id}`);
         }
       }

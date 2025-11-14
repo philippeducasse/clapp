@@ -27,6 +27,8 @@ const statusBadgeVariants = cva(
           "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/40",
         [ApplicationStatus.OTHER]:
           "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800/40",
+        [ApplicationStatus.DRAFT]:
+          "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/40",
       },
     },
     defaultVariants: {

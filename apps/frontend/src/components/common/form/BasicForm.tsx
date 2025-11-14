@@ -78,7 +78,7 @@ const BasicForm = ({
                         )}
                       </FormLabel>
                       <FormControl className="">
-                        {getControlledInputs(formField, field, true, organisationType, action)}
+                        {getControlledInputs(formField, field, true, organisationType)}
                       </FormControl>
                       <FormDescription>{formField.helpText}</FormDescription>
                       <FormMessage />
