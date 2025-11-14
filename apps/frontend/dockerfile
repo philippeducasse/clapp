@@ -2,7 +2,7 @@ FROM node:22-alpine AS base
 ARG APP_HOME=/app
 
 FROM base AS deps
-RUN apk add --no-cache libc-compat
+RUN apk add --no-cache libc6-compat
 # sets relative path, all subsequennt path references are based off this
 WORKDIR ${APP_HOME}
 
@@ -22,7 +22,7 @@ ENV NODE_ENV production
 
 RUN npm run build
 
-FROM base as run
+FROM base AS run
 WORKDIR ${APP_HOME}
 
 ENV NODE_ENV production

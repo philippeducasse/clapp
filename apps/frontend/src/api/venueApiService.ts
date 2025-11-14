@@ -6,7 +6,7 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
-import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
+import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
@@ -57,11 +57,11 @@ const generateEmail = (venueId: number): Promise<{ message: string }> => {
 
 const apply = (
   venueId: number,
-  application: Application,
+  application: ApplicationCreate,
   files: File[],
   fileFieldName: string
-): Promise<Application> => {
-  return sendFormDataRequest<ApplicationCreate, Application>(
+): Promise<ApplicationCreate> => {
+  return sendFormDataRequest<ApplicationCreate, ApplicationCreate>(
     `${endpoint}${venueId}/apply/`,
     application,
     files,

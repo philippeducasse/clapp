@@ -6,7 +6,7 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
-import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
+import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
@@ -51,7 +51,7 @@ const enrich = (id: number): Promise<Residency> => {
 
 const apply = (
   residencyId: number,
-  application: Application,
+  application: ApplicationCreate,
   files: File[],
   fileFieldName: string
 ): Promise<{ message: string; applicationId: number }> => {
@@ -65,8 +65,8 @@ const apply = (
   );
 };
 
-const generateEmail = (residencyId: number): Promise<{ message: string }> => {
-  return sendRequest<{ message: string }>(
+const generateEmail = (residencyId: number) => {
+  return sendRequest<{ message: string }, { message: string }>(
     `${endpoint}${residencyId}/generate_email/`,
     { message: "" },
     "POST",

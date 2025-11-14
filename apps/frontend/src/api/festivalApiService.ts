@@ -6,7 +6,7 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
-import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
+import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
@@ -69,7 +69,7 @@ const generateEmail = (
 
 const apply = (
   festivalId: number,
-  application: Application,
+  application: ApplicationCreate,
   files: File[],
   fileFieldName: string
 ): Promise<{ message: string; applicationId: number }> => {

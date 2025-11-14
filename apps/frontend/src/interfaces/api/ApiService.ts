@@ -1,6 +1,6 @@
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { Application } from "@/interfaces/entities/Application";
+import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "../entities/Profile";
 
 export interface EntityApiService<T> {
@@ -13,10 +13,10 @@ export interface EntityApiService<T> {
   enrich: (id: number) => Promise<T>;
   apply: (
     entityId: number,
-    application: Application,
+    application: ApplicationCreate,
     files: File[],
     fileFieldName: string
-  ) => Promise<{ message: string; applicationId: number } | Application>;
+  ) => Promise<{ message: string; applicationId: number } | ApplicationCreate>;
   generateEmail: (
     entityId: number,
     data: { profile: Profile; selectedPerformanceIds?: number[] }
