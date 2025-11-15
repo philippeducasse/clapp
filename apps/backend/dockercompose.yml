@@ -1,0 +1,79 @@
+services:
+  db:
+    image: postgres:16-apline
+    container_name: cab_db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cab}
+      POSTGRES_USER: ${DB_USER:-philippe}
+      POSTGRES_PASSWORD: 0306
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ca-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-philippe}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      container_name: cab
+      environment:
+        - DB_HOST=db
+        - DB_NAME=${DB_NAME:-cab}
+        - DB_USER=${DB_USER:-philippe}
+        - DB_PASSWORD=${DB_PASSWORD:-0306}
+        - DB_PORT=5432
+        - SECRET_KEY=${SECRET_KEY}
+        - DEBUG=${DEBUG:-False}
+        - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+        - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
+
+      depends_on:
+        db:
+          condition: service_healthy
+      networks: 
+        - ca-network
+      volumes:
+        - static_volume:/app/staticfiles
+        - media_colume:/app/media
+
+  next:
+    image: ${REGISTRY_URL}/circus-frontend:${FRONTEND_VERSION:-latest}
+    container_name: caf
+    environment:
+      - NEXT_PUBLIC_API_URL=http://nginx
+    depends_on:
+      - django
+    networks:
+      - ca-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: ca_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro  # For SSL certificates
+    depends_on:
+      - django
+      - next
+    networks:
+      - ca-network
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  circus-network:
+    driver: bridge
