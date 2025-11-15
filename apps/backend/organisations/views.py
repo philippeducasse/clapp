@@ -147,7 +147,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         query = f"{organisation.website_url} {organisation.name} {organisation.country} {datetime.now().year} {org_type}"
         search_results = self.gemini_client.search(query=query)
-
+        # print("SEARCH: ", search_results)
         prompt: str = self.get_enrich_prompt(organisation, search_results)
         # print("prompt: ", prompt)
         llm_response: str = self.mistral_client.chat(prompt=prompt)
@@ -267,6 +267,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 text_content,
                 "info@philippeducasse.com",
                 recipient_emails,
+                # ["philocircus@gmail.com"],
                 # bcc=["info@philippeducasse.com"],
             )
             email.attach_alternative(html_content, "text/html")
