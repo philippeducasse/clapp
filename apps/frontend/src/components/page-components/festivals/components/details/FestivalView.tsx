@@ -94,11 +94,7 @@ const FestivalView = () => {
         entityId={festival.id}
         actionElements={
           <>
-            <SendButton
-              onClick={goToApplyPage}
-              label={festival.applied ? "Go to application" : "Apply to festival"}
-              isLoading={false}
-            />
+            <SendButton onClick={goToApplyPage} label={"Apply"} isLoading={false} />
             <FestivalUpdateDialog />
             <EditButton href={`/festivals/${festival.id}/edit`} />
             <DeleteButton
