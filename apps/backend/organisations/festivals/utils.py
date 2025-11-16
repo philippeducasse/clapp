@@ -409,10 +409,10 @@ def generate_application_mail_prompt(
         Response Format Instructions:
         Return ONLY the email HTML content. 
         CRITICAL: Use <br><br> tags for paragraph breaks (empty lines between sections).
+        CRITICAL: Do NOT use the em dash character (—). Use only regular hyphens (-) or commas instead.
         Use <a> tags for links.
         Do NOT use newlines, \n characters, or any other line break methods.
         Do NOT use asterisks (*) for emphasis (*like this*).
-        do NOT use the em dash character (—). Use only regular hyphens (-) or commas instead.
         Do not add any preamble message, notes, or formatting indicators. 
         The response should begin immediately with the salutation.
 

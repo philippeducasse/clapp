@@ -311,8 +311,7 @@ def generate_application_mail_prompt(
 
         Email Requirements:
         - Salutation: {salutation}
-        - Introduction: Briefly introduce yourself as {artist_identity} and mention your background/experience (1-2 sentences).
-        This should come immediately after the salutation and before discussing the performances.
+        - Introduction: Briefly introduce yourself as {artist_identity} and mention your background. Then say that you would like to propose {performances} for the enxt edition of the event.
         - Body: Make the text very playful and informal. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this organisation, using the organisation description as your main reference.
         Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the organisation's theme and audience.
         Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
@@ -343,7 +342,14 @@ def generate_application_mail_prompt(
 
         EXAMPLE OUTPUT FORMAT:
 
-        Dear Team,<br><br>I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant, family-friendly performances.<br><br>"Ah Bah Bravo!" is a whirlwind of acrobatic butt hullahooping, flaming staff juggling (while handstanding!), and playful storytelling. It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment.<br><br>Here you can see the <a href="https://example.com/trailer">trailer</a><br><br>The dossier is attached with full details, photos, and technical requirements. I'd love to bring this show and can't wait to hear your thoughts—feel free to reach out for any questions!<br><br>Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com<br>Instagram & Facebook
+        Dear Team,<br><br>I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant, 
+        family-friendly performances. I would like to propose my show "Ah Bah Bravo!" to the next edition of your festival.
+        <br><br>"Ah Bah Bravo!" is a whirlwind of acrobatic butt hooping, flaming staff juggling while handstanding, and playful storytelling.
+        It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment.
+        <br><br>Here you can see the <a href="https://example.com/trailer">trailer</a>
+        <br><br>The dossier is attached with full details, photos, and technical requirements. 
+        Looking forward to your reply!
+        <br><br>Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com<br>Instagram & Facebook
 
         """
     return prompt.strip()
