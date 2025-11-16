@@ -27,9 +27,8 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
-  const [festivalId, contactIndex] = [Number(params?.id), Number(params?.index)];
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
-
+  const [festivalId, contactIndex] = [Number(params?.id) || -1, Number(params?.index)];
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId ?? -1));
   const formFields = getFestivalContactFormFields(action === Action.EDIT);
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +41,10 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, contactToEdit as unknown as Record<string, unknown>),
+    defaultValues: getInitialValues(
+      formFields,
+      contactToEdit as unknown as Record<string, unknown>
+    ),
     mode: "onSubmit",
   });
 
@@ -89,11 +91,12 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         const existingContacts = festival?.contacts ?? [];
 
         const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
-
+        console.log("UP", updatedContacts);
         const festivalWithContacts = {
           ...festival,
           contacts: updatedContacts,
         };
+        console.log("fes", festivalWithContacts);
 
         const newFestival = await festivalApiService.create(
           festivalWithContacts as unknown as Festival

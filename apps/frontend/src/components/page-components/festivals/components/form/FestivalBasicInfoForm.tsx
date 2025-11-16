@@ -64,7 +64,8 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         dispatch(updateFestival(updatedFestival));
         router.push(`/festivals/${festival?.id}`);
       } else {
-        dispatch(setFestival(values as Festival));
+        const tempFestival = { ...values, id: -1 };
+        dispatch(setFestival(tempFestival as Festival));
         router.push(`/festivals/create/contact`);
       }
     } catch (error) {
