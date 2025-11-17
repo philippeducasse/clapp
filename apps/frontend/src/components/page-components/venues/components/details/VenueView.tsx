@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshVenue } from "../../helpers/refreshVenue";
 import { Skeleton } from "@/components/ui/skeleton";
-import SendButton from "@/components/common/buttons/GenericButton";
+import { Button } from "@/components/ui/button";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
@@ -50,11 +50,9 @@ const VenueView = () => {
         entityId={venue.id}
         actionElements={
           <>
-            <SendButton
-              onClick={goToApplyPage}
-              label={venue.applied ? "Go to application" : "Apply to venue"}
-              isLoading={false}
-            />
+            <Button onClick={goToApplyPage} disabled={false}>
+              {venue.applied ? "Go to application" : "Apply to venue"}
+            </Button>
             <VenueUpdateDialog />
             <EditButton href={`/venues/${venue.id}/edit`} />
           </>

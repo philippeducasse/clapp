@@ -14,7 +14,7 @@ import BackButton from "../buttons/BackButton";
 import SubmitButton from "../buttons/SubmitButton";
 import { getControlledInputs } from "@/helpers/formHelper";
 import { Action } from "@/interfaces/Enums";
-import SendButton from "../buttons/GenericButton";
+import { Button } from "@/components/ui/button";
 
 interface BasicFormProps {
   form: UseFormReturn;
@@ -92,7 +92,7 @@ const BasicForm = ({
             <div className="flex gap-4">
               {additionalActions}
               {action === Action.APPLY ? (
-                <SendButton label="Send application" isLoading={isLoading} />
+                <Button disabled={isLoading}>Send application</Button>
               ) : (
                 <SubmitButton
                   label={action === Action.CREATE ? "Next" : undefined}

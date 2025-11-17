@@ -3,7 +3,7 @@ import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElem
 import { Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
-
+import { ApplicationMethod } from "@/interfaces/entities/Application";
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
     value: String(p.id),
@@ -19,6 +19,16 @@ export const getApplicationFormFields = (
   const performanceOptions = getPerformanceOptions(performances);
 
   return [
+    {
+      label: "Method",
+      fieldName: "applicationMethod",
+      type: ControlledFormElementType.SELECT,
+      options: [
+        { value: "EMAIL", label: "Email" },
+        { value: "FORM", label: "Form" },
+      ],
+      defaultValue: ApplicationMethod.EMAIL,
+    },
     {
       label: "Email subject",
       fieldName: "emailSubject",

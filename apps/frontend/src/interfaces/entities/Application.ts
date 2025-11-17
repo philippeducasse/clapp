@@ -42,7 +42,7 @@ export type ApplicationCreate = Partial<
 export enum ApplicationMethod {
   EMAIL = "EMAIL",
   FORM = "FORM",
-  INVITATION_ONLY = "INVITATION_ONLY",
+  INVITATION = "INVITATION",
   OTHER = "OTHER",
   UNKNOWN = "UNKNOWN",
 }

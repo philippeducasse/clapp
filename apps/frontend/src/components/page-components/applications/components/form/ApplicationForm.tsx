@@ -49,6 +49,7 @@ const ApplicationForm = () => {
     mode: "onSubmit",
   });
 
+  // const applicationType = form.watch("applicationMethod");
   const performanceSelection = form.watch("performances") as number[];
 
   useEffect(() => {

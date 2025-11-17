@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshResidency } from "../../helpers/refreshResidency";
 import { Skeleton } from "@/components/ui/skeleton";
-import GenericButton from "@/components/common/buttons/GenericButton";
+import { Button } from "@/components/ui/button";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
@@ -49,7 +49,9 @@ const ResidencyView = () => {
         entityId={residency.id}
         actionElements={
           <>
-            <GenericButton onClick={goToApplyPage} label={"Apply to residency"} isLoading={false} />
+            <Button onClick={goToApplyPage} disabled={false}>
+              Apply to residency
+            </Button>
             <EditButton href={`/residencies/${residency.id}/edit`} />
           </>
         }

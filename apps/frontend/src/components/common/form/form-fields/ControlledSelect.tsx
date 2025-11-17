@@ -15,11 +15,7 @@ interface ControlledSelectProps {
   showLabels: boolean;
 }
 
-const ControlledSelect = ({
-  field,
-  options,
-  showLabels,
-}: ControlledSelectProps) => {
+const ControlledSelect = ({ field, options, showLabels }: ControlledSelectProps) => {
   return showLabels ? (
     <Select
       value={field.value as string | undefined}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Flag, MessageSquare } from "lucide-react";
+import { Flag, MessageSquare, Send } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
 import { Skeleton } from "@/components/ui/skeleton";
-import SendButton from "@/components/common/buttons/GenericButton";
+import { Button } from "@/components/ui/button";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
@@ -94,7 +94,9 @@ const FestivalView = () => {
         entityId={festival.id}
         actionElements={
           <>
-            <SendButton onClick={goToApplyPage} label={"Apply"} isLoading={false} />
+            <Button onClick={goToApplyPage}>
+              <Send /> Apply
+            </Button>
             <FestivalUpdateDialog />
             <EditButton href={`/festivals/${festival.id}/edit`} />
             <DeleteButton

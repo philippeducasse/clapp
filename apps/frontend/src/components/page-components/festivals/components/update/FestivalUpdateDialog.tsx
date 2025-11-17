@@ -21,7 +21,6 @@ import { selectFestival, updateFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { X } from "lucide-react";
-import GenericButton from "@/components/common/buttons/GenericButton";
 
 export const FestivalUpdateDialog = () => {
   const [open, setOpen] = useState(false);
@@ -69,12 +68,10 @@ export const FestivalUpdateDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <GenericButton
-          variant="secondary"
-          icon={<Hammer />}
-          label="Update"
-          onClick={handleUpdate}
-        />
+        <Button variant="secondary" onClick={handleUpdate}>
+          <Hammer />
+          Update
+        </Button>
       </DialogTrigger>
       <DialogContent className="w-full md:w-[90vw] max-w-full h-[90vh] overflow-y-auto">
         <DialogHeader>
