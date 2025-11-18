@@ -12,7 +12,7 @@ class Application(models.Model):
     APPLICATION_TYPE: List[Tuple[str, str]] = [
         ("EMAIL", "Email"),
         ("FORM", "Form"),
-        ("INVITATION_ONLY", "Invitation only"),
+        ("INVITATION", "Invitation"),
         ("OTHER", "Other"),
         ("UNKNOWN", "Unknown"),
     ]

@@ -1,5 +1,6 @@
 from typing import Any, List, Optional
 
+from applications.models import Application
 from organisations.models import Organisation
 from performances.models import Performance
 from profiles.models import Profile
@@ -288,3 +289,28 @@ def generate_application_mail_prompt(
 
         """
     return prompt.strip()
+
+
+def create_form_application(
+    organisation: Organisation,
+    performances: List[Performance],
+    default_profile: Profile,
+    comments: str,
+) -> Application:
+    print("SO FAR SO GOOD")
+    application = Application.objects.create(
+        application_method="FORM",
+        organisation=organisation,
+        profile=default_profile,
+        comments=comments,
+        application_status="APPLIED",
+    )
+
+    if performances:
+        performance_ids = [
+            int(id.strip()) for id in performances.split(",") if id.strip()
+        ]
+        application.performances.set(Performance.objects.filter(id__in=performance_ids))
+        application.save()
+
+    return application

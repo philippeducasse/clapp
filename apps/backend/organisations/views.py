@@ -25,7 +25,11 @@ from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
 
 from .models import Organisation
-from .services import generate_application_mail_prompt, generate_enrich_prompt
+from .services import (
+    generate_application_mail_prompt,
+    generate_enrich_prompt,
+    create_form_application,
+)
 from .utils import clean_organisation_data, extract_fields_from_llm
 
 
@@ -179,16 +183,31 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
-
+        # TODO: refactor this once more than one user
+        default_profile = Profile.objects.get(id=2)
         application_method = request.data.get("application_method")
+        performances = request.data.get("performances")
+        comments = request.data.get("comments", None)
 
         if application_method == "FORM":
-            print("create form application")
-            return Response(
-                {"message": "Form application created"},
-                status=status.HTTP_200_OK,
-            )
-
+            try:
+                online_form_application = create_form_application(
+                    organisation, performances, default_profile, comments
+                )
+                return Response(
+                    {
+                        "message": "Form application created",
+                        "applicationId": online_form_application.id,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            except Exception:
+                return Response(
+                    {
+                        "error": f"Failed to create form application for{self.get_organisation_type_name().capitalize()}"
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
         # Parse and validate recipients
         recipients_input = request.data.get("recipients", "")
         recipient_emails = [
@@ -222,7 +241,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             )
 
         attachments = request.FILES.getlist("attachments_sent")
-        performances = request.data.get("performances")
 
         # Calculate application year
         current_date = timezone.now().date()
@@ -242,7 +260,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             None,
         )
 
-        if application:
+        if application and "test" not in organisation.name.lower():
             if application.application_status != "DRAFT":
                 return Response(
                     "Application already exists for this organisation and year",
@@ -253,9 +271,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 application.email_subject = subject
                 application.save()
         else:
-            # TODO: refactor this once more than one user
-            default_profile = Profile.objects.get(id=2)
-
             application = Application.objects.create(
                 organisation=organisation,
                 application_date=timezone.now().date(),
