@@ -4,6 +4,7 @@ from applications.models import Application
 from organisations.models import Organisation
 from performances.models import Performance
 from profiles.models import Profile
+from django.utils import timezone
 
 
 def generate_enrich_prompt(
@@ -304,6 +305,7 @@ def create_form_application(
         profile=default_profile,
         comments=comments,
         application_status="APPLIED",
+        application_date=timezone.now().date(),
     )
 
     if performances:
