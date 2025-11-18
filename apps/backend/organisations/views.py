@@ -1,31 +1,34 @@
 from datetime import datetime
-from django.apps import apps
 from typing import Any, Dict, List
-from django.core.mail import EmailMultiAlternatives
-from django.utils import timezone
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.decorators import action, api_view, permission_classes
-from django.utils.html import strip_tags
+
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-from django.http import HttpRequest
-from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
+from django.core.validators import validate_email
 from django.db.models import Q
+from django.http import HttpRequest
+from django.utils import timezone
+from django.utils.html import strip_tags
+from rest_framework import status, viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.request import Request
+from rest_framework.response import Response
+
+from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
-from applications.models import Application
-from services.gemini_service import GeminiClient
-from services.mistral_service import MistralClient
 from performances.models import Performance
 from profiles.models import Profile
+from services.gemini_service import GeminiClient
+from services.mistral_service import MistralClient
+
 from .models import Organisation
 from .utils import (
-    generate_application_mail_prompt,
-    extract_fields_from_llm,
     clean_organisation_data,
+    extract_fields_from_llm,
+    generate_application_mail_prompt,
     generate_enrich_prompt,
 )
 
@@ -179,6 +182,15 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     "error": f"{self.get_organisation_type_name().capitalize()} not found"
                 },
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+        application_method = request.data.get("application_method")
+
+        if application_method == "FORM":
+            print("create form application")
+            return Response(
+                {"message": "Form application created"},
+                status=status.HTTP_200_OK,
             )
 
         # Parse and validate recipients

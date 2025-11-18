@@ -1,13 +1,17 @@
 from typing import Optional
-from django.db.models import Exists, OuterRef, Subquery, QuerySet
+
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Exists, OuterRef, QuerySet, Subquery
+from django_filters.rest_framework import DjangoFilterBackend
+
+from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
-from organisations.views import OrganisationViewSet
 from organisations.models import Organisation
-from applications.models import Application
-from django_filters.rest_framework import DjangoFilterBackend
-from .utils import generate_enrich_prompt as generate_festival_enrich_prompt
+from organisations.utils import (
+    generate_enrich_prompt as generate_festival_enrich_prompt,
+)
+from organisations.views import OrganisationViewSet
 
 
 class FestivalViewSet(OrganisationViewSet):
