@@ -25,12 +25,8 @@ from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
 
 from .models import Organisation
-from .utils import (
-    clean_organisation_data,
-    extract_fields_from_llm,
-    generate_application_mail_prompt,
-    generate_enrich_prompt,
-)
+from .services import generate_application_mail_prompt, generate_enrich_prompt
+from .utils import clean_organisation_data, extract_fields_from_llm
 
 
 @api_view(["GET"])
@@ -331,7 +327,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             performance_ids = request.data.get("selected_performance_ids")
             performance_objects = []
 
-            # Parse performance IDs
             if performance_ids:
                 if isinstance(performance_ids, str):
                     performance_ids = [
@@ -348,9 +343,10 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     Performance.objects.filter(id__in=performance_ids)
                 )
 
-            # Generate email content
+            language = request.data.get("language", "ENGLISH")
+
             prompt = generate_application_mail_prompt(
-                organisation, profile, performance_objects
+                organisation, profile, performance_objects, language
             )
             message = self.mistral_client.chat(prompt=prompt)
 
