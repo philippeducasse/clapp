@@ -36,7 +36,9 @@ const ApplicationForm = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<number[]>([]);
-  const [applicationMethod, setApplicationMethod] = useState<ApplicationMethod.EMAIL | ApplicationMethod.FORM>(ApplicationMethod.EMAIL);
+  const [applicationMethod, setApplicationMethod] = useState<
+    ApplicationMethod.EMAIL | ApplicationMethod.FORM
+  >(ApplicationMethod.EMAIL);
 
   const formFields = getApplicationFormFields(
     festival as Festival,
@@ -56,7 +58,9 @@ const ApplicationForm = () => {
   const performanceSelection = form.watch("performances") as number[];
 
   useEffect(() => {
-    setApplicationMethod(applicationMethodWatch as ApplicationMethod.EMAIL | ApplicationMethod.FORM);
+    setApplicationMethod(
+      applicationMethodWatch as ApplicationMethod.EMAIL | ApplicationMethod.FORM
+    );
   }, [applicationMethodWatch]);
 
   useEffect(() => {
@@ -137,8 +141,8 @@ const ApplicationForm = () => {
         onCancelHref={`/festivals/${festival?.id}`}
         isLoading={isLoading}
         entity={festival}
-        additionalActions={generateEmail()}
-        action={Action.APPLY}
+        additionalActions={applicationMethod == ApplicationMethod.EMAIL ? generateEmail() : null}
+        action={applicationMethod == ApplicationMethod.EMAIL ? Action.APPLY : Action.CREATE}
       />
     </>
   );
