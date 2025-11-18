@@ -14,21 +14,12 @@ export const getPerformanceOptions = (performances: Performance[]): SelectOption
 export const getApplicationFormFields = (
   festival: Festival,
   performances: Performance[],
-  profile: Profile
+  profile: Profile,
+  applicationMethod: ApplicationMethod.EMAIL | ApplicationMethod.FORM
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
 
-  return [
-    {
-      label: "Method",
-      fieldName: "applicationMethod",
-      type: ControlledFormElementType.SELECT,
-      options: [
-        { value: "EMAIL", label: "Email" },
-        { value: "FORM", label: "Form" },
-      ],
-      defaultValue: ApplicationMethod.EMAIL,
-    },
+  const emailApplicationFields = [
     {
       label: "Email subject",
       fieldName: "emailSubject",
@@ -47,13 +38,6 @@ export const getApplicationFormFields = (
       helpText: "Please separate emails by a comma",
     },
     {
-      label: "Performance(s)",
-      fieldName: "performances",
-      type: ControlledFormElementType.MULTI_SELECT,
-      options: performanceOptions,
-      helpText: "Select with which performances you want to apply to this festival",
-    },
-    {
       label: "Message",
       fieldName: "message",
       type: ControlledFormElementType.TEXT_EDITOR,
@@ -64,4 +48,36 @@ export const getApplicationFormFields = (
       type: ControlledFormElementType.FILE,
     },
   ];
+
+  const displayedFields: ControlledFormElement[] = [
+    {
+      label: "Method",
+      fieldName: "applicationMethod",
+      type: ControlledFormElementType.SELECT,
+      options: [
+        { value: "EMAIL", label: "Email" },
+        { value: "FORM", label: "Form" },
+      ],
+      defaultValue: "EMAIL",
+    },
+    {
+      label: "Performance(s)",
+      fieldName: "performances",
+      type: ControlledFormElementType.MULTI_SELECT,
+      options: performanceOptions,
+      helpText: "Select with which performances you want to apply to this festival",
+    },
+  ];
+
+  if (applicationMethod == ApplicationMethod.EMAIL) {
+    displayedFields.push(...emailApplicationFields);
+  }
+
+  displayedFields.push({
+    label: "Comments",
+    fieldName: "comments",
+    type: ControlledFormElementType.TEXT_AREA,
+  });
+
+  return displayedFields;
 };

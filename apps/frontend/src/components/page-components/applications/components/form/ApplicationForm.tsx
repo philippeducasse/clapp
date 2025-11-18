@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import { festivalApiService } from "@/api/festivalApiService";
-import { ApplicationCreate } from "@/interfaces/entities/Application";
+import { ApplicationCreate, ApplicationMethod } from "@/interfaces/entities/Application";
 import { selectProfile } from "@/redux/slices/authSlice";
 import { selectAllPerformances, fetchPerformances } from "@/redux/slices/performanceSlice";
 import { Festival } from "@/interfaces/entities/Festival";
@@ -36,10 +36,13 @@ const ApplicationForm = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<number[]>([]);
+  const [applicationMethod, setApplicationMethod] = useState<ApplicationMethod.EMAIL | ApplicationMethod.FORM>(ApplicationMethod.EMAIL);
+
   const formFields = getApplicationFormFields(
     festival as Festival,
     performances,
-    profile as Profile
+    profile as Profile,
+    applicationMethod
   );
   const formSchema = createZodFormSchema(formFields);
 
@@ -49,8 +52,12 @@ const ApplicationForm = () => {
     mode: "onSubmit",
   });
 
-  // const applicationType = form.watch("applicationMethod");
+  const applicationMethodWatch = form.watch("applicationMethod") ?? "EMAIL";
   const performanceSelection = form.watch("performances") as number[];
+
+  useEffect(() => {
+    setApplicationMethod(applicationMethodWatch as ApplicationMethod.EMAIL | ApplicationMethod.FORM);
+  }, [applicationMethodWatch]);
 
   useEffect(() => {
     setSelectedPerformanceIds(performanceSelection);
