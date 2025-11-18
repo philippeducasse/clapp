@@ -56,6 +56,7 @@ const ApplicationForm = () => {
 
   const applicationMethodWatch = form.watch("applicationMethod") ?? "EMAIL";
   const performanceSelection = form.watch("performances") as number[];
+  const language = form.watch("language") as string;
 
   useEffect(() => {
     setApplicationMethod(
@@ -111,7 +112,7 @@ const ApplicationForm = () => {
     const handleClick = async () => {
       setIsLoading(true);
       if (profile) {
-        const data = { profile, selectedPerformanceIds };
+        const data = { profile, selectedPerformanceIds, language };
         try {
           const { message } = await festivalApiService.generateEmail(festivalId, data);
           form.setValue("message", message);

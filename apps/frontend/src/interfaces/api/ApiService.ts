@@ -19,6 +19,6 @@ export interface EntityApiService<T> {
   ) => Promise<{ message: string; applicationId: number } | ApplicationCreate>;
   generateEmail: (
     entityId: number,
-    data: { profile: Profile; selectedPerformanceIds?: number[] }
+    data: { profile: Profile; selectedPerformanceIds?: number[]; language: string }
   ) => Promise<{ message: string }>;
 }

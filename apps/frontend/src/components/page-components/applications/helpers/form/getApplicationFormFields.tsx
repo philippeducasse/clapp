@@ -4,6 +4,7 @@ import { Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
+import { capitalize } from "lodash";
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
     value: String(p.id),
@@ -18,8 +19,9 @@ export const getApplicationFormFields = (
   applicationMethod: ApplicationMethod.EMAIL | ApplicationMethod.FORM
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
+  const userLanguages = ["FRENCH", "ITALIAN", "GERMAN", "ENGLISH", "SPANISH"];
 
-  const emailApplicationFields = [
+  const emailApplicationFields: ControlledFormElement[] = [
     {
       label: "Email subject",
       fieldName: "emailSubject",
@@ -36,6 +38,14 @@ export const getApplicationFormFields = (
       type: ControlledFormElementType.TEXT,
       defaultValue: festival?.contacts?.[0]?.email ?? "",
       helpText: "Please separate emails by a comma",
+    },
+    {
+      label: "Language",
+      fieldName: "language",
+      type: ControlledFormElementType.SELECT,
+      options: userLanguages.map((l) => ({ value: l, label: capitalize(l) })),
+      helpText: "Provide the language for the email generation",
+      defaultValue: "ENGLISH",
     },
     {
       label: "Message",
@@ -59,6 +69,10 @@ export const getApplicationFormFields = (
         { value: "FORM", label: "Form" },
       ],
       defaultValue: "EMAIL",
+      helpText:
+        applicationMethod == ApplicationMethod.FORM
+          ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."
+          : "",
     },
     {
       label: "Performance(s)",
