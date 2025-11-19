@@ -278,6 +278,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 message=message,
                 email_subject=subject,
                 profile=default_profile,
+                email_recipients=recipient_emails,
             )
 
         # Send email

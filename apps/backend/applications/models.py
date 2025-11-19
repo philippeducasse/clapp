@@ -51,7 +51,7 @@ class Application(models.Model):
         blank=True,
     )
     email_subject = models.CharField(max_length=100, blank=True)
-    email_recipients = models.JSONField(blank=True)
+    email_recipients = models.JSONField(blank=True, null=True)
     message = models.CharField(max_length=10000, blank=True)
     attachments_sent = models.JSONField(blank=True, null=True)
     application_status = models.CharField(
