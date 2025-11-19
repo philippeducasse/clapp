@@ -14,7 +14,6 @@ const ControlledMultiSelect = ({ options, field }: MultiSelectProps) => {
       onValueChange={(val) => {
         field.onChange(val);
       }}
-      //   placeholder=""
     />
   );
 };

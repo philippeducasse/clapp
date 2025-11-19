@@ -18,6 +18,10 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
     },
     {
       title: "Email Subject",
+      value: application.emailRecipients,
+    },
+    {
+      title: "Email Subject",
       value: application.emailSubject,
     },
     {

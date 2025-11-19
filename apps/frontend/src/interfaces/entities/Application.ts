@@ -15,20 +15,11 @@ export interface Application {
   emailSubject?: string;
   message?: string;
   attachmentsSent?: File[];
-  attachmentsReceived?: File[];
-  answerReceived?: boolean;
-  answerDate?: string;
   applicationStatus: ApplicationStatus;
-  followUpDate?: string;
-  responseDetails?: string;
-  performanceDetails?: string;
-  contractReceived?: boolean;
-  contractSigned?: boolean;
-  paymentReceived?: boolean;
-  paymentAmount?: number;
   comments?: string;
   createdAt: string;
   updatedAt?: string;
+  emailRecipients?: string[];
 }
 
 export type ApplicationCreate = Partial<
