@@ -7,6 +7,7 @@ export enum ControlledFormElementType {
   URL = "URL",
   EMAIL = "EMAIL",
   BOOLEAN = "BOOLEAN",
+  MULTI_EMAIL = "MULTI_EMAIL",
   TEXT_AREA = "TEXT_AREA",
   TEXT_EDITOR = "TEXT_EDITOR",
   MULTI_SELECT = "MULTI_SELECT",

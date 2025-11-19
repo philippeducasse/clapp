@@ -11,6 +11,7 @@ import { ControlledTextEditor } from "@/components/common/form/form-fields/Contr
 import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
 import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
 import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
+import ControlledMultiEmail from "@/components/common/form/form-fields/ControlledMultiEmail";
 
 export const getControlledInputs = (
   formField: ControlledFormElement,
@@ -34,6 +35,8 @@ export const getControlledInputs = (
         return <ControlledTextArea field={field} showLabels={showLabels} />;
       case ControlledFormElementType.TEXT_EDITOR:
         return <ControlledTextEditor field={field} />;
+      case ControlledFormElementType.MULTI_EMAIL:
+        return <ControlledMultiEmail field={field} />;
       case ControlledFormElementType.FILE:
         return <ControlledFile field={field} />;
       case ControlledFormElementType.SEARCH:
@@ -94,6 +97,9 @@ export const createZodFormSchema = (
         break;
       case ControlledFormElementType.EMAIL:
         zodType = z.email();
+        break;
+      case ControlledFormElementType.MULTI_EMAIL:
+        zodType = z.array(z.email());
         break;
       case ControlledFormElementType.SEARCH:
         zodType = z.number();

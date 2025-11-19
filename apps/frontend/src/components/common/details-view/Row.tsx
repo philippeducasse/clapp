@@ -44,6 +44,13 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
         );
       case SectionCellType.Bool:
         return value ? "Yes" : "No";
+      case SectionCellType.HTML:
+        return (
+          <p
+            dangerouslySetInnerHTML={{ __html: value }}
+            className="prose dark:prose-invert max-w-none"
+          />
+        );
       default:
         return value.toString() || <span className="text-gray-400">-</span>;
     }

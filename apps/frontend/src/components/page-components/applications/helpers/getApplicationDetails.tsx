@@ -17,16 +17,17 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
       value: _.capitalize(_.lowerCase(application.applicationStatus)),
     },
     {
-      title: "Email Subject",
-      value: application.emailRecipients,
+      title: "Email recipients",
+      value: application.emailRecipients?.join(", "),
     },
     {
-      title: "Email Subject",
+      title: "Email subject",
       value: application.emailSubject,
     },
     {
       title: "Email content",
       value: application.message,
+      type: SectionCellType.HTML,
     },
     {
       title: "Comments",
