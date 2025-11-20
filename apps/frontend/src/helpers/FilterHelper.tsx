@@ -15,10 +15,11 @@ import { MultiSelect } from "@/components/ui/multi-select";
 
 export const getFilterInput = <TData,>(
   filterConfig: FilterConfig,
-  value: string | string[],
+  value: string | string[] | boolean,
   column: Column<TData>
 ) => {
   const renderInput = () => {
+    console.log("val", typeof value, value);
     switch (filterConfig.type) {
       case FilterType.SELECT:
         return filterConfig.options ? (
@@ -45,7 +46,6 @@ export const getFilterInput = <TData,>(
             options={filterConfig.options}
             defaultValue={Array.isArray(value) ? value : []}
             onValueChange={(values) => {
-              console.log("VALUES:", values);
               column?.setFilterValue(values.length > 0 ? values : undefined);
             }}
           />
@@ -55,7 +55,7 @@ export const getFilterInput = <TData,>(
         return (
           <Input
             type="number"
-            value={value || ""}
+            value={typeof value === "string" ? value : ""}
             onChange={(event) => column?.setFilterValue(event || undefined)}
             placeholder={`Enter ${filterConfig.label.toLowerCase()}`}
           />
@@ -65,7 +65,7 @@ export const getFilterInput = <TData,>(
         return (
           <Input
             type="date"
-            value={value || ""}
+            value={typeof value === "string" ? value : ""}
             onChange={(event) => column?.setFilterValue(event || undefined)}
             placeholder={filterConfig.label}
           />
@@ -73,8 +73,11 @@ export const getFilterInput = <TData,>(
       case FilterType.BOOLEAN:
         return (
           <Switch
-            value={value || ""}
-            onChange={(event) => column?.setFilterValue(event || undefined)}
+            checked={value === true}
+            onCheckedChange={(checked) => {
+              console.log("checked state", value, checked);
+              column?.setFilterValue(checked ? true : undefined);
+            }}
           />
         );
 
@@ -83,7 +86,7 @@ export const getFilterInput = <TData,>(
         return (
           <Input
             type="text"
-            value={value || ""}
+            value={typeof value === "string" ? value : ""}
             onChange={(event) => column?.setFilterValue(event || undefined)}
             placeholder={`Search ${filterConfig.label.toLowerCase()}`}
           />

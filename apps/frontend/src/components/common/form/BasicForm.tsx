@@ -27,6 +27,7 @@ interface BasicFormProps {
   formSubtitle?: string;
   additionalActions?: React.ReactNode;
   action?: Action;
+  submitButtonLabel?: string;
 }
 
 const BasicForm = ({
@@ -39,6 +40,7 @@ const BasicForm = ({
   formSubtitle,
   additionalActions,
   action,
+  submitButtonLabel,
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
 
@@ -95,7 +97,7 @@ const BasicForm = ({
                 <Button disabled={isLoading}>Send application</Button>
               ) : (
                 <SubmitButton
-                  label={action === Action.CREATE ? "Next" : undefined}
+                  label={submitButtonLabel ?? "Save"}
                   isLoading={isLoading}
                   showIcon={action !== Action.CREATE}
                 />

@@ -93,6 +93,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         entity={festival}
         action={action}
         formTitle="Basic Information"
+        submitButtonLabel="Next"
         formSubtitle={
           action === Action.CREATE
             ? "Please provide basic festival information. You will provide contact information next."

@@ -28,12 +28,15 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
       <DialogContent className="w-1/3 border-2 ">
         <DialogHeader className="items-center w-full">
           <DialogTitle>Set filters</DialogTitle>
-          <div className="flex gap-2 flex-col w-full mt-8">
+          <div className="flex gap-8 flex-col w-full mt-8">
             {filters.map((filter) => {
               const column = table.getColumn(filter.column) as Column<TData>;
-              const value = filter.type === FilterType.MULTI_SELECT
-                ? (column?.getFilterValue() as string[]) ?? []
-                : (column?.getFilterValue() as string) ?? "";
+              const value =
+                filter.type === FilterType.MULTI_SELECT
+                  ? (column?.getFilterValue() as string[]) ?? []
+                  : filter.type === FilterType.BOOLEAN
+                    ? (column?.getFilterValue() as boolean) ?? false
+                    : (column?.getFilterValue() as string) ?? "";
 
               return (
                 <div key={filter.column} className=" gap-1">

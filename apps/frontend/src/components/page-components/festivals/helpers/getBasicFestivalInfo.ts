@@ -1,6 +1,6 @@
 import { Festival } from "@/interfaces/entities/Festival";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
-import { capitalize } from "lodash";
+import _ from "lodash";
 
 export const getFestivalBasicInfo = (festival: Festival): SectionCellProps[] => {
   if (!festival) return [];
@@ -14,7 +14,7 @@ export const getFestivalBasicInfo = (festival: Festival): SectionCellProps[] => 
       value: festival.websiteUrl,
       type: SectionCellType.Link,
     },
-    { title: "Festival type", value: capitalize(festival.festivalType) },
+    { title: "Festival type", value: _.capitalize(_.lowerCase(festival.festivalType)) },
     { title: "Approximate date", value: festival.approximateDate },
   ];
 };
