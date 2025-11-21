@@ -46,10 +46,9 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       accessorKey: "currentYearApplications",
       header: getSortableHeader("Applied"),
       size: 70,
-      filterFn: (row, columnId, filterValue) => {
-        console.log("hasapplication:", filterValue);
+      filterFn: (row, _columnId, filterValue) => {
         if (filterValue === undefined) return true;
-        const hasApplication = !!row.original?.currentYearApplication?.id;
+        const hasApplication = !!(row.original?.currentYearApplication as Application)?.id;
         return filterValue === "APPLIED" ? hasApplication : !hasApplication;
       },
       cell: ({ row }) => {
@@ -71,8 +70,6 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       header: getSortableHeader("Tag"),
       size: 50,
       filterFn: (row, columnId, filterValue) => {
-        console.log("filtervalue:", filterValue);
-
         if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
         return filterValue.includes(row.getValue(columnId));
       },
