@@ -41,7 +41,11 @@ export const getFestivalFilters = (): FilterConfig[] => {
     {
       column: "currentYearApplications",
       label: "Applied?",
-      type: FilterType.BOOLEAN,
+      type: FilterType.SELECT,
+      options: [
+        { value: "APPLIED", label: "Applied" },
+        { value: "NOT_APPLIED", label: "Not applied" },
+      ],
     },
   ];
 };
