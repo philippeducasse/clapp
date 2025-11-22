@@ -17,18 +17,18 @@ const PerformanceViewSection = ({
   entityId,
   onDelete,
 }: PerformanceViewSectionProps) => {
-  return (
+  return performances.map((performance) => (
     <AuxilliarySection
       title={title}
       icon={<Music className="text-emerald-600 dark:text-emerald-400" />}
-      items={performances}
+      item={performance}
       entityId={entityId}
       formatData={getPerformanceInfo}
       getItemKey={(performance, idx) => `${performance.id}_${idx}`}
       editPath="performances"
       onDelete={onDelete}
     />
-  );
+  ));
 };
 
 export default PerformanceViewSection;

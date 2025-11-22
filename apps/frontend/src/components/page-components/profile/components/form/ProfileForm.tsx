@@ -1,0 +1,103 @@
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useEffect, useState } from "react";
+import { Profile } from "@/interfaces/entities/Profile";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import { getProfileFormFields } from "../../helpers/form/getProfileFormFields";
+import { profileApiService } from "@/api/profileApiService";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { updateProfile, selectProfile } from "@/redux/slices/authSlice";
+import { AppDispatch, RootState } from "@/redux/store";
+import { Skeleton } from "@/components/ui/skeleton";
+import FormHeader from "@/components/common/form/FormHeader";
+import BasicForm from "@/components/common/form/BasicForm";
+import { Action } from "@/interfaces/Enums";
+import { EntityName } from "@/interfaces/Enums";
+
+interface ProfileFormProps {
+  action: Action;
+}
+
+const ProfileForm = ({ action }: ProfileFormProps) => {
+  const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
+  const profile = useSelector((state: RootState) => selectProfile(state));
+  const formFields = getProfileFormFields();
+  const formSchema = createZodFormSchema(formFields);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: getInitialValues(formFields, profile),
+    mode: "onSubmit",
+  });
+
+  // Fetch profile data if not available
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!profile) {
+        try {
+          const fetchedProfile = await profileApiService.getProfile();
+          dispatch(updateProfile(fetchedProfile));
+          setInitialDataLoaded(true);
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      }
+    };
+    fetchProfile();
+  }, [profile, dispatch]);
+
+  // Reset form when profile data changes (but only once)
+  useEffect(() => {
+    if (profile && initialDataLoaded) {
+      form.reset(sanitizeFormData(profile));
+      setInitialDataLoaded(false);
+    }
+  }, [profile, form, initialDataLoaded]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      if (action === Action.EDIT && profile) {
+        const updatedProfile = { ...values, id: profile.id } as Profile;
+        await profileApiService.updateProfile(profile.id, updatedProfile);
+        dispatch(updateProfile(updatedProfile));
+        router.push(`/profile`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!profile) {
+    return <Skeleton />;
+  }
+
+  const onCancelHref = profile ? `/profile` : "/profile";
+
+  return (
+    <>
+      <FormHeader action={action} entityName={EntityName.PROFILE} />
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={onCancelHref}
+        isLoading={isLoading}
+        entity={profile}
+        action={action}
+        formTitle="Profile Information"
+        submitButtonLabel="Save"
+        formSubtitle="Update your profile information and contact details"
+      />
+    </>
+  );
+};
+export default ProfileForm;

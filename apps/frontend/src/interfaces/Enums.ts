@@ -9,6 +9,7 @@ export enum EntityName {
   APPLICATION = "application",
   RESIDENCY = "residency",
   VENUE = "venue",
+  PROFILE = "profile",
 }
 
 export enum TagAction {

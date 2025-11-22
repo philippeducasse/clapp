@@ -42,7 +42,6 @@ const ProfileView = () => {
     setItemName(entity);
     setOpenDeleteDialog(true);
   };
-  console.log("Profile:", profile);
   //   const onConfirmDelete = async () => {
 
   //     try {
@@ -66,7 +65,7 @@ const ProfileView = () => {
   //   };
   if (!profile) return;
   return (
-    <DetailsViewWrapper href="/profiles">
+    <DetailsViewWrapper href="/profile">
       {/* <DeleteModal
         open={openDeleteDialog}
         onOpenChange={setOpenDeleteDialog}
@@ -80,7 +79,7 @@ const ProfileView = () => {
         entityId={profile.id}
         actionElements={
           <>
-            <EditButton href={`/profiles/${profile.id}/edit`} />
+            <EditButton href={`/profile/edit`} />
             <DeleteButton
               variant={"outline"}
               className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
@@ -101,17 +100,25 @@ const ProfileView = () => {
         data={getProfileContactInfo(profile)}
       />
       {profile.performances && profile.performances.length > 0 && (
-        <PerformanceViewSection
-          title="Performances"
-          performances={profile.performances}
-          entityId={profileId}
-          onDelete={(index) => handleDelete("performance", index)}
-        />
+        <>
+          <DetailsViewHeader
+            title={profile?.artistName ?? "Profile"}
+            subtitle={`${profile?.firstName}, ${profile.lastName}`}
+            icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
+            entityId={profile.id}
+          />
+          <PerformanceViewSection
+            title="Performances"
+            performances={profile.performances}
+            entityId={profileId}
+            onDelete={(index) => handleDelete("performance", index)}
+          />
+        </>
       )}
-      {/* <AddSection
-        label="contact"
-        href={`${profileId}/edit/contacts/${profile.contacts?.length ?? 0}`}
-      /> */}
+      <AddSection
+        label="performance"
+        href={`${profileId}/edit/performances/${profile.performances?.length ?? 0}`}
+      />
     </DetailsViewWrapper>
   );
 };
