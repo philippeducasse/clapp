@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CircleUser } from "lucide-react";
+import { CircleUser, PartyPopper } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
@@ -102,13 +102,10 @@ const ProfileView = () => {
       {profile.performances && profile.performances.length > 0 && (
         <>
           <DetailsViewHeader
-            title={profile?.artistName ?? "Profile"}
-            subtitle={`${profile?.firstName}, ${profile.lastName}`}
-            icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
-            entityId={profile.id}
+            title={"Performances"}
+            icon={<PartyPopper className="text-emerald-600 dark:text-emerald-400" size={32} />}
           />
           <PerformanceViewSection
-            title="Performances"
             performances={profile.performances}
             entityId={profileId}
             onDelete={(index) => handleDelete("performance", index)}

@@ -8,7 +8,8 @@ import { SectionCellProps } from "@/interfaces/DetailsView";
 interface AuxilliarySectionProps<T> {
   title: string;
   icon: ReactNode;
-  items: T[];
+  item: T;
+  index: number;
   entityId: number;
   formatData: (item: T) => SectionCellProps[];
   getItemKey: (item: T, idx: number) => string;
@@ -19,7 +20,8 @@ interface AuxilliarySectionProps<T> {
 const AuxilliarySection = <T,>({
   title,
   icon,
-  items,
+  item,
+  index,
   entityId,
   formatData,
   getItemKey,
@@ -27,7 +29,7 @@ const AuxilliarySection = <T,>({
   onDelete,
 }: AuxilliarySectionProps<T>) => {
   return (
-    <Card className="mb-6 relative">
+    <Card className="mb-6 relative" key={getItemKey(item, index)}>
       <CardContent>
         <div className="flex items-center gap-2 mb-6">
           {icon}
@@ -36,15 +38,13 @@ const AuxilliarySection = <T,>({
           </CardTitle>
         </div>
         <div className="">
-          {items.map((item, idx) => (
-            <div key={getItemKey(item, idx)} className="flex flex-col">
-              <DetailsView data={formatData(item)} />
-              <div className="flex my-6 self-end mr-6 gap-2">
-                <EditButton href={`${entityId}/edit/${editPath}/${idx}`} className="" />
-                <DeleteButton variant="outline" onDelete={() => onDelete(idx)} />
-              </div>
+          <div className="flex flex-col">
+            <DetailsView data={formatData(item)} />
+            <div className="flex my-6 self-end mr-6 gap-2">
+              <EditButton href={`${entityId}/edit/${editPath}/${index}`} className="" />
+              <DeleteButton variant="outline" onDelete={() => onDelete(index)} />
             </div>
-          ))}
+          </div>
         </div>
       </CardContent>
     </Card>

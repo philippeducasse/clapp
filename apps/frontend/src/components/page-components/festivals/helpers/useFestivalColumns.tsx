@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import _ from "lodash";
+import { capitalizeFirst } from "@/utils/stringUtils";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { festivalApiService } from "@/api/festivalApiService";
 import { deleteFestival } from "@/redux/slices/festivalSlice";
@@ -82,7 +83,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
       accessorKey: "festivalType",
       header: getSortableHeader("Type"),
       size: 70,
-      cell: ({ row }) => _.capitalize(_.lowerCase(row.original.festivalType)),
+      cell: ({ row }) => capitalizeFirst(row.original.festivalType),
     },
     {
       accessorKey: "websiteUrl",

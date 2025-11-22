@@ -1,6 +1,7 @@
 import { Application } from "@/interfaces/entities/Application";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
 import _ from "lodash";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 export const getApplicationBasicInfo = (application: Application): SectionCellProps[] => {
   if (!application) return [];
@@ -14,7 +15,7 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
     },
     {
       title: "Status",
-      value: _.capitalize(_.lowerCase(application.applicationStatus)),
+      value: capitalizeFirst(application.applicationStatus),
     },
     {
       title: "Email recipients",

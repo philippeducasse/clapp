@@ -18,16 +18,22 @@ const ContactsViewSection = ({
   onDelete,
 }: ContactsViewSectionProps) => {
   return (
-    <AuxilliarySection
-      title={title}
-      icon={<Contact2 className="text-emerald-600 dark:text-emerald-400" />}
-      items={contacts}
-      entityId={entityId}
-      formatData={getFestivalContacts}
-      getItemKey={(contact, idx) => `${contact.email}_${idx}`}
-      editPath="contacts"
-      onDelete={onDelete}
-    />
+    <>
+      {contacts.map((contact, index) => (
+        <AuxilliarySection
+          key={`${contact.email}_${index}`}
+          title={title}
+          icon={<Contact2 className="text-emerald-600 dark:text-emerald-400" />}
+          item={contact}
+          index={index}
+          entityId={entityId}
+          formatData={getFestivalContacts}
+          getItemKey={(contact, idx) => `${contact.email}_${idx}`}
+          editPath="contacts"
+          onDelete={onDelete}
+        />
+      ))}
+    </>
   );
 };
 

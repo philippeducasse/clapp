@@ -8,6 +8,7 @@ import { SlidersHorizontal } from "lucide-react";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { X } from "lucide-react";
 import _ from "lodash";
+import { capitalizeFirst } from "@/utils/stringUtils";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import {
@@ -128,7 +129,7 @@ const DataTableHeader = <TData,>({
                       className="h-7 px-2 text-xs gap-1"
                       onClick={() => handleRemoveFilter(filter?.column as string, filter?.value)}
                     >
-                      <span>{_.capitalize(_.lowerCase(String(filter?.value)))}</span>
+                      <span>{capitalizeFirst(String(filter?.value))}</span>
                       <X className="h-3 w-3 ml-1 text-emerald-600" />
                     </Button>
                   );
