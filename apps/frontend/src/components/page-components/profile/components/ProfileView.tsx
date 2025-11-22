@@ -1,47 +1,46 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+// import React, { useEffect, useState } from "react";
 import { CircleUser, PartyPopper } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { getBasicProfileInfo } from "../helpers/getBasicProfileInfo";
 import { getProfileContactInfo } from "../helpers/getProfileContactInfo";
 // import { getProfileDetails, getProfileComments } from "../../helpers/getProfileDetails";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+// import { Skeleton } from "@/components/ui/skeleton";
+// import { Button } from "@/components/ui/button";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
-import ContactsViewSection from "@/components/common/details-view/ContactsSection";
 import AddSection from "@/components/common/buttons/AddSection";
-import { profileApiService } from "@/api/profileApiService";
+// import { profileApiService } from "@/api/profileApiService";
 import { selectProfile } from "@/redux/slices/authSlice";
 // import { updateProfile } from "@/redux/slices/profileSlice";
-import DeleteButton from "@/components/common/buttons/DeleteButton";
-import { DeleteModal } from "@/components/common/modals/DeleteModal";
+// import DeleteButton from "@/components/common/buttons/DeleteButton";
+// import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 
 const ProfileView = () => {
   const params = useParams();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const profileId = Number(params.id);
-  const router = useRouter();
+  // const router = useRouter();
   const profile = useSelector((state: RootState) => selectProfile(state));
 
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemName, setItemName] = useState<"profile" | "contact" | "performance">("profile");
-  const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
+  // const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  // const [itemName, setItemName] = useState<"profile" | "contact" | "performance">("profile");
+  // const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
 
-  const handleDelete = (entity: "profile" | "contact" | "performance", index?: number) => {
-    setDeleteIndex(index);
-    setItemName(entity);
-    setOpenDeleteDialog(true);
-  };
+  // const handleDelete = (entity: "profile" | "contact" | "performance", index?: number) => {
+  //   setDeleteIndex(index);
+  //   setItemName(entity);
+  //   setOpenDeleteDialog(true);
+  // };
   //   const onConfirmDelete = async () => {
 
   //     try {
@@ -80,11 +79,11 @@ const ProfileView = () => {
         actionElements={
           <>
             <EditButton href={`/profile/edit`} />
-            <DeleteButton
+            {/* <DeleteButton
               variant={"outline"}
               className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
               onDelete={() => handleDelete("profile", profileId)}
-            />
+            /> */}
           </>
         }
       />
@@ -108,7 +107,8 @@ const ProfileView = () => {
           <PerformanceViewSection
             performances={profile.performances}
             entityId={profileId}
-            onDelete={(index) => handleDelete("performance", index)}
+            // onDelete={(index) => handleDelete("performance", index)}
+            onDelete={(index) => console.log("performance", index)}
           />
         </>
       )}

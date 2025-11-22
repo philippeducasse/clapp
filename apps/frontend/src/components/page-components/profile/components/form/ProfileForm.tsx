@@ -32,7 +32,7 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, profile),
+    defaultValues: getInitialValues(formFields, profile ?? undefined),
     mode: "onSubmit",
   });
 

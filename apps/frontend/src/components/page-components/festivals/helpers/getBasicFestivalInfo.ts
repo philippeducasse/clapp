@@ -1,6 +1,5 @@
 import { Festival } from "@/interfaces/entities/Festival";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
-import _ from "lodash";
 import { capitalizeFirst } from "@/utils/stringUtils";
 
 export const getFestivalBasicInfo = (festival: Festival): SectionCellProps[] => {

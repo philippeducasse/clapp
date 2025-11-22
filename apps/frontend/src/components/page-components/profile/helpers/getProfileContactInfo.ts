@@ -1,6 +1,5 @@
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
 import { Profile } from "@/interfaces/entities/Profile";
-import { capitalize } from "lodash";
 
 export const getProfileContactInfo = (profile: Profile): SectionCellProps[] => {
   if (!profile) return [];

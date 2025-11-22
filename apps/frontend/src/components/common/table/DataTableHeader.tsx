@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { X } from "lucide-react";
-import _ from "lodash";
 import { capitalizeFirst } from "@/utils/stringUtils";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
-import _ from "lodash";
 import { capitalizeFirst } from "@/utils/stringUtils";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { festivalApiService } from "@/api/festivalApiService";
