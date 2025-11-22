@@ -12,17 +12,17 @@ const createProfile = async (profile: Partial<Profile>): Promise<Profile> => {
 };
 
 const deleteProfile = (profileId: number) => {
-  return deleteRequest(
-    `${endpoint}${profileId}`,
-    "Profile successfully deleted"
-  );
+  return deleteRequest(`${endpoint}${profileId}`, "Profile successfully deleted");
 };
 
-const updateProfile = async (
-  id: number,
-  profile: Partial<Profile>
-): Promise<Profile> => {
-  return await sendRequest(`${endpoint}/${id}`, profile);
+const updateProfile = async (id: number, profile: Partial<Profile>): Promise<Profile> => {
+  return await sendRequest(
+    `${endpoint}/${id}`,
+    profile,
+    "PUT",
+    "Profile successfully updated",
+    true
+  );
 };
 
 export const profileApiService = {

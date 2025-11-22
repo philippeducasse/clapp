@@ -16,14 +16,25 @@ export const sendRequest = async <TReq, TRes>(
   url: string,
   data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",
-  toastMessage?: string
+  toastMessage?: string,
+  includeCredentials: boolean = false
 ): Promise<TRes> => {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (includeCredentials) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRFToken"] = csrfToken;
+    }
+  }
+
   const res = await fetch(url, {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
+    headers,
+    ...(includeCredentials && { credentials: "include" }),
     body: JSON.stringify(transformKeysToSnakeCase(data)),
   });
 
@@ -116,4 +127,9 @@ export const patchRequest = async <TRes>(url: string, toastMessage?: string): Pr
     toast.success(toastMessage);
   }
   return transformKeysToCamelCase(json);
+};
+
+const getCsrfToken = (): string | null => {
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
 };
