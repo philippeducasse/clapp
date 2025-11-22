@@ -91,12 +91,10 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         const existingContacts = festival?.contacts ?? [];
 
         const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
-        console.log("UP", updatedContacts);
         const festivalWithContacts = {
           ...festival,
           contacts: updatedContacts,
         };
-        console.log("fes", festivalWithContacts);
 
         const newFestival = await festivalApiService.create(
           festivalWithContacts as unknown as Festival

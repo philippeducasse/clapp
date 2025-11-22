@@ -46,7 +46,6 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-  // console.log("app: ", applicationId, application)
   useEffect(() => {
     if (action !== Action.CREATE && !application) {
       refreshApplication(applicationId, dispatch);
@@ -85,7 +84,6 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
           id: applicationId,
           profileId: profile?.id,
         } as Application;
-        console.log("updated:", updatedApplication);
         await applicationApiService.updateApplication(updatedApplication);
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);
@@ -97,8 +95,9 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
             objectType: (values as Record<string, unknown>).organisationType as string,
             objectId: (values as Record<string, unknown>).organisation as number,
           };
-          console.log("application: ", application);
-          const newApplication = await applicationApiService.createApplication(application as unknown as Application);
+          const newApplication = await applicationApiService.createApplication(
+            application as unknown as Application
+          );
           router.push(`/applications/${newApplication?.id}`);
         }
       }

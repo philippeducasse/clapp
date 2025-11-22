@@ -13,7 +13,6 @@ const getApplication = (applicationId: number): Promise<Application> => {
 };
 
 const createApplication = (application: Application): Promise<Application> => {
-  console.log("APP: ", application);
   return sendRequest<Application, Application>(
     `${endpoint}`,
     application,
@@ -27,8 +26,6 @@ const deleteApplication = (applicationId: number) => {
 };
 
 const updateApplication = (application: Application): Promise<Application> => {
-  console.log("APP: ", application);
-
   return sendRequest<Application, Application>(
     `${endpoint}${application.id}/`,
     application,

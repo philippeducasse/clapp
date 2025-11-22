@@ -1,17 +1,14 @@
 import React from "react";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import DetailsView from "./DetailsView";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { getFestivalContacts } from "@/components/page-components/festivals/helpers/getFestivaContacts";
 import { Contact2 } from "lucide-react";
-import EditButton from "../buttons/EditButton";
-import DeleteButton from "../buttons/DeleteButton";
+import AuxilliarySection from "./AuxilliarySection";
 
 interface ContactsViewSectionProps {
   title: string;
   contacts: OrganisationContact[];
   entityId: number;
-  onDelete: (index?: number) => void;
+  onDelete: (index: number) => void;
 }
 
 const ContactsViewSection = ({
@@ -21,35 +18,16 @@ const ContactsViewSection = ({
   onDelete,
 }: ContactsViewSectionProps) => {
   return (
-    <>
-      <Card className="mb-6 relative">
-        <CardContent>
-          <div className="flex items-center gap-2 mb-6">
-            <Contact2 className="text-emerald-600 dark:text-emerald-400" />
-            <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
-              {title}
-            </CardTitle>
-          </div>
-          <div className="">
-            {contacts.map((contact: OrganisationContact, idx) => (
-              <div key={`${contact.email}_${idx}`} className="flex flex-col">
-                <DetailsView data={getFestivalContacts(contact)} />
-                <div className="flex my-6 self-end mr-6 gap-2">
-                  <EditButton
-                    href={`${entityId}/edit/contacts/${idx}`}
-                    className=""
-                  />
-                  <DeleteButton
-                    variant="outline"
-                    onDelete={() => onDelete(idx)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </>
+    <AuxilliarySection
+      title={title}
+      icon={<Contact2 className="text-emerald-600 dark:text-emerald-400" />}
+      items={contacts}
+      entityId={entityId}
+      formatData={getFestivalContacts}
+      getItemKey={(contact, idx) => `${contact.email}_${idx}`}
+      editPath="contacts"
+      onDelete={onDelete}
+    />
   );
 };
 

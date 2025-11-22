@@ -1,3 +1,5 @@
+import { Performance } from "./Performance";
+
 export interface Profile {
   [key: string]: unknown;
   id: number;
@@ -13,4 +15,6 @@ export interface Profile {
   instagramProfile?: string;
   facebookProfile?: string;
   tiktokProfile?: string;
+  youtubeProfile?: string;
+  performances: Performance[];
 }
