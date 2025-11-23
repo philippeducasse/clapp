@@ -6,11 +6,11 @@ from performances.serializers import PerformanceSerializer
 from rest_framework.decorators import api_view
 
 
-class PerformanceViewSet(viewsets.ModelViewSet):
-    serializer_class = PerformanceSerializer
+# class PerformanceViewSet(viewsets.ModelViewSet):
+#     serializer_class = PerformanceSerializer
 
-    def get_queryset(self):
-        return Performance.objects.filter(profile=self.request.user)
+#     def get_queryset(self):
+#         return Performance.objects.filter(profile=self.request.user)
 
 
 @api_view(["GET"])
