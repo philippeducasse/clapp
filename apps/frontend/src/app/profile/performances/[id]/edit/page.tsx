@@ -1,9 +1,9 @@
-import FestivalContactsForm from "@/components/page-components/festivals/components/form/FestivalContactsForm";
+import PerformanceForm from "@/components/page-components/performances/components/PerformanceForm";
 import React from "react";
 import { Action } from "@/interfaces/Enums";
 
-const FestivalCreationPage = () => {
-  return <FestivalContactsForm action={Action.CREATE} />;
+const PerformanceEditPage = () => {
+  return <PerformanceForm action={Action.EDIT} />;
 };
 
-export default FestivalCreationPage;
+export default PerformanceEditPage;
