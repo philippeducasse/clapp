@@ -68,7 +68,7 @@ export const getApplicationFormFields = (
         { value: "EMAIL", label: "Email" },
         { value: "FORM", label: "Form" },
       ],
-      defaultValue: "EMAIL",
+      defaultValue: festival.applicationType ?? "EMAIL",
       helpText:
         applicationMethod == ApplicationMethod.FORM
           ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."

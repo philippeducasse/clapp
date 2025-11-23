@@ -13,6 +13,7 @@ export const getPerformanceInfo = (performance: Performance): SectionCellProps[]
     },
     { title: "Length", value: performance.length },
     { title: "Short Description", value: performance.shortDescription },
+    { title: "Long Description", value: performance.longDescription },
     { title: "Creation Date", value: performance.creationDate?.toString() },
   ];
 };
