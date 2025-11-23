@@ -32,17 +32,12 @@ const performanceSlice = createSlice({
     setPerformances(state, action: PayloadAction<Performance[]>) {
       state.performances = action.payload;
     },
-    // setSelectedPerformance(state, action: PayloadAction<Performance>) {
-    //   state.selectedPerformance = action.payload;
-    // },
     addPerformance(state, action: PayloadAction<Performance>) {
       state.performances.push(action.payload);
     },
     updatePerformance(state, action: PayloadAction<Performance>) {
       const { id } = action.payload;
-      const existingPerformance = state.performances.find(
-        (performance) => performance.id === id
-      );
+      const existingPerformance = state.performances.find((performance) => performance.id === id);
       if (existingPerformance) {
         Object.assign(existingPerformance, action.payload);
       }
@@ -64,11 +59,9 @@ const performanceSlice = createSlice({
   },
 });
 
-export const { setPerformances, addPerformance, updatePerformance } =
-  performanceSlice.actions;
+export const { setPerformances, addPerformance, updatePerformance } = performanceSlice.actions;
 
-export const selectAllPerformances = (state: RootState) =>
-  state.performances.performances;
+export const selectAllPerformances = (state: RootState) => state.performances.performances;
 export const selectPerformance = (state: RootState, performanceId: number) =>
   state.performances.performances.find(
     (performance: Performance) => performance.id === performanceId

@@ -32,6 +32,8 @@ const ControlledMultiEmail = ({ field }: ControlledMultiEmailProps) => {
     field.onChange(values.filter((_, i) => i !== index));
   };
 
+  if (!values) return;
+
   return (
     <div className="flex flex-wrap gap-2 p-2 border rounded-md">
       {values.map((value, index) => (
