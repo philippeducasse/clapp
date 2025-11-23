@@ -4,6 +4,8 @@ from typing import Type
 
 
 class PerformanceSerializer(serializers.ModelSerializer):
+    creation_date = serializers.DateField(allow_null=True, required=False)
+
     class Meta:
         model: Type[Performance] = Performance
         fields: str = "__all__"
