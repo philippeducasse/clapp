@@ -67,6 +67,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile`);
       } else if (action === Action.CREATE && profileId) {
+        console.log("performacne:", values);
         await performanceApiService.createPerformance(values as Performance);
         router.push(`/profile`);
       }

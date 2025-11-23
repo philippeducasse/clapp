@@ -114,7 +114,7 @@ const ProfileView = () => {
       )}
       <AddSection
         label="performance"
-        href={`${profileId}/edit/performances/${profile.performances?.length ?? 0}`}
+        href={`/profile/performances/${profile.performances?.length ?? 0}/create`}
       />
     </DetailsViewWrapper>
   );
