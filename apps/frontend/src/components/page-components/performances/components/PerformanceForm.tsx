@@ -4,12 +4,21 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Performance } from "@/interfaces/entities/Performance";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import {
+  createZodFormSchema,
+  sanitizeFormData,
+  getInitialValues,
+  prepareFormDataForSubmission,
+} from "@/helpers/formHelper";
 import { getPerformanceFormFields } from "../helpers/form/getPerformanceFormFields";
 import { performanceApiService } from "@/api/performanceApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { updatePerformance, selectPerformance } from "@/redux/slices/performanceSlice";
+import {
+  updatePerformance,
+  selectPerformance,
+  addPerformance,
+} from "@/redux/slices/performanceSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
@@ -61,14 +70,17 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
+      // Clean up form data before sending to backend
+      const cleanedData = prepareFormDataForSubmission(values, formFields);
+
       if (action === Action.EDIT && performanceId) {
-        const updatedPerformance = { ...values, id: performanceId } as Performance;
+        const updatedPerformance = { ...cleanedData, id: performanceId } as Performance;
         await performanceApiService.updatePerformance(updatedPerformance);
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile`);
       } else if (action === Action.CREATE && profileId) {
-        console.log("performacne:", values);
-        await performanceApiService.createPerformance(values as Performance);
+        await performanceApiService.createPerformance(cleanedData as Performance);
+        dispatch(addPerformance(cleanedData));
         router.push(`/profile`);
       }
     } catch (error) {

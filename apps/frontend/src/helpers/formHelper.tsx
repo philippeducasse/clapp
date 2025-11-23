@@ -63,6 +63,56 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): 
   return sanitizedData;
 };
 
+/**
+ * Prepares form data for backend submission by converting empty strings to null/undefined
+ * and removing fields that should not be sent to the backend.
+ * This is the inverse of sanitizeFormData.
+ */
+export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
+  data: T,
+  formFields?: ControlledFormElement[]
+): T => {
+  const preparedData = { ...data } as T;
+
+  // Map field names to their configuration
+  const fieldConfigMap = new Map<string, { type: ControlledFormElementType; required: boolean }>();
+  formFields?.forEach((field) => {
+    fieldConfigMap.set(field.fieldName, { type: field.type, required: field.required ?? false });
+  });
+
+  for (const key in preparedData) {
+    if (Object.prototype.hasOwnProperty.call(preparedData, key)) {
+      const value = preparedData[key];
+      const fieldConfig = fieldConfigMap.get(key);
+
+      // Only clean up optional fields - never delete required fields
+      if ((value === "" || value === null) && !fieldConfig?.required) {
+        if (
+          fieldConfig?.type === ControlledFormElementType.DATE ||
+          fieldConfig?.type === ControlledFormElementType.NUMBER ||
+          fieldConfig?.type === ControlledFormElementType.URL ||
+          fieldConfig?.type === ControlledFormElementType.EMAIL
+        ) {
+          delete preparedData[key];
+        }
+      }
+
+      // Handle empty arrays for optional multi-select fields
+      if (Array.isArray(value) && value.length === 0 && !fieldConfig?.required) {
+        if (
+          fieldConfig?.type === ControlledFormElementType.MULTI_SELECT ||
+          fieldConfig?.type === ControlledFormElementType.MULTI_EMAIL
+        ) {
+          // Keep empty arrays or delete based on your backend requirements
+          // delete preparedData[key];
+        }
+      }
+    }
+  }
+
+  return preparedData;
+};
+
 export const createZodFormSchema = (
   formFields: ControlledFormElement[]
 ): ZodObject<Record<string, ZodType>> => {
