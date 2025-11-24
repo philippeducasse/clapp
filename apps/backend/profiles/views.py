@@ -4,7 +4,7 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.request import Request
 from django.db.models import QuerySet
 from profiles.models import Profile
-from profiles.serializers import ProfileSerializer
+from profiles.serializers import ProfileSerializer, RegisterSerializer
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -43,3 +43,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
         user.set_password(new_password)
         user.save()
         return Response({"status": "password changed successfully"})
+
+    @action(detail=False, methods=["post"], permission_classes=[permissions.AllowAny])
+    def register(self, request: Request) -> Response:
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {"email": user.email, "message": "User created successfully"},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(serializer.erors, status=status.HTTP_400_BAD_REQUEST)

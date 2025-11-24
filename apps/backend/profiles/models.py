@@ -30,7 +30,6 @@ class Profile(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
-    artist_name = models.CharField(max_length=255, blank=True)
     company_name = models.CharField(max_length=255, blank=True)
     personal_website = models.URLField(blank=True)
     age = models.PositiveIntegerField(blank=True, null=True)

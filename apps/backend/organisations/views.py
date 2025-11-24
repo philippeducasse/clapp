@@ -220,7 +220,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Validate email format
         try:
             for email in recipient_emails:
                 validate_email(email)
