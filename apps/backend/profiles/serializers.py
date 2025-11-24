@@ -24,9 +24,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "password_confirm",
-            "first_name",
-            "last_name",
-            "company_name",
         ]
 
     def validate_password(self, value):
