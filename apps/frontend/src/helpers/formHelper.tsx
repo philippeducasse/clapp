@@ -12,7 +12,7 @@ import ControlledFile from "@/components/common/form/form-fields/ControlledFile"
 import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
 import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
 import ControlledMultiEmail from "@/components/common/form/form-fields/ControlledMultiEmail";
-
+import { Input } from "@/components/ui/input";
 export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
@@ -39,6 +39,9 @@ export const getControlledInputs = (
         return <ControlledMultiEmail field={field} />;
       case ControlledFormElementType.FILE:
         return <ControlledFile field={field} />;
+      case ControlledFormElementType.PASSWORD:
+        return <Input type="password" {...field} />;
+
       case ControlledFormElementType.SEARCH:
         return <ControlledSearch field={field} organisationType={organisationType} />;
       default:
