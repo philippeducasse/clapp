@@ -7,13 +7,13 @@ import BasicForm from "@/components/common/form/BasicForm";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { getRegistrationFormFields } from "./getRegistrationFormFields";
+import { getAuthFormFields } from "../helpers/getAuthFormFields";
 import { useRouter } from "next/navigation";
 
+const IS_REGISRATION = true;
 const RegistrationForm = () => {
   const router = useRouter();
-
-  const formFields = getRegistrationFormFields();
+  const formFields = getAuthFormFields(IS_REGISRATION);
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
 
