@@ -21,8 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "caf",
-  description:
-    "Your personal assistant for your career in the performance arts",
+  description: "Your personal assistant for your career in the performance arts",
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
@@ -31,27 +30,15 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex min-h-screen flex-col bg-background`}
       >
-        <StoreProvider>
-          <ProfileHydrator />
-          <SidebarProvider>
-            <AppSidebar />
-
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
-                <header className="flex justify-between border-b pb-4 w-full">
-                  <Navbar />
-                </header>
-                <main>{children}</main>
-              </div>
-              <Toaster />
-            </ThemeProvider>
-          </SidebarProvider>
-        </StoreProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main>{children}</main>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

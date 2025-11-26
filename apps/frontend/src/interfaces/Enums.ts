@@ -2,6 +2,8 @@ export enum Action {
   CREATE = "create",
   EDIT = "edit",
   APPLY = "apply",
+  REGISTER = "register",
+  LOGIN = "login",
 }
 
 export enum EntityName {

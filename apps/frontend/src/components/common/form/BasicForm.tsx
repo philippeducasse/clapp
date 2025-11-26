@@ -15,7 +15,7 @@ import SubmitButton from "../buttons/SubmitButton";
 import { getControlledInputs } from "@/helpers/formHelper";
 import { Action } from "@/interfaces/Enums";
 import { Button } from "@/components/ui/button";
-
+import Link from "next/link";
 interface BasicFormProps {
   form: UseFormReturn;
   formFields: ControlledFormElement[];
@@ -43,7 +43,7 @@ const BasicForm = ({
   submitButtonLabel,
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
-
+  const showIcon = action === Action.EDIT || action === Action.APPLY;
   return (
     <Form {...form}>
       <div className="flex">
@@ -90,7 +90,17 @@ const BasicForm = ({
               )
           )}
           <div className="flex justify-between mt-6">
-            <BackButton href={onCancelHref} />
+            {action === Action.LOGIN ? (
+              <Button variant={"outline"}>
+                <Link href="/register">Register</Link>
+              </Button>
+            ) : action === Action.REGISTER ? (
+              <Button variant={"outline"}>
+                <Link href="/login">Login</Link>
+              </Button>
+            ) : (
+              <BackButton href={onCancelHref} />
+            )}
             <div className="flex gap-4">
               {additionalActions}
               {action === Action.APPLY ? (
@@ -99,7 +109,7 @@ const BasicForm = ({
                 <SubmitButton
                   label={submitButtonLabel ?? "Save"}
                   isLoading={isLoading}
-                  showIcon={action !== Action.CREATE}
+                  showIcon={showIcon}
                 />
               )}
             </div>

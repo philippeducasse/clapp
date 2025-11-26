@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getAuthFormFields } from "../helpers/getAuthFormFields";
 import { useRouter } from "next/navigation";
-
+import { Action } from "@/interfaces/Enums";
 const LoginForm = () => {
   const router = useRouter();
 
@@ -40,6 +40,7 @@ const LoginForm = () => {
       onSubmit={onSubmit}
       onCancelHref={"index"}
       isLoading={isLoading}
+      action={Action.LOGIN}
     />
   );
 };

@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getAuthFormFields } from "../helpers/getAuthFormFields";
 import { useRouter } from "next/navigation";
+import { Action } from "@/interfaces/Enums";
 
 const IS_REGISRATION = true;
 const RegistrationForm = () => {
@@ -40,6 +41,8 @@ const RegistrationForm = () => {
       onSubmit={onSubmit}
       onCancelHref={"index"}
       isLoading={isLoading}
+      submitButtonLabel="Register"
+      action={Action.REGISTER}
     />
   );
 };

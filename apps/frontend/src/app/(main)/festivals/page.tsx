@@ -1,5 +1,5 @@
 import { festivalApiService } from "@/api/festivalApiService";
-import { FestivalsTable } from "../../components/page-components/festivals/components/table/FestivalsTable";
+import { FestivalsTable } from "../../../components/page-components/festivals/components/table/FestivalsTable";
 
 const FestivalsPage = async () => {
   const festivals = await festivalApiService.getAll();
