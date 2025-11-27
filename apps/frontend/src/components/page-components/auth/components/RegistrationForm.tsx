@@ -35,15 +35,18 @@ const RegistrationForm = () => {
     }
   };
   return (
-    <BasicForm
-      form={form}
-      formFields={formFields}
-      onSubmit={onSubmit}
-      onCancelHref={"index"}
-      isLoading={isLoading}
-      submitButtonLabel="Register"
-      action={Action.REGISTER}
-    />
+    <div className="flex flex-col text-center">
+      <h3 className="text-xl font-semibold">Register</h3>
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={"index"}
+        isLoading={isLoading}
+        submitButtonLabel="Register"
+        action={Action.REGISTER}
+      />
+    </div>
   );
 };
 

@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { getAuthFormFields } from "../helpers/getAuthFormFields";
 import { useRouter } from "next/navigation";
 import { Action } from "@/interfaces/Enums";
+import { Credentials } from "@/interfaces/api/ApiService";
 const LoginForm = () => {
   const router = useRouter();
 
@@ -25,23 +26,28 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      await profileApiService.createProfile(values);
-      router.push(`/login`);
+      await profileApiService.login(values as unknown as Credentials);
+      router.push(`/`);
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
+
   return (
-    <BasicForm
-      form={form}
-      formFields={formFields}
-      onSubmit={onSubmit}
-      onCancelHref={"index"}
-      isLoading={isLoading}
-      action={Action.LOGIN}
-    />
+    <div className="flex flex-col text-center">
+      <h3 className="text-xl font-semibold">Login</h3>
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={"index"}
+        isLoading={isLoading}
+        action={Action.LOGIN}
+        submitButtonLabel="Login"
+      />
+    </div>
   );
 };
 

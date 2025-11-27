@@ -22,3 +22,8 @@ export interface EntityApiService<T> {
     data: { profile: Profile; selectedPerformanceIds?: number[]; language: string }
   ) => Promise<{ message: string }>;
 }
+
+export interface Credentials {
+  email: string;
+  password: string;
+}

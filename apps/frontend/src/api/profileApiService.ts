@@ -1,5 +1,6 @@
 import { Profile } from "@/interfaces/entities/Profile";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
+import { Credentials } from "@/interfaces/api/ApiService";
 
 const endpoint = "/api/profiles";
 
@@ -25,9 +26,20 @@ const updateProfile = async (id: number, profile: Partial<Profile>): Promise<Pro
   );
 };
 
+const login = async (credentials: Credentials) => {
+  return await sendRequest(
+    `${endpoint}/login`,
+    credentials,
+    "POST",
+    `Welcome ${credentials.email}, you have successfully logged in`,
+    true
+  );
+};
+
 export const profileApiService = {
   getProfile,
   createProfile,
   updateProfile,
   deleteProfile,
+  login,
 };
