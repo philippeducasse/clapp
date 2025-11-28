@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createZodFormSchema } from "@/helpers/formHelper";
+import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
 import { profileApiService } from "@/api/profileApiService";
 import BasicForm from "@/components/common/form/BasicForm";
 import { z } from "zod";
@@ -20,6 +20,7 @@ const LoginForm = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: getInitialValues(formFields),
     mode: "onSubmit",
   });
 

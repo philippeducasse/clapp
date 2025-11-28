@@ -2,7 +2,7 @@
 
 import { DarkModeToggle } from "@/components/ui/dark-mode-toggle";
 import Breadcrumbs from "./Breadcrumbs";
-import { UserRound } from "lucide-react";
+import { UserRound, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
@@ -20,7 +20,15 @@ const Navbar = () => {
           size="icon"
           onClick={() => router.push("/profile")}
         >
-          <UserRound className="" />
+          <UserRound />
+        </Button>
+        <Button
+          className="cursor-pointer"
+          variant="outline"
+          size="icon"
+          onClick={() => router.push("/profile")}
+        >
+          <LogOut />
         </Button>
       </div>
     </nav>
