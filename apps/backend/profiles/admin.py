@@ -1,6 +1,6 @@
 from django.contrib import admin
-
 from django.contrib.auth.admin import UserAdmin
+
 from .models import Profile
 
 
@@ -16,7 +16,6 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "first_name",
                     "last_name",
-                    "artist_name",
                     "company_name",
                     "personal_website",
                     "age",
