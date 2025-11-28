@@ -144,7 +144,15 @@ export const createZodFormSchema = (
       case ControlledFormElementType.DATE:
         zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
         break;
-
+      case ControlledFormElementType.PASSWORD:
+        zodType = z
+          .string()
+          .min(1, "Password is required")
+          .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+          .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+          .regex(/\d/, "Password must contain at least one digit")
+          .regex(/[!@#$%^&*(),.?":{}|<>]/, "Password must contain at least one special character");
+        break;
       case ControlledFormElementType.URL:
         zodType = z.url();
         break;

@@ -15,9 +15,12 @@ const IS_REGISRATION = true;
 const RegistrationForm = () => {
   const router = useRouter();
   const formFields = getAuthFormFields(IS_REGISRATION);
-  const formSchema = createZodFormSchema(formFields);
+  const baseFormSchema = createZodFormSchema(formFields);
+  const formSchema = baseFormSchema.refine((data) => data.password === data.passwordConfirm, {
+    message: "Passwords do not match",
+    path: ["passwordConfirm"],
+  });
   const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onSubmit",
@@ -26,7 +29,7 @@ const RegistrationForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      await profileApiService.createProfile(values);
+      await profileApiService.register(values);
       router.push(`/login`);
     } catch (error) {
       console.error(error);

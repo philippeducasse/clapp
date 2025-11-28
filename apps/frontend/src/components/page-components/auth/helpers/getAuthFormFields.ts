@@ -6,11 +6,13 @@ export const getAuthFormFields = (isRegistration: boolean = false): ControlledFo
       label: "Email",
       fieldName: "email",
       type: ControlledFormElementType.EMAIL,
+      required: true,
     },
     {
       label: "Password",
       fieldName: "password",
       type: ControlledFormElementType.PASSWORD,
+      required: true,
     },
   ];
   if (isRegistration) {
@@ -18,6 +20,7 @@ export const getAuthFormFields = (isRegistration: boolean = false): ControlledFo
       label: "Password (confirm)",
       fieldName: "passwordConfirm",
       type: ControlledFormElementType.PASSWORD,
+      required: true,
     });
   }
   return fields;

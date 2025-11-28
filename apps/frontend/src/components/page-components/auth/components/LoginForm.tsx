@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
+import {
+  createZodFormSchema,
+  getInitialValues,
+  prepareFormDataForSubmission,
+} from "@/helpers/formHelper";
 import { profileApiService } from "@/api/profileApiService";
 import BasicForm from "@/components/common/form/BasicForm";
 import { z } from "zod";
@@ -27,7 +31,7 @@ const LoginForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      await profileApiService.login(values as unknown as Credentials);
+      await profileApiService.login(prepareFormDataForSubmission(values) as unknown as Credentials);
       router.push(`/`);
     } catch (error) {
       console.error(error);

@@ -67,23 +67,25 @@ const BasicForm = ({
                     <FormItem>
                       <FormLabel className="text-emerald-700 dark:text-emerald-400">
                         {formField.label}
-                        {formField.required && (
-                          <span
-                            className={`-ml-1 ${
-                              form.formState.errors[formField.fieldName]
-                                ? "text-red-600"
-                                : "text-emerald-700"
-                            }`}
-                          >
-                            *
-                          </span>
-                        )}
+                        {formField.required &&
+                          action !== Action.LOGIN &&
+                          action !== Action.REGISTER && (
+                            <span
+                              className={`-ml-1 ${
+                                form.formState.errors[formField.fieldName]
+                                  ? "text-red-600"
+                                  : "text-emerald-700"
+                              }`}
+                            >
+                              *
+                            </span>
+                          )}
                       </FormLabel>
                       <FormControl className="">
                         {getControlledInputs(formField, field, true, organisationType)}
                       </FormControl>
                       <FormDescription>{formField.helpText}</FormDescription>
-                      <FormMessage />
+                      <FormMessage className="text-left" />
                     </FormItem>
                   )}
                 />

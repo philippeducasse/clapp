@@ -6,7 +6,6 @@ export interface Profile {
   email: string;
   firstName?: string;
   lastName?: string;
-  artistName?: string;
   companyName?: string;
   personalWebsite?: string;
   age?: number;
