@@ -27,12 +27,6 @@ export const getProfileFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.TEXT,
     },
     {
-      label: "Artist Name",
-      fieldName: "artistName",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Stage or artist name",
-    },
-    {
       label: "Company Name",
       fieldName: "companyName",
       type: ControlledFormElementType.TEXT,
@@ -53,7 +47,6 @@ export const getProfileFormFields = (): ControlledFormElement[] => {
       fieldName: "age",
       type: ControlledFormElementType.NUMBER,
     },
-    // Contact Information
     {
       label: "Personal Website",
       fieldName: "personalWebsite",

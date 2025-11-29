@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Profile } from "@/interfaces/entities/Profile";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues, prepareFormDataForSubmission } from "@/helpers/formHelper";
 import { getProfileFormFields } from "../../helpers/form/getProfileFormFields";
 import { profileApiService } from "@/api/profileApiService";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,9 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
     try {
       if (action === Action.EDIT && profile) {
         const updatedProfile = { ...values, id: profile.id } as Profile;
-        await profileApiService.updateProfile(profile.id, updatedProfile);
+        const sanitisedData = prepareFormDataForSubmission(updatedProfile, formFields)
+        console.log(sanitisedData)
+        await profileApiService.updateProfile(profile.id, sanitisedData);
         dispatch(updateProfile(updatedProfile));
         router.push(`/profile`);
       }

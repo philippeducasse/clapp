@@ -39,7 +39,7 @@ const FormHeader = ({
             <h3 className="text-xl font-semibold">{capitalize(action)}</h3>
             <p className="text-gray-400">
               {action === Action.EDIT
-                ? `Edit ${entityName} manually`
+                ? `Edit ${entityName}`
                 : `Create a new ${entityName}`}
             </p>
           </div>
