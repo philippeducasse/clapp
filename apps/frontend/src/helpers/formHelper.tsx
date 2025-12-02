@@ -77,7 +77,6 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
 ): T => {
   const preparedData = { ...data } as T;
 
-  // Map field names to their configuration
   const fieldConfigMap = new Map<string, { type: ControlledFormElementType; required: boolean }>();
   formFields?.forEach((field) => {
     fieldConfigMap.set(field.fieldName, { type: field.type, required: field.required ?? false });
@@ -88,7 +87,6 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
       const value = preparedData[key];
       const fieldConfig = fieldConfigMap.get(key);
 
-      // Only clean up optional fields - never delete required fields
       if ((value === "" || value === null) && !fieldConfig?.required) {
         if (
           fieldConfig?.type === ControlledFormElementType.DATE ||
@@ -100,13 +98,11 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
         }
       }
 
-      // Handle empty arrays for optional multi-select fields
       if (Array.isArray(value) && value.length === 0 && !fieldConfig?.required) {
         if (
           fieldConfig?.type === ControlledFormElementType.MULTI_SELECT ||
           fieldConfig?.type === ControlledFormElementType.MULTI_EMAIL
         ) {
-          // Keep empty arrays or delete based on your backend requirements
           // delete preparedData[key];
         }
       }
