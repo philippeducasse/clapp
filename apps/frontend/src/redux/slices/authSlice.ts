@@ -5,23 +5,16 @@ import { profileApiService } from "@/api/profileApiService";
 
 interface AuthState {
   profile: Profile | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
 }
 
 const initialState: AuthState = {
-  status: "idle",
-  error: null,
   profile: null,
 };
 
-export const fetchProfile = createAsyncThunk(
-  "profiles/fetchProfile",
-  async () => {
-    const response = await profileApiService.getProfile();
-    return response;
-  }
-);
+export const fetchProfile = createAsyncThunk("profiles/fetchProfile", async () => {
+  const response = await profileApiService.get();
+  return response;
+});
 
 const authSlice = createSlice({
   name: "profiles",
@@ -37,24 +30,14 @@ const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchProfile.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchProfile.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.profile = action.payload;
-      })
-      .addCase(fetchProfile.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchProfile.fulfilled, (state, action) => {
+      state.profile = action.payload;
+    });
   },
 });
 
 export const { setProfile, updateProfile } = authSlice.actions;
 
-export const selectProfileStatus = (state: RootState) => state.profile.status;
 export const selectProfile = (state: RootState) => state.profile.profile;
 
 export default authSlice.reducer;
