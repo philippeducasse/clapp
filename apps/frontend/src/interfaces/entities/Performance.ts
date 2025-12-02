@@ -1,6 +1,9 @@
+import { Profile } from "./Profile";
+
 export interface Performance {
   [key: string]: unknown;
   id: number;
+  profile: Profile | number;
   performanceTitle: string;
   shortDescription?: string;
   trailer?: string;

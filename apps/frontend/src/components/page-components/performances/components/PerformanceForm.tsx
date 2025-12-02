@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action, EntityName } from "@/interfaces/Enums";
+import { selectProfile } from "@/redux/slices/authSlice";
 
 interface PerformanceFormProps {
   action: string;
@@ -34,10 +35,10 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const router = useRouter();
   const params = useParams();
 
-  const id = Number(params?.id);
-  const profileId = action === Action.CREATE ? id : undefined;
-  const performanceId = action === Action.EDIT ? id : undefined;
+  // const profileId = action === Action.CREATE ? id : undefined;
+  const performanceId = action === Action.EDIT ? Number(params?.id) : undefined;
 
+  const profile = useSelector((state: RootState) => selectProfile(state));
   const performance = useSelector((state: RootState) =>
     performanceId ? selectPerformance(state, performanceId) : undefined
   );
@@ -78,9 +79,13 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
         await performanceApiService.updatePerformance(updatedPerformance);
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile`);
-      } else if (action === Action.CREATE && profileId) {
-        await performanceApiService.createPerformance(cleanedData as Performance);
-        dispatch(addPerformance(cleanedData));
+      } else if (action === Action.CREATE && profile) {
+        const newPerformance = await performanceApiService.createPerformance({
+          ...cleanedData,
+          profile: profile.id,
+        } as Performance);
+        console.log("creating performance: ", newPerformance);
+        dispatch(addPerformance(newPerformance));
         router.push(`/profile`);
       }
     } catch (error) {
