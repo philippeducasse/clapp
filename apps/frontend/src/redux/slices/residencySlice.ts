@@ -5,23 +5,16 @@ import { residencyApiService } from "@/api/residencyApiService";
 
 interface ResidenciesState {
   residencies: Residency[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
 }
 
 const initialState: ResidenciesState = {
   residencies: [],
-  status: "idle",
-  error: null,
 };
 
-export const fetchResidencies = createAsyncThunk(
-  "residencies/fetchResidencies",
-  async () => {
-    const response = await residencyApiService.getAll();
-    return response;
-  }
-);
+export const fetchResidencies = createAsyncThunk("residencies/fetchResidencies", async () => {
+  const response = await residencyApiService.getAll();
+  return response;
+});
 
 const residencySlice = createSlice({
   name: "residencies",
@@ -45,44 +38,24 @@ const residencySlice = createSlice({
     },
     updateResidency(state, action: PayloadAction<Residency>) {
       const { id } = action.payload;
-      const existingResidency = state.residencies.find(
-        (residency) => residency.id === id
-      );
+      const existingResidency = state.residencies.find((residency) => residency.id === id);
       if (existingResidency) {
         Object.assign(existingResidency, action.payload);
       }
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchResidencies.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchResidencies.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.residencies = action.payload.results;
-      })
-      .addCase(fetchResidencies.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchResidencies.fulfilled, (state, action) => {
+      state.residencies = action.payload.results;
+    });
   },
 });
 
-export const {
-  setResidencies,
-  setResidency,
-  addResidency,
-  updateResidency,
-} = residencySlice.actions;
+export const { setResidencies, setResidency, addResidency, updateResidency } =
+  residencySlice.actions;
 
-export const selectAllResidencies = (state: RootState) =>
-  state.residencies.residencies;
-export const selectResidenciesStatus = (state: RootState) =>
-  state.residencies.status;
+export const selectAllResidencies = (state: RootState) => state.residencies.residencies;
 export const selectResidency = (state: RootState, residencyId: number) =>
-  state.residencies.residencies.find(
-    (residency: Residency) => residency.id === residencyId
-  );
+  state.residencies.residencies.find((residency: Residency) => residency.id === residencyId);
 
 export default residencySlice.reducer;
