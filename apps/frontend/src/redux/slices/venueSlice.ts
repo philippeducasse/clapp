@@ -5,14 +5,10 @@ import { venueApiService } from "@/api/venueApiService";
 
 interface VenuesState {
   venues: Venue[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
 }
 
 const initialState: VenuesState = {
   venues: [],
-  status: "idle",
-  error: null,
 };
 
 export const fetchVenues = createAsyncThunk("venues/fetchVenues", async () => {
@@ -28,9 +24,7 @@ const venueSlice = createSlice({
       state.venues = action.payload;
     },
     setVenue(state, action: PayloadAction<Venue>) {
-      const existingIndex = state.venues.findIndex(
-        (venue) => venue.id === action.payload.id
-      );
+      const existingIndex = state.venues.findIndex((venue) => venue.id === action.payload.id);
       if (existingIndex >= 0) {
         state.venues[existingIndex] = action.payload;
       } else {
@@ -49,26 +43,15 @@ const venueSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchVenues.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchVenues.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.venues = action.payload.results;
-      })
-      .addCase(fetchVenues.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchVenues.fulfilled, (state, action) => {
+      state.venues = action.payload.results;
+    });
   },
 });
 
-export const { setVenues, setVenue, addVenue, updateVenue } =
-  venueSlice.actions;
+export const { setVenues, setVenue, addVenue, updateVenue } = venueSlice.actions;
 
 export const selectAllVenues = (state: RootState) => state.venues.venues;
-export const selectVenuesStatus = (state: RootState) => state.venues.status;
 export const selectVenue = (state: RootState, venueId: number) =>
   state.venues.venues.find((venue: Venue) => venue.id === venueId);
 
