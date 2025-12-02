@@ -10,7 +10,7 @@ interface AuxilliarySectionProps<T> {
   icon: ReactNode;
   item: T;
   index: number;
-  entityId: number;
+  entityId: number | "profile";
   formatData: (item: T) => SectionCellProps[];
   getItemKey: (item: T, idx: number) => string;
   editPath: string;

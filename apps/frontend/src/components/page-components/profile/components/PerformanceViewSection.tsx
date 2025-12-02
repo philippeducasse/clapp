@@ -6,15 +6,10 @@ import AuxilliarySection from "@/components/common/details-view/AuxilliarySectio
 
 interface PerformanceViewSectionProps {
   performances: Performance[];
-  entityId: number;
   onDelete: (index: number) => void;
 }
 
-const PerformanceViewSection = ({
-  performances,
-  entityId,
-  onDelete,
-}: PerformanceViewSectionProps) => {
+const PerformanceViewSection = ({ performances, onDelete }: PerformanceViewSectionProps) => {
   return (
     <>
       {performances.map((performance, index) => (
@@ -24,7 +19,7 @@ const PerformanceViewSection = ({
           icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
           item={performance}
           index={index}
-          entityId={entityId}
+          entityId={"profile"}
           formatData={getPerformanceInfo}
           getItemKey={(performance, idx) => `${performance.id}_${idx}`}
           editPath="performances"

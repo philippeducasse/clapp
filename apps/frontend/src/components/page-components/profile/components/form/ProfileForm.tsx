@@ -41,7 +41,6 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
     mode: "onSubmit",
   });
 
-  // Fetch profile data if not available
   useEffect(() => {
     const fetchProfile = async () => {
       if (!profile) {
@@ -57,7 +56,6 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
     fetchProfile();
   }, [profile, dispatch]);
 
-  // Reset form when profile data changes (but only once)
   useEffect(() => {
     if (profile && initialDataLoaded) {
       form.reset(sanitizeFormData(profile));

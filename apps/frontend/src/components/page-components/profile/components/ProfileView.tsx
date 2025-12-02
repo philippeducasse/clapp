@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { CircleUser, PartyPopper } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getBasicProfileInfo } from "../helpers/getBasicProfileInfo";
@@ -25,9 +24,7 @@ import PerformanceViewSection from "./PerformanceViewSection";
 import { Profile } from "@/interfaces/entities/Profile";
 
 const ProfileView = () => {
-  const params = useParams();
   const dispatch = useDispatch();
-  const profileId = Number(params.id);
   const router = useRouter();
   const profile = useSelector((state: RootState) => selectProfile(state));
 
@@ -42,8 +39,8 @@ const ProfileView = () => {
   };
   const onConfirmDelete = async () => {
     try {
-      if (itemName === "profile") {
-        await performanceApiService.remove(profileId);
+      if (itemName === "profile" && profile) {
+        await performanceApiService.remove(profile.id);
         router.push("/profiles");
       } else if (itemName === "performance" && deleteIndex !== undefined && profile) {
         const updatedperformances = profile.performances?.filter((_, i) => i !== deleteIndex) ?? [];
@@ -79,7 +76,7 @@ const ProfileView = () => {
             <DeleteButton
               variant={"outline"}
               className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
-              onDelete={() => handleDelete("profile", profileId)}
+              onDelete={() => handleDelete("profile", profile.id)}
             />
           </>
         }
@@ -103,14 +100,13 @@ const ProfileView = () => {
           />
           <PerformanceViewSection
             performances={profile.performances}
-            entityId={profileId}
             onDelete={(index) => handleDelete("performance", index)}
           />
         </>
       )}
       <AddSection
         label="performance"
-        href={`/profile/performances/${profile.performances?.length ?? 0}/create`}
+        href={`/profile/edit/performances/${profile.performances?.length}`}
       />
     </DetailsViewWrapper>
   );
