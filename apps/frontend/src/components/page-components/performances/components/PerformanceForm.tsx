@@ -55,7 +55,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
 
   useEffect(() => {
     if (!performance && performanceId && action === Action.EDIT) {
-      performanceApiService.getPerformance(performanceId).then(() => {
+      performanceApiService.get(performanceId).then(() => {
         setInitialDataLoaded(true);
       });
     }
@@ -71,16 +71,15 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      // Clean up form data before sending to backend
       const cleanedData = prepareFormDataForSubmission(values, formFields);
 
       if (action === Action.EDIT && performanceId) {
         const updatedPerformance = { ...cleanedData, id: performanceId } as Performance;
-        await performanceApiService.updatePerformance(updatedPerformance);
+        await performanceApiService.update(updatedPerformance);
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile`);
       } else if (action === Action.CREATE && profile) {
-        const newPerformance = await performanceApiService.createPerformance({
+        const newPerformance = await performanceApiService.create({
           ...cleanedData,
           profile: profile.id,
         } as Performance);

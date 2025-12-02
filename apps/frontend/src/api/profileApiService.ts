@@ -3,7 +3,7 @@ import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 import { Credentials } from "@/interfaces/api/ApiService";
 const endpoint = "/api/profiles";
 
-const getProfile = async (): Promise<Profile> => {
+const get = async (): Promise<Profile> => {
   return await fetchRequest(`${endpoint}/me/`, { credentials: "include" });
 };
 
@@ -16,13 +16,13 @@ const register = async (profile: Partial<Profile>): Promise<Profile> => {
   );
 };
 
-const deleteProfile = (profileId: number) => {
+const remove = (profileId: number) => {
   return deleteRequest(`${endpoint}${profileId}`, "Profile successfully deleted");
 };
 
-const updateProfile = async (id: number, profile: Partial<Profile>): Promise<Profile> => {
+const update = async (profile: Partial<Profile>): Promise<Profile> => {
   return await sendRequest(
-    `${endpoint}/${id}`,
+    `${endpoint}/${profile.id}`,
     profile,
     "PUT",
     "Profile successfully updated",
@@ -44,10 +44,10 @@ const logout = async () => {
 };
 
 export const profileApiService = {
-  getProfile,
+  get,
   register,
-  updateProfile,
-  deleteProfile,
+  update,
+  remove,
   login,
   logout,
 };
