@@ -8,7 +8,7 @@ const getAll = (userId: number): Promise<Performance[]> => {
 };
 
 const get = (performanceId: number): Promise<Performance> => {
-  return fetchRequest<Performance>(`${endpoint}${performanceId}/`);
+  return fetchRequest<Performance>(`${endpoint}${performanceId}/`, { credentials: "include" });
 };
 
 const create = (performance: Performance): Promise<Performance> => {

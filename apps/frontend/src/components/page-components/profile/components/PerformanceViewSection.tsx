@@ -18,7 +18,7 @@ const PerformanceViewSection = ({ performances, onDelete }: PerformanceViewSecti
           title={performance.performanceTitle}
           icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
           item={performance}
-          index={index}
+          index={performance.id}
           entityId={"profile"}
           formatData={getPerformanceInfo}
           getItemKey={(performance, idx) => `${performance.id}_${idx}`}

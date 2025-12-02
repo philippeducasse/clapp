@@ -35,13 +35,12 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const router = useRouter();
   const params = useParams();
 
-  // const profileId = action === Action.CREATE ? id : undefined;
-  const performanceId = action === Action.EDIT ? Number(params?.id) : undefined;
-
+  const performanceId = action === Action.EDIT ? Number(params?.index) : undefined;
   const profile = useSelector((state: RootState) => selectProfile(state));
   const performance = useSelector((state: RootState) =>
     performanceId ? selectPerformance(state, performanceId) : undefined
   );
+  console.log("performance:", performance, performanceId);
   const formFields = getPerformanceFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
