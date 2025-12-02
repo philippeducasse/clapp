@@ -4,6 +4,9 @@
 - add filtering to festivals slice
 - add redux update on festival delete (from table)
 
+Mistakes:
+- need route handlers in apiServices??
+
 # SEARCH
 
 ● Plan: Add Organization Search Field to Manual Application Form

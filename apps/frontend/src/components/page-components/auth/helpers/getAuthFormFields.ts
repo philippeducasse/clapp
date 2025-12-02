@@ -13,6 +13,7 @@ export const getAuthFormFields = (isRegistration: boolean = false): ControlledFo
       fieldName: "password",
       type: ControlledFormElementType.PASSWORD,
       required: true,
+      isRegistration,
     },
   ];
   if (isRegistration) {

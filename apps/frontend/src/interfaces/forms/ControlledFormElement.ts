@@ -18,4 +18,5 @@ export interface ControlledFormElement {
   defaultValue?: string | string[];
   multiple?: boolean;
   action?: Action;
+  isRegistration?: boolean;
 }
