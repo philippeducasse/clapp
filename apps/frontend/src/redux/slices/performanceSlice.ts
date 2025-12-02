@@ -5,16 +5,10 @@ import { performanceApiService } from "@/api/performanceApiService";
 
 interface PerformancesState {
   performances: Performance[];
-  status: "idle" | "loading" | "succeeded" | "failed";
-  error: string | null;
-  selectedPerformance?: Performance;
 }
 
 const initialState: PerformancesState = {
   performances: [],
-  status: "idle",
-  error: null,
-  selectedPerformance: undefined,
 };
 
 export const fetchPerformances = createAsyncThunk(
@@ -44,18 +38,9 @@ const performanceSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchPerformances.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchPerformances.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.performances = action.payload;
-      })
-      .addCase(fetchPerformances.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message || null;
-      });
+    builder.addCase(fetchPerformances.fulfilled, (state, action) => {
+      state.performances = action.payload;
+    });
   },
 });
 
