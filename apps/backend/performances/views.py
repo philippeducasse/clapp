@@ -1,16 +1,20 @@
-from rest_framework.response import Response
-from rest_framework.request import Request
 from rest_framework import status, viewsets
+from rest_framework.decorators import api_view
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from performances.models import Performance
 from performances.serializers import PerformanceSerializer
-from rest_framework.decorators import api_view
 
 
-# class PerformanceViewSet(viewsets.ModelViewSet):
-#     serializer_class = PerformanceSerializer
+class PerformanceViewSet(viewsets.ModelViewSet):
+    serializer_class = PerformanceSerializer
 
-#     def get_queryset(self):
-#         return Performance.objects.filter(profile=self.request.user)
+    def get_queryset(self):
+        if self.request.user.is_authenticated:
+            queryset = Performance.objects.filter(profile=self.request.user)
+            return queryset
+        return Performance.objects.none()
 
 
 @api_view(["GET"])

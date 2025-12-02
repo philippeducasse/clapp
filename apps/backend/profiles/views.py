@@ -11,12 +11,12 @@ from profiles.serializers import ProfileSerializer, RegisterSerializer
 
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
-    # permission_classes = [permissions.IsAuthenticated]
     permission_classes = [permissions.AllowAny]
 
     def get_queryset(self) -> QuerySet[Profile]:
-        # Only return the logged-in user's profile
-        return Profile.objects.filter(id=self.request.user.id)
+        if self.request.user.is_authenticated:
+            return Profile.objects.filter(id=self.request.user.id)
+        return Profile.objects.none()
 
     def get_object(self) -> Profile:
         obj = super().get_object()
