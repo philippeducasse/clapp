@@ -11,7 +11,10 @@ class PerformanceViewSet(viewsets.ModelViewSet):
     serializer_class = PerformanceSerializer
 
     def get_queryset(self):
-        return Performance.objects.filter(profile=self.request.user)
+        if self.request.user.is_authenticated:
+            queryset = Performance.objects.filter(profile=self.request.user)
+            return queryset
+        return Performance.objects.none()
 
 
 @api_view(["GET"])
