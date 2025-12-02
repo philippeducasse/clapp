@@ -20,7 +20,7 @@ const initialState: PerformancesState = {
 export const fetchPerformances = createAsyncThunk(
   "performances/fetchPerformances",
   async (profileId: number) => {
-    const response = await performanceApiService.getPerformances(profileId);
+    const response = await performanceApiService.getAll(profileId);
     return response;
   }
 );
