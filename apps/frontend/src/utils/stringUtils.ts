@@ -15,3 +15,21 @@ export const capitalizeFirst = (str: string | undefined | null): string => {
   if (!str) return "";
   return _.capitalize(_.lowerCase(str));
 };
+
+export function formatDate(date: string | Date): string {
+  const d = new Date(date);
+  return (
+    d.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }) +
+    ", " +
+    d.toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    })
+  );
+}

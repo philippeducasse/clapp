@@ -8,7 +8,8 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import _ from "lodash"
+import { formatDate } from "@/utils/stringUtils";
+import _ from "lodash";
 
 const useApplicationColumns = (): ColumnDef<Application>[] => {
   const router = useRouter();
@@ -25,7 +26,9 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
         const application = row.original;
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/applications/${application.id}`}>{_.capitalize(application.organisation.name)}</Link>
+            <Link href={`/applications/${application.id}`}>
+              {_.capitalize(application.organisation.name)}
+            </Link>
           </div>
         );
       },
@@ -38,7 +41,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
         const date = row.original.createdAt;
         return (
           <div className="overflow-hidden text-ellipsis whitespace-nowrap ">
-            <span>{new Date(date).toLocaleString()}</span>
+            <span>{formatDate(date)}</span>
           </div>
         );
       },
@@ -60,12 +63,9 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       accessorKey: "organisationType",
       header: "Organisation type",
       size: 110,
-       cell: ({ row }) => {
-        return (
-            <span>{_.capitalize(row.original.organisationType)}</span>
-        );
+      cell: ({ row }) => {
+        return <span>{_.capitalize(row.original.organisationType)}</span>;
       },
-
     },
     {
       header: "Actions",
