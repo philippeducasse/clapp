@@ -28,7 +28,6 @@ const AuxilliarySection = <T,>({
   editPath,
   onDelete,
 }: AuxilliarySectionProps<T>) => {
-  console.log("perf:", title, item, index, entityId);
   return (
     <Card className="mb-6 relative" key={getItemKey(item, index)}>
       <CardContent>
