@@ -43,16 +43,16 @@ export const DeleteModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-1/3 border-2 border-red-500 p-0 gap-0 overflow-hidden shadow-2xl [&>button]:text-white [&>button:hover]:text-white/80">
-        <DialogHeader className="bg-red-600  text-white py-2 px-6">
+      <DialogContent className="w-1/3 p-0 gap-0 overflow-hidden shadow-2xl [&>button]:text-white [&>button:hover]:text-white/80">
+        <DialogHeader className="pt-6">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <AlertTriangle className="w-8 h-8 text-white" strokeWidth={2.5} />
-            <DialogTitle className="text-white text-xl font-bold">Delete {itemName}</DialogTitle>
+            <AlertTriangle className="w-8 h-8 text-red-600" strokeWidth={2.5} />
+            <DialogTitle className="text-red-600 text-xl font-bold">Delete {itemName}</DialogTitle>
           </div>
         </DialogHeader>
 
         <div className="px-6 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="p-4 mb-6">
             <p className="text-center text-lg font-semibold text-gray-800 mb-2">
               Are you sure you want to delete this {itemName}?
             </p>
