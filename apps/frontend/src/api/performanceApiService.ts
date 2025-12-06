@@ -4,7 +4,7 @@ import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 const endpoint = "http://localhost:8000/api/performances/";
 
 const getAll = (userId: number): Promise<Performance[]> => {
-  return fetchRequest<Performance[]>(`${endpoint}${userId}/`);
+  return fetchRequest<Performance[]>(`${endpoint}${userId}/`, { credentials: "include" });
 };
 
 const get = (performanceId: number): Promise<Performance> => {
@@ -16,12 +16,13 @@ const create = (performance: Performance): Promise<Performance> => {
     `${endpoint}`,
     performance,
     "POST",
-    "Performance successfully created"
+    "Performance successfully created",
+    true
   );
 };
 
 const remove = (performanceId: number) => {
-  return deleteRequest(`${endpoint}${performanceId}`, "Performance successfully deleted");
+  return deleteRequest(`${endpoint}${performanceId}`, "Performance successfully deleted", true);
 };
 
 const update = (performance: Performance): Promise<Performance> => {
@@ -29,7 +30,8 @@ const update = (performance: Performance): Promise<Performance> => {
     `${endpoint}${performance.id}/`,
     performance,
     "PUT",
-    "Performance successfully updated"
+    "Performance successfully updated",
+    true
   );
 };
 

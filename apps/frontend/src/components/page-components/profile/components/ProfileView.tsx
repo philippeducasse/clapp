@@ -30,26 +30,27 @@ const ProfileView = () => {
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemName, setItemName] = useState<"profile" | "performance">("performance");
-  const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
+  const [idToDelete, setIdToDelete] = useState<number | undefined>();
 
   const handleDelete = (entity: "profile" | "performance", index?: number) => {
-    setDeleteIndex(index);
+    setIdToDelete(index);
     setItemName(entity);
     setOpenDeleteDialog(true);
   };
   const onConfirmDelete = async () => {
+    console.log("deleting:", itemName, profile);
     try {
       if (itemName === "profile" && profile) {
-        await performanceApiService.remove(profile.id);
+        await profileApiService.remove(profile.id);
         router.push("/profiles");
-      } else if (itemName === "performance" && deleteIndex !== undefined && profile) {
-        const updatedperformances = profile.performances?.filter((_, i) => i !== deleteIndex) ?? [];
+      } else if (itemName === "performance" && idToDelete !== undefined && profile) {
+        await performanceApiService.remove(idToDelete);
 
+        const updatedperformances = profile.performances?.filter((p) => p.id !== idToDelete) ?? [];
         const updatedProfile: Profile = {
           ...profile,
           performances: updatedperformances,
         };
-        await profileApiService.update(updatedProfile);
         dispatch(updateProfile(updatedProfile));
       }
     } catch (error) {
@@ -100,7 +101,7 @@ const ProfileView = () => {
           />
           <PerformanceViewSection
             performances={profile.performances}
-            onDelete={(index) => handleDelete("performance", index)}
+            onDelete={(performanceId) => handleDelete("performance", performanceId)}
           />
         </>
       )}

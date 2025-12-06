@@ -50,7 +50,7 @@ export const getPerformanceFormFields = (): ControlledFormElement[] => {
     {
       label: "Performance Type",
       fieldName: "performanceType",
-      type: ControlledFormElementType.MULTI_SELECT,
+      type: ControlledFormElementType.SELECT,
       options: getOptions(PerformanceType),
     },
     {

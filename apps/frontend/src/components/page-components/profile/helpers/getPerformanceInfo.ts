@@ -9,7 +9,9 @@ export const getPerformanceInfo = (performance: Performance): SectionCellProps[]
     { title: "Type", value: capitalizeFirst(performance.performanceType) },
     {
       title: "Genres",
-      value: performance.genres?.map((genre) => capitalizeFirst(genre)).join(", "),
+      value: Array.isArray(performance.genres)
+        ? performance.genres.map((genre) => capitalizeFirst(genre)).join(", ")
+        : "",
     },
     { title: "Length", value: performance.length },
     { title: "Short Description", value: performance.shortDescription },

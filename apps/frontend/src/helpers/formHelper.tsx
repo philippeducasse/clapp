@@ -215,7 +215,9 @@ export const getInitialValues = (
 
   const emptyValues = formFields.reduce((acc, field) => {
     acc[field.fieldName] =
-      field.type === ControlledFormElementType.BOOLEAN
+      field.type === ControlledFormElementType.MULTI_SELECT
+        ? []
+        : field.type === ControlledFormElementType.BOOLEAN
         ? false
         : field.type === ControlledFormElementType.NUMBER
         ? undefined
