@@ -27,25 +27,19 @@ interface AlertModalProps {
 const variantConfig = {
   success: {
     icon: CheckCircle,
-    headerBg: "bg-green-600",
-    borderColor: "border-green-500",
-    iconColor: "text-white",
+    textColor: "text-green-500",
     buttonVariant: "default" as const,
     buttonClassName: "bg-green-600 hover:bg-green-700",
   },
   warning: {
     icon: AlertTriangle,
-    headerBg: "bg-yellow-600",
-    borderColor: "border-yellow-500",
-    iconColor: "text-white",
+    textColor: "text-yellow-500",
     buttonVariant: "default" as const,
     buttonClassName: "bg-yellow-600 hover:bg-yellow-700",
   },
   danger: {
     icon: XCircle,
-    headerBg: "bg-red-600",
-    borderColor: "border-red-500",
-    iconColor: "text-white",
+    textColor: "text-red-500",
     buttonVariant: "destructive" as const,
     buttonClassName: "",
   },
@@ -75,12 +69,14 @@ export const AlertModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`w-1/3 border-2 ${config.borderColor} p-0 gap-0 overflow-hidden shadow-2xl [&>button]:text-white [&>button:hover]:text-white/80`}
+        className={`w-1/3 p-0 gap-0 overflow-hidden shadow-2xl [&>button]:text-white [&>button:hover]:text-white/80`}
       >
-        <DialogHeader className={`${config.headerBg} text-white py-2 px-6`}>
+        <DialogHeader className={`text-white py-2 pt-6`}>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <Icon className={`w-8 h-8 ${config.iconColor}`} strokeWidth={2.5} />
-            <DialogTitle className="text-white text-xl font-bold">{title}</DialogTitle>
+            <Icon className={`w-8 h-8 ${config.textColor}`} strokeWidth={2.5} />
+            <DialogTitle className={`text-white text-xl font-bold ${config.textColor}`}>
+              {title}
+            </DialogTitle>
           </div>
         </DialogHeader>
 
