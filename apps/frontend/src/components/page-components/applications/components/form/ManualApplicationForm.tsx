@@ -16,11 +16,8 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
-import { selectAllPerformances } from "@/redux/slices/performanceSlice";
 import { refreshApplication } from "../../helpers/refreshApplication";
 import { selectProfile } from "@/redux/slices/authSlice";
-import { fetchPerformances } from "@/redux/slices/performanceSlice";
-import { useAppDispatch } from "@/redux/hook";
 
 interface ManualApplicationFormProps {
   action: Action;
@@ -33,15 +30,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   const applicationId = Number(params?.id);
   const application = useSelector((state: RootState) => selectApplication(state, applicationId));
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const asyncDispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (profile?.id) {
-      asyncDispatch(fetchPerformances(profile.id));
-    }
-  }, [profile, asyncDispatch]);
-
-  const performances = useSelector((state: RootState) => selectAllPerformances(state));
+  const performances = profile?.performances ?? [];
   const formFields = getManualApplicationFormFields(performances);
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);

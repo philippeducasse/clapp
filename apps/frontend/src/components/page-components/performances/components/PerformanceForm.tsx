@@ -14,17 +14,12 @@ import { getPerformanceFormFields } from "../helpers/form/getPerformanceFormFiel
 import { performanceApiService } from "@/api/performanceApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updatePerformance,
-  selectPerformance,
-  addPerformance,
-} from "@/redux/slices/performanceSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action, EntityName } from "@/interfaces/Enums";
-import { selectProfile } from "@/redux/slices/authSlice";
+import { selectProfile, addPerformance, updatePerformance } from "@/redux/slices/authSlice";
 
 interface PerformanceFormProps {
   action: string;
@@ -37,10 +32,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
 
   const performanceId = action === Action.EDIT ? Number(params?.performanceId) : undefined;
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const performance = useSelector((state: RootState) =>
-    performanceId ? selectPerformance(state, performanceId) : undefined
-  );
-  console.log("performance:", performance, performanceId);
+  const performance = profile?.performances.find((p) => p.id === performanceId);
   const formFields = getPerformanceFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +74,6 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
           ...cleanedData,
           profile: profile.id,
         } as Performance);
-        console.log("creating performance: ", newPerformance);
         dispatch(addPerformance(newPerformance));
         router.push(`/profile`);
       }

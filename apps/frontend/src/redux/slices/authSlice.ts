@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Profile } from "@/interfaces/entities/Profile";
+import { Performance } from "@/interfaces/entities/Performance";
 import { RootState } from "../store";
 import { profileApiService } from "@/api/profileApiService";
 
@@ -28,6 +29,21 @@ const authSlice = createSlice({
         state.profile = { ...state.profile, ...action.payload };
       }
     },
+    addPerformance(state, action: PayloadAction<Performance>) {
+      if (state.profile) {
+        state.profile.performances.push(action.payload);
+      }
+    },
+    updatePerformance(state, action: PayloadAction<Performance>) {
+      if (state.profile) {
+        const index = state.profile.performances.findIndex(
+          (p) => p.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.profile.performances[index] = action.payload;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProfile.fulfilled, (state, action) => {
@@ -36,7 +52,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setProfile, updateProfile } = authSlice.actions;
+export const { setProfile, updateProfile, addPerformance, updatePerformance } = authSlice.actions;
 
 export const selectProfile = (state: RootState) => state.profile.profile;
 

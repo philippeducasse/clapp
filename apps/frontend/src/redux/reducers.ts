@@ -4,7 +4,6 @@ import festivalsReducer from "./slices/festivalSlice";
 import residenciesReducer from "./slices/residencySlice";
 import venuesReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
-import performanceReducer from "./slices/performanceSlice";
 import applicationReducer from "./slices/applicationSlice"
 
 const rootReducer = combineReducers({
@@ -12,7 +11,6 @@ const rootReducer = combineReducers({
   residencies: residenciesReducer,
   venues: venuesReducer,
   profile: authReducer,
-  performances: performanceReducer,
   applications: applicationReducer,
 });
 
