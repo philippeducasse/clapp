@@ -104,10 +104,7 @@ const ProfileView = () => {
           />
         </>
       )}
-      <AddSection
-        label="performance"
-        href={`/profile/edit/performances/${profile.performances?.length}`}
-      />
+      <AddSection label="performance" href={`/profile/edit/performances/new`} />
     </DetailsViewWrapper>
   );
 };

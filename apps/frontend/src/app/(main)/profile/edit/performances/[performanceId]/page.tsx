@@ -1,14 +1,18 @@
+"use client";
+
 import PerformanceForm from "@/components/page-components/performances/components/PerformanceForm";
 import React, { Suspense } from "react";
 import { Action } from "@/interfaces/Enums";
 import FormSkeleton from "@/components/common/skeletons/FormSkeleton";
-
-const PerformanceCreationPage = () => {
+import { useParams } from "next/navigation";
+const PerformanceFormPage = () => {
+  const params = useParams();
+  const { performanceId } = params;
   return (
     <Suspense fallback={<FormSkeleton />}>
-      <PerformanceForm action={Action.EDIT} />
+      <PerformanceForm action={performanceId === "new" ? Action.CREATE : Action.EDIT} />
     </Suspense>
   );
 };
 
-export default PerformanceCreationPage;
+export default PerformanceFormPage;

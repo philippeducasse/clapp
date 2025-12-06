@@ -35,7 +35,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const router = useRouter();
   const params = useParams();
 
-  const performanceId = action === Action.EDIT ? Number(params?.index) : undefined;
+  const performanceId = action === Action.EDIT ? Number(params?.performanceId) : undefined;
   const profile = useSelector((state: RootState) => selectProfile(state));
   const performance = useSelector((state: RootState) =>
     performanceId ? selectPerformance(state, performanceId) : undefined
