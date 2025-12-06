@@ -51,14 +51,27 @@ export const sendRequest = async <TReq, TRes>(
   return json;
 };
 
-export const deleteRequest = async (url: string, toastMessage?: string): Promise<void> => {
+export const deleteRequest = async (
+  url: string,
+  toastMessage?: string,
+  includeCredentials?: boolean
+): Promise<void> => {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (includeCredentials) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      headers["X-CSRFToken"] = csrfToken;
+    }
+  }
   const res = await fetch(url, {
     method: "DELETE",
-    headers: {
-      Accept: "application/json",
-    },
+    headers,
+    ...(includeCredentials && { credentials: "include" }),
   });
-
   if (!res.ok) {
     const error = await res.text();
     toast.error(`Error: ${error}`);
