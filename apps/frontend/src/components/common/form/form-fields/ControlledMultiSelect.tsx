@@ -11,6 +11,7 @@ const ControlledMultiSelect = ({ options, field }: MultiSelectProps) => {
   return (
     <MultiSelect
       options={options}
+      defaultValue={field.value as string[]}
       onValueChange={(val) => {
         field.onChange(val);
       }}

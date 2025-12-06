@@ -36,7 +36,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const formFields = getPerformanceFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
-  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const [formInitialized, setFormInitialized] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,20 +44,15 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
     mode: "onSubmit",
   });
 
-  useEffect(() => {
-    if (!performance && performanceId && action === Action.EDIT) {
-      performanceApiService.get(performanceId).then(() => {
-        setInitialDataLoaded(true);
-      });
-    }
-  }, [performanceId, performance, action]);
+  console.log("FORM: ", form, formFields);
 
+  // Reset form when performance data becomes available
   useEffect(() => {
-    if (performance && initialDataLoaded) {
-      form.reset(sanitizeFormData(performance));
-      setInitialDataLoaded(false);
+    if (performance && action === Action.EDIT && !formInitialized) {
+      form.reset(sanitizeFormData(performance, formFields));
+      setFormInitialized(true);
     }
-  }, [performance, form, initialDataLoaded]);
+  }, [performance, action, formInitialized, form, formFields]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);

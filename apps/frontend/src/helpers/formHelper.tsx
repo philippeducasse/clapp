@@ -50,14 +50,23 @@ export const getControlledInputs = (
   }
 };
 
-export const sanitizeFormData = <T extends Record<string, unknown>>(entity: T): T => {
+export const sanitizeFormData = <T extends Record<string, unknown>>(
+  entity: T,
+  formFields?: ControlledFormElement[]
+): T => {
   const sanitizedData = { ...entity } as T;
 
   for (const key in sanitizedData) {
-    if (Object.prototype.hasOwnProperty.call(sanitizedData, key)) {
-      const value = sanitizedData[key];
-      // Replace null or undefined with an empty string to prevent uncontrolled inputs
-      if (value === null || value === undefined) {
+    const value = sanitizedData[key];
+    if (value === null || value === undefined) {
+      const field = formFields?.find((f) => f.fieldName === key);
+      if (
+        field?.type === ControlledFormElementType.MULTI_SELECT ||
+        field?.type === ControlledFormElementType.MULTI_EMAIL ||
+        field?.type === ControlledFormElementType.FILE
+      ) {
+        sanitizedData[key] = [] as T[Extract<keyof T, string>];
+      } else {
         sanitizedData[key] = "" as T[Extract<keyof T, string>];
       }
     }
@@ -211,7 +220,7 @@ export const getInitialValues = (
   formFields: ControlledFormElement[],
   entity?: Record<string, unknown>
 ) => {
-  if (entity) return sanitizeFormData(entity);
+  if (entity) return sanitizeFormData(entity, formFields);
 
   const emptyValues = formFields.reduce((acc, field) => {
     acc[field.fieldName] =

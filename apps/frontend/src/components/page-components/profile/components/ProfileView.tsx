@@ -71,10 +71,12 @@ const ProfileView = () => {
         subtitle={`${profile?.firstName}, ${profile.lastName}`}
         icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={profile.id}
+        showTags={false}
         actionElements={
           <>
             <EditButton href={`/profile/edit`} />
             <DeleteButton
+              label="Delete account"
               variant={"outline"}
               className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
               onDelete={() => handleDelete("profile", profile.id)}

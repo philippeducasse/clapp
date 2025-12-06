@@ -10,6 +10,7 @@ interface DetailsViewHeaderProps {
   entityId?: number;
   subtitle?: string;
   actionElements?: React.ReactNode;
+  showTags?: boolean;
 }
 
 const DetailsViewHeader = ({
@@ -18,6 +19,7 @@ const DetailsViewHeader = ({
   subtitle,
   actionElements,
   entityId,
+  showTags = true,
 }: DetailsViewHeaderProps) => {
   return (
     <div className="flex justify-between my-6">
@@ -31,7 +33,7 @@ const DetailsViewHeader = ({
       {actionElements && (
         <div className="flex gap-6 self-end mx-8 items-stretch">
           {actionElements}
-          {entityId && (
+          {entityId && showTags && (
             <TagsButton
               tag={festivalApiService.tag}
               entityId={entityId}

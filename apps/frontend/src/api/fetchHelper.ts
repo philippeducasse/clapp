@@ -48,7 +48,7 @@ export const sendRequest = async <TReq, TRes>(
 
   toast.success(toastMessage ?? "Success");
 
-  return json;
+  return transformKeysToCamelCase(json);
 };
 
 export const deleteRequest = async (
@@ -118,7 +118,7 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
 
   const json = await res.json();
   toast.success(toastMessage ?? "Success");
-  return json;
+  return transformKeysToCamelCase(json);
 };
 
 export const patchRequest = async <TRes>(url: string, toastMessage?: string): Promise<TRes> => {

@@ -81,7 +81,7 @@ const BasicForm = ({
                             </span>
                           )}
                       </FormLabel>
-                      <FormControl className="">
+                      <FormControl>
                         {getControlledInputs(formField, field, true, organisationType)}
                       </FormControl>
                       <FormDescription>{formField.helpText}</FormDescription>
