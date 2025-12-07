@@ -4,15 +4,15 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
 const endpoint = "http://localhost:8000/api/applications/";
 
-const getAllApplications = (): Promise<PaginatedResponse<Application>> => {
+const getAll = (): Promise<PaginatedResponse<Application>> => {
   return fetchRequest<PaginatedResponse<Application>>(endpoint);
 };
 
-const getApplication = (applicationId: number): Promise<Application> => {
+const get = (applicationId: number): Promise<Application> => {
   return fetchRequest<Application>(`${endpoint}${applicationId}/`);
 };
 
-const createApplication = (application: Application): Promise<Application> => {
+const create = (application: Application): Promise<Application> => {
   return sendRequest<Application, Application>(
     `${endpoint}`,
     application,
@@ -21,11 +21,11 @@ const createApplication = (application: Application): Promise<Application> => {
   );
 };
 
-const deleteApplication = (applicationId: number) => {
+const remove = (applicationId: number) => {
   return deleteRequest(`${endpoint}${applicationId}`, "Application successfully deleted");
 };
 
-const updateApplication = (application: Application): Promise<Application> => {
+const update = (application: Application): Promise<Application> => {
   return sendRequest<Application, Application>(
     `${endpoint}${application.id}/`,
     application,
@@ -35,9 +35,9 @@ const updateApplication = (application: Application): Promise<Application> => {
 };
 
 export const applicationApiService = {
-  getAllApplications,
-  getApplication,
-  createApplication,
-  updateApplication,
-  deleteApplication,
+  getAll,
+  get,
+  create,
+  update,
+  remove,
 };

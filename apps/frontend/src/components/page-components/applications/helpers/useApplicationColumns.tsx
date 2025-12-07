@@ -1,5 +1,4 @@
 "use client";
-
 import { ColumnDef } from "@tanstack/react-table";
 import { Application } from "@/interfaces/entities/Application";
 import { Pencil, Trash } from "lucide-react";
@@ -9,14 +8,21 @@ import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { formatDate } from "@/utils/stringUtils";
-import _ from "lodash";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
-const useApplicationColumns = (): ColumnDef<Application>[] => {
+interface UseApplicationColumnsProps {
+  onDeleteClick: (id: number) => void;
+}
+
+const useApplicationColumns = ({
+  onDeleteClick,
+}: UseApplicationColumnsProps): ColumnDef<Application>[] => {
   const router = useRouter();
 
   const onEdit = (id: string) => {
     router.push(`/applications/${id}/edit`);
   };
+
   return [
     {
       accessorKey: "organisation.name",
@@ -27,7 +33,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
         return (
           <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
             <Link href={`/applications/${application.id}`}>
-              {_.capitalize(application.organisation.name)}
+              {capitalizeFirst(application.organisation.name)}
             </Link>
           </div>
         );
@@ -64,7 +70,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       header: "Organisation type",
       size: 110,
       cell: ({ row }) => {
-        return <span>{_.capitalize(row.original.organisationType)}</span>;
+        return <span>{capitalizeFirst(row.original.organisationType)}</span>;
       },
     },
     {
@@ -73,7 +79,7 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
       cell: ({ row }) => {
         const application = row.original;
         return (
-          <div className="flex gap-2 align-middle">
+          <div className="flex gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -82,7 +88,12 @@ const useApplicationColumns = (): ColumnDef<Application>[] => {
             >
               <Pencil />
             </Button>
-            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 hover:text-red-500"
+              onClick={() => onDeleteClick(application.id as number)}
+            >
               <Trash />
             </Button>
           </div>

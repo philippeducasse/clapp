@@ -73,7 +73,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
           id: applicationId,
           profileId: profile?.id,
         } as Application;
-        await applicationApiService.updateApplication(updatedApplication);
+        await applicationApiService.update(updatedApplication);
         dispatch(updateApplication(updatedApplication));
         router.push(`/applications/${application?.id}`);
       } else {
@@ -84,7 +84,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
             objectType: (values as Record<string, unknown>).organisationType as string,
             objectId: (values as Record<string, unknown>).organisation as number,
           };
-          const newApplication = await applicationApiService.createApplication(
+          const newApplication = await applicationApiService.create(
             application as unknown as Application
           );
           router.push(`/applications/${newApplication?.id}`);

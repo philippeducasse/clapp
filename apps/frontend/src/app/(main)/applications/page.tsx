@@ -4,7 +4,7 @@ import { ApplicationsTable } from "@/components/page-components/applications/com
 import TableSkeleton from "@/components/common/skeletons/TableSkeleton";
 
 const ApplicationsPage = async () => {
-  const data = await applicationApiService.getAllApplications();
+  const data = await applicationApiService.getAll();
   return (
     <div className="container mx-auto py-10">
       <Suspense fallback={<TableSkeleton />}>

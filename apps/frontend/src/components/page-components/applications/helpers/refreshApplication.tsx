@@ -4,7 +4,7 @@ import { setApplication } from "@/redux/slices/applicationSlice";
 
 export const refreshApplication = async (applicationId: number, dispatch: AppDispatch) => {
   try {
-    const newApplication = await applicationApiService.getApplication(applicationId);
+    const newApplication = await applicationApiService.get(applicationId);
     if (newApplication) {
       dispatch(setApplication(newApplication));
     }

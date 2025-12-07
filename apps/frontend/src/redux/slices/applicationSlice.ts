@@ -15,7 +15,7 @@ const initialState: ApplicationsState = {
 };
 
 export const fetchApplications = createAsyncThunk("applications/fetchApplications", async () => {
-  const response = await applicationApiService.getAllApplications();
+  const response = await applicationApiService.getAll();
   return response;
 });
 
@@ -46,6 +46,11 @@ const applicationSlice = createSlice({
         Object.assign(existingApplication, action.payload);
       }
     },
+    deleteApplication(state, action: PayloadAction<number>) {
+      state.applications = state.applications.filter(
+        (application) => application.id !== action.payload
+      );
+    },
     ...createFilterReducers<ApplicationsState>(),
   },
   extraReducers: (builder) => {
@@ -60,6 +65,7 @@ export const {
   setApplication,
   addApplication,
   updateApplication,
+  deleteApplication,
   setColumnFilters,
   setColumnFilter,
   removeColumnFilter,

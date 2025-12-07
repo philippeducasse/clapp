@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Clipboard } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -14,12 +14,17 @@ import DetailsViewSection from "@/components/common/details-view/DetailsViewSect
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
 import { refreshApplication } from "../../helpers/refreshApplication";
 import { useDispatch } from "react-redux";
+import DeleteButton from "@/components/common/buttons/DeleteButton";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
+import { applicationApiService } from "@/api/applicationApiService";
+import { useRouter } from "next/navigation";
 
 const ApplicationView = () => {
   const params = useParams();
   const applicationId = Number(params.id);
   const dispatch = useDispatch();
-
+  const router = useRouter();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const application = useSelector((state: RootState) => selectApplication(state, applicationId));
 
   useEffect(() => {
@@ -28,16 +33,36 @@ const ApplicationView = () => {
     }
   }, [applicationId, application, dispatch]);
 
+  const onConfirmDelete = async () => {
+    await applicationApiService.remove(applicationId);
+    router.push("/applications");
+  };
+
   if (!application) {
     return <Skeleton />;
   }
 
   return (
     <DetailsViewWrapper href="/applications">
+      <DeleteModal
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        onConfirm={onConfirmDelete}
+        itemName={"application"}
+      />
       <DetailsViewHeader
         title={application.emailSubject ?? ""}
         icon={<Clipboard className="text-emerald-600 dark:text-emerald-400" size={32} />}
-        actionElements={<EditButton href={`/applications/${application.id}/edit`} />}
+        actionElements={
+          <>
+            <EditButton href={`/applications/${application.id}/edit`} />{" "}
+            <DeleteButton
+              variant={"outline"}
+              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
+              onDelete={() => setOpenDeleteDialog(true)}
+            />
+          </>
+        }
       />
       <DetailsViewSection
         title="Application information"

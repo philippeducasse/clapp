@@ -18,10 +18,11 @@ import { Application } from "@/interfaces/entities/Application";
 const useFestivalColumns = (): ColumnDef<Festival>[] => {
   const router = useRouter();
   const [openDeleteModel, setOpenDeleteModal] = useState(false);
+  const dispatch = useDispatch();
+
   const onEdit = (id: string) => {
     router.push(`/festivals/${id}/edit`);
   };
-  const dispatch = useDispatch();
 
   const onConfirmDelete = async (id: number) => {
     await festivalApiService.remove(id as number);
@@ -116,12 +117,12 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
           router.push(applyRoute);
         };
         return (
-          <div className="flex gap-2 align-middle">
+          <div className="flex gap-2">
             <DeleteModal
               onConfirm={() => onConfirmDelete(festival.id)}
               open={openDeleteModel}
               onOpenChange={setOpenDeleteModal}
-              itemName="Festival"
+              itemName="festival"
             />
             <Button
               variant="outline"

@@ -64,7 +64,6 @@ const FestivalView = () => {
         await festivalApiService.remove(festivalId);
         router.push("/festivals");
       } else if (itemName === "contact" && deleteIndex !== undefined) {
-        // Remove contact at the given index
         const updatedContacts = festival.contacts?.filter((_, i) => i !== deleteIndex) ?? [];
 
         const updatedFestival = {
