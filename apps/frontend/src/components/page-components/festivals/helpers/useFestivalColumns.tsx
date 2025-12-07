@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Pencil, Trash, Send } from "lucide-react";
@@ -8,25 +7,18 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 import { capitalizeFirst } from "@/utils/stringUtils";
-import { DeleteModal } from "@/components/common/modals/DeleteModal";
-import { festivalApiService } from "@/api/festivalApiService";
-import { deleteFestival } from "@/redux/slices/festivalSlice";
-import { useDispatch } from "react-redux";
 import { TagBadge } from "@/components/common/TagBadge";
 import { Application } from "@/interfaces/entities/Application";
 
-const useFestivalColumns = (): ColumnDef<Festival>[] => {
+interface UseFestivalColumnsProps {
+  onDeleteClick: (id: number) => void;
+}
+
+const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnDef<Festival>[] => {
   const router = useRouter();
-  const [openDeleteModel, setOpenDeleteModal] = useState(false);
-  const dispatch = useDispatch();
 
   const onEdit = (id: string) => {
     router.push(`/festivals/${id}/edit`);
-  };
-
-  const onConfirmDelete = async (id: number) => {
-    await festivalApiService.remove(id as number);
-    dispatch(deleteFestival(id as number));
   };
 
   return [
@@ -118,12 +110,6 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
         };
         return (
           <div className="flex gap-2">
-            <DeleteModal
-              onConfirm={() => onConfirmDelete(festival.id)}
-              open={openDeleteModel}
-              onOpenChange={setOpenDeleteModal}
-              itemName="festival"
-            />
             <Button
               variant="outline"
               size="icon"
@@ -144,7 +130,7 @@ const useFestivalColumns = (): ColumnDef<Festival>[] => {
               variant="outline"
               size="icon"
               className="size-8 hover:text-red-500"
-              onClick={() => setOpenDeleteModal(true)}
+              onClick={() => onDeleteClick(festival.id)}
             >
               <Trash />
             </Button>
