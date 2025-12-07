@@ -8,7 +8,11 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 
-const useResidencyColumns = (): ColumnDef<Residency>[] => {
+interface UseResidencyColumnsProps {
+  onDeleteClick: (id: number) => void;
+}
+
+const useResidencyColumns = ({ onDeleteClick }: UseResidencyColumnsProps): ColumnDef<Residency>[] => {
   const router = useRouter();
 
   const onEdit = (id: string) => {
@@ -80,7 +84,12 @@ const useResidencyColumns = (): ColumnDef<Residency>[] => {
             >
               <Send />
             </Button>
-            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 hover:text-red-500"
+              onClick={() => onDeleteClick(residency.id)}
+            >
               <Trash />
             </Button>
           </div>

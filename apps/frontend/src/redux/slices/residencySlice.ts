@@ -43,6 +43,9 @@ const residencySlice = createSlice({
         Object.assign(existingResidency, action.payload);
       }
     },
+    deleteResidency(state, action: PayloadAction<number>) {
+      state.residencies = state.residencies.filter((residency) => residency.id !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchResidencies.fulfilled, (state, action) => {
@@ -51,7 +54,7 @@ const residencySlice = createSlice({
   },
 });
 
-export const { setResidencies, setResidency, addResidency, updateResidency } =
+export const { setResidencies, setResidency, addResidency, updateResidency, deleteResidency } =
   residencySlice.actions;
 
 export const selectAllResidencies = (state: RootState) => state.residencies.residencies;
