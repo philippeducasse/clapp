@@ -17,7 +17,8 @@ interface ApplicationsTableProps {
 
 export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const dispatch = useDispatch();
-  const [applicationData, setApplicationData] = useState<PaginatedResponse<Application>>(initialData);
+  const [applicationData, setApplicationData] =
+    useState<PaginatedResponse<Application>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(null);
 
@@ -34,14 +35,12 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     if (deleteApplicationId === null) return;
     await applicationApiService.remove(deleteApplicationId);
 
-    // Update local state by filtering out the deleted application
-    setApplicationData(prev => ({
+    setApplicationData((prev) => ({
       ...prev,
-      results: prev.results.filter(app => app.id !== deleteApplicationId),
-      count: prev.count - 1
+      results: prev.results.filter((app) => app.id !== deleteApplicationId),
+      count: prev.count - 1,
     }));
 
-    // Also update Redux for consistency
     dispatch(deleteApplication(deleteApplicationId));
     setDeleteApplicationId(null);
   };
