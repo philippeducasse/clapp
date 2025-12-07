@@ -8,7 +8,11 @@ import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
 
-const useVenueColumns = (): ColumnDef<Venue>[] => {
+interface UseVenueColumnsProps {
+  onDeleteClick: (id: number) => void;
+}
+
+const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Venue>[] => {
   const router = useRouter();
 
   const onEdit = (id: string) => {
@@ -75,7 +79,12 @@ const useVenueColumns = (): ColumnDef<Venue>[] => {
             >
               <Send />
             </Button>
-            <Button variant="outline" size="icon" className="size-8 hover:text-red-500">
+            <Button
+              variant="outline"
+              size="icon"
+              className="size-8 hover:text-red-500"
+              onClick={() => onDeleteClick(venue.id)}
+            >
               <Trash />
             </Button>
           </div>

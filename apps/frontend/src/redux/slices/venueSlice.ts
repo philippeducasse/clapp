@@ -41,6 +41,9 @@ const venueSlice = createSlice({
         Object.assign(existingVenue, action.payload);
       }
     },
+    deleteVenue(state, action: PayloadAction<number>) {
+      state.venues = state.venues.filter((venue) => venue.id !== action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchVenues.fulfilled, (state, action) => {
@@ -49,7 +52,7 @@ const venueSlice = createSlice({
   },
 });
 
-export const { setVenues, setVenue, addVenue, updateVenue } = venueSlice.actions;
+export const { setVenues, setVenue, addVenue, updateVenue, deleteVenue } = venueSlice.actions;
 
 export const selectAllVenues = (state: RootState) => state.venues.venues;
 export const selectVenue = (state: RootState, venueId: number) =>
