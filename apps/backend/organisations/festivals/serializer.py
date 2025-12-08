@@ -1,7 +1,9 @@
-from rest_framework import serializers
-from organisations.festivals.models import Festival, FestivalContact
-from typing import List, Type, Any
+from typing import Any, List, Type
+
 from drf_writable_nested.serializers import WritableNestedModelSerializer
+from rest_framework import serializers
+
+from organisations.festivals.models import Festival, FestivalContact
 
 
 class BlankToNullDateField(serializers.DateField):
@@ -93,23 +95,9 @@ class FestivalSerializer(WritableNestedModelSerializer):
         return instance
 
     def get_current_year_application(self, obj: Festival) -> dict[str, Any]:
-        # application_year = request.application_year
-        # Calculate date range for this year
-        from datetime import date
-        from django.contrib.contenttypes.models import ContentType
-        from applications.models import Application
         from applications.serializer import MinimalApplicationSerializer
 
-        year_start = date(2026 - 1, 9, 1)
-        year_end = date(2026, 8, 31)
-
-        # Get applications for this specific festival using GenericForeignKey
-        festival_content_type = ContentType.objects.get_for_model(Festival)
-        application = Application.objects.filter(
-            content_type=festival_content_type,
-            object_id=obj.pk,
-            application_date__gte=year_start,
-            application_date__lte=year_end,
-        ).first()
+        applications = getattr(obj, "_prefetched_current_year_apps", [])
+        application = applications[0] if applications else None
 
         return MinimalApplicationSerializer(application, context=self.context).data

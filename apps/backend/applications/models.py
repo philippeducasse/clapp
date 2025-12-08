@@ -4,7 +4,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-from organisations.models import OrganisationContact
 from performances.models import Performance
 from profiles.models import Profile
 
@@ -35,6 +34,13 @@ class Application(models.Model):
     # which specific instance of the model?
     object_id = models.PositiveIntegerField(null=True, blank=True)
     # combine both
+    # This allows one Application to point to a Festival, another to a Venue, another to a Residency, etc.
+
+    #   Key points:
+    #   - Goes on the model that needs to reference multiple types
+    #   - Requires 2 database fields: content_type (which model type) + object_id (which instance)
+    #   - The GenericForeignKey itself is NOT a real database field - it's a Python property that combines the two
+    #   - Lets you do: application.organisation → gets you the Festival/Venue/Residency object
     organisation = GenericForeignKey("content_type", "object_id")
 
     profile = models.ForeignKey(

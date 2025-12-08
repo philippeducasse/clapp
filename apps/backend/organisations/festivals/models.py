@@ -1,5 +1,8 @@
-from django.db import models
 from typing import List, Tuple
+
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+
 from organisations.models import Organisation, OrganisationContact
 
 
@@ -42,6 +45,16 @@ class Festival(Organisation):
         null=True,
         blank=True,
         help_text="Best estimate of start date for sorting. Use start_date if known, otherwise estimate from approximate_date",
+    )
+
+    #   - Goes on the target models (Festival, Venue, Residency)
+    #   - Creates NO database fields at all - it's purely for querying
+    #   - Lets you do: festival.applications.all() → gets all applications for this festival
+    #   - Enables prefetching: Festival.objects.prefetch_related('applications')
+    applications = GenericRelation(
+        "applications.Application",
+        content_type_field="content_type",
+        object_id_field="object_id",
     )
 
     class Meta:
