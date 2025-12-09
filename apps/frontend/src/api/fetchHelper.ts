@@ -15,7 +15,7 @@ export const fetchRequest = async <T = unknown>(url: string, options?: RequestIn
   const res = await fetch(url, {
     credentials: "include",
     ...options,
-    headers
+    headers,
   });
   if (!res.ok) {
     const text = await res.text();
@@ -31,7 +31,7 @@ export const sendRequest = async <TReq, TRes>(
   data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",
   toastMessage?: string,
-  includeCredentials: boolean = false
+  includeCredentials: boolean = true
 ): Promise<TRes> => {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -173,7 +173,7 @@ export const patchRequest = async <TRes>(url: string, toastMessage?: string): Pr
 };
 
 const getCsrfToken = (): string | null => {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return null;
   }
   const match = document.cookie.match(/csrftoken=([^;]+)/);
