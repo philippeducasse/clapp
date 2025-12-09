@@ -27,7 +27,8 @@ const create = (festival: Festival): Promise<Festival> => {
     `${endpoint}`,
     festival,
     "POST",
-    "Festival successfully created"
+    "Festival successfully created",
+    true
   );
 };
 
@@ -39,7 +40,7 @@ const tag = (festivalId: number, action: TagAction): Promise<Festival> => {
 };
 
 const remove = (festivalId: number): Promise<void> => {
-  return deleteRequest(`${endpoint}${festivalId}`, "Festival successfully deleted");
+  return deleteRequest(`${endpoint}${festivalId}`, "Festival successfully deleted", true);
 };
 
 const enrich = (festivalId: number): Promise<Festival> => {
@@ -51,7 +52,8 @@ const update = (festival: Festival): Promise<Festival> => {
     `${endpoint}${festival.id}/`,
     festival,
     "PUT",
-    "Festival successfully updated"
+    "Festival successfully updated",
+    true
   );
 };
 
@@ -63,7 +65,8 @@ const generateEmail = (
     `${endpoint}${festivalId}/generate_email/`,
     data,
     "POST",
-    "Email successfully generated"
+    "Email successfully generated",
+    true
   );
 };
 

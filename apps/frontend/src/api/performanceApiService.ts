@@ -4,11 +4,11 @@ import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 const endpoint = "http://localhost:8000/api/performances/";
 
 const getAll = (userId: number): Promise<Performance[]> => {
-  return fetchRequest<Performance[]>(`${endpoint}${userId}/`, { credentials: "include" });
+  return fetchRequest<Performance[]>(`${endpoint}${userId}/`);
 };
 
 const get = (performanceId: number): Promise<Performance> => {
-  return fetchRequest<Performance>(`${endpoint}${performanceId}/`, { credentials: "include" });
+  return fetchRequest<Performance>(`${endpoint}${performanceId}/`);
 };
 
 const create = (performance: Performance): Promise<Performance> => {

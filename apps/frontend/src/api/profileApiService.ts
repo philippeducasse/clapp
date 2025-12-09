@@ -1,10 +1,10 @@
 import { Profile } from "@/interfaces/entities/Profile";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 import { Credentials } from "@/interfaces/api/ApiService";
-const endpoint = "/api/profiles";
+const endpoint = "http://localhost:8000/api/profiles";
 
 const get = async (): Promise<Profile> => {
-  return await fetchRequest(`${endpoint}/me/`, { credentials: "include" });
+  return await fetchRequest(`${endpoint}/me/`);
 };
 
 const register = async (profile: Partial<Profile>): Promise<Profile> => {
@@ -17,7 +17,7 @@ const register = async (profile: Partial<Profile>): Promise<Profile> => {
 };
 
 const remove = (profileId: number) => {
-  return deleteRequest(`${endpoint}${profileId}`, "Profile successfully deleted");
+  return deleteRequest(`${endpoint}/${profileId}/`, "Profile successfully deleted", true);
 };
 
 const update = async (profile: Partial<Profile>): Promise<Profile> => {
@@ -32,7 +32,7 @@ const update = async (profile: Partial<Profile>): Promise<Profile> => {
 
 const login = async (credentials: Credentials) => {
   return await sendRequest(
-    `${endpoint}/login`,
+    `${endpoint}/login/`,
     credentials,
     "POST",
     `Welcome ${credentials.email}, you have successfully logged in`,
@@ -40,7 +40,7 @@ const login = async (credentials: Credentials) => {
   );
 };
 const logout = async () => {
-  return await sendRequest(`${endpoint}/logout`, {}, "POST", `Successfully logged out`, true);
+  return await sendRequest(`${endpoint}/logout/`, {}, "POST", `Successfully logged out`, true);
 };
 
 export const profileApiService = {

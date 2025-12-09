@@ -2,7 +2,21 @@ import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/se
 import { toast } from "sonner";
 
 export const fetchRequest = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
-  const res = await fetch(url, options);
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...(options?.headers as Record<string, string>),
+  };
+
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRFToken"] = csrfToken;
+  }
+
+  const res = await fetch(url, {
+    credentials: "include",
+    ...options,
+    headers
+  });
   if (!res.ok) {
     const text = await res.text();
     toast.error(`Error: ${text}`);
@@ -102,12 +116,20 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
     });
   }
 
+  const headers: HeadersInit = {
+    Accept: "application/json",
+  };
+
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRFToken"] = csrfToken;
+  }
+
   const res = await fetch(url, {
     method,
+    credentials: "include",
     body: formData,
-    headers: {
-      Accept: "application/json",
-    },
+    headers,
   });
 
   if (!res.ok) {
@@ -122,11 +144,19 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
 };
 
 export const patchRequest = async <TRes>(url: string, toastMessage?: string): Promise<TRes> => {
+  const headers: HeadersInit = {
+    Accept: "application/json",
+  };
+
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRFToken"] = csrfToken;
+  }
+
   const res = await fetch(url, {
     method: "PATCH",
-    headers: {
-      Accept: "application/json",
-    },
+    credentials: "include",
+    headers,
   });
 
   if (!res.ok) {
@@ -143,6 +173,9 @@ export const patchRequest = async <TRes>(url: string, toastMessage?: string): Pr
 };
 
 const getCsrfToken = (): string | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
   const match = document.cookie.match(/csrftoken=([^;]+)/);
   return match ? match[1] : null;
 };
