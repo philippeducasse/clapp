@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Exists, OuterRef, Prefetch, QuerySet, Subquery
+from django.db.models import Exists, OuterRef, Prefetch, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from applications.models import Application
@@ -27,50 +27,34 @@ class FestivalViewSet(OrganisationViewSet):
         festival_content_type = ContentType.objects.get_for_model(Festival)
         year_start = date(2026 - 1, 9, 1)
         year_end = date(2026, 8, 31)
-
-        # TODO: Use request.user.profile once multi-user auth is implemented
-        # For now, hardcoded to profile_id=2 to match the rest of the codebase
+        # user_profile_id = self.request.user.profile.id
         user_profile_id = 2
-
-        queryset = Festival.objects.annotate(
-            has_application_this_year=Exists(
-                Application.objects.filter(
-                    content_type=festival_content_type,
-                    object_id=OuterRef("pk"),
-                    application_date__year=2026,
-                    profile_id=user_profile_id,  # Filter by user's profile
-                )
-            ),
-            latest_application_status=Subquery(
-                Application.objects.filter(
-                    content_type=festival_content_type,
-                    object_id=OuterRef("pk"),
-                    profile_id=user_profile_id,  # Filter by user's profile
-                )
-                .order_by("-application_date")
-                .values("application_status")[:1]
-            ),
-            latest_application_date=Subquery(
-                Application.objects.filter(
-                    content_type=festival_content_type,
-                    object_id=OuterRef("pk"),
-                    profile_id=user_profile_id,  # Filter by user's profile
-                )
-                .order_by("-application_date")
-                .values("application_date")[:1]
-            ),
-        ).prefetch_related(
-            Prefetch(
-                "applications",
-                queryset=Application.objects.filter(
-                    content_type=festival_content_type,
-                    application_date__gte=year_start,
-                    application_date__lte=year_end,
-                    profile_id=user_profile_id,  # Filter by user's profile
-                ).select_related("content_type"),
-                to_attr="_prefetched_current_year_apps",
+        queryset = (
+            Festival.objects.annotate(
+                has_application_this_year=Exists(
+                    Application.objects.filter(
+                        content_type=festival_content_type,
+                        object_id=OuterRef("pk"),
+                        application_date__year=2026,
+                        profile_id=user_profile_id,
+                    )
+                ),
             )
+            .prefetch_related(
+                Prefetch(
+                    "applications",
+                    queryset=Application.objects.filter(
+                        content_type=festival_content_type,
+                        application_date__gte=year_start,
+                        application_date__lte=year_end,
+                        profile_id=user_profile_id,
+                    ).select_related("content_type"),
+                    to_attr="_prefetched_current_year_apps",
+                )
+            )
+            .prefetch_related("contacts")
         )
+
         return queryset
 
     def get_organisation_type_name(self) -> str:

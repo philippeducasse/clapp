@@ -69,27 +69,22 @@ class FestivalSerializer(WritableNestedModelSerializer):
         # Update festival fields
         instance = super().update(instance, validated_data)
 
-        # Handle contacts
         if contacts_data is not None:
-            # Get existing contact IDs
             existing_contacts = {c.id: c for c in instance.contacts.all()}
             incoming_ids = {c.get("id") for c in contacts_data if c.get("id")}
 
-            # Delete removed contacts
             to_delete = set(existing_contacts.keys()) - incoming_ids
             FestivalContact.objects.filter(id__in=to_delete).delete()
 
-            # Update or create contacts
             for contact_data in contacts_data:
                 contact_id = contact_data.get("id")
                 if contact_id and contact_id in existing_contacts:
-                    # Update existing
-                    print("updated contact")
+                    # print("updated contact")
                     for attr, value in contact_data.items():
                         setattr(existing_contacts[contact_id], attr, value)
                     existing_contacts[contact_id].save()
                 else:
-                    print("created new contact")
+                    # print("created new contact")
                     FestivalContact.objects.create(festival=instance, **contact_data)
 
         return instance
