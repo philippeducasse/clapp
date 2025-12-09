@@ -1,4 +1,6 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as django_login
+from django.contrib.auth import logout as django_logout
 from django.db.models import QuerySet
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -11,9 +13,11 @@ from profiles.serializers import ProfileSerializer, RegisterSerializer
 
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
-    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self) -> QuerySet[Profile]:
+        print(f"Session key: {self.request.session.session_key}")
+        print(f"User: {self.request.user}")
+        print(f"Is authenticated: {self.request.user.is_authenticated}")
         if self.request.user.is_authenticated:
             return Profile.objects.filter(id=self.request.user.id)
         return Profile.objects.none()
@@ -24,8 +28,23 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise permissions.PermissionDenied("You can only access your own profile")
         return obj
 
+    # def get_user(request):
+    #     from django.contrib.auth.models import AnonymousUser
+
+    #     try:
+    #         user_id = request.session["sessionid"]
+    #         print("SESSION_ID IN GET_USER", user_id)
+
+    #     except KeyError:
+    #         user = AnonymousUser()
+    #     return user
+
     @action(detail=False, methods=["get"])
     def me(self, request: Request) -> Response:
+        print("ME FUNCTION ############")
+        print(f"Session key: {self.request.session.session_key}")
+        print(f"User: {self.request.user}")
+        print(f"Is authenticated: {self.request.user.is_authenticated}")
         """Get the authenticated user's profile"""
         profile = self.get_queryset().first()
         serializer = self.get_serializer(profile)
@@ -61,12 +80,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def login(self, request: Request) -> Response:
         email = request.data.get("email")
         password = request.data.get("password")
-        print("password: ", password)
         user = authenticate(request, username=email, password=password)
+        print("USER: ", password, user)
 
         if user is not None:
-            login(request, user)
+            django_login(request, user)
             serializer = self.get_serializer(user)
+            print(f"Session after login: {request.session.session_key}")
+            print(f"User after login: {request.user}")
             return Response(serializer.data)
 
         return Response(
@@ -75,5 +96,5 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["post"])
     def logout(self, request):
-        logout(request)
+        django_logout(request)
         return Response({"message": "Logged out successfully"})

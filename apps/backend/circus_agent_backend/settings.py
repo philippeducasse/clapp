@@ -94,12 +94,14 @@ CORS_ALLOW_HEADERS = [
     "accept-encoding",
     "authorization",
     "content-type",
+    "cookie",
     "dnt",
     "origin",
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
 ]
+
 
 ROOT_URLCONF = "circus_agent_backend.urls"
 
@@ -199,9 +201,9 @@ AUTH_USER_MODEL = "profiles.Profile"
 
 # DRF settings
 REST_FRAMEWORK = {
-    # "DEFAULT_AUTHENTICATION_CLASSES": [
-    #     "circus_agent_backend.authentication.CsrfExemptSessionAuthentication",  # CSRF handled by Django middleware
-    # ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     # "DEFAULT_PERMISSION_CLASSES": [
     #     "rest_framework.permissions.IsAuthenticated",
     # ],

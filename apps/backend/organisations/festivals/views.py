@@ -24,6 +24,10 @@ class FestivalViewSet(OrganisationViewSet):
     ordering = ["name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
+        print(f"Session : {self.request.session}")
+        print(f"Session key: {self.request.session.session_key}")
+        print(f"User: {self.request.user}")
+        print(f"Is authenticated: {self.request.user.is_authenticated}")
         festival_content_type = ContentType.objects.get_for_model(Festival)
         year_start = date(2026 - 1, 9, 1)
         year_end = date(2026, 8, 31)
