@@ -32,8 +32,6 @@ DEBUG = True
 
 ALLOWED_HOSTS: list[str] = []
 
-# SESSION_COOKIE_SAMESITE = "None"
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -68,6 +66,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3020",
+    "http://localhost:3000",
     "http://localhost",  # Next.js dev server
 ]
 
@@ -76,6 +75,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3020",
+    "http://localhost:3000",
     "http://127.0.0.1:3020",
 ]
 # Allow specific methods
@@ -199,6 +199,12 @@ AUTH_USER_MODEL = "profiles.Profile"
 
 # DRF settings
 REST_FRAMEWORK = {
+    # "DEFAULT_AUTHENTICATION_CLASSES": [
+    #     "circus_agent_backend.authentication.CsrfExemptSessionAuthentication",  # CSRF handled by Django middleware
+    # ],
+    # "DEFAULT_PERMISSION_CLASSES": [
+    #     "rest_framework.permissions.IsAuthenticated",
+    # ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 500,
 }
