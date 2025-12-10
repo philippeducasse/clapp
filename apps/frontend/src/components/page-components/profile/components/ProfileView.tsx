@@ -38,7 +38,6 @@ const ProfileView = () => {
     setOpenDeleteDialog(true);
   };
   const onConfirmDelete = async () => {
-    console.log("deleting:", itemName, profile);
     try {
       if (itemName === "profile" && profile) {
         await profileApiService.remove(profile.id);

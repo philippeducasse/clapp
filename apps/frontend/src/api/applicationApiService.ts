@@ -2,7 +2,7 @@ import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 import { Application } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
-const endpoint = "http://localhost:8000/api/applications/";
+const endpoint = "/api/applications/";
 
 const getAll = (): Promise<PaginatedResponse<Application>> => {
   return fetchRequest<PaginatedResponse<Application>>(endpoint);

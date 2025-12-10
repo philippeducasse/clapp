@@ -44,9 +44,6 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
     mode: "onSubmit",
   });
 
-  console.log("FORM: ", form, formFields);
-
-  // Reset form when performance data becomes available
   useEffect(() => {
     if (performance && action === Action.EDIT && !formInitialized) {
       form.reset(sanitizeFormData(performance, formFields));

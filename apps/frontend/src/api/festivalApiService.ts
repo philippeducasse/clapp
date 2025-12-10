@@ -12,7 +12,7 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
-const endpoint = "http://localhost:8000/api/festivals/";
+const endpoint = "/api/festivals/";
 
 const getAll = (): Promise<PaginatedResponse<Festival>> => {
   return fetchRequest<PaginatedResponse<Festival>>(endpoint);

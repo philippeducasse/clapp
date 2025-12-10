@@ -11,7 +11,7 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { EntityApiService } from "@/interfaces/api/ApiService";
 
-const endpoint = "http://localhost:8000/api/residencies/";
+const endpoint = "/api/residencies/";
 
 const getAll = (): Promise<PaginatedResponse<Residency>> => {
   return fetchRequest<PaginatedResponse<Residency>>(endpoint);

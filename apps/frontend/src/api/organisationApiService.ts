@@ -1,6 +1,6 @@
 import { fetchRequest } from "./fetchHelper";
 
-const endpoint = "http://localhost:8000/api/organisations";
+const endpoint = "/api/organisations";
 
 export interface OrganisationSearchResponse {
   id: number;
@@ -10,7 +10,10 @@ export interface OrganisationSearchResponse {
   type: string;
 }
 
-const search = async (searchQuery: string, type?: string): Promise<OrganisationSearchResponse[]> => {
+const search = async (
+  searchQuery: string,
+  type?: string
+): Promise<OrganisationSearchResponse[]> => {
   if (!searchQuery || searchQuery.length < 2) {
     return [];
   }

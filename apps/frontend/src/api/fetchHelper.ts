@@ -1,29 +1,68 @@
 import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
 import { toast } from "sonner";
 
-export const fetchRequest = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
+const getFullUrl = (url: string): string => {
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+  return url.startsWith("http") ? url : `${backendUrl}${url}`;
+};
+
+const getServerCookies = async (): Promise<string> => {
+  if (typeof window === "undefined") {
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      const allCookies = cookieStore.getAll();
+      return allCookies.map((cookie) => `${cookie.name}=${cookie.value}`).join("; ");
+    } catch {
+      return "";
+    }
+  }
+  return "";
+};
+
+const baseRequest = async (
+  url: string,
+  options: RequestInit = {},
+  includeCredentials: boolean = true
+): Promise<Response> => {
   const headers: Record<string, string> = {
     Accept: "application/json",
-    ...(options?.headers as Record<string, string>),
+    ...(options.headers as Record<string, string>),
   };
 
-  const csrfToken = getCsrfToken();
-  if (csrfToken) {
-    headers["X-CSRFToken"] = csrfToken;
+  const serverCookies = await getServerCookies();
+  if (serverCookies) {
+    headers["Cookie"] = serverCookies;
   }
 
-  const res = await fetch(url, {
-    credentials: "include",
+  return fetch(getFullUrl(url), {
     ...options,
+    ...(includeCredentials && { credentials: "include" }),
     headers,
   });
+};
+
+const handleResponse = async <T>(
+  res: Response,
+  url: string,
+  successMessage?: string
+): Promise<T> => {
   if (!res.ok) {
-    const text = await res.text();
-    toast.error(`Error: ${text}`);
-    throw new Error(`Failed to fetch ${url}: ${res.status}`);
+    const error = await res.text();
+    toast.error(`Error: ${error}`);
+    throw new Error(`Request failed for ${url}: ${res.status} - ${error}`);
   }
+
   const json = await res.json();
+  if (successMessage) {
+    toast.success(successMessage);
+  }
   return transformKeysToCamelCase(json);
+};
+
+export const fetchRequest = async <T = unknown>(url: string, options?: RequestInit): Promise<T> => {
+  const res = await baseRequest(url, options);
+  return handleResponse<T>(res, url);
 };
 
 export const sendRequest = async <TReq, TRes>(
@@ -33,66 +72,25 @@ export const sendRequest = async <TReq, TRes>(
   toastMessage?: string,
   includeCredentials: boolean = true
 ): Promise<TRes> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-
-  if (includeCredentials) {
-    const csrfToken = getCsrfToken();
-    if (csrfToken) {
-      headers["X-CSRFToken"] = csrfToken;
-    }
-  }
-
-  const res = await fetch(url, {
-    method,
-    headers,
-    ...(includeCredentials && { credentials: "include" }),
-    body: JSON.stringify(transformKeysToSnakeCase(data)),
-  });
-
-  if (!res.ok) {
-    const error = await res.text();
-    toast.error(`Error: ${error}`);
-    throw new Error(`Failed to ${method} ${url}: ${res.status} - ${error}`);
-  }
-
-  const json = await res.json();
-
-  toast.success(toastMessage ?? "Success");
-
-  return transformKeysToCamelCase(json);
+  const res = await baseRequest(
+    url,
+    {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(transformKeysToSnakeCase(data)),
+    },
+    includeCredentials
+  );
+  return handleResponse<TRes>(res, url, toastMessage ?? "Success");
 };
 
 export const deleteRequest = async (
   url: string,
   toastMessage?: string,
-  includeCredentials?: boolean
+  includeCredentials: boolean = true
 ): Promise<void> => {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  };
-
-  if (includeCredentials) {
-    const csrfToken = getCsrfToken();
-    if (csrfToken) {
-      headers["X-CSRFToken"] = csrfToken;
-    }
-  }
-  const res = await fetch(url, {
-    method: "DELETE",
-    headers,
-    ...(includeCredentials && { credentials: "include" }),
-  });
-  if (!res.ok) {
-    const error = await res.text();
-    toast.error(`Error: ${error}`);
-    throw new Error(`Failed to DELETE ${url}: ${res.status} - ${error}`);
-  }
-
-  toast.success(toastMessage ?? "Successfully deleted");
+  const res = await baseRequest(url, { method: "DELETE" }, includeCredentials);
+  await handleResponse(res, url, toastMessage ?? "Successfully deleted");
 };
 
 export const sendFormDataRequest = async <TReq, TRes = TReq>(
@@ -116,66 +114,11 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
     });
   }
 
-  const headers: HeadersInit = {
-    Accept: "application/json",
-  };
-
-  const csrfToken = getCsrfToken();
-  if (csrfToken) {
-    headers["X-CSRFToken"] = csrfToken;
-  }
-
-  const res = await fetch(url, {
-    method,
-    credentials: "include",
-    body: formData,
-    headers,
-  });
-
-  if (!res.ok) {
-    const error = await res.text();
-    toast.error(`Error: ${error}`);
-    throw new Error(`Failed to ${method} ${url}: ${res.status} - ${error}`);
-  }
-
-  const json = await res.json();
-  toast.success(toastMessage ?? "Success");
-  return transformKeysToCamelCase(json);
+  const res = await baseRequest(url, { method, body: formData });
+  return handleResponse<TRes>(res, url, toastMessage ?? "Success");
 };
 
 export const patchRequest = async <TRes>(url: string, toastMessage?: string): Promise<TRes> => {
-  const headers: HeadersInit = {
-    Accept: "application/json",
-  };
-
-  const csrfToken = getCsrfToken();
-  if (csrfToken) {
-    headers["X-CSRFToken"] = csrfToken;
-  }
-
-  const res = await fetch(url, {
-    method: "PATCH",
-    credentials: "include",
-    headers,
-  });
-
-  if (!res.ok) {
-    const error = await res.text();
-    toast.error(`Error: ${error}`);
-    throw new Error(`Failed to PATCH ${url}: ${res.status} - ${error}`);
-  }
-
-  const json = await res.json();
-  if (toastMessage) {
-    toast.success(toastMessage);
-  }
-  return transformKeysToCamelCase(json);
-};
-
-const getCsrfToken = (): string | null => {
-  if (typeof document === "undefined") {
-    return null;
-  }
-  const match = document.cookie.match(/csrftoken=([^;]+)/);
-  return match ? match[1] : null;
+  const res = await baseRequest(url, { method: "PATCH" });
+  return handleResponse<TRes>(res, url, toastMessage);
 };

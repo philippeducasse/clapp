@@ -1,7 +1,7 @@
 import { Performance } from "@/interfaces/entities/Performance";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 
-const endpoint = "http://localhost:8000/api/performances/";
+const endpoint = "/api/performances/";
 
 const getAll = (userId: number): Promise<Performance[]> => {
   return fetchRequest<Performance[]>(`${endpoint}${userId}/`);

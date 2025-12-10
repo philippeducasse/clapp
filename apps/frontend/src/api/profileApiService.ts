@@ -1,7 +1,7 @@
 import { Profile } from "@/interfaces/entities/Profile";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 import { Credentials } from "@/interfaces/api/ApiService";
-const endpoint = "http://localhost:8000/api/profiles";
+const endpoint = "/api/profiles";
 
 const get = async (): Promise<Profile> => {
   return await fetchRequest(`${endpoint}/me/`);

@@ -69,7 +69,6 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
       if (action === Action.EDIT && profile) {
         const updatedProfile = { ...values, id: profile.id } as Profile;
         const sanitisedData = prepareFormDataForSubmission(updatedProfile, formFields);
-        console.log(sanitisedData);
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));
         router.push(`/profile`);
