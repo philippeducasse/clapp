@@ -1,14 +1,9 @@
-import React, { Suspense } from "react";
+import React from "react";
 import ManualApplicationForm from "@/components/page-components/applications/components/form/ManualApplicationForm";
 import { Action } from "@/interfaces/Enums";
-import FormSkeleton from "@/components/common/skeletons/FormSkeleton";
 
 const ManualApplicationPage = () => {
-  return (
-    <Suspense fallback={<FormSkeleton />}>
-      <ManualApplicationForm action={Action.EDIT} />
-    </Suspense>
-  );
+  return <ManualApplicationForm action={Action.EDIT} />;
 };
 
 export default ManualApplicationPage;

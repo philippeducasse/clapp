@@ -1,14 +1,9 @@
-import React, { Suspense } from "react";
+import React from "react";
 import ResidencyForm from "@/components/page-components/residencies/components/form/ResidencyForm";
 import { Action } from "@/interfaces/Enums";
-import FormSkeleton from "@/components/common/skeletons/FormSkeleton";
 
 const EditResidencyPage = () => {
-  return (
-    <Suspense fallback={<FormSkeleton />}>
-      <ResidencyForm action={Action.EDIT} />
-    </Suspense>
-  );
+  return <ResidencyForm action={Action.EDIT} />;
 };
 
 export default EditResidencyPage;

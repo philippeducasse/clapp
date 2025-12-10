@@ -1,14 +1,9 @@
 import VenueForm from "@/components/page-components/venues/components/form/VenueForm";
-import React, { Suspense } from "react";
+import React from "react";
 import { Action } from "@/interfaces/Enums";
-import FormSkeleton from "@/components/common/skeletons/FormSkeleton";
 
 const VenueCreationPage = () => {
-  return (
-    <Suspense fallback={<FormSkeleton />}>
-      <VenueForm action={Action.CREATE} />
-    </Suspense>
-  );
+  return <VenueForm action={Action.CREATE} />;
 };
 
 export default VenueCreationPage;

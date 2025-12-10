@@ -1,14 +1,9 @@
-import React, { Suspense } from "react";
+import React from "react";
 import FestivalForm from "@/components/page-components/festivals/components/form/FestivalBasicInfoForm";
 import { Action } from "@/interfaces/Enums";
-import FormSkeleton from "@/components/common/skeletons/FormSkeleton";
 
 const EditFestivalPage = () => {
-  return (
-    <Suspense fallback={<FormSkeleton />}>
-      <FestivalForm action={Action.EDIT} />
-    </Suspense>
-  );
+  return <FestivalForm action={Action.EDIT} />;
 };
 
 export default EditFestivalPage;

@@ -1,13 +1,8 @@
-import React, { Suspense } from "react";
+import React from "react";
 import ProfileView from "@/components/page-components/profile/components/ProfileView";
-import DetailsViewSkeleton from "@/components/common/skeletons/DetailsViewSkeleton";
 
 const ProfilePage = () => {
-  return (
-    <Suspense fallback={<DetailsViewSkeleton />}>
-      <ProfileView />
-    </Suspense>
-  );
+  return <ProfileView />;
 };
 
 export default ProfilePage;
