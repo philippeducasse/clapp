@@ -15,9 +15,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
 
     def get_queryset(self) -> QuerySet[Profile]:
-        print(f"Session key: {self.request.session.session_key}")
-        print(f"User: {self.request.user}")
-        print(f"Is authenticated: {self.request.user.is_authenticated}")
         if self.request.user.is_authenticated:
             return Profile.objects.filter(id=self.request.user.id)
         return Profile.objects.none()
@@ -28,23 +25,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
             raise permissions.PermissionDenied("You can only access your own profile")
         return obj
 
-    # def get_user(request):
-    #     from django.contrib.auth.models import AnonymousUser
-
-    #     try:
-    #         user_id = request.session["sessionid"]
-    #         print("SESSION_ID IN GET_USER", user_id)
-
-    #     except KeyError:
-    #         user = AnonymousUser()
-    #     return user
-
     @action(detail=False, methods=["get"])
     def me(self, request: Request) -> Response:
-        print("ME FUNCTION ############")
-        print(f"Session key: {self.request.session.session_key}")
-        print(f"User: {self.request.user}")
-        print(f"Is authenticated: {self.request.user.is_authenticated}")
         """Get the authenticated user's profile"""
         profile = self.get_queryset().first()
         serializer = self.get_serializer(profile)

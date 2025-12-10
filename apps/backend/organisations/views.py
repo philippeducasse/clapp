@@ -34,8 +34,6 @@ from .utils import clean_organisation_data, extract_fields_from_llm
 
 
 @api_view(["GET"])
-# todo: add authentication?
-# @permission_classes([])
 def search(request: Request) -> Response:
     """
     Unified search endpoint for all organisation types
@@ -184,7 +182,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
         # TODO: refactor this once more than one user
-        default_profile = Profile.objects.get(id=2)
+        profile = Profile.objects.get(self.request.user.id)
         application_method = request.data.get("application_method")
         performances = request.data.get("performances")
         comments = request.data.get("comments", None)
@@ -192,7 +190,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         if application_method == "FORM":
             try:
                 online_form_application = create_form_application(
-                    organisation, performances, default_profile, comments
+                    organisation, performances, profile, comments
                 )
                 return Response(
                     {
@@ -276,7 +274,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 application_status="DRAFT",
                 message=message,
                 email_subject=subject,
-                profile=default_profile,
+                profile=profile,
                 email_recipients=recipient_emails,
             )
 
