@@ -26,9 +26,9 @@ from services.mistral_service import MistralClient
 
 from .models import Organisation
 from .services import (
+    create_form_application,
     generate_application_mail_prompt,
     generate_enrich_prompt,
-    create_form_application,
 )
 from .utils import clean_organisation_data, extract_fields_from_llm
 
@@ -181,8 +181,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
-        # TODO: refactor this once more than one user
-        profile = Profile.objects.get(self.request.user.id)
+        profile = request.user
         application_method = request.data.get("application_method")
         performances = request.data.get("performances")
         comments = request.data.get("comments", None)
@@ -335,7 +334,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         """Generate email content using LLM."""
         try:
             organisation = self.get_object()
-            profile = Profile.objects.get(id=2)  # TODO: Use request.user.profile
+            profile = request.user
 
             performance_ids = request.data.get("selected_performance_ids")
             performance_objects = []
