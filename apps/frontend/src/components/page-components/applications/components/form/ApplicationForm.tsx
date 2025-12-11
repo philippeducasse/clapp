@@ -52,7 +52,7 @@ const ApplicationForm = () => {
   });
 
   const applicationMethodWatch = form.watch("applicationMethod") ?? "EMAIL";
-  const performanceSelection = form.watch("performances") as number[];
+  const performanceSelection = form.watch("performances") as string[];
   const language = form.watch("language") as string;
 
   useEffect(() => {
@@ -62,8 +62,16 @@ const ApplicationForm = () => {
   }, [applicationMethodWatch]);
 
   useEffect(() => {
-    setSelectedPerformanceIds(performanceSelection);
+    setSelectedPerformanceIds(performanceSelection.map((performanceId) => Number(performanceId)));
   }, [performanceSelection]);
+
+  useEffect(() => {
+    const performanceDossiers = profile?.performances.filter((p) =>
+      selectedPerformanceIds.includes(p.id)
+    )[0]?.dossiers;
+    console.log("Performances:;", performanceDossiers, selectedPerformanceIds);
+    form.setValue("attachmentsSent", performanceDossiers);
+  }, [selectedPerformanceIds]);
 
   useEffect(() => {
     if (!festival) {

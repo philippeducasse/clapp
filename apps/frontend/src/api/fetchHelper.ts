@@ -35,6 +35,11 @@ const baseRequest = async (
     headers["Cookie"] = serverCookies;
   }
 
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers["X-CSRFToken"] = csrfToken;
+  }
+
   return fetch(getFullUrl(url), {
     ...options,
     ...(includeCredentials && { credentials: "include" }),
@@ -121,4 +126,12 @@ export const sendFormDataRequest = async <TReq, TRes = TReq>(
 export const patchRequest = async <TRes>(url: string, toastMessage?: string): Promise<TRes> => {
   const res = await baseRequest(url, { method: "PATCH" });
   return handleResponse<TRes>(res, url, toastMessage);
+};
+
+const getCsrfToken = (): string | null => {
+  if (typeof document === "undefined") {
+    return null;
+  }
+  const match = document.cookie.match(/csrftoken=([^;]+)/);
+  return match ? match[1] : null;
 };

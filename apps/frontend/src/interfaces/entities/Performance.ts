@@ -10,7 +10,6 @@ export interface Performance {
   length?: string;
   longDescription?: string;
   creationDate?: Date;
-  dossier?: string;
   performanceType?: PerformanceType;
   genres?: PerformanceGenre[];
   dossiers?: Dossier[];

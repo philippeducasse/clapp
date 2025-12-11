@@ -90,7 +90,8 @@ export const getApplicationFormFields = (
   displayedFields.push({
     label: "Comments",
     fieldName: "comments",
-    type: ControlledFormElementType.TEXT_AREA,
+    type: ControlledFormElementType.TEXT,
+    helpText: "These are for you and won't be included in the application"
   });
 
   return displayedFields;
