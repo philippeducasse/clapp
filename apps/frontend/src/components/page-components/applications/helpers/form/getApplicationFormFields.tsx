@@ -4,7 +4,7 @@ import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
-import { capitalize } from "lodash";
+import { LANGUAGES } from "@/constants/languages";
 
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
@@ -30,7 +30,9 @@ export const getApplicationFormFields = (
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
-  const userLanguages = ["FRENCH", "ITALIAN", "GERMAN", "ENGLISH", "SPANISH"];
+
+  const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
+  const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
 
   const emailApplicationFields: ControlledFormElement[] = [
     {
@@ -54,9 +56,9 @@ export const getApplicationFormFields = (
       label: "Language",
       fieldName: "language",
       type: ControlledFormElementType.SELECT,
-      options: userLanguages.map((l) => ({ value: l, label: capitalize(l) })),
+      options: userLanguages.map((l) => ({ value: l.code, label: l.name })),
       helpText: "Provide the language for the email generation",
-      defaultValue: "ENGLISH",
+      defaultValue: userLanguages[0]?.code ?? "en",
     },
     {
       label: "Message",
@@ -67,7 +69,12 @@ export const getApplicationFormFields = (
       label: "Message length",
       fieldName: "messageLength",
       type: ControlledFormElementType.SLIDER,
-      sliderOptions: { min: 1, max: 5, step: 1 },
+      sliderOptions: {
+        min: 1,
+        max: 5,
+        step: 1,
+        labels: ["very short", "short", "normal", "long", "very long"],
+      },
       helpText: "Set the length if generating email",
     },
   ];

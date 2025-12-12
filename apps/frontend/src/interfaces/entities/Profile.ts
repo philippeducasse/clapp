@@ -11,6 +11,7 @@ export interface Profile {
   age?: number;
   location?: string;
   nationality?: string;
+  spokenLanguages?: string[];
   instagramProfile?: string;
   facebookProfile?: string;
   tiktokProfile?: string;

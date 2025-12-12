@@ -22,7 +22,7 @@ const remove = (profileId: number) => {
 
 const update = async (profile: Partial<Profile>): Promise<Profile> => {
   return await sendRequest(
-    `${endpoint}/${profile.id}`,
+    `${endpoint}/${profile.id}/`,
     profile,
     "PUT",
     "Profile successfully updated",

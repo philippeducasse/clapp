@@ -1,5 +1,6 @@
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
+import { LANGUAGES } from "@/constants/languages";
 
 export const getProfileFormFields = (): ControlledFormElement[] => {
   const fields: ControlledFormElement[] = [
@@ -41,6 +42,14 @@ export const getProfileFormFields = (): ControlledFormElement[] => {
       label: "Nationality",
       fieldName: "nationality",
       type: ControlledFormElementType.TEXT,
+    },
+    {
+      label: "Spoken Languages",
+      fieldName: "spokenLanguages",
+      type: ControlledFormElementType.MULTI_SELECT,
+      options: LANGUAGES.map((lang) => ({ value: lang.code, label: lang.name })),
+      defaultValue: [],
+      helpText: "Select all languages you can communicate in",
     },
     {
       label: "Age",
