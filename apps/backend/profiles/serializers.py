@@ -7,6 +7,9 @@ import re
 
 class ProfileSerializer(serializers.ModelSerializer):
     performances = PerformanceSerializer(many=True, read_only=True)
+    spoken_languages = serializers.ListField(
+        child=serializers.CharField(), required=False, allow_empty=True
+    )
 
     class Meta:
         model: Type[Profile] = Profile

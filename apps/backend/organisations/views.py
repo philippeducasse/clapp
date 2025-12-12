@@ -322,9 +322,11 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 )
 
             language = request.data.get("language", "ENGLISH")
+            email_length = request.data.get("message_length", None)
+            print("LENGTH: ", email_length)
 
             prompt = generate_application_mail_prompt(
-                organisation, profile, performance_objects, language
+                organisation, profile, performance_objects, language, email_length
             )
             message = self.mistral_client.chat(prompt=prompt)
 

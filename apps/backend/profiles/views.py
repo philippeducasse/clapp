@@ -19,7 +19,8 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
 
     def get_queryset(self) -> QuerySet[Profile]:
-        return self.request.user
+        # Only allow users to access their own profile
+        return Profile.objects.filter(id=self.request.user.id)
 
     def get_object(self) -> Profile:
         obj = super().get_object()
@@ -33,7 +34,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def me(self, request: Request) -> Response:
         """Get the authenticated user's profile"""
-        profile = self.get_queryset()
+        profile = request.user
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
 

@@ -2,7 +2,10 @@ from django.db import models
 from typing import Any
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
+
+from profiles.constants import LANGUAGES
 
 
 class ProfileManager(BaseUserManager["Profile"]):
@@ -40,6 +43,7 @@ class Profile(AbstractUser):
     tiktok_profile = models.URLField(blank=True)
     youtube_profile = models.URLField(blank=True)
     phone = PhoneNumberField(blank=True, null=True)
+    spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
 

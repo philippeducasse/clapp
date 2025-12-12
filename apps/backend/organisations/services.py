@@ -87,13 +87,12 @@ def generate_application_mail_prompt(
     profile: Profile,
     performances: List[Performance],
     language: str,
+    length: int,
 ) -> str:
     """Generate email application prompt for any organisation type."""
-    print("LANGUAGE:", language)
     primary_contact = organisation.contacts.first()
     contact_name = None
     contact_emails = []
-
     if primary_contact:
         if primary_contact.name and primary_contact.name.strip().lower() != "nan":
             contact_name = primary_contact.name.strip()
@@ -104,7 +103,6 @@ def generate_application_mail_prompt(
     else:
         salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {organisation.name} organizers."
 
-    # Build artist identity section
     artist_identity = (
         f"{profile.first_name} {profile.last_name}".strip()
         or profile.artist_name
@@ -113,6 +111,41 @@ def generate_application_mail_prompt(
     company_info = (
         f" representing {profile.company_name}" if profile.company_name else ""
     )
+
+    length_guidelines = {
+        1: {
+            "description": "VERY SHORT",
+            "max_words": 50,
+            "paragraphs": "2-3 short paragraphs",
+            "detail": "Keep it extremely brief and to the point.",
+        },
+        2: {
+            "description": "SHORT",
+            "max_words": 100,
+            "paragraphs": "3-4 paragraphs",
+            "detail": "Be concise and focus only on key points.",
+        },
+        3: {
+            "description": "MEDIUM",
+            "max_words": 150,
+            "paragraphs": "4-5 paragraphs",
+            "detail": "Provide moderate detail about the performance.",
+        },
+        4: {
+            "description": "LONG",
+            "max_words": 200,
+            "paragraphs": "5-6 paragraphs",
+            "detail": "Include more details and descriptions.",
+        },
+        5: {
+            "description": "VERY LONG",
+            "max_words": 300,
+            "paragraphs": "6-7 paragraphs",
+            "detail": "Provide comprehensive details and context.",
+        },
+    }
+    length_config = length_guidelines.get(length, length_guidelines[3])
+    max_words = length_config["max_words"]
 
     # Build performances section with details
     if len(performances) == 1:
@@ -197,7 +230,6 @@ def generate_application_mail_prompt(
         else:
             dossier_instruction = "No dossiers to mention."
 
-    # Build contact information
     contact_lines = []
     if profile.email:
         contact_lines.append(f"<a href='mailto:{profile.email}'>{profile.email}</a>")
@@ -206,7 +238,6 @@ def generate_application_mail_prompt(
             f"<a href='{profile.personal_website}'>{profile.personal_website}</a>"
         )
 
-    # Build social media line
     social_links = []
     if profile.instagram_profile:
         social_links.append(f"<a href='{profile.instagram_profile}'>Instagram</a>")
@@ -214,10 +245,8 @@ def generate_application_mail_prompt(
         social_links.append(f"<a href='{profile.facebook_profile}'>Facebook</a>")
     if profile.youtube_profile:
         social_links.append(f"<a href='{profile.youtube_profile}'>YouTube</a>")
-
     social_line = " & ".join(social_links) if social_links else ""
 
-    # Format signature
     signature = f"{artist_identity}<br><br>"
     if profile.company_name:
         signature += f"{profile.company_name}<br>"
@@ -227,14 +256,23 @@ def generate_application_mail_prompt(
     if social_line:
         signature += f"<br>{social_line}"
 
-    # The full prompt
     prompt = f"""
+        ⚠️ CRITICAL LENGTH REQUIREMENT - READ THIS FIRST ⚠️
+        MAXIMUM WORDS: {max_words}
+        TARGET LENGTH: {length_config["description"]} ({length_config["paragraphs"]})
+        INSTRUCTION: {length_config["detail"]}
+
+        DO NOT EXCEED {max_words} WORDS. Count your words carefully. If you go over, the email will be rejected.
+
         You are {artist_identity}{company_info}, a performer seeking to apply to various organisations with {performance_intro}.
 
         Generate ONLY the plain text email content (no additional messages) in {language}.
         IMPORTANT: Use the STANDARD written form of the language, NOT regional dialects or colloquial variations.
         Do not include a subject line.
 
+        ⚠️ LENGTH REMINDER: Your response must be {length_config["description"]} - MAXIMUM {max_words} WORDS TOTAL
+        {length_config["detail"]}
+        
         Artist Profile:
         - Name: {artist_identity}
         {f"- Company: {profile.company_name}" if profile.company_name else ""}
@@ -252,15 +290,11 @@ def generate_application_mail_prompt(
 
         Email Requirements:
         - Salutation: {salutation}
-        - Introduction: Briefly introduce yourself as {artist_identity} and mention your background. Then say that you would like to propose {performances} for the enxt edition of the event.
-        - Body: Make the text very playful and informal. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this organisation, using the organisation description as your main reference.
-        Mention unique aspects of the performance(s) and how {"it aligns" if len(performances) == 1 else "they align"} with the organisation's theme and audience.
-        Use the performance details provided above to create a compelling pitch. Keep the body concise (max 500 characters).
-
-        Example body:
-            "Ah Bah Bravo! is a magical mix of world-class juggling — from butt and nose hooping to spinning a flaming staff with my feet while in a handstand!
-            it's a show full of imagination, laughter, and wonder, perfectly suited to the lively and diverse spirit of your organisation.
-            Audiences are invited to dream, share, and rediscover the carefree joy of being a child again".
+        - Introduction: BRIEFLY introduce yourself as {artist_identity}. Keep it SHORT - just 1-2 sentences. Say that you would like to propose {performance_intro} for the next edition.
+        - Body: Make the text playful and informal but CONCISE. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this organisation.
+        Focus on ONE or TWO key points that align with the organisation's description. Do NOT go into exhaustive detail about the performance.
+        Remember: You must stay within {max_words} words TOTAL for the ENTIRE email.
+    
         - Closing: {trailer_instruction} {dossier_instruction}
         Express enthusiasm in awaiting the response and openness to answer any questions or provide more information. Provide contact information using this format: {signature}
 
@@ -281,17 +315,15 @@ def generate_application_mail_prompt(
         5. Sign-off (e.g., "Best regards," or equivalent in the target language)
         6. {signature}
 
+        🚨 FINAL REMINDER BEFORE YOU START WRITING 🚨
+        MAXIMUM WORDS: {max_words}
+        COUNT YOUR WORDS AS YOU WRITE. STOP IMMEDIATELY WHEN YOU REACH {max_words} WORDS.
+        Be selective with details. Prioritize impact over completeness.
+        {length_config["detail"]}
+
         EXAMPLE OUTPUT FORMAT:
 
-        Dear Team,<br><br>I am Philippe Ducasse, a circus artist based in Berlin with a passion for blending juggling, mime, and clowning into vibrant,
-        family-friendly performances. I would like to propose my show "Ah Bah Bravo!" to the next edition of your festival.
-        <br><br>"Ah Bah Bravo!" is a whirlwind of acrobatic butt hooping, flaming staff juggling while handstanding, and playful storytelling.
-        It's a joyful celebration of childhood wonder, inviting audiences to laugh, dream, and embrace the magic of the moment.
-        <br><br>Here you can see the <a href="https://example.com/trailer">trailer</a>
-        <br><br>The dossier is attached with full details, photos, and technical requirements.
-        Looking forward to your reply!
-        <br><br>Best regards,<br><br>Philippe Ducasse<br>+4915203723753<br>info@philippeducasse.com<br>https://www.philippeducasse.com<br>Instagram & Facebook
-
+        {performance.email_prompt}
         """
     return prompt.strip()
 
