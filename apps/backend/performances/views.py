@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
@@ -5,6 +7,8 @@ from rest_framework.response import Response
 
 from performances.models import Performance
 from performances.serializers import PerformanceSerializer
+
+logger = logging.getLogger(__name__)
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
@@ -14,6 +18,7 @@ class PerformanceViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             queryset = Performance.objects.filter(profile=self.request.user)
             return queryset
+        logger.warning("Unauthenticated user attempted to access performances")
         return Performance.objects.none()
 
 

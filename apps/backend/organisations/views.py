@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any, Dict, List
 
@@ -31,6 +32,8 @@ from .services import (
     generate_enrich_prompt,
 )
 from .utils import clean_organisation_data, extract_fields_from_llm
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -191,6 +194,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 online_form_application = create_form_application(
                     organisation, performances, profile, comments
                 )
+                logger.info(
+                    f"Form application created for organisation {organisation.id} by user {profile.id}"
+                )
                 return Response(
                     {
                         "message": "Form application created",
@@ -198,7 +204,10 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     },
                     status=status.HTTP_200_OK,
                 )
-            except Exception:
+            except Exception as e:
+                logger.error(
+                    f"Failed to create form application for organisation {organisation.id}: {str(e)}"
+                )
                 return Response(
                     {
                         "error": f"Failed to create form application for{self.get_organisation_type_name().capitalize()}"
@@ -221,6 +230,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             for email in recipient_emails:
                 validate_email(email)
         except ValidationError:
+            logger.warning(f"Invalid email format in application: {recipient_emails}")
             return Response(
                 {"error": "Invalid email address format"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -315,6 +325,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             email.send(fail_silently=False)
             application.application_status = "APPLIED"
             application.save()
+            logger.info(
+                f"Application {application.id} sent successfully to {recipient_emails} for organisation {organisation.id}"
+            )
 
             return Response(
                 {
@@ -324,6 +337,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK,
             )
         except Exception as e:
+            logger.error(
+                f"Failed to send application email for organisation {organisation.id}: {str(e)}"
+            )
             return Response(
                 {"error": f"Email failed to send: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -381,6 +397,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
+            logger.error(f"Failed to generate email for organisation {pk}: {str(e)}")
             return Response(
                 {"error": f"Failed to generate email: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
