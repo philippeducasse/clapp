@@ -1,10 +1,14 @@
+import logging
 from typing import Any, List, Optional
+
+from django.utils import timezone
 
 from applications.models import Application
 from organisations.models import Organisation
 from performances.models import Performance
 from profiles.models import Profile
-from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 
 def generate_enrich_prompt(
@@ -316,3 +320,140 @@ def create_form_application(
         application.save()
 
     return application
+
+
+def validate_application_recipients(recipients_input: str) -> List[str]:
+    from django.core.exceptions import ValidationError
+    from django.core.validators import validate_email
+
+    recipient_emails = [
+        email.strip() for email in recipients_input.split(",") if email.strip()
+    ]
+
+    if not recipient_emails:
+        raise ValueError("At least one recipient email is required")
+
+    try:
+        for email in recipient_emails:
+            validate_email(email)
+    except ValidationError:
+        raise ValueError(f"Invalid email address format: {recipient_emails}")
+
+    return recipient_emails
+
+
+def get_or_create_application(
+    organisation: Organisation,
+    profile: Profile,
+    application_year: int,
+    message: str,
+    subject: str,
+    recipient_emails: List[str],
+) -> Application:
+    from django.contrib.contenttypes.models import ContentType
+
+    organisation_content_type = ContentType.objects.get_for_model(
+        organisation.__class__
+    )
+    applications = Application.objects.filter(
+        content_type=organisation_content_type, object_id=organisation.pk
+    )
+
+    application = next(
+        (a for a in applications if a.application_year == application_year),
+        None,
+    )
+
+    if application and "test" not in organisation.name.lower():
+        if application.application_status != "DRAFT":
+            raise ValueError(
+                "Application already exists for this organisation and year"
+            )
+        else:
+            application.message = message
+            application.email_subject = subject
+            application.save()
+    else:
+        application = Application.objects.create(
+            organisation=organisation,
+            application_date=timezone.now().date(),
+            application_status="DRAFT",
+            message=message,
+            email_subject=subject,
+            profile=profile,
+            email_recipients=recipient_emails,
+        )
+
+    return application
+
+
+def prepare_application_email(
+    application: Application,
+    recipient_emails: List[str],
+    dossiers: Optional[str],
+    attachments: List[Any],
+    profile: Profile,
+    performances: Optional[str],
+) -> Any:
+    """
+    Prepare the application email with all attachments.
+    """
+    from django.core.mail import EmailMultiAlternatives
+    from django.utils.html import strip_tags
+
+    from performances.models import Dossier
+
+    text_content = strip_tags(application.message)
+    html_content = application.message
+
+    email = EmailMultiAlternatives(
+        application.email_subject,
+        text_content,
+        "info@philippeducasse.com",
+        recipient_emails,
+    )
+    email.attach_alternative(html_content, "text/html")
+
+    if dossiers:
+        try:
+            dossier_ids = [int(d) for d in dossiers.split(",")]
+            logger.debug(f"Dossiers to send: {dossier_ids}")
+
+        except ValueError:
+            raise ValueError(f"Invalid dossier IDs: {dossiers}")
+
+        if performances:
+            performance_ids = [int(p) for p in performances.split(",")]
+            dossier_objects = Dossier.objects.filter(
+                id__in=dossier_ids,
+                performance__profile=profile,
+                performance__id__in=performance_ids,
+            )
+            logger.debug(f"Attaching dossiers: {dossier_objects}")
+
+            for dossier in dossier_objects:
+                with dossier.file.open("rb") as f:
+                    email.attach(
+                        dossier.name,
+                        f.read(),
+                        "application/pdf",
+                    )
+
+    for file in attachments:
+        if hasattr(file, "content_type"):
+            logger.debug(f"Attaching extra files: {file}")
+            email.attach(file.name, file.read(), file.content_type)
+
+    return email
+
+
+def send_application_email(email: Any, application: Application) -> None:
+    """
+    Send the application email and update application status.
+    """
+    logger.debug(f"Sending email for application {application.id}")
+    email.send(fail_silently=False)
+    logger.debug("Email sent, updating application status to APPLIED")
+    application.application_status = "APPLIED"
+    application.save()
+    logger.debug(f"Application {application.id} status updated")

@@ -3,20 +3,14 @@ from datetime import datetime
 from typing import Any, Dict, List
 
 from django.apps import apps
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.core.mail import EmailMultiAlternatives
-from django.core.validators import validate_email
 from django.db.models import Q
 from django.http import HttpRequest
 from django.utils import timezone
-from django.utils.html import strip_tags
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
@@ -30,6 +24,10 @@ from .services import (
     create_form_application,
     generate_application_mail_prompt,
     generate_enrich_prompt,
+    get_or_create_application,
+    prepare_application_email,
+    send_application_email,
+    validate_application_recipients,
 )
 from .utils import clean_organisation_data, extract_fields_from_llm
 
@@ -175,9 +173,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def apply(self, request: HttpRequest, pk: int) -> Response:
         """Submit an application to the organisation."""
+        logger.debug(f"Processing application for organisation {pk}")
+        logger.debug(f"Request data: {request.data}")
         try:
             organisation = self.get_object()
+            logger.debug(f"Found organisation: {organisation.id}")
         except self.queryset.model.DoesNotExist:
+            logger.error(f"Organisation {pk} not found")
             return Response(
                 {
                     "error": f"{self.get_organisation_type_name().capitalize()} not found"
@@ -188,6 +190,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         application_method = request.data.get("application_method")
         performances = request.data.get("performances")
         comments = request.data.get("comments", None)
+        logger.debug(f"Application method: {application_method}")
 
         if application_method == "FORM":
             try:
@@ -214,121 +217,65 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     },
                     status=status.HTTP_404_NOT_FOUND,
                 )
-        # Parse and validate recipients
-        recipients_input = request.data.get("recipients", "")
-        recipient_emails = [
-            email.strip() for email in recipients_input.split(",") if email.strip()
-        ]
 
-        if not recipient_emails:
-            return Response(
-                {"error": "At least one recipient email is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+        logger.debug("Validating recipients for email application")
         try:
-            for email in recipient_emails:
-                validate_email(email)
-        except ValidationError:
-            logger.warning(f"Invalid email format in application: {recipient_emails}")
-            return Response(
-                {"error": "Invalid email address format"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            recipients_input = request.data.get("recipients", "")
+            recipient_emails = validate_application_recipients(recipients_input)
+            logger.debug(f"Valid recipients: {recipient_emails}")
+        except ValueError as e:
+            logger.warning(f"Invalid email in application: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get message and subject
         message = request.data.get("message")
         subject = request.data.get("email_subject")
-
         if not message or not subject:
+            logger.warning("Missing message or subject")
             return Response(
                 {"error": "Message and/or subject not found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        attachments = request.FILES.getlist("attachments_sent")
-
-        # Calculate application year
         current_date = timezone.now().date()
         application_year = current_date.year
         if current_date.month >= 9:
             application_year += 1
 
-        organisation_content_type = ContentType.objects.get_for_model(
-            organisation.__class__
-        )
-        applications = Application.objects.filter(
-            content_type=organisation_content_type, object_id=organisation.pk
-        )
-
-        application = next(
-            (a for a in applications if a.application_year == application_year),
-            None,
-        )
-
-        if application and "test" not in organisation.name.lower():
-            if application.application_status != "DRAFT":
-                return Response(
-                    "Application already exists for this organisation and year",
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            else:
-                application.message = message
-                application.email_subject = subject
-                application.save()
-        else:
-            application = Application.objects.create(
-                organisation=organisation,
-                application_date=timezone.now().date(),
-                application_status="DRAFT",
-                message=message,
-                email_subject=subject,
-                profile=profile,
-                email_recipients=recipient_emails,
-            )
-
-        # Send email
+        logger.debug(f"Creating/updating application for year {application_year}")
         try:
-            text_content = strip_tags(application.message)
-            html_content = application.message
-
-            email = EmailMultiAlternatives(
+            application = get_or_create_application(
+                organisation,
+                profile,
+                application_year,
+                message,
                 subject,
-                text_content,
-                "info@philippeducasse.com",
                 recipient_emails,
-                # ["philocircus@gmail.com"],
-                # bcc=["info@philippeducasse.com"],
             )
-            email.attach_alternative(html_content, "text/html")
+            logger.debug(f"Application created/updated: {application.id}")
+        except ValueError as e:
+            logger.error(f"Failed to create application: {str(e)}")
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-            # Attach performance dossiers
-            if performances:
-                performance_objects = Performance.objects.filter(
-                    id__in=performances.split(",")
-                )
-                for p in performance_objects:
-                    if p.dossiers:
-                        for dossier in p.dossiers.all():
-                            filename = dossier.file.name.split("/")[-1]
-                            email.attach(
-                                filename,
-                                dossier.file.read(),
-                                "application/pdf",
-                            )
+        logger.debug("Preparing and sending email")
+        try:
+            dossiers = request.data.get("dossiers")
+            attachments = request.FILES.getlist("attachments_sent")
 
-            # Attach uploaded files
-            for file in attachments:
-                if hasattr(file, "content_type"):
-                    email.attach(file.name, file.read(), file.content_type)
+            email = prepare_application_email(
+                application,
+                recipient_emails,
+                dossiers,
+                attachments,
+                profile,
+                performances,
+            )
+            logger.debug("Email prepared, sending now...")
+            send_application_email(email, application)
+            logger.debug("Email sent successfully")
 
-            email.send(fail_silently=False)
-            application.application_status = "APPLIED"
-            application.save()
             logger.info(
                 f"Application {application.id} sent successfully to {recipient_emails} for organisation {organisation.id}"
             )
-
             return Response(
                 {
                     "message": "Application sent successfully",
@@ -336,6 +283,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_200_OK,
             )
+        except ValueError as e:
+            logger.warning(f"Invalid data in application: {str(e)}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             logger.error(
                 f"Failed to send application email for organisation {organisation.id}: {str(e)}"
