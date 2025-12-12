@@ -6,16 +6,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ControllerRenderProps } from "react-hook-form";
-import { SelectOptions } from "@/interfaces/forms/ControlledFormElement";
+import { BaseControlledPropsWithOptionsAndLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface ControlledSelectProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-  options: SelectOptions[];
-  showLabels: boolean;
-}
-
-const ControlledSelect = ({ field, options, showLabels }: ControlledSelectProps) => {
+const ControlledSelect = ({ field, options, showLabels }: BaseControlledPropsWithOptionsAndLabels) => {
   return showLabels ? (
     <Select
       value={field.value as string | undefined}

@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { ControllerRenderProps } from "react-hook-form";
 import { FormItem } from "@/components/ui/form";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -14,12 +13,9 @@ import {
   Undo,
 } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle";
+import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface ControlledTextEditorProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-}
-
-export const ControlledTextEditor = ({ field }: ControlledTextEditorProps) => {
+export const ControlledTextEditor = ({ field }: BaseControlledProps) => {
   const editor = useEditor({
     extensions: [StarterKit],
     immediatelyRender: false,

@@ -1,14 +1,10 @@
 import React, { useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ControllerRenderProps } from "react-hook-form";
 import { X } from "lucide-react";
+import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface ControlledFileProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-}
-
-const ControlledFile = ({ field }: ControlledFileProps) => {
+const ControlledFile = ({ field }: BaseControlledProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 

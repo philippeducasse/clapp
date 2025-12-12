@@ -13,6 +13,7 @@ export enum ControlledFormElementType {
   MULTI_SELECT = "MULTI_SELECT",
   SEARCH = "SEARCH",
   PASSWORD = "PASSWORD",
+  SLIDER = "SLIDER",
 }
 
 export enum FilterType {

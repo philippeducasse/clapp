@@ -13,6 +13,7 @@ import ControlledMultiSelect from "@/components/common/form/form-fields/Controll
 import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
 import ControlledMultiEmail from "@/components/common/form/form-fields/ControlledMultiEmail";
 import { Input } from "@/components/ui/input";
+import ControlledSlider from "@/components/common/form/form-fields/ControlledSlider";
 export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
@@ -44,6 +45,10 @@ export const getControlledInputs = (
 
       case ControlledFormElementType.SEARCH:
         return <ControlledSearch field={field} organisationType={organisationType} />;
+      case ControlledFormElementType.SLIDER:
+        return formField.sliderOptions ? (
+          <ControlledSlider field={field} sliderOptions={formField.sliderOptions} />
+        ) : null;
       default:
         return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
     }
@@ -132,20 +137,18 @@ export const createZodFormSchema = (
 
     switch (type) {
       case ControlledFormElementType.NUMBER:
+      case ControlledFormElementType.SLIDER:
         zodType = z.number().optional();
         break;
-
       case ControlledFormElementType.MULTI_SELECT:
         zodType = z.array(z.string());
         break;
       case ControlledFormElementType.BOOLEAN:
         zodType = z.boolean();
         break;
-
       case ControlledFormElementType.FILE:
         zodType = z.array(z.instanceof(File));
         break;
-
       case ControlledFormElementType.DATE:
         zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
         break;

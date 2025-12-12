@@ -1,13 +1,7 @@
 import { MultiSelect } from "@/components/ui/multi-select";
-import { SelectOptions } from "@/interfaces/forms/ControlledFormElement";
-import { ControllerRenderProps } from "react-hook-form";
+import { BaseControlledPropsWithOptions } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface MultiSelectProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-  options: SelectOptions[];
-}
-
-const ControlledMultiSelect = ({ options, field }: MultiSelectProps) => {
+const ControlledMultiSelect = ({ options, field }: BaseControlledPropsWithOptions) => {
   return (
     <MultiSelect
       options={options}

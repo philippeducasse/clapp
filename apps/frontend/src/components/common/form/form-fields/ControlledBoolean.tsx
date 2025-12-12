@@ -1,13 +1,8 @@
 import React from "react";
-import { ControllerRenderProps } from "react-hook-form";
 import { Switch } from "@/components/ui/switch";
+import { BaseControlledPropsWithLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface ControlledBooleanProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-  showLabels: boolean;
-}
-
-const ControlledBoolean = ({ field, showLabels }: ControlledBooleanProps) => {
+const ControlledBoolean = ({ field, showLabels }: BaseControlledPropsWithLabels) => {
   return showLabels ? (
     <Switch className="my-4" checked={field?.value as boolean} onCheckedChange={field.onChange} />
   ) : (

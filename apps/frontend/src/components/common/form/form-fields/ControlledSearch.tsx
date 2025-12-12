@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
-import { ControllerRenderProps } from "react-hook-form";
 import { organisationApiService, OrganisationSearchResponse } from "@/api/organisationApiService";
-// import { Spinner } from "@/components/ui/spinner";
+import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
 import _ from "lodash";
-interface ControlledTextProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
+
+interface ControlledSearchProps extends BaseControlledProps {
   organisationType?: string;
 }
 
-const ControlledSearch = ({ field, organisationType }: ControlledTextProps) => {
+const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<OrganisationSearchResponse[]>([]);
   const [isLoading, setLoading] = useState(false);

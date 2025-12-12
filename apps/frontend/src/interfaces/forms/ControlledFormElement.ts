@@ -19,4 +19,11 @@ export interface ControlledFormElement {
   multiple?: boolean;
   action?: Action;
   isRegistration?: boolean;
+  sliderOptions?: SliderOptions;
+}
+
+export interface SliderOptions {
+  min: number;
+  max: number;
+  step: number;
 }

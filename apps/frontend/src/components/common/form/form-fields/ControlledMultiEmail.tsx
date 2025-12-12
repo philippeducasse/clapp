@@ -1,13 +1,9 @@
 import React, { useState, KeyboardEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import { ControllerRenderProps } from "react-hook-form";
+import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-interface ControlledMultiEmailProps {
-  field: ControllerRenderProps<Record<string, unknown>, string>;
-}
-
-const ControlledMultiEmail = ({ field }: ControlledMultiEmailProps) => {
+const ControlledMultiEmail = ({ field }: BaseControlledProps) => {
   const [inputValue, setInputValue] = useState("");
   const values = (field.value as string[]) ?? [];
 
