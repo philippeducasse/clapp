@@ -1,9 +1,11 @@
-from django.db import models
+from pathlib import Path
 from typing import List, Tuple
 
+from django.db import models
 from django.forms import ValidationError
-from profiles.models import Profile
 from multiselectfield import MultiSelectField
+
+from profiles.models import Profile
 
 
 class Performance(models.Model):
@@ -67,6 +69,10 @@ class Dossier(models.Model):
     )
     file = models.FileField(upload_to="dossiers/")
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def name(self) -> str:
+        return Path(self.file.name).name
 
     def clean(self) -> None:
         if self.file and not self.file.name.endswith(".pdf"):

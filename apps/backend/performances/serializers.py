@@ -1,13 +1,15 @@
-from rest_framework import serializers
-from performances.models import Performance, Dossier
 from typing import Type
+
+from rest_framework import serializers
+
+from performances.models import Dossier, Performance
 
 
 class DossierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dossier
-        fields = ["id", "file", "uploaded_at"]
-        read_only_fields = ["id", "uploaded_at"]
+        fields = ["id", "file", "uploaded_at", "name"]
+        read_only_fields = ["id", "uploaded_at", "name"]
 
 
 class PerformanceSerializer(serializers.ModelSerializer):
