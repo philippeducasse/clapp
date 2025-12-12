@@ -20,6 +20,7 @@ export interface Dossier {
   id: number;
   file: string;
   uploadedAt: Date;
+  name: string;
 }
 
 export enum PerformanceType {

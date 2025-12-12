@@ -1,10 +1,11 @@
 import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
-import { Performance } from "@/interfaces/entities/Performance";
+import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { capitalize } from "lodash";
+
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
     value: String(p.id),
@@ -12,13 +13,23 @@ export const getPerformanceOptions = (performances: Performance[]): SelectOption
   }));
 };
 
+export const getDossierOptions = (dossiers: Dossier[]): SelectOptions[] | undefined => {
+  if (!dossiers.length) return;
+  return dossiers.map((d) => ({
+    value: String(d.id),
+    label: d.name,
+  }));
+};
+
 export const getApplicationFormFields = (
   festival: Festival,
   performances: Performance[],
+  applicationMethod: ApplicationMethod.EMAIL | ApplicationMethod.FORM,
   profile: Profile,
-  applicationMethod: ApplicationMethod.EMAIL | ApplicationMethod.FORM
+  dossiers: Dossier[]
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
+  const dossierOptions = getDossierOptions(dossiers);
   const userLanguages = ["FRENCH", "ITALIAN", "GERMAN", "ENGLISH", "SPANISH"];
 
   const emailApplicationFields: ControlledFormElement[] = [
@@ -36,7 +47,7 @@ export const getApplicationFormFields = (
       label: "Recipients",
       fieldName: "recipients",
       type: ControlledFormElementType.MULTI_EMAIL,
-      defaultValue: festival?.contacts?.map((c) => c.email),
+      defaultValue: festival?.contacts?.map((c) => c.email) ?? [],
       helpText: "Enter recipients, hit enter or ',' to separate them",
     },
     {
@@ -52,12 +63,24 @@ export const getApplicationFormFields = (
       fieldName: "message",
       type: ControlledFormElementType.TEXT_EDITOR,
     },
-    {
-      label: "Attachments",
-      fieldName: "attachmentsSent",
-      type: ControlledFormElementType.FILE,
-    },
   ];
+
+  if (dossierOptions && dossierOptions?.length > 0) {
+    emailApplicationFields.push({
+      label: "Dossier(s)",
+      fieldName: "dossiers",
+      type: ControlledFormElementType.MULTI_SELECT,
+      options: dossierOptions,
+      defaultValue: dossierOptions.map((option) => String(option.value)),
+      helpText: "Select which dossiers to attach to this application",
+    });
+  }
+
+  emailApplicationFields.push({
+    label: "Additional Attachments",
+    fieldName: "attachmentsSent",
+    type: ControlledFormElementType.FILE,
+  });
 
   const displayedFields: ControlledFormElement[] = [
     {
@@ -91,7 +114,7 @@ export const getApplicationFormFields = (
     label: "Comments",
     fieldName: "comments",
     type: ControlledFormElementType.TEXT,
-    helpText: "These are for you and won't be included in the application"
+    helpText: "These are for you and won't be included in the application",
   });
 
   return displayedFields;

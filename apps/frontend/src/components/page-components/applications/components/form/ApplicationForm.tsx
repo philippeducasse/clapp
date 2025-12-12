@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/reducers";
 import { selectFestival } from "@/redux/slices/festivalSlice";
@@ -22,28 +22,37 @@ import { selectProfile } from "@/redux/slices/authSlice";
 import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { useRouter } from "next/navigation";
+import { Dossier } from "@/interfaces/entities/Performance";
 
 const ApplicationForm = () => {
   const params = useParams();
   const festivalId = Number(params.id);
   const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const performances = profile?.performances ?? [];
   const router = useRouter();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [dossiers, setDossiers] = useState<Dossier[]>([]);
   const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<number[]>([]);
   const [applicationMethod, setApplicationMethod] = useState<
     ApplicationMethod.EMAIL | ApplicationMethod.FORM
   >(ApplicationMethod.EMAIL);
+  const dossiersSetRef = useRef(false);
 
-  const formFields = getApplicationFormFields(
-    festival as Festival,
-    performances,
-    profile as Profile,
-    applicationMethod
-  );
-  const formSchema = createZodFormSchema(formFields);
+  const formFields = useMemo(() => {
+    const performances = profile?.performances ?? [];
+    return getApplicationFormFields(
+      festival as Festival,
+      performances,
+      applicationMethod,
+      profile as Profile,
+      dossiers
+    );
+  }, [festival, applicationMethod, profile, dossiers]);
+
+  const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
+
+  const formKey = useMemo(() => `form-${dossiers.length}`, [dossiers]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,12 +75,28 @@ const ApplicationForm = () => {
   }, [performanceSelection]);
 
   useEffect(() => {
-    const performanceDossiers = profile?.performances.filter((p) =>
+    if (applicationMethod !== ApplicationMethod.EMAIL) return;
+
+    const selectedPerformances = profile?.performances.filter((p) =>
       selectedPerformanceIds.includes(p.id)
-    )[0]?.dossiers;
-    console.log("Performances:;", performanceDossiers, selectedPerformanceIds);
-    form.setValue("attachmentsSent", performanceDossiers);
-  }, [selectedPerformanceIds]);
+    );
+
+    const allDossierFiles =
+      selectedPerformances?.flatMap((performance) => performance.dossiers ?? []) ?? [];
+
+    console.log("Setting dossiers:", allDossierFiles, selectedPerformanceIds);
+
+    setDossiers(allDossierFiles);
+    dossiersSetRef.current = false;
+  }, [selectedPerformanceIds, profile, applicationMethod]);
+
+  useEffect(() => {
+    if (dossiers.length > 0 && !dossiersSetRef.current) {
+      const dossierIds = dossiers.map((d) => String(d.id));
+      form.setValue("dossiers", dossierIds);
+      dossiersSetRef.current = true;
+    }
+  }, [dossiers, form]);
 
   useEffect(() => {
     if (!festival) {
@@ -135,6 +160,7 @@ const ApplicationForm = () => {
     <>
       <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
       <BasicForm
+        key={formKey}
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
