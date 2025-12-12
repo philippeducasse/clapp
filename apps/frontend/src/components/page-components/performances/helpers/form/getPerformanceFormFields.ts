@@ -24,6 +24,19 @@ export const getPerformanceFormFields = (): ControlledFormElement[] => {
       helpText: "A brief description of your performance",
     },
     {
+      label: "Long Description",
+      fieldName: "longDescription",
+      type: ControlledFormElementType.TEXT_EDITOR,
+      helpText: "Detailed description of your performance",
+    },
+    {
+      label: "Email Prompt",
+      fieldName: "emailPrompt",
+      type: ControlledFormElementType.TEXT_EDITOR,
+      helpText:
+        "Provide an example email that shows the AI the content, style, and tone you want for generated emails",
+    },
+    {
       label: "Trailer",
       fieldName: "trailer",
       type: ControlledFormElementType.URL,
@@ -34,12 +47,6 @@ export const getPerformanceFormFields = (): ControlledFormElement[] => {
       fieldName: "length",
       type: ControlledFormElementType.TEXT,
       helpText: "Duration of the performance (e.g., 45 minutes, 1 hour)",
-    },
-    {
-      label: "Long Description",
-      fieldName: "longDescription",
-      type: ControlledFormElementType.TEXT_EDITOR,
-      helpText: "Detailed description of your performance",
     },
     {
       label: "Creation Date",

@@ -84,8 +84,6 @@ const ApplicationForm = () => {
     const allDossierFiles =
       selectedPerformances?.flatMap((performance) => performance.dossiers ?? []) ?? [];
 
-    console.log("Setting dossiers:", allDossierFiles, selectedPerformanceIds);
-
     setDossiers(allDossierFiles);
     dossiersSetRef.current = false;
   }, [selectedPerformanceIds, profile, applicationMethod]);

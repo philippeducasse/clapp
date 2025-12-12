@@ -63,6 +63,13 @@ export const getApplicationFormFields = (
       fieldName: "message",
       type: ControlledFormElementType.TEXT_EDITOR,
     },
+    {
+      label: "Message length",
+      fieldName: "messageLength",
+      type: ControlledFormElementType.SLIDER,
+      sliderOptions: { min: 1, max: 5, step: 1 },
+      helpText: "Set the length if generating email",
+    },
   ];
 
   if (dossierOptions && dossierOptions?.length > 0) {

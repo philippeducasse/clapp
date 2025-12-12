@@ -13,6 +13,7 @@ export interface Performance {
   performanceType?: PerformanceType;
   genres?: PerformanceGenre[];
   dossiers?: Dossier[];
+  emailPrompt?: string;
 }
 
 export interface Dossier {
