@@ -323,7 +323,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
             language = request.data.get("language", "ENGLISH")
             email_length = request.data.get("message_length", None)
-            print("LENGTH: ", email_length)
 
             prompt = generate_application_mail_prompt(
                 organisation, profile, performance_objects, language, email_length
@@ -332,7 +331,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
             return Response({"message": message}, status=status.HTTP_200_OK)
 
-        except self.queryset.model.DoesNotExist:
+        except Organisation.DoesNotExist:
             return Response(
                 {
                     "error": f"{self.get_organisation_type_name().capitalize()} not found"
@@ -349,9 +348,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            logger.error(f"Failed to generate email for organisation {pk}: {str(e)}")
+            logger.error(f"Error generating email: {str(e)}", exc_info=True)
             return Response(
-                {"error": f"Failed to generate email: {str(e)}"},
+                {"error": f"Error generating email: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 

@@ -320,10 +320,11 @@ def generate_application_mail_prompt(
         COUNT YOUR WORDS AS YOU WRITE. STOP IMMEDIATELY WHEN YOU REACH {max_words} WORDS.
         Be selective with details. Prioritize impact over completeness.
         {length_config["detail"]}
+        Do NOT use asterisks (* or **) for emphasis (*like this* or **like this**).
 
         EXAMPLE OUTPUT FORMAT:
 
-        {performance.email_prompt}
+        {performances[0].email_prompt if len(performances) == 1 else chr(10).join([f"For {p.performance_title}:" + chr(10) + p.email_prompt for p in performances if hasattr(p, 'email_prompt') and p.email_prompt])}
         """
     return prompt.strip()
 
@@ -442,7 +443,8 @@ def prepare_application_email(
         application.email_subject,
         text_content,
         "info@philippeducasse.com",
-        recipient_emails,
+        ["info@philippeducasse.com"],
+        # recipient_emails,
     )
     email.attach_alternative(html_content, "text/html")
 
