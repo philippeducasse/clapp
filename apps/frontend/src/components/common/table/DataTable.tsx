@@ -85,7 +85,7 @@ DataTableProps<TData, TValue>) {
   });
 
   return (
-    <div>
+    <>
       <Card className="rounded-md border px-6">
         <DataTableHeader
           globalFilter={globalFilter}
@@ -135,6 +135,6 @@ DataTableProps<TData, TValue>) {
         totalCount={totalCount}
         isServerSide={isServerSide}
       />
-    </div>
+    </>
   );
 }

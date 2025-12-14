@@ -75,7 +75,7 @@ const useApplicationColumns = ({
     },
     {
       header: "Actions",
-      id: "actions",
+      id: "actions", size: 75,
       cell: ({ row }) => {
         const application = row.original;
         return (

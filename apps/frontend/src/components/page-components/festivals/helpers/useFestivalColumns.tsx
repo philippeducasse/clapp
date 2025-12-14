@@ -100,6 +100,8 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
     {
       header: "Actions",
       id: "actions",
+      size: 75,
+
       cell: ({ row }) => {
         const festival = row.original;
         const applyRoute = festival.applied

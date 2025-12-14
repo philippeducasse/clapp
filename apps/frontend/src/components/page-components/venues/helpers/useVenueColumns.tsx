@@ -54,7 +54,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
     },
     {
       header: "Actions",
-      id: "actions",
+      id: "actions", size: 75,
       cell: ({ row }) => {
         const venue = row.original;
         const applyRoute = venue.applied ? `/application/${1}` : `/venues/${venue.id}/apply`; // find way to reference application id

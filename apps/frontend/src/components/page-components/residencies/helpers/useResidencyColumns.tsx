@@ -59,7 +59,7 @@ const useResidencyColumns = ({ onDeleteClick }: UseResidencyColumnsProps): Colum
     },
     {
       header: "Actions",
-      id: "actions",
+      id: "actions", size: 75,
       cell: ({ row }) => {
         const residency = row.original;
         const applyRoute = `/residencies/${residency.id}/apply`;
