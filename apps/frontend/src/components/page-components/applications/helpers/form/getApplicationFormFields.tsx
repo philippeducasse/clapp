@@ -30,7 +30,6 @@ export const getApplicationFormFields = (
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
-
   const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
 
@@ -75,6 +74,7 @@ export const getApplicationFormFields = (
         step: 1,
         labels: ["very short", "short", "normal", "long", "very long"],
       },
+      defaultValue: 3 as unknown as string,
       helpText: "Set the length if generating email",
     },
   ];
