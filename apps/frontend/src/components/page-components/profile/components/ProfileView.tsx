@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CircleUser, PartyPopper } from "lucide-react";
+import { CircleUser } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -22,8 +22,7 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import { Profile } from "@/interfaces/entities/Profile";
-import { Tabs, TabsContent } from "@/components/ui/tabs";
-import TabListing from "@/components/common/details-view/TabList";
+import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
 const ProfileView = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -85,43 +84,30 @@ const ProfileView = () => {
         }
       />
 
-      <Tabs defaultValue="basic" className="w-full">
-        <TabListing
-          viewSections={[
-            { key: "basic", name: "Basic Information" },
-            { key: "performances", name: "Performances" },
-          ]}
-        />
-        <TabsContent value="basic">
+      <DetailsTabs defaultTab="basic-information">
+        <Tab name="Basic Information">
           <DetailsViewSection
             title="Basic information"
             icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
             data={getBasicProfileInfo(profile)}
           />
-
           <DetailsViewSection
             title="Contact details"
             icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
             data={getProfileContactInfo(profile)}
           />
-        </TabsContent>
+        </Tab>
 
-        <TabsContent value="performances">
+        <Tab name="Performances">
           {profile.performances && profile.performances.length > 0 && (
-            <>
-              <DetailsViewHeader
-                title={"Performances"}
-                icon={<PartyPopper className="text-emerald-600 dark:text-emerald-400" size={32} />}
-              />
-              <PerformanceViewSection
-                performances={profile.performances}
-                onDelete={(performanceId) => handleDelete("performance", performanceId)}
-              />
-            </>
+            <PerformanceViewSection
+              performances={profile.performances}
+              onDelete={(performanceId) => handleDelete("performance", performanceId)}
+            />
           )}
           <AddSection label="performance" href={`/profile/edit/performances/new`} />
-        </TabsContent>
-      </Tabs>
+        </Tab>
+      </DetailsTabs>
     </DetailsViewWrapper>
   );
 };
