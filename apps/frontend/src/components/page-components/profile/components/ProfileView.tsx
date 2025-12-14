@@ -22,7 +22,8 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import { Profile } from "@/interfaces/entities/Profile";
-
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import TabListing from "@/components/common/details-view/TabList";
 const ProfileView = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -83,30 +84,44 @@ const ProfileView = () => {
           </>
         }
       />
-      <DetailsViewSection
-        title="Basic information"
-        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
-        data={getBasicProfileInfo(profile)}
-      />
 
-      <DetailsViewSection
-        title="Contact details"
-        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
-        data={getProfileContactInfo(profile)}
-      />
-      {profile.performances && profile.performances.length > 0 && (
-        <>
-          <DetailsViewHeader
-            title={"Performances"}
-            icon={<PartyPopper className="text-emerald-600 dark:text-emerald-400" size={32} />}
+      <Tabs defaultValue="basic" className="w-full">
+        <TabListing
+          viewSections={[
+            { key: "basic", name: "Basic Information" },
+            { key: "performances", name: "Performances" },
+          ]}
+        />
+        <TabsContent value="basic">
+          <DetailsViewSection
+            title="Basic information"
+            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            data={getBasicProfileInfo(profile)}
           />
-          <PerformanceViewSection
-            performances={profile.performances}
-            onDelete={(performanceId) => handleDelete("performance", performanceId)}
+
+          <DetailsViewSection
+            title="Contact details"
+            icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+            data={getProfileContactInfo(profile)}
           />
-        </>
-      )}
-      <AddSection label="performance" href={`/profile/edit/performances/new`} />
+        </TabsContent>
+
+        <TabsContent value="performances">
+          {profile.performances && profile.performances.length > 0 && (
+            <>
+              <DetailsViewHeader
+                title={"Performances"}
+                icon={<PartyPopper className="text-emerald-600 dark:text-emerald-400" size={32} />}
+              />
+              <PerformanceViewSection
+                performances={profile.performances}
+                onDelete={(performanceId) => handleDelete("performance", performanceId)}
+              />
+            </>
+          )}
+          <AddSection label="performance" href={`/profile/edit/performances/new`} />
+        </TabsContent>
+      </Tabs>
     </DetailsViewWrapper>
   );
 };
