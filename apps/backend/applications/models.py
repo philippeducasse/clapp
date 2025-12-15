@@ -7,26 +7,28 @@ from django.db import models
 from performances.models import Performance
 from profiles.models import Profile
 
+APPLICATION_TYPE: List[Tuple[str, str]] = [
+    ("EMAIL", "Email"),
+    ("FORM", "Form"),
+    ("INVITATION", "Invitation"),
+    ("OTHER", "Other"),
+    ("UNKNOWN", "Unknown"),
+]
+
+APPLICATION_STATUS: List[Tuple[str, str]] = [
+    ("DRAFT", "Draft"),
+    ("APPLIED", "Applied"),
+    ("IN_DISCUSSION", "In discussion"),
+    ("REJECTED", "Rejected"),
+    ("IGNORED", "Ignored"),
+    ("ACCEPTED", "Accepted"),
+    ("POSTPONED", "Postponed"),
+    ("CANCELLED", "Cancelled"),
+    ("OTHER", "Other"),
+]
+
 
 class Application(models.Model):
-    APPLICATION_TYPE: List[Tuple[str, str]] = [
-        ("EMAIL", "Email"),
-        ("FORM", "Form"),
-        ("INVITATION", "Invitation"),
-        ("OTHER", "Other"),
-        ("UNKNOWN", "Unknown"),
-    ]
-    APPLICATION_STATUS: List[Tuple[str, str]] = [
-        ("DRAFT", "Draft"),
-        ("APPLIED", "Applied"),
-        ("IN_DISCUSSION", "In discussion"),
-        ("REJECTED", "Rejected"),
-        ("IGNORED", "Ignored"),
-        ("ACCEPTED", "Accepted"),
-        ("POSTPONED", "Postponed"),
-        ("CANCELLED", "Cancelled"),
-        ("OTHER", "Other"),
-    ]
     # what type of model is this?
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
     # which specific instance of the model?

@@ -416,13 +416,16 @@ def prepare_application_email(
 
     text_content = strip_tags(application.message)
     html_content = application.message
+    # connection = get_user_email_connection(profile)
 
     email = EmailMultiAlternatives(
         application.email_subject,
         text_content,
-        "info@philippeducasse.com",
+        # from_email=profile.email_host_user,
+        # "info@philippeducasse.com",
         # ["info@philippeducasse.com"],
-        recipient_emails,
+        to=recipient_emails,
+        # connection=connection,
     )
     email.attach_alternative(html_content, "text/html")
 

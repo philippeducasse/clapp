@@ -1,7 +1,7 @@
-from django.db import models
 from typing import Any
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
 from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -44,6 +44,11 @@ class Profile(AbstractUser):
     youtube_profile = models.URLField(blank=True)
     phone = PhoneNumberField(blank=True, null=True)
     spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
+    email_host = models.CharField(max_length=255, blank=True)
+    email_port = models.IntegerField(default=587)
+    email_use_tls = models.BooleanField(default=True)
+    email_host_password = models.CharField(max_length=255, blank=True)
+    email_host_user = models.CharField(max_length=255, blank=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
 
