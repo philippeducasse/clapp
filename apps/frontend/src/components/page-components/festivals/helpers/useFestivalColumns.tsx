@@ -25,9 +25,8 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
     [router]
   );
 
-  return useMemo(() => {
-    console.log("RENDERING FESTIVAL COLUMNS");
-    return [
+  return useMemo(
+    () => [
       {
         accessorKey: "name",
         header: getSortableHeader("Name"),
@@ -146,8 +145,9 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
           );
         },
       },
-    ];
-  }, [onDeleteClick, onEdit, router]);
+    ],
+    [onDeleteClick, onEdit, router]
+  );
 };
 
 export { useFestivalColumns };

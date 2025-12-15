@@ -8,10 +8,14 @@ import {
 } from "@/components/ui/select";
 import { BaseControlledPropsWithOptionsAndLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-const ControlledSelect = ({ field, options, showLabels }: BaseControlledPropsWithOptionsAndLabels) => {
+const ControlledSelect = ({
+  field,
+  options,
+  showLabels,
+}: BaseControlledPropsWithOptionsAndLabels) => {
   return showLabels ? (
     <Select
-      value={field.value as string | undefined}
+      defaultValue={field.value as string | undefined}
       onValueChange={(val) => {
         field.onChange(val);
       }}

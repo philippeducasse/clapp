@@ -16,7 +16,6 @@ interface FestivalsTableProps {
 }
 
 export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
-  console.log("🔄 FestivalsTable RENDER");
   const dispatch = useDispatch();
   const [festivalData, setFestivalData] = useState<PaginatedResponse<Festival>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -28,7 +27,6 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   // const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log("📦 Dispatching festivals to Redux", festivalData.results.length);
     dispatch(setFestivals(festivalData.results));
   }, [dispatch, festivalData.results]);
 

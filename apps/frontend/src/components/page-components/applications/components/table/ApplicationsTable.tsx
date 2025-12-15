@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Application } from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
@@ -26,12 +26,12 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     dispatch(setApplications(applicationData.results));
   }, [dispatch, applicationData.results]);
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setDeleteApplicationId(id);
     setOpenDeleteModal(true);
-  };
+  }, []);
 
-  const onConfirmDelete = async () => {
+  const onConfirmDelete = useCallback(async () => {
     if (deleteApplicationId === null) return;
     await applicationApiService.remove(deleteApplicationId);
 
@@ -43,8 +43,10 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
 
     dispatch(deleteApplication(deleteApplicationId));
     setDeleteApplicationId(null);
-  };
+  }, [deleteApplicationId, dispatch]);
 
+  const columns = useApplicationColumns({ onDeleteClick: handleDeleteClick });
+  const filters = useMemo(() => getApplicationFilters(), []);
   return (
     <>
       <DeleteModal
@@ -54,10 +56,10 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         itemName="application"
       />
       <DataTable
-        columns={useApplicationColumns({ onDeleteClick: handleDeleteClick })}
+        columns={columns}
         data={applicationData.results}
         entityName={EntityName.APPLICATION}
-        filters={getApplicationFilters()}
+        filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
       />
     </>

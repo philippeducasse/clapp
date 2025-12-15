@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/reducers";
 import { selectFestival } from "@/redux/slices/festivalSlice";
@@ -131,12 +131,11 @@ const ApplicationForm = () => {
     }
   };
 
-  const generateEmail = () => {
+  const generateEmail = useCallback(() => {
     const handleClick = async () => {
       setIsLoading(true);
       if (profile) {
         const data = { profile, selectedPerformanceIds, language, messageLength };
-        console.log(data);
         try {
           const { message } = await festivalApiService.generateEmail(festivalId, data);
           form.setValue("message", message);
@@ -154,7 +153,7 @@ const ApplicationForm = () => {
         {isLoading ? "Generating..." : "Generate email"}
       </Button>
     );
-  };
+  }, [profile, selectedPerformanceIds, language, messageLength, isLoading, form, festivalId]);
 
   return (
     <>
