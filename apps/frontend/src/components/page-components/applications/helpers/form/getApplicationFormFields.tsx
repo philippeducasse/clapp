@@ -5,6 +5,7 @@ import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { LANGUAGES } from "@/constants/languages";
+import { getOptions } from "@/helpers/formHelper";
 
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
@@ -101,11 +102,7 @@ export const getApplicationFormFields = (
       label: "Method",
       fieldName: "applicationMethod",
       type: ControlledFormElementType.SELECT,
-      options: [
-        { value: "EMAIL", label: "Email" },
-        { value: "FORM", label: "Form" },
-        { value: "UNKNOWN", label: "Unknown" },
-      ],
+      options: getOptions(ApplicationMethod),
       defaultValue: festival?.applicationType ?? "EMAIL",
       helpText:
         applicationMethod === ApplicationMethod.FORM
