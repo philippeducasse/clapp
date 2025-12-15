@@ -24,7 +24,7 @@ export const getDossierOptions = (dossiers: Dossier[]): SelectOptions[] | undefi
 export const getApplicationFormFields = (
   festival: Festival,
   performances: Performance[],
-  applicationMethod: ApplicationMethod.EMAIL | ApplicationMethod.FORM,
+  applicationMethod: ApplicationMethod,
   profile: Profile,
   dossiers: Dossier[]
 ): ControlledFormElement[] => {
@@ -104,11 +104,14 @@ export const getApplicationFormFields = (
       options: [
         { value: "EMAIL", label: "Email" },
         { value: "FORM", label: "Form" },
+        { value: "UNKNOWN", label: "Unknown" },
       ],
       defaultValue: festival?.applicationType ?? "EMAIL",
       helpText:
-        applicationMethod == ApplicationMethod.FORM
+        applicationMethod === ApplicationMethod.FORM
           ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."
+          : applicationMethod === ApplicationMethod.UNKNOWN
+          ? "Please check the organisation website before you submit an application"
           : "",
     },
     {
