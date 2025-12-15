@@ -6,41 +6,57 @@ import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('residencies', '0001_initial'),
+        ("residencies", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='residency',
-            old_name='residency_name',
-            new_name='name',
+            model_name="residency",
+            old_name="residency_name",
+            new_name="name",
         ),
         migrations.RemoveField(
-            model_name='residency',
-            name='contact_email',
+            model_name="residency",
+            name="contact_email",
         ),
         migrations.RemoveField(
-            model_name='residency',
-            name='contact_person',
+            model_name="residency",
+            name="contact_person",
         ),
         migrations.AlterModelTable(
-            name='residency',
-            table='residencies_residency',
+            name="residency",
+            table="residencies_residency",
         ),
         migrations.CreateModel(
-            name='ResidencyContact',
+            name="ResidencyContact",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=200, null=True)),
-                ('email', models.EmailField(max_length=200)),
-                ('role', models.CharField(blank=True, max_length=100, null=True)),
-                ('phone', phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128, null=True, region=None)),
-                ('residency', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contacts', to='residencies.residency')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=200, null=True)),
+                ("email", models.EmailField(max_length=200)),
+                ("role", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "phone",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        blank=True, max_length=128, null=True, region=None
+                    ),
+                ),
+                (
+                    "residency",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="contacts",
+                        to="residencies.residency",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'residencies_residencycontact',
+                "db_table": "residencies_residencycontact",
             },
         ),
     ]

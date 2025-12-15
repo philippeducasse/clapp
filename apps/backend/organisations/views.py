@@ -69,22 +69,16 @@ def search(request: Request) -> Response:
 
         try:
             Entity = apps.get_model(app_label, model_name)
-            results = Entity.objects.filter(search_filter).values(
-                *ORGANISATION_SEARCH_FIELDS
-            )[:20]
+            results = Entity.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
         except LookupError:
             return Response({"error": "Model not found"}, status=400)
 
     else:
-        festivals = Festival.objects.filter(search_filter).values(
-            *ORGANISATION_SEARCH_FIELDS
-        )[:20]
-        venues = Venue.objects.filter(search_filter).values(
-            *ORGANISATION_SEARCH_FIELDS
-        )[:20]
-        residencies = Residency.objects.filter(search_filter).values(
-            *ORGANISATION_SEARCH_FIELDS
-        )[:20]
+        festivals = Festival.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
+        venues = Venue.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
+        residencies = Residency.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[
+            :20
+        ]
 
         results: List[Dict[str, Any]] = []
 
@@ -181,9 +175,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         except self.queryset.model.DoesNotExist:
             logger.error(f"Organisation {pk} not found")
             return Response(
-                {
-                    "error": f"{self.get_organisation_type_name().capitalize()} not found"
-                },
+                {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         profile = request.user
@@ -308,18 +300,14 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             if performance_ids:
                 if isinstance(performance_ids, str):
                     performance_ids = [
-                        int(id.strip())
-                        for id in performance_ids.split(",")
-                        if id.strip()
+                        int(id.strip()) for id in performance_ids.split(",") if id.strip()
                     ]
                 elif isinstance(performance_ids, list):
                     performance_ids = performance_ids
                 else:
                     performance_ids = [performance_ids]
 
-                performance_objects = list(
-                    Performance.objects.filter(id__in=performance_ids)
-                )
+                performance_objects = list(Performance.objects.filter(id__in=performance_ids))
 
             language = request.data.get("language", "ENGLISH")
             email_length = request.data.get("message_length", None)
@@ -333,15 +321,11 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         except Organisation.DoesNotExist:
             return Response(
-                {
-                    "error": f"{self.get_organisation_type_name().capitalize()} not found"
-                },
+                {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Profile.DoesNotExist:
-            return Response(
-                {"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except ValueError as e:
             return Response(
                 {"error": f"Invalid performance ID format: {str(e)}"},
@@ -362,9 +346,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         if tag_action not in valid_actions:
             return Response(
-                {
-                    "error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"
-                },
+                {"error": f"Invalid action. Must be one of: {', '.join(valid_actions)}"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

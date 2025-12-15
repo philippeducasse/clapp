@@ -28,9 +28,7 @@ class Application(models.Model):
         ("OTHER", "Other"),
     ]
     # what type of model is this?
-    content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, null=True, blank=True
-    )
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
     # which specific instance of the model?
     object_id = models.PositiveIntegerField(null=True, blank=True)
     # combine both
@@ -43,12 +41,8 @@ class Application(models.Model):
     #   - Lets you do: application.organisation → gets you the Festival/Venue/Residency object
     organisation = GenericForeignKey("content_type", "object_id")
 
-    profile = models.ForeignKey(
-        Profile, on_delete=models.CASCADE, related_name="applications"
-    )
-    performances = models.ManyToManyField(
-        Performance, related_name="applications", blank=True
-    )
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="applications")
+    performances = models.ManyToManyField(Performance, related_name="applications", blank=True)
     application_date = models.DateField(blank=True, null=True)
     application_method = models.CharField(
         max_length=50,
@@ -60,9 +54,7 @@ class Application(models.Model):
     email_recipients = models.JSONField(blank=True, null=True)
     message = models.CharField(max_length=10000, blank=True)
     attachments_sent = models.JSONField(blank=True, null=True)
-    application_status = models.CharField(
-        max_length=50, choices=APPLICATION_STATUS, default="NOT_APPLIED"
-    )
+    status = models.CharField(max_length=50, choices=APPLICATION_STATUS, default="NOT_APPLIED")
     comments = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

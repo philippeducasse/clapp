@@ -38,9 +38,7 @@ def profile(db):
     # Delete any existing profile with id=2 first
     Profile.objects.filter(id=2).delete()
 
-    profile = Profile(
-        id=2, email="test@example.com", first_name="Test", last_name="User"
-    )
+    profile = Profile(id=2, email="test@example.com", first_name="Test", last_name="User")
     profile.set_password("testpass123")
     profile.save()
     return profile
@@ -49,9 +47,7 @@ def profile(db):
 @pytest.fixture
 def performance(profile):
     """Fixture to create a test performance"""
-    return Performance.objects.create(
-        performance_title="Test Performance", profile=profile
-    )
+    return Performance.objects.create(performance_title="Test Performance", profile=profile)
 
 
 @pytest.mark.django_db
@@ -146,9 +142,7 @@ class TestFestivalEnrichAction:
 
     @patch("organisations.festivals.views.MistralClient")
     @patch("organisations.festivals.views.GeminiClient")
-    def test_enrich_festival_not_found(
-        self, mock_gemini_client, mock_mistral_client, api_client
-    ):
+    def test_enrich_festival_not_found(self, mock_gemini_client, mock_mistral_client, api_client):
         """Test enriching a non-existent festival"""
         response = api_client.get("/api/festivals/9999/enrich/")
 
@@ -185,9 +179,7 @@ class TestFestivalGenerateEmailAction:
 
         data = {"selected_performance_ids": str(performance.id)}
 
-        response = api_client.post(
-            f"/api/festivals/{festival.id}/generate_email/", data
-        )
+        response = api_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
 
         assert response.status_code == status.HTTP_200_OK
         assert "message" in response.data
@@ -197,12 +189,8 @@ class TestFestivalGenerateEmailAction:
         self, mock_mistral_client, api_client, festival, profile
     ):
         """Test generating email with multiple performances"""
-        performance1 = Performance.objects.create(
-            performance_title="Show 1", profile=profile
-        )
-        performance2 = Performance.objects.create(
-            performance_title="Show 2", profile=profile
-        )
+        performance1 = Performance.objects.create(performance_title="Show 1", profile=profile)
+        performance2 = Performance.objects.create(performance_title="Show 2", profile=profile)
 
         mock_mistral = Mock()
         mock_mistral.chat.return_value = "Generated email"
@@ -210,9 +198,7 @@ class TestFestivalGenerateEmailAction:
 
         data = {"selected_performance_ids": f"{performance1.id},{performance2.id}"}
 
-        response = api_client.post(
-            f"/api/festivals/{festival.id}/generate_email/", data
-        )
+        response = api_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
 
         assert response.status_code == status.HTTP_200_OK
 
@@ -267,9 +253,7 @@ class TestFestivalApplyAction:
         assert application.application_status == "APPLIED"
 
     @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_with_performances(
-        self, mock_email, api_client, festival, profile, performance
-    ):
+    def test_apply_with_performances(self, mock_email, api_client, festival, profile, performance):
         """Test applying with performances attached"""
         mock_email_instance = Mock()
         mock_email.return_value = mock_email_instance
@@ -287,9 +271,7 @@ class TestFestivalApplyAction:
         assert application.performances.count() == 1
 
     @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_duplicate_application_same_year(
-        self, mock_email, api_client, festival, profile
-    ):
+    def test_apply_duplicate_application_same_year(self, mock_email, api_client, festival, profile):
         """Test that duplicate applications for the same year are rejected"""
         mock_email_instance = Mock()
         mock_email.return_value = mock_email_instance
@@ -316,9 +298,7 @@ class TestFestivalApplyAction:
         assert "already exists" in response.data
 
     @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_email_sending_failure(
-        self, mock_email, api_client, festival, profile
-    ):
+    def test_apply_email_sending_failure(self, mock_email, api_client, festival, profile):
         """Test handling of email sending failure"""
         mock_email_instance = Mock()
         mock_email_instance.send.side_effect = Exception("Email server error")

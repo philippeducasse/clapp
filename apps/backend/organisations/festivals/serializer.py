@@ -29,9 +29,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
     latest_application_status = serializers.CharField(
         read_only=True, allow_null=True, required=False
     )
-    latest_application_date = serializers.DateField(
-        read_only=True, allow_null=True, required=False
-    )
+    latest_application_date = serializers.DateField(read_only=True, allow_null=True, required=False)
 
     # will look for this name + get
     current_year_application = serializers.SerializerMethodField()

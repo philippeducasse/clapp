@@ -31,9 +31,7 @@ class Residency(Organisation):
 
 
 class ResidencyContact(OrganisationContact):
-    residency = models.ForeignKey(
-        Residency, on_delete=models.CASCADE, related_name="contacts"
-    )
+    residency = models.ForeignKey(Residency, on_delete=models.CASCADE, related_name="contacts")
 
     class Meta:
         db_table = "residencies_residencycontact"

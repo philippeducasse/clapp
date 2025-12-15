@@ -9,9 +9,7 @@ class TestFestivalModel:
 
     def test_festival_creation(self):
         """Test creating a festival with required fields"""
-        festival = Festival.objects.create(
-            name="Test Festival", country="France", town="Paris"
-        )
+        festival = Festival.objects.create(name="Test Festival", country="France", town="Paris")
 
         assert festival.id is not None
         assert festival.name == "Test Festival"
@@ -108,17 +106,13 @@ class TestFestivalModel:
 
     def test_festival_url_validation(self):
         """Test that website_url field validates URL format"""
-        festival = Festival.objects.create(
-            name="URL Test", website_url="https://valid-url.com"
-        )
+        festival = Festival.objects.create(name="URL Test", website_url="https://valid-url.com")
         assert festival.website_url == "https://valid-url.com"
 
     def test_festival_description_max_length(self):
         """Test description field max length"""
         long_description = "A" * 1000
-        festival = Festival.objects.create(
-            name="Description Test", description=long_description
-        )
+        festival = Festival.objects.create(name="Description Test", description=long_description)
         assert len(festival.description) == 1000
 
     def test_festival_comments_max_length(self):

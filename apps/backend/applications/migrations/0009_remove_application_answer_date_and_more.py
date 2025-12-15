@@ -4,60 +4,70 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('applications', '0008_alter_application_message'),
+        ("applications", "0008_alter_application_message"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='application',
-            name='answer_date',
+            model_name="application",
+            name="answer_date",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='answer_received',
+            model_name="application",
+            name="answer_received",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='attachments_received',
+            model_name="application",
+            name="attachments_received",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='contract_received',
+            model_name="application",
+            name="contract_received",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='contract_signed',
+            model_name="application",
+            name="contract_signed",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='follow_up_date',
+            model_name="application",
+            name="follow_up_date",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='payment_amount',
+            model_name="application",
+            name="payment_amount",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='payment_received',
+            model_name="application",
+            name="payment_received",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='performance_details',
+            model_name="application",
+            name="performance_details",
         ),
         migrations.RemoveField(
-            model_name='application',
-            name='response_details',
+            model_name="application",
+            name="response_details",
         ),
         migrations.AddField(
-            model_name='application',
-            name='email_recipients',
+            model_name="application",
+            name="email_recipients",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='application',
-            name='application_method',
-            field=models.CharField(blank=True, choices=[('EMAIL', 'Email'), ('FORM', 'Form'), ('INVITATION', 'Invitation'), ('OTHER', 'Other'), ('UNKNOWN', 'Unknown')], default='EMAIL', max_length=50),
+            model_name="application",
+            name="application_method",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("EMAIL", "Email"),
+                    ("FORM", "Form"),
+                    ("INVITATION", "Invitation"),
+                    ("OTHER", "Other"),
+                    ("UNKNOWN", "Unknown"),
+                ],
+                default="EMAIL",
+                max_length=50,
+            ),
         ),
     ]

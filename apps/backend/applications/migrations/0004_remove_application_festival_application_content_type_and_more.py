@@ -5,25 +5,29 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('applications', '0003_application_performances_application_profile_and_more'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("applications", "0003_application_performances_application_profile_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='application',
-            name='festival',
+            model_name="application",
+            name="festival",
         ),
         migrations.AddField(
-            model_name='application',
-            name='content_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
+            model_name="application",
+            name="content_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.contenttype",
+            ),
         ),
         migrations.AddField(
-            model_name='application',
-            name='object_id',
+            model_name="application",
+            name="object_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
     ]

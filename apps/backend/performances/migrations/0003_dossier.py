@@ -5,22 +5,33 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('performances', '0002_rename_performance_name_performance_performance_title_and_more'),
+        ("performances", "0002_rename_performance_name_performance_performance_title_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Dossier',
+            name="Dossier",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to='dossiers/')),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('performance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dossiers', to='performances.performance')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("file", models.FileField(upload_to="dossiers/")),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "performance",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="dossiers",
+                        to="performances.performance",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-uploaded_at'],
+                "ordering": ["-uploaded_at"],
             },
         ),
     ]

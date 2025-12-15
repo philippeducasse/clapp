@@ -12,15 +12,11 @@ class TestPerformanceModel:
 
     @pytest.fixture
     def profile(self):
-        return Profile.objects.create_user(
-            email="performer@example.com", password="testpass123"
-        )
+        return Profile.objects.create_user(email="performer@example.com", password="testpass123")
 
     def test_performance_creation(self, profile):
         """Test creating a performance with required fields"""
-        performance = Performance.objects.create(
-            performance_title="Amazing Show", profile=profile
-        )
+        performance = Performance.objects.create(performance_title="Amazing Show", profile=profile)
 
         assert performance.id is not None
         assert performance.performance_title == "Amazing Show"
@@ -73,9 +69,7 @@ class TestPerformanceModel:
 
     def test_performance_optional_fields_null(self, profile):
         """Test that optional fields can be blank or null"""
-        performance = Performance.objects.create(
-            performance_title="Minimal Show", profile=profile
-        )
+        performance = Performance.objects.create(performance_title="Minimal Show", profile=profile)
 
         assert performance.short_description == ""
         assert performance.trailer == ""
@@ -101,21 +95,15 @@ class TestDossierModel:
 
     @pytest.fixture
     def profile(self):
-        return Profile.objects.create_user(
-            email="test@example.com", password="testpass123"
-        )
+        return Profile.objects.create_user(email="test@example.com", password="testpass123")
 
     @pytest.fixture
     def performance(self, profile):
-        return Performance.objects.create(
-            performance_title="Test Performance", profile=profile
-        )
+        return Performance.objects.create(performance_title="Test Performance", profile=profile)
 
     def test_dossier_creation(self, performance):
         """Test creating a dossier"""
-        pdf_file = SimpleUploadedFile(
-            "test.pdf", b"file_content", content_type="application/pdf"
-        )
+        pdf_file = SimpleUploadedFile("test.pdf", b"file_content", content_type="application/pdf")
         dossier = Dossier.objects.create(performance=performance, file=pdf_file)
 
         try:
@@ -129,12 +117,8 @@ class TestDossierModel:
 
     def test_dossier_ordering(self, performance):
         """Test that dossiers are ordered by uploaded_at descending"""
-        pdf1 = SimpleUploadedFile(
-            "test1.pdf", b"content1", content_type="application/pdf"
-        )
-        pdf2 = SimpleUploadedFile(
-            "test2.pdf", b"content2", content_type="application/pdf"
-        )
+        pdf1 = SimpleUploadedFile("test1.pdf", b"content1", content_type="application/pdf")
+        pdf2 = SimpleUploadedFile("test2.pdf", b"content2", content_type="application/pdf")
 
         dossier1 = Dossier.objects.create(performance=performance, file=pdf1)
         dossier2 = Dossier.objects.create(performance=performance, file=pdf2)

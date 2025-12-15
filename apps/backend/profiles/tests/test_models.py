@@ -23,9 +23,7 @@ class TestProfileModel:
 
     def test_profile_string_representation(self):
         """Test the __str__ method returns email"""
-        profile = Profile.objects.create_user(
-            email="artist@example.com", password="testpass123"
-        )
+        profile = Profile.objects.create_user(email="artist@example.com", password="testpass123")
 
         assert str(profile) == "artist@example.com"
 
@@ -34,9 +32,7 @@ class TestProfileModel:
         Profile.objects.create_user(email="unique@example.com", password="testpass123")
 
         with pytest.raises(Exception):  # Will raise IntegrityError
-            Profile.objects.create_user(
-                email="unique@example.com", password="anotherpass"
-            )
+            Profile.objects.create_user(email="unique@example.com", password="anotherpass")
 
     def test_profile_username_field_is_email(self):
         """Test that USERNAME_FIELD is email"""
@@ -71,9 +67,7 @@ class TestProfileModel:
 
     def test_profile_optional_fields_null(self):
         """Test that optional fields can be blank or null"""
-        profile = Profile.objects.create_user(
-            email="minimal@example.com", password="testpass123"
-        )
+        profile = Profile.objects.create_user(email="minimal@example.com", password="testpass123")
 
         # CharField fields with blank=True default to empty string
         assert profile.artist_name == ""
@@ -93,9 +87,7 @@ class TestProfileModel:
 
     def test_profile_password_hashing(self):
         """Test that passwords are hashed"""
-        profile = Profile.objects.create_user(
-            email="secure@example.com", password="mypassword"
-        )
+        profile = Profile.objects.create_user(email="secure@example.com", password="mypassword")
 
         # Password should be hashed, not stored in plain text
         assert profile.password != "mypassword"

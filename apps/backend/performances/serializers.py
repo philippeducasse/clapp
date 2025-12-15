@@ -14,9 +14,7 @@ class DossierSerializer(serializers.ModelSerializer):
 
 class PerformanceSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateField(allow_null=True, required=False)
-    genres = serializers.ListField(
-        child=serializers.CharField(), required=False, allow_empty=True
-    )
+    genres = serializers.ListField(child=serializers.CharField(), required=False, allow_empty=True)
     dossiers = DossierSerializer(many=True, read_only=True)
 
     class Meta:

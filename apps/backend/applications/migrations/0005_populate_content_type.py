@@ -10,9 +10,7 @@ def populate_content_type(apps, schema_editor):
 
     festival_ct = ContentType.objects.get_for_model(Festival)
 
-    Application.objects.filter(content_type__isnull=True).update(
-        content_type=festival_ct
-    )
+    Application.objects.filter(content_type__isnull=True).update(content_type=festival_ct)
 
 
 class Migration(migrations.Migration):

@@ -7,17 +7,11 @@ def convert_nulls_to_empty(apps, schema_editor):
     Performance = apps.get_model("performances", "Performance")
 
     # Update Performance text fields
-    Performance.objects.filter(short_description__isnull=True).update(
-        short_description=""
-    )
+    Performance.objects.filter(short_description__isnull=True).update(short_description="")
     Performance.objects.filter(email_prompt__isnull=True).update(email_prompt="")
     Performance.objects.filter(trailer__isnull=True).update(trailer="")
-    Performance.objects.filter(long_description__isnull=True).update(
-        long_description=""
-    )
-    Performance.objects.filter(performance_type__isnull=True).update(
-        performance_type=""
-    )
+    Performance.objects.filter(long_description__isnull=True).update(long_description="")
+    Performance.objects.filter(performance_type__isnull=True).update(performance_type="")
 
 
 class Migration(migrations.Migration):
@@ -26,7 +20,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(
-            convert_nulls_to_empty, reverse_code=migrations.RunPython.noop
-        ),
+        migrations.RunPython(convert_nulls_to_empty, reverse_code=migrations.RunPython.noop),
     ]

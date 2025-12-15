@@ -87,7 +87,5 @@ class TestResidencyModel:
 
     def test_residency_url_validation(self):
         """Test that website_url field validates URL format"""
-        residency = Residency.objects.create(
-            name="URL Test", website_url="https://valid-url.com"
-        )
+        residency = Residency.objects.create(name="URL Test", website_url="https://valid-url.com")
         assert residency.website_url == "https://valid-url.com"

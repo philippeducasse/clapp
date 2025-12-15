@@ -11,9 +11,7 @@ from profiles.models import Profile
 logger = logging.getLogger(__name__)
 
 
-def generate_enrich_prompt(
-    organisation: Organisation, search_results: Optional[str]
-) -> str:
+def generate_enrich_prompt(organisation: Organisation, search_results: Optional[str]) -> str:
     """Generate enrichment prompt for any organisation type."""
     sr = search_results or "No search results provided."
 
@@ -99,18 +97,16 @@ def generate_application_mail_prompt(
         contact_emails = [c.email for c in organisation.contacts.all()]
 
     if contact_name:
-        salutation = f"Use a standard salutation in {language} and include the name '{contact_name}'."
+        salutation = (
+            f"Use a standard salutation in {language} and include the name '{contact_name}'."
+        )
     else:
         salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {organisation.name} organizers."
 
     artist_identity = (
-        f"{profile.first_name} {profile.last_name}".strip()
-        or profile.artist_name
-        or "the artist"
+        f"{profile.first_name} {profile.last_name}".strip() or profile.artist_name or "the artist"
     )
-    company_info = (
-        f" representing {profile.company_name}" if profile.company_name else ""
-    )
+    company_info = f" representing {profile.company_name}" if profile.company_name else ""
 
     length_guidelines = {
         1: {
@@ -167,14 +163,10 @@ def generate_application_mail_prompt(
         }
             - Duration: {performance.length if performance.length else "Not specified"}
             - Description: {
-            performance.long_description
-            if performance.long_description
-            else "Not available"
+            performance.long_description if performance.long_description else "Not available"
         }
             - Dossier: {
-            performance.dossiers.first()
-            if performance.dossiers.exists()
-            else "Not available"
+            performance.dossiers.first() if performance.dossiers.exists() else "Not available"
         }
             """
 
@@ -191,9 +183,7 @@ def generate_application_mail_prompt(
             perf_details = f"""
                 * "{perf.performance_title}"
                     - Type: {
-                perf.get_performance_type_display()
-                if perf.performance_type
-                else "Not specified"
+                perf.get_performance_type_display() if perf.performance_type else "Not specified"
             }
                     - Genres: {
                 ", ".join([dict(Performance.GENRES).get(g, g) for g in perf.genres])
@@ -212,9 +202,7 @@ def generate_application_mail_prompt(
             performances_list.append(perf_details)
 
             if perf.trailer:
-                trailers.append(
-                    f'<a href="{perf.trailer}">{perf.performance_title} trailer</a>'
-                )
+                trailers.append(f'<a href="{perf.trailer}">{perf.performance_title} trailer</a>')
             if perf.dossiers.exists():
                 has_dossiers = True
 
@@ -234,9 +222,7 @@ def generate_application_mail_prompt(
     if profile.email:
         contact_lines.append(f"<a href='mailto:{profile.email}'>{profile.email}</a>")
     if profile.personal_website:
-        contact_lines.append(
-            f"<a href='{profile.personal_website}'>{profile.personal_website}</a>"
-        )
+        contact_lines.append(f"<a href='{profile.personal_website}'>{profile.personal_website}</a>")
 
     social_links = []
     if profile.instagram_profile:
@@ -346,9 +332,7 @@ def create_form_application(
     )
 
     if performances:
-        performance_ids = [
-            int(id.strip()) for id in performances.split(",") if id.strip()
-        ]
+        performance_ids = [int(id.strip()) for id in performances.split(",") if id.strip()]
         application.performances.set(Performance.objects.filter(id__in=performance_ids))
         application.save()
 
@@ -359,9 +343,7 @@ def validate_application_recipients(recipients_input: str) -> List[str]:
     from django.core.exceptions import ValidationError
     from django.core.validators import validate_email
 
-    recipient_emails = [
-        email.strip() for email in recipients_input.split(",") if email.strip()
-    ]
+    recipient_emails = [email.strip() for email in recipients_input.split(",") if email.strip()]
 
     if not recipient_emails:
         raise ValueError("At least one recipient email is required")
@@ -385,9 +367,7 @@ def get_or_create_application(
 ) -> Application:
     from django.contrib.contenttypes.models import ContentType
 
-    organisation_content_type = ContentType.objects.get_for_model(
-        organisation.__class__
-    )
+    organisation_content_type = ContentType.objects.get_for_model(organisation.__class__)
     applications = Application.objects.filter(
         content_type=organisation_content_type, object_id=organisation.pk
     )
@@ -399,9 +379,7 @@ def get_or_create_application(
 
     if application and "test" not in organisation.name.lower():
         if application.application_status != "DRAFT":
-            raise ValueError(
-                "Application already exists for this organisation and year"
-            )
+            raise ValueError("Application already exists for this organisation and year")
         else:
             application.message = message
             application.email_subject = subject

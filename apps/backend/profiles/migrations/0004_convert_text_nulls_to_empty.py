@@ -26,7 +26,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(
-            convert_nulls_to_empty, reverse_code=migrations.RunPython.noop
-        ),
+        migrations.RunPython(convert_nulls_to_empty, reverse_code=migrations.RunPython.noop),
     ]

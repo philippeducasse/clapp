@@ -54,9 +54,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="application",
             name="created_at",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
+            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
@@ -77,9 +75,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="application",
             name="payment_amount",
-            field=models.DecimalField(
-                blank=True, decimal_places=2, max_digits=10, null=True
-            ),
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True),
         ),
         migrations.AddField(
             model_name="application",

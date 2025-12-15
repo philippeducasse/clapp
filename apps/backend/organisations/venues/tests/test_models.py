@@ -36,9 +36,7 @@ class TestVenueModel:
             comments="Very interested",
         )
 
-        VenueContact.objects.create(
-            venue=venue, name="John Smith", email="venue@example.com"
-        )
+        VenueContact.objects.create(venue=venue, name="John Smith", email="venue@example.com")
 
         assert venue.description == "A beautiful performance space"
         assert venue.website_url == "https://example.com"
@@ -70,9 +68,7 @@ class TestVenueModel:
         ]
 
         for venue_type in types:
-            venue = Venue.objects.create(
-                name=f"Venue {venue_type}", venue_type=venue_type
-            )
+            venue = Venue.objects.create(name=f"Venue {venue_type}", venue_type=venue_type)
             assert venue.venue_type == venue_type
 
     def test_venue_contact_email_validation(self):
@@ -85,9 +81,7 @@ class TestVenueModel:
 
     def test_venue_url_validation(self):
         """Test that website_url field validates URL format"""
-        venue = Venue.objects.create(
-            name="URL Test", website_url="https://venue-url.com"
-        )
+        venue = Venue.objects.create(name="URL Test", website_url="https://venue-url.com")
         assert venue.website_url == "https://venue-url.com"
 
     def test_venue_contacted_flag(self):

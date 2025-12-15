@@ -18,9 +18,7 @@ for app_id, festival_name in manual_matches.items():
         app.object_id = festival.id
         app.save()
 
-        print(
-            f"✓ Matched App {app_id} to Festival '{festival.name}' (ID: {festival.id})"
-        )
+        print(f"✓ Matched App {app_id} to Festival '{festival.name}' (ID: {festival.id})")
     except Application.DoesNotExist:
         print(f"✗ Application {app_id} not found")
     except Festival.DoesNotExist:

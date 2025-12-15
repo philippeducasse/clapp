@@ -5,15 +5,34 @@ import multiselectfield.db.fields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('performances', '0003_dossier'),
+        ("performances", "0003_dossier"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='performance',
-            name='genres',
-            field=multiselectfield.db.fields.MultiSelectField(blank=True, choices=[('CIRCUS', 'Circus / Street Show'), ('JUGGLING', 'Juggling'), ('COMEDY', 'Comedy'), ('CLOWN', 'Clown'), ('MIME', 'Mime'), ('PUPPETRY', 'Puppetry'), ('WALK_ACT', 'Walk Act'), ('FIRE_SHOW', 'Fire Show'), ('MUSIC', 'Live Music'), ('DANCE', 'Dance / Physical Theatre'), ('THEATRE', 'Theatre / Drama'), ('MAGIC', 'Magic / Illusion'), ('INSTALLATION', 'Installation / Interactive Art'), ('KIDS', 'Kids / Family Show'), ('MULTIMEDIA', 'Multimedia / Projection')], max_length=116),
+            model_name="performance",
+            name="genres",
+            field=multiselectfield.db.fields.MultiSelectField(
+                blank=True,
+                choices=[
+                    ("CIRCUS", "Circus / Street Show"),
+                    ("JUGGLING", "Juggling"),
+                    ("COMEDY", "Comedy"),
+                    ("CLOWN", "Clown"),
+                    ("MIME", "Mime"),
+                    ("PUPPETRY", "Puppetry"),
+                    ("WALK_ACT", "Walk Act"),
+                    ("FIRE_SHOW", "Fire Show"),
+                    ("MUSIC", "Live Music"),
+                    ("DANCE", "Dance / Physical Theatre"),
+                    ("THEATRE", "Theatre / Drama"),
+                    ("MAGIC", "Magic / Illusion"),
+                    ("INSTALLATION", "Installation / Interactive Art"),
+                    ("KIDS", "Kids / Family Show"),
+                    ("MULTIMEDIA", "Multimedia / Projection"),
+                ],
+                max_length=116,
+            ),
         ),
     ]

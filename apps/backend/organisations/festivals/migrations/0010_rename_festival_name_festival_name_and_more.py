@@ -6,46 +6,66 @@ import phonenumber_field.modelfields
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('festivals', '0009_remove_festival_applied'),
+        ("festivals", "0009_remove_festival_applied"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='festival',
-            old_name='festival_name',
-            new_name='name',
+            model_name="festival",
+            old_name="festival_name",
+            new_name="name",
         ),
         migrations.RemoveField(
-            model_name='festival',
-            name='contact_email',
+            model_name="festival",
+            name="contact_email",
         ),
         migrations.RemoveField(
-            model_name='festival',
-            name='contact_person',
+            model_name="festival",
+            name="contact_person",
         ),
         migrations.AddField(
-            model_name='festival',
-            name='estimated_start_date',
-            field=models.DateField(blank=True, help_text='Best estimate of start date for sorting. Use start_date if known, otherwise estimate from approximate_date', null=True),
+            model_name="festival",
+            name="estimated_start_date",
+            field=models.DateField(
+                blank=True,
+                help_text="Best estimate of start date for sorting. Use start_date if known, otherwise estimate from approximate_date",
+                null=True,
+            ),
         ),
         migrations.AlterModelTable(
-            name='festival',
-            table='festivals_festival',
+            name="festival",
+            table="festivals_festival",
         ),
         migrations.CreateModel(
-            name='FestivalContact',
+            name="FestivalContact",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=200, null=True)),
-                ('email', models.EmailField(max_length=200)),
-                ('role', models.CharField(blank=True, max_length=100, null=True)),
-                ('phone', phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128, null=True, region=None)),
-                ('festival', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='contacts', to='festivals.festival')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=200, null=True)),
+                ("email", models.EmailField(max_length=200)),
+                ("role", models.CharField(blank=True, max_length=100, null=True)),
+                (
+                    "phone",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        blank=True, max_length=128, null=True, region=None
+                    ),
+                ),
+                (
+                    "festival",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="contacts",
+                        to="festivals.festival",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'festivals_festivalcontact',
+                "db_table": "festivals_festivalcontact",
             },
         ),
     ]

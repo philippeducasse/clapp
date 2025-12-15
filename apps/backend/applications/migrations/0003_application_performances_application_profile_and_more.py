@@ -6,29 +6,39 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('festivals', '0008_alter_festival_application_type_and_more'),
+        ("festivals", "0008_alter_festival_application_type_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('performances', '0006_alter_performance_genres'),
-        ('applications', '0002_remove_application_application_type_and_more'),
+        ("performances", "0006_alter_performance_genres"),
+        ("applications", "0002_remove_application_application_type_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='application',
-            name='performances',
-            field=models.ManyToManyField(blank=True, related_name='applications', to='performances.performance'),
+            model_name="application",
+            name="performances",
+            field=models.ManyToManyField(
+                blank=True, related_name="applications", to="performances.performance"
+            ),
         ),
         migrations.AddField(
-            model_name='application',
-            name='profile',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='applications', to=settings.AUTH_USER_MODEL),
+            model_name="application",
+            name="profile",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="applications",
+                to=settings.AUTH_USER_MODEL,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='application',
-            name='festival',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='festivals.festival'),
+            model_name="application",
+            name="festival",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="applications",
+                to="festivals.festival",
+            ),
         ),
     ]

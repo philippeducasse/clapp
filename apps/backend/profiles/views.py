@@ -25,9 +25,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     def get_object(self) -> Profile:
         obj = super().get_object()
         if obj.pk != self.request.user.pk:
-            logger.warning(
-                f"User {self.request.user.pk} attempted to access profile {obj.pk}"
-            )
+            logger.warning(f"User {self.request.user.pk} attempted to access profile {obj.pk}")
             raise permissions.PermissionDenied("You can only access your own profile")
         return obj
 
@@ -45,9 +43,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         new_password = request.data.get("new_password")
 
         if not new_password:
-            return Response(
-                {"error": "new_password required"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "new_password required"}, status=status.HTTP_400_BAD_REQUEST)
 
         user.set_password(new_password)
         user.save()
@@ -80,9 +76,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         logger.warning(f"Failed login attempt for email: {email}")
-        return Response(
-            {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
-        )
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False, methods=["post"])
     def logout(self, request):

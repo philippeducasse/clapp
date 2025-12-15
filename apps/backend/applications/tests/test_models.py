@@ -16,15 +16,11 @@ class TestApplicationModel:
 
     @pytest.fixture
     def profile(self):
-        return Profile.objects.create_user(
-            email="test@example.com", password="testpass123"
-        )
+        return Profile.objects.create_user(email="test@example.com", password="testpass123")
 
     @pytest.fixture
     def performance(self, profile):
-        return Performance.objects.create(
-            performance_title="Test Performance", profile=profile
-        )
+        return Performance.objects.create(performance_title="Test Performance", profile=profile)
 
     def test_application_creation(self, festival, profile):
         """Test creating an application with required fields"""

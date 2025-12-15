@@ -51,9 +51,7 @@ class Performance(models.Model):
     long_description = models.TextField(max_length=10000, blank=True)
     creation_date = models.DateField(blank=True, null=True)
 
-    performance_type = models.CharField(
-        max_length=50, choices=PERFORMANCE_TYPES, blank=True
-    )
+    performance_type = models.CharField(max_length=50, choices=PERFORMANCE_TYPES, blank=True)
     genres = MultiSelectField(choices=GENRES, blank=True)
 
     def __str__(self) -> str:

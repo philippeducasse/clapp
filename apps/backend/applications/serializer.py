@@ -89,9 +89,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 content_type = ContentType.objects.get(model=organisation_type.lower())
             except ContentType.DoesNotExist:
                 raise ValidationError(
-                    {
-                        "organisation_type": f"Invalid organisation type: {organisation_type}"
-                    }
+                    {"organisation_type": f"Invalid organisation type: {organisation_type}"}
                 )
 
             validated_data["content_type"] = content_type
@@ -109,9 +107,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 validated_data["content_type"] = content_type
             except ContentType.DoesNotExist:
                 raise ValidationError(
-                    {
-                        "organisation_type": f"Invalid organisation type: {organisation_type}"
-                    }
+                    {"organisation_type": f"Invalid organisation type: {organisation_type}"}
                 )
 
         if organisation_id is not None:

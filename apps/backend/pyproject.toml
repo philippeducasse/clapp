@@ -134,3 +134,6 @@ module = [
     "scripts"
 ]
 ignore_errors = true
+
+[tool.ruff]
+line-length = 100

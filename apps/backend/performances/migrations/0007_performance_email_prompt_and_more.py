@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('performances', '0006_alter_performance_genres'),
+        ("performances", "0006_alter_performance_genres"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='performance',
-            name='email_prompt',
+            model_name="performance",
+            name="email_prompt",
             field=models.TextField(blank=True, max_length=10000, null=True),
         ),
         migrations.AlterField(
-            model_name='performance',
-            name='short_description',
+            model_name="performance",
+            name="short_description",
             field=models.TextField(blank=True, max_length=1000, null=True),
         ),
     ]

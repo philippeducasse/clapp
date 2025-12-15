@@ -62,9 +62,7 @@ class Festival(Organisation):
 
 
 class FestivalContact(OrganisationContact):
-    festival = models.ForeignKey(
-        Festival, on_delete=models.CASCADE, related_name="contacts"
-    )
+    festival = models.ForeignKey(Festival, on_delete=models.CASCADE, related_name="contacts")
 
     class Meta:
         db_table = "festivals_festivalcontact"

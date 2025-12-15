@@ -59,8 +59,6 @@ class FestivalViewSet(OrganisationViewSet):
     def get_organisation_type_name(self) -> str:
         return "festival"
 
-    def get_enrich_prompt(
-        self, organisation: Organisation, search_results: Optional[str]
-    ) -> str:
+    def get_enrich_prompt(self, organisation: Organisation, search_results: Optional[str]) -> str:
         """Use festival-specific enrichment prompt."""
         return generate_festival_enrich_prompt(organisation, search_results)
