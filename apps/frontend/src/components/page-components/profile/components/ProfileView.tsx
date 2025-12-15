@@ -31,6 +31,7 @@ const ProfileView = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemName, setItemName] = useState<"profile" | "performance">("performance");
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
+  const [activeTab, setActiveTab] = useState("basic-information");
 
   const handleDelete = (entity: "profile" | "performance", index?: number) => {
     setIdToDelete(index);
@@ -73,7 +74,7 @@ const ProfileView = () => {
         showTags={false}
         actionElements={
           <>
-            <EditButton href={`/profile/edit`} />
+            {activeTab === "basic-information" && <EditButton href={`/profile/edit`} />}
             <DeleteButton
               label="Delete account"
               variant={"outline"}
@@ -84,7 +85,7 @@ const ProfileView = () => {
         }
       />
 
-      <DetailsTabs defaultTab="basic-information">
+      <DetailsTabs defaultTab="basic-information" onTabChange={setActiveTab}>
         <Tab name="Basic Information">
           <DetailsViewSection
             title="Basic information"

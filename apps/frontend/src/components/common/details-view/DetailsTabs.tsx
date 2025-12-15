@@ -14,9 +14,10 @@ export const Tab = ({ children }: TabProps) => {
 interface DetailsTabsProps {
   defaultTab: string;
   children: React.ReactElement<TabProps> | React.ReactElement<TabProps>[];
+  onTabChange?: (value: string) => void;
 }
 
-const DetailsTabs = ({ defaultTab, children }: DetailsTabsProps) => {
+const DetailsTabs = ({ defaultTab, children, onTabChange }: DetailsTabsProps) => {
   const tabs = React.Children.toArray(children) as React.ReactElement<TabProps>[];
 
   const tabSections = tabs.map((tab) => ({
@@ -25,7 +26,7 @@ const DetailsTabs = ({ defaultTab, children }: DetailsTabsProps) => {
   }));
 
   return (
-    <Tabs defaultValue={defaultTab} className="w-full">
+    <Tabs defaultValue={defaultTab} className="w-full" onValueChange={onTabChange}>
       <TabListing viewSections={tabSections} />
       {tabs.map((tab) => {
         const key = tab.props.name.toLowerCase().replace(/\s+/g, "-");
