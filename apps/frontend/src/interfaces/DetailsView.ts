@@ -32,6 +32,6 @@ export const enum SectionCellType {
   Image = "img",
   Bool = "bool",
   HTML = "html",
-  Log = "log",
   Video = "video",
+  Password = "password",
 }

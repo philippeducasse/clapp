@@ -29,3 +29,23 @@ export enum OrganisationType {
   VENUE = "VENUE",
   RESIDENCY = "RESIDENCY",
 }
+
+export enum EmailHost {
+  GMAIL = "GMAIL",
+  OUTLOOK = "OUTLOOK",
+  YAHOO = "YAHOO",
+  ICLOUD = "ICLOUD",
+  PROTONMAIL = "PROTONMAIL",
+  ZOHO = "ZOHO",
+  AOL = "AOL",
+  FASTMAIL = "FASTMAIL",
+  GMX = "GMX",
+  WEB_DE = "WEB_DE",
+  ORANGE = "ORANGE",
+  FREE = "FREE",
+  LIBERO = "LIBERO",
+  MAIL_RU = "MAIL_RU",
+  VIRGILIO = "VIRGILIO",
+  T_ONLINE = "T_ONLINE",
+  OTHER = "OTHER",
+}

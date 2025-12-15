@@ -1,10 +1,10 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Application } from "@/interfaces/entities/Application";
+import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
-import { setApplications, deleteApplication } from "@/redux/slices/applicationSlice";
+import { setApplications, deleteApplication, updateApplication } from "@/redux/slices/applicationSlice";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
@@ -45,7 +45,23 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     setDeleteApplicationId(null);
   }, [deleteApplicationId, dispatch]);
 
-  const columns = useApplicationColumns({ onDeleteClick: handleDeleteClick });
+  const handleStatusChange = useCallback(async (id: number, status: ApplicationStatus) => {
+    const updatedApplication = await applicationApiService.changeStatus(id, status);
+
+    setApplicationData((prev) => ({
+      ...prev,
+      results: prev.results.map((app) =>
+        app.id === id ? updatedApplication : app
+      ),
+    }));
+
+    dispatch(updateApplication(updatedApplication));
+  }, [dispatch]);
+
+  const columns = useApplicationColumns({
+    onDeleteClick: handleDeleteClick,
+    onStatusChange: handleStatusChange
+  });
   const filters = useMemo(() => getApplicationFilters(), []);
   return (
     <>

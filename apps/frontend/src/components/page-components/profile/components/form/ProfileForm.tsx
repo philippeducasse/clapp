@@ -21,16 +21,18 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
+import { getEmailSettingsFormFields } from "../../helpers/form/getEmailSettingsFormFields";
 
 interface ProfileFormProps {
   action: Action;
+  isEmailConfig: boolean;
 }
 
-const ProfileForm = ({ action }: ProfileFormProps) => {
+const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const formFields = getProfileFormFields();
+  const formFields = isEmailConfig ? getEmailSettingsFormFields() : getProfileFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
@@ -84,8 +86,6 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
     return <Skeleton />;
   }
 
-  const onCancelHref = profile ? `/profile` : "/profile";
-
   return (
     <>
       <FormHeader action={action} entityName={EntityName.PROFILE} />
@@ -93,13 +93,17 @@ const ProfileForm = ({ action }: ProfileFormProps) => {
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
-        onCancelHref={onCancelHref}
+        onCancelHref={"/profile"}
         isLoading={isLoading}
         entity={profile}
         action={action}
-        formTitle="Profile Information"
+        formTitle={isEmailConfig ? "Email Settings" : "Profile Information"}
         submitButtonLabel="Save"
-        formSubtitle="Update your profile information and contact details"
+        formSubtitle={
+          isEmailConfig
+            ? "Configure the app to connect with your email account. Please fill these fields out carefully!"
+            : "Update your profile information and contact details"
+        }
       />
     </>
   );

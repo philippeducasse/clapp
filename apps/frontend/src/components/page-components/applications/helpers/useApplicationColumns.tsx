@@ -1,6 +1,6 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Application } from "@/interfaces/entities/Application";
+import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
 import { Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -10,13 +10,16 @@ import { StatusBadge } from "@/components/common/StatusBadge";
 import { formatDate } from "@/utils/stringUtils";
 import { capitalizeFirst } from "@/utils/stringUtils";
 import { useCallback, useMemo } from "react";
+import { StatusDropdown } from "@/components/common/table/StatusDropdown";
 
 interface UseApplicationColumnsProps {
   onDeleteClick: (id: number) => void;
+  onStatusChange: (id: number, status: ApplicationStatus) => void;
 }
 
 const useApplicationColumns = ({
   onDeleteClick,
+  onStatusChange,
 }: UseApplicationColumnsProps): ColumnDef<Application>[] => {
   const router = useRouter();
 
@@ -81,11 +84,15 @@ const useApplicationColumns = ({
       {
         header: "Actions",
         id: "actions",
-        size: 75,
+        size: 120,
         cell: ({ row }) => {
           const application = row.original;
           return (
             <div className="flex gap-2">
+              <StatusDropdown
+                entityId={application.id as number}
+                onStatusChange={onStatusChange}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -107,7 +114,7 @@ const useApplicationColumns = ({
         },
       },
     ],
-    [onEdit, onDeleteClick]
+    [onEdit, onDeleteClick, onStatusChange]
   );
 };
 

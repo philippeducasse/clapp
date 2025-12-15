@@ -10,24 +10,42 @@ interface DetailsViewSectionProps {
   data: SectionCellProps[];
   ribbonType?: "tag" | "status";
   ribbonValue?: string;
+  sideText?: string;
+  subtitle?: string;
 }
 
-const DetailsViewSection = ({ title, icon, data, ribbonType, ribbonValue }: DetailsViewSectionProps) => {
+const DetailsViewSection = ({
+  title,
+  icon,
+  data,
+  ribbonType,
+  ribbonValue,
+  sideText,
+  subtitle,
+}: DetailsViewSectionProps) => {
   return (
-    <Card className="mb-6 relative overflow-hidden">
-      {ribbonType && ribbonValue && <Ribbon ribbonType={ribbonType} ribbonValue={ribbonValue} />}
-      <CardContent className="grid-cols-2 ">
-        <div className="flex items-center gap-2 mb-6">
-          {icon}
-          <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
-            {title}
-          </CardTitle>
-        </div>
-        <div className="col-span-2">
-          <DetailsView data={data} />
-        </div>
-      </CardContent>
-    </Card>
+    <div className={`${sideText ? "flex" : ""}`}>
+      {sideText && <p className="flex-1 p-2">{sideText}</p>}
+      <Card className="mb-6 relative overflow-hidden flex-2">
+        {ribbonType && ribbonValue && <Ribbon ribbonType={ribbonType} ribbonValue={ribbonValue} />}
+        <CardContent>
+          <div className="flex items-center gap-2 mb-6">
+            {icon}
+            <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
+              {title}
+            </CardTitle>
+            {subtitle && (
+              <CardTitle className="font-light text-gray-400 dark:text-foreground">
+                {subtitle}
+              </CardTitle>
+            )}
+          </div>
+          <div className="col-span-2">
+            <DetailsView data={data} />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

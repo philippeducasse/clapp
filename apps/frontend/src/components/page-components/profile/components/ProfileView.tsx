@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { CircleUser } from "lucide-react";
+import { CircleUser, Cog } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -23,6 +23,8 @@ import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import { Profile } from "@/interfaces/entities/Profile";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
+import { getEmailSettings } from "../helpers/getEmailSettings";
+
 const ProfileView = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -71,10 +73,10 @@ const ProfileView = () => {
         subtitle={`${profile?.firstName}, ${profile.lastName}`}
         icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={profile.id}
-        showTags={false}
         actionElements={
           <>
             {activeTab === "basic-information" && <EditButton href={`/profile/edit`} />}
+            {activeTab === "email-settings" && <EditButton href={`/profile/edit/email-settings`} />}
             <DeleteButton
               label="Delete account"
               variant={"outline"}
@@ -107,6 +109,14 @@ const ProfileView = () => {
             />
           )}
           <AddSection label="performance" href={`/profile/edit/performances/new`} />
+        </Tab>
+        <Tab name="Email Settings">
+          <DetailsViewSection
+            title="Email Settings"
+            icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
+            data={getEmailSettings(profile)}
+            subtitle="These values are used when contacting organisations"
+          />
         </Tab>
       </DetailsTabs>
     </DetailsViewWrapper>

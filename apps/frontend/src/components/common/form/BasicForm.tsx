@@ -49,7 +49,7 @@ const BasicForm = ({
       <div className="flex">
         <div className="flex flex-col max-w-[200px]  mt-8 ml-8">
           {formTitle && <h3 className="text-xl text-bold text-emerald-600">{formTitle}</h3>}
-          {formSubtitle && <p className="text-base">{formSubtitle}</p>}
+          {formSubtitle && <p className="text-base mt-2">{formSubtitle}</p>}
         </div>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

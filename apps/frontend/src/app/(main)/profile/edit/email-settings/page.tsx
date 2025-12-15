@@ -3,7 +3,7 @@ import ProfileForm from "@/components/page-components/profile/components/form/Pr
 import { Action } from "@/interfaces/Enums";
 
 const EditProfilePage = () => {
-  return <ProfileForm action={Action.EDIT} isEmailConfig={false} />;
+  return <ProfileForm action={Action.EDIT} isEmailConfig />;
 };
 
 export default EditProfilePage;

@@ -1,4 +1,5 @@
 import { Performance } from "./Performance";
+import { EmailHost } from "../Enums";
 
 export interface Profile {
   [key: string]: unknown;
@@ -17,4 +18,9 @@ export interface Profile {
   tiktokProfile?: string;
   youtubeProfile?: string;
   performances: Performance[];
+  emailHost?: EmailHost;
+  emailPort?: number;
+  emailUseTls?: boolean;
+  emailHostUser?: string;
+  emailHostPassword?: string;
 }
