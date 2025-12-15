@@ -15,7 +15,7 @@ export interface Application {
   emailSubject?: string;
   message?: string;
   attachmentsSent?: File[];
-  applicationStatus: ApplicationStatus;
+  status: ApplicationStatus;
   comments?: string;
   createdAt: string;
   updatedAt?: string;

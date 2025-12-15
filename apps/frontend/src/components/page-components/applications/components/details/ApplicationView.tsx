@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Clipboard } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectApplication } from "@/redux/slices/applicationSlice";
+import { selectApplication, updateApplication } from "@/redux/slices/applicationSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { getApplicationBasicInfo } from "../../helpers/getApplicationDetails";
@@ -53,6 +53,9 @@ const ApplicationView = () => {
       <DetailsViewHeader
         title={application.emailSubject ?? ""}
         icon={<Clipboard className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        entityId={application.id}
+        statusApiMethod={applicationApiService.changeStatus}
+        updateSlice={updateApplication}
         actionElements={
           <>
             <EditButton href={`/applications/${application.id}/edit`} />{" "}
@@ -68,6 +71,8 @@ const ApplicationView = () => {
         title="Application information"
         icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
         data={getApplicationBasicInfo(application)}
+        ribbonValue={application.status}
+        ribbonType="status"
       />
     </DetailsViewWrapper>
   );

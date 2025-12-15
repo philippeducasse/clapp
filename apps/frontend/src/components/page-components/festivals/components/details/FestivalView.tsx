@@ -91,6 +91,8 @@ const FestivalView = () => {
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
         icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={festival.id}
+        tagApiMethod={festivalApiService.tag}
+        updateSlice={updateFestival}
         actionElements={
           <>
             <Button onClick={goToApplyPage}>
@@ -110,7 +112,8 @@ const FestivalView = () => {
         title="Basic information"
         icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
         data={getFestivalBasicInfo(festival)}
-        tag={festival.tag}
+        ribbonType="tag"
+        ribbonValue={festival.tag}
       />
       {festival.comments && (
         <DetailsViewSection

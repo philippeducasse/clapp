@@ -1,5 +1,5 @@
-import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
-import { Application } from "@/interfaces/entities/Application";
+import { fetchRequest, sendRequest, deleteRequest, patchRequest } from "./fetchHelper";
+import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
 const endpoint = "/api/applications/";
@@ -34,10 +34,18 @@ const update = (application: Application): Promise<Application> => {
   );
 };
 
+const changeStatus = (entityId: number, action: ApplicationStatus): Promise<Application> => {
+  return patchRequest<Application>(
+    `${endpoint}${entityId}/status/${action}/`,
+    "Festival status successfully updated"
+  );
+};
+
 export const applicationApiService = {
   getAll,
   get,
   create,
   update,
   remove,
+  changeStatus,
 };

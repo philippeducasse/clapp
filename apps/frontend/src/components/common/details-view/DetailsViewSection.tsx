@@ -8,17 +8,20 @@ interface DetailsViewSectionProps {
   title: string;
   icon: React.ReactNode;
   data: SectionCellProps[];
-  tag?: string;
+  ribbonType?: "tag" | "status";
+  ribbonValue?: string;
 }
 
-const DetailsViewSection = ({ title, icon, data, tag }: DetailsViewSectionProps) => {
+const DetailsViewSection = ({ title, icon, data, ribbonType, ribbonValue }: DetailsViewSectionProps) => {
   return (
     <Card className="mb-6 relative overflow-hidden">
-      {tag && <Ribbon tag={tag} />}
+      {ribbonType && ribbonValue && <Ribbon ribbonType={ribbonType} ribbonValue={ribbonValue} />}
       <CardContent className="grid-cols-2 ">
         <div className="flex items-center gap-2 mb-6">
           {icon}
-          <CardTitle className="text-lg font-semibold text-black dark:text-foreground">{title}</CardTitle>
+          <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
+            {title}
+          </CardTitle>
         </div>
         <div className="col-span-2">
           <DetailsView data={data} />

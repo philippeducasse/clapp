@@ -15,7 +15,7 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
     },
     {
       title: "Status",
-      value: capitalizeFirst(application.applicationStatus),
+      value: capitalizeFirst(application.status),
     },
     {
       title: "Email recipients",

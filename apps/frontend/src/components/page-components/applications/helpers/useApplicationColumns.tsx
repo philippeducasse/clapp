@@ -67,7 +67,7 @@ const useApplicationColumns = ({
         },
         cell: ({ row }) => {
           const application = row.original;
-          return <StatusBadge status={application.applicationStatus} />;
+          return <StatusBadge status={application.status} />;
         },
       },
       {
