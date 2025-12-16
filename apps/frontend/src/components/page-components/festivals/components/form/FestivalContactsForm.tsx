@@ -130,7 +130,7 @@ const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
         isLoading={isLoading}
         entity={festival}
         formTitle="Contacts"
-        formSubtitle="here you can provide contact information"
+        formSubtitle="Here you can provide optional contact information."
       />
     </>
   );
