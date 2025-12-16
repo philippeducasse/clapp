@@ -40,6 +40,18 @@ class CustomUserAdmin(UserAdmin):
                 )
             },
         ),
+        (
+            "Email settings",
+            {
+                "fields": (
+                    "email_host",
+                    "email_host_user",
+                    "email_port",
+                    "email_host_password",
+                    "email_use_tls",
+                )
+            },
+        ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
