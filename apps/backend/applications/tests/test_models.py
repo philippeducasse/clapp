@@ -28,13 +28,13 @@ class TestApplicationModel:
             organisation=festival,
             profile=profile,
             application_date=date(2025, 3, 15),
-            application_status="DRAFT",
+            status="DRAFT",
         )
 
         assert application.id is not None
         assert application.organisation == festival
         assert application.profile == profile
-        assert application.application_status == "DRAFT"
+        assert application.status == "DRAFT"
         assert application.answer_received is False
 
     def test_application_string_representation(self, festival, profile):
@@ -74,10 +74,8 @@ class TestApplicationModel:
         statuses = ["DRAFT", "APPLIED", "IN_DISCUSSION", "REJECTED", "ACCEPTED"]
 
         for status in statuses:
-            app = Application.objects.create(
-                organisation=festival, profile=profile, application_status=status
-            )
-            assert app.application_status == status
+            app = Application.objects.create(organisation=festival, profile=profile, status=status)
+            assert app.status == status
 
     def test_application_optional_fields(self, festival, profile):
         """Test that optional fields can be blank or null"""

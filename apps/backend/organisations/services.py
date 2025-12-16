@@ -321,13 +321,12 @@ def create_form_application(
     default_profile: Profile,
     comments: str,
 ) -> Application:
-    print("SO FAR SO GOOD")
     application = Application.objects.create(
         application_method="FORM",
         organisation=organisation,
         profile=default_profile,
         comments=comments,
-        application_status="APPLIED",
+        status="APPLIED",
         application_date=timezone.now().date(),
     )
 
@@ -378,7 +377,7 @@ def get_or_create_application(
     )
 
     if application and "test" not in organisation.name.lower():
-        if application.application_status != "DRAFT":
+        if application.status != "DRAFT":
             raise ValueError("Application already exists for this organisation and year")
         else:
             application.message = message
@@ -388,7 +387,7 @@ def get_or_create_application(
         application = Application.objects.create(
             organisation=organisation,
             application_date=timezone.now().date(),
-            application_status="DRAFT",
+            status="DRAFT",
             message=message,
             email_subject=subject,
             profile=profile,
@@ -469,6 +468,6 @@ def send_application_email(email: Any, application: Application) -> None:
     logger.debug(f"Sending email for application {application.id}")
     email.send(fail_silently=False)
     logger.debug("Email sent, updating application status to APPLIED")
-    application.application_status = "APPLIED"
+    application.status = "APPLIED"
     application.save()
     logger.debug(f"Application {application.id} status updated")

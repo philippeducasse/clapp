@@ -250,7 +250,7 @@ class TestFestivalApplyAction:
         assert application.organisation == festival
         assert application.message == "<p>Test application message</p>"
         assert application.email_subject == "Application to Test Festival"
-        assert application.application_status == "APPLIED"
+        assert application.status == "APPLIED"
 
     @patch("organisations.festivals.views.EmailMultiAlternatives")
     def test_apply_with_performances(self, mock_email, api_client, festival, profile, performance):
@@ -280,7 +280,7 @@ class TestFestivalApplyAction:
         Application.objects.create(
             organisation=festival,
             application_date=timezone.now().date(),
-            application_status="APPLIED",
+            status="APPLIED",
             message="First application",
             email_subject="First Subject",
             profile=profile,
