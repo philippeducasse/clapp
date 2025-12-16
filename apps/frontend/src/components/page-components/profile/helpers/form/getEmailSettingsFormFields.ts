@@ -2,7 +2,8 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { EmailHost } from "@/interfaces/Enums";
 import { getOptions } from "@/helpers/formHelper";
-export const getEmailSettingsFormFields = (): ControlledFormElement[] => {
+
+export const getEmailSettingsFormFields = (isOtherEmailHost: boolean): ControlledFormElement[] => {
   const fields: ControlledFormElement[] = [
     {
       label: "Email",
@@ -14,10 +15,12 @@ export const getEmailSettingsFormFields = (): ControlledFormElement[] => {
     {
       label: "Email provider",
       fieldName: "emailHost",
-      type: ControlledFormElementType.SELECT,
+      type: isOtherEmailHost ? ControlledFormElementType.TEXT : ControlledFormElementType.SELECT,
       options: getOptions(EmailHost),
       helpText: "Select the email hosting provider",
+      register: isOtherEmailHost,
     },
+
     {
       label: "Email port",
       fieldName: "emailPort",

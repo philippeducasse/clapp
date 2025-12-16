@@ -32,16 +32,34 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const formFields = isEmailConfig ? getEmailSettingsFormFields() : getProfileFormFields();
-  const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const [isOtherEmailHost, setIsOtherEmailHost] = useState(false);
 
+  const formFields = isEmailConfig
+    ? getEmailSettingsFormFields(isOtherEmailHost)
+    : getProfileFormFields();
+  const formSchema = createZodFormSchema(formFields);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: getInitialValues(formFields, profile ?? undefined),
     mode: "onSubmit",
   });
+
+  const emailHost = form.watch("emailHost");
+  useEffect(() => {
+    if (emailHost === "OTHER") {
+      setIsOtherEmailHost(true);
+      form.setValue("emailHost", "");
+      form.register("emailHost");
+    }
+  }, [emailHost]);
+
+  useEffect(() => {
+    if (isOtherEmailHost) {
+      form.setFocus("emailHost");
+    }
+  }, [isOtherEmailHost, form]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -66,11 +84,20 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   }, [profile, form, initialDataLoaded]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    console.log("values:", values);
     setIsLoading(true);
     try {
-      if (action === Action.EDIT && profile) {
-        const updatedProfile = { ...values, id: profile.id } as Profile;
+      if (profile) {
+        let updatedProfile;
+        if (isEmailConfig) {
+          updatedProfile = { ...profile, ...values } as Profile;
+          console.log("updated profile: ", updatedProfile);
+        } else {
+          updatedProfile = { ...values, id: profile.id } as Profile;
+        }
         const sanitisedData = prepareFormDataForSubmission(updatedProfile, formFields);
+        console.log("sanitzed profile: ", sanitisedData);
+
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));
         router.push(`/profile`);

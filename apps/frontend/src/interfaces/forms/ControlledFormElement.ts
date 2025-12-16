@@ -20,6 +20,7 @@ export interface ControlledFormElement {
   action?: Action;
   isRegistration?: boolean;
   sliderOptions?: SliderOptions;
+  register?: boolean;
 }
 
 export interface SliderOptions {

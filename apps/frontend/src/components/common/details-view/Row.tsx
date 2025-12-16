@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { SectionCellValueType, SectionCellType } from "@/interfaces/DetailsView";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UrlObject } from "url";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface RowProps {
   value: SectionCellValueType;
@@ -16,6 +18,8 @@ interface RowProps {
 }
 
 const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoading }: RowProps) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const renderContent = () => {
     if (value instanceof Date) {
       return value.toLocaleDateString();
@@ -24,6 +28,23 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
       return <span className="text-gray-400">-</span>;
     }
     switch (type) {
+      case SectionCellType.Password:
+        return (
+          <div className="flex items-center gap-2">
+            <span className={`${!showPassword ? "blur-sm select-none" : ""}`}>
+              {value.toString()}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowPassword(!showPassword)}
+              className="h-8 w-8 p-0"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
+          </div>
+        );
       case SectionCellType.Link:
         return (
           <Link
