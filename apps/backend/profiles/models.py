@@ -45,6 +45,7 @@ class Profile(AbstractUser):
     phone = PhoneNumberField(blank=True, null=True)
     spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
     email_host = models.CharField(max_length=255, blank=True)
+    other_email_host = models.CharField(max_length=255, blank=True)
     email_port = models.IntegerField(default=587)
     email_use_tls = models.BooleanField(default=True)
     email_host_password = models.CharField(max_length=255, blank=True)
