@@ -26,7 +26,7 @@ const DetailsTabs = ({ defaultTab, children, onTabChange }: DetailsTabsProps) =>
   }));
 
   return (
-    <Tabs defaultValue={defaultTab} className="w-full" onValueChange={onTabChange}>
+    <Tabs value={defaultTab} className="w-full" onValueChange={onTabChange}>
       <TabListing viewSections={tabSections} />
       {tabs.map((tab) => {
         const key = tab.props.name.toLowerCase().replace(/\s+/g, "-");

@@ -60,14 +60,14 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
         const updatedPerformance = { ...cleanedData, id: performanceId } as Performance;
         await performanceApiService.update(updatedPerformance);
         dispatch(updatePerformance(updatedPerformance));
-        router.push(`/profile`);
+        router.push(`/profile#performances`);
       } else if (action === Action.CREATE && profile) {
         const newPerformance = await performanceApiService.create({
           ...cleanedData,
           profile: profile.id,
         } as Performance);
         dispatch(addPerformance(newPerformance));
-        router.push(`/profile`);
+        router.push(`/profile#performances`);
       }
     } catch (error) {
       console.error(error);
@@ -80,7 +80,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
     return <Skeleton />;
   }
 
-  const onCancelHref = `/profile`;
+  const onCancelHref = `/profile#performances`;
 
   return (
     <>

@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Profile } from "@/interfaces/entities/Profile";
 import {
   createZodFormSchema,
@@ -39,7 +39,9 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const formFields = isEmailConfig
     ? getEmailSettingsFormFields(isOtherEmailHost)
     : getProfileFormFields();
-  const formSchema = createZodFormSchema(formFields);
+
+  const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: getInitialValues(formFields, profile ?? undefined),
@@ -106,7 +108,8 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
 
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));
-        router.push(`/profile`);
+        const tabHash = isEmailConfig ? "#email-settings" : "#basic-information";
+        router.push(`/profile${tabHash}`);
       }
     } catch (error) {
       console.error(error);
@@ -126,7 +129,7 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
-        onCancelHref={"/profile"}
+        onCancelHref={isEmailConfig ? "/profile#email-settings" : "/profile#basic-information"}
         isLoading={isLoading}
         entity={profile}
         action={action}

@@ -22,8 +22,10 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import { Profile } from "@/interfaces/entities/Profile";
+import { Performance } from "@/interfaces/entities/Performance";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
 import { getEmailSettings } from "../helpers/getEmailSettings";
+import { useHashTab } from "@/hooks/useHashTab";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -33,7 +35,7 @@ const ProfileView = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemName, setItemName] = useState<"profile" | "performance">("performance");
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
-  const [activeTab, setActiveTab] = useState("basic-information");
+  const { activeTab, handleTabChange } = useHashTab("basic-information");
 
   const handleDelete = (entity: "profile" | "performance", index?: number) => {
     setIdToDelete(index);
@@ -48,7 +50,8 @@ const ProfileView = () => {
       } else if (itemName === "performance" && idToDelete !== undefined && profile) {
         await performanceApiService.remove(idToDelete);
 
-        const updatedperformances = profile.performances?.filter((p) => p.id !== idToDelete) ?? [];
+        const updatedperformances =
+          profile.performances?.filter((p: Performance) => p.id !== idToDelete) ?? [];
         const updatedProfile: Profile = {
           ...profile,
           performances: updatedperformances,
@@ -87,7 +90,7 @@ const ProfileView = () => {
         }
       />
 
-      <DetailsTabs defaultTab="basic-information" onTabChange={setActiveTab}>
+      <DetailsTabs defaultTab={activeTab} onTabChange={handleTabChange}>
         <Tab name="Basic Information">
           <DetailsViewSection
             title="Basic information"
