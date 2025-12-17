@@ -34,7 +34,7 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const profile = useSelector((state: RootState) => selectProfile(state));
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-  const [isOtherEmailHost, setIsOtherEmailHost] = useState(false);
+  const [isOtherEmailHost, setIsOtherEmailHost] = useState(profile?.emailHost === "OTHER");
 
   const formFields = isEmailConfig
     ? getEmailSettingsFormFields(isOtherEmailHost)
@@ -47,17 +47,23 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   });
 
   const emailHost = form.watch("emailHost");
+
+  useEffect(() => {
+    if (profile?.emailHost && !profile.emailHost) {
+    }
+  }, [profile]);
+
   useEffect(() => {
     if (emailHost === "OTHER") {
       setIsOtherEmailHost(true);
-      form.setValue("emailHost", "");
-      form.register("emailHost");
+    } else if (profile?.emailHost === "OTHER") {
+      setIsOtherEmailHost(true);
     }
-  }, [emailHost]);
+  }, [emailHost, profile]);
 
   useEffect(() => {
     if (isOtherEmailHost) {
-      form.setFocus("emailHost");
+      form.setFocus("otherEmailHost");
     }
   }, [isOtherEmailHost, form]);
 

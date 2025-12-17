@@ -15,12 +15,22 @@ export const getEmailSettingsFormFields = (isOtherEmailHost: boolean): Controlle
     {
       label: "Email provider",
       fieldName: "emailHost",
-      type: isOtherEmailHost ? ControlledFormElementType.TEXT : ControlledFormElementType.SELECT,
+      type: ControlledFormElementType.SELECT,
       options: getOptions(EmailHost),
       helpText: "Select the email hosting provider",
       register: isOtherEmailHost,
+      hidden: isOtherEmailHost,
     },
-
+    {
+      label: "Email provider",
+      fieldName: "otherEmailHost",
+      type: ControlledFormElementType.SMTP,
+      helpText:
+        "The SMTP server address for sending emails (e.g., smtp.gmail.com or mail.yourprovider.com). Check your email provider's documentation if unsure.",
+      register: isOtherEmailHost,
+      hidden: !isOtherEmailHost,
+      required: true,
+    },
     {
       label: "Email port",
       fieldName: "emailPort",

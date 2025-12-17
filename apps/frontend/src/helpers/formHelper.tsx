@@ -180,6 +180,15 @@ export const createZodFormSchema = (
       case ControlledFormElementType.SEARCH:
         zodType = z.number();
         break;
+      case ControlledFormElementType.SMTP:
+        zodType = z
+          .string()
+          .min(1, "SMTP server is required")
+          .regex(
+            /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+            "Must be a valid hostname (e.g., smtp.gmail.com)"
+          );
+        break;
       case ControlledFormElementType.TEXT:
       case ControlledFormElementType.SELECT:
       case ControlledFormElementType.TEXT_AREA:

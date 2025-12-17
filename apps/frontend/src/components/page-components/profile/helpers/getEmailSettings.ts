@@ -11,7 +11,10 @@ export const getEmailSettings = (profile: Profile): SectionCellProps[] => {
       value: profile.emailHostPassword,
       type: SectionCellType.Password,
     },
-    { title: "Email Host", value: profile.emailHost },
+    {
+      title: "Email Host",
+      value: profile.emailHost === "OTHER" ? profile.otherEmailHost : profile.emailHost,
+    },
     { title: "Email Port", value: profile.emailPort },
     { title: "Email uses TLS?", value: profile.emailUseTls, type: SectionCellType.Bool },
   ];

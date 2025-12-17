@@ -19,6 +19,7 @@ export interface Profile {
   youtubeProfile?: string;
   performances: Performance[];
   emailHost?: EmailHost;
+  otherEmailHost?: string;
   emailPort?: number;
   emailUseTls?: boolean;
   emailHostUser?: string;
