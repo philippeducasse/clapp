@@ -18,8 +18,6 @@ export const getEmailSettingsFormFields = (isOtherEmailHost: boolean): Controlle
       type: ControlledFormElementType.SELECT,
       options: getOptions(EmailHost),
       helpText: "Select the email hosting provider",
-      register: isOtherEmailHost,
-      hidden: isOtherEmailHost,
     },
     {
       label: "Email provider",
