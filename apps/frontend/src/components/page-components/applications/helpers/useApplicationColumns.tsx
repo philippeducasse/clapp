@@ -61,7 +61,7 @@ const useApplicationColumns = ({
         },
       },
       {
-        accessorKey: "applicationStatus",
+        accessorKey: "status",
         header: getSortableHeader("Status"),
         size: 110,
         filterFn: (row, columnId, filterValue) => {
@@ -89,10 +89,7 @@ const useApplicationColumns = ({
           const application = row.original;
           return (
             <div className="flex gap-2">
-              <StatusDropdown
-                entityId={application.id as number}
-                onStatusChange={onStatusChange}
-              />
+              <StatusDropdown entityId={application.id as number} onStatusChange={onStatusChange} />
               <Button
                 variant="outline"
                 size="icon"
