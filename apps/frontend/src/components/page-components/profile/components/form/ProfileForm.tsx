@@ -49,23 +49,26 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   });
 
   const emailHost = form.watch("emailHost");
-
-  useEffect(() => {
-    if (profile?.emailHost && !profile.emailHost) {
-    }
-  }, [profile]);
+  console.log("State: ", emailHost, isOtherEmailHost);
+  // useEffect(() => {
+  //   if (profile?.emailHost && !profile.emailHost) {
+  //   }
+  // }, [profile]);
 
   useEffect(() => {
     if (emailHost === "OTHER") {
       setIsOtherEmailHost(true);
-    } else if (profile?.emailHost === "OTHER") {
-      setIsOtherEmailHost(true);
+    } else {
+      setIsOtherEmailHost(false);
     }
-  }, [emailHost, profile]);
+  }, [emailHost]);
 
   useEffect(() => {
     if (isOtherEmailHost) {
-      form.setFocus("otherEmailHost");
+      // Use setTimeout to ensure focus is set after form has finished re-rendering
+      setTimeout(() => {
+        form.setFocus("otherEmailHost");
+      }, 0);
     }
   }, [isOtherEmailHost, form]);
 

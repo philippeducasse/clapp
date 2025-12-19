@@ -27,7 +27,7 @@ export const getEmailSettingsFormFields = (isOtherEmailHost: boolean): Controlle
         "The SMTP server address for sending emails (e.g., smtp.gmail.com or mail.yourprovider.com). Check your email provider's documentation if unsure.",
       register: isOtherEmailHost,
       hidden: !isOtherEmailHost,
-      required: true,
+      required: isOtherEmailHost,
     },
     {
       label: "Email port",
@@ -41,6 +41,12 @@ export const getEmailSettingsFormFields = (isOtherEmailHost: boolean): Controlle
       fieldName: "emailHostPassword",
       type: ControlledFormElementType.PASSWORD,
       helpText: "Enter the password for your email account",
+    },
+    {
+      label: "Email uses TLS?",
+      fieldName: "emailUseTls",
+      type: ControlledFormElementType.BOOLEAN,
+      helpText: "Enable TLS/SSL encryption for secure email transmission. Recommended for most providers.",
     },
   ];
 

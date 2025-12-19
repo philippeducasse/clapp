@@ -1,5 +1,6 @@
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
 import { Profile } from "@/interfaces/entities/Profile";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 export const getEmailSettings = (profile: Profile): SectionCellProps[] => {
   if (!profile) return [];
@@ -13,7 +14,8 @@ export const getEmailSettings = (profile: Profile): SectionCellProps[] => {
     },
     {
       title: "Email Host",
-      value: profile.emailHost === "OTHER" ? profile.otherEmailHost : profile.emailHost,
+      value:
+        profile.emailHost === "OTHER" ? profile.otherEmailHost : capitalizeFirst(profile.emailHost),
     },
     { title: "Email Port", value: profile.emailPort },
     { title: "Email uses TLS?", value: profile.emailUseTls, type: SectionCellType.Bool },
