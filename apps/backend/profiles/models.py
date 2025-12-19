@@ -8,6 +8,26 @@ from phonenumber_field.modelfields import PhoneNumberField
 from profiles.constants import LANGUAGES
 
 
+EMAIL_HOST_MAPPING = {
+    "GMAIL": "smtp.gmail.com",
+    "OUTLOOK": "smtp.office365.com",
+    "YAHOO": "smtp.mail.yahoo.com",
+    "ICLOUD": "smtp.mail.me.com",
+    "PROTONMAIL": "smtp.protonmail.ch",
+    "ZOHO": "smtp.zoho.com",
+    "AOL": "smtp.aol.com",
+    "FASTMAIL": "smtp.fastmail.com",
+    "GMX": "smtp.gmx.com",
+    "WEB.DE": "smtp.web.de",
+    "ORANGE": "smtp.orange.fr",
+    "FREE": "smtp.free.fr",
+    "LIBERO": "smtp.libero.it",
+    "MAIL.RU": "smtp.mail.ru",
+    "VIRGILIO": "smtp.virgilio.it",
+    "T-ONLINE": "securesmtp.t-online.de",
+}
+
+
 class ProfileManager(BaseUserManager["Profile"]):
     def create_user(
         self, email: str, password: str | None = None, **extra_fields: Any

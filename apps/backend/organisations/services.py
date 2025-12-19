@@ -6,6 +6,7 @@ from django.utils import timezone
 from applications.models import Application
 from organisations.models import Organisation
 from performances.models import Performance
+from profiles.emails import get_user_email_connection
 from profiles.models import Profile
 
 logger = logging.getLogger(__name__)
@@ -415,12 +416,12 @@ def prepare_application_email(
 
     text_content = strip_tags(application.message)
     html_content = application.message
-    # connection = get_user_email_connection(profile)
-
+    connection = get_user_email_connection(profile)
+    print("CONNECTION: ", connection)
     email = EmailMultiAlternatives(
         application.email_subject,
         text_content,
-        # from_email=profile.email_host_user,
+        from_email=profile.email_host_user,
         # "info@philippeducasse.com",
         # ["info@philippeducasse.com"],
         to=recipient_emails,

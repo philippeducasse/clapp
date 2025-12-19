@@ -46,6 +46,7 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "email_host",
                     "email_host_user",
+                    "other_email_host",
                     "email_port",
                     "email_host_password",
                     "email_use_tls",
