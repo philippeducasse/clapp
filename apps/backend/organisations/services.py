@@ -425,7 +425,7 @@ def prepare_application_email(
         # "info@philippeducasse.com",
         # ["info@philippeducasse.com"],
         to=recipient_emails,
-        # connection=connection,
+        connection=connection,
     )
     email.attach_alternative(html_content, "text/html")
 
