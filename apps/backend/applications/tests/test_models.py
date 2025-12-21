@@ -1,9 +1,11 @@
-import pytest
 from datetime import date
+
+import pytest
+
 from applications.models import Application
 from organisations.festivals.models import Festival
-from profiles.models import Profile
 from performances.models import Performance
+from profiles.models import Profile
 
 
 @pytest.mark.django_db
@@ -69,7 +71,7 @@ class TestApplicationModel:
         assert application.performances.count() == 1
         assert performance in application.performances.all()
 
-    def test_application_status_choices(self, festival, profile):
+    def test_status_choices(self, festival, profile):
         """Test valid application status choices"""
         statuses = ["DRAFT", "APPLIED", "IN_DISCUSSION", "REJECTED", "ACCEPTED"]
 

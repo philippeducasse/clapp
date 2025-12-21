@@ -1,4 +1,5 @@
 import pytest
+
 from profiles.models import Profile
 
 
@@ -45,8 +46,7 @@ class TestProfileModel:
             password="testpass123",
             first_name="Jane",
             last_name="Smith",
-            artist_name="Amazing Jane",
-            company_name="Smith Productions",
+            company_name="Amazing Jane",
             personal_website="https://janesmith.com",
             age=30,
             location="Paris, France",
@@ -58,7 +58,7 @@ class TestProfileModel:
             phone="+33123456789",
         )
 
-        assert profile.artist_name == "Amazing Jane"
+        assert profile.company_name == "Amazing Jane"
         assert profile.company_name == "Smith Productions"
         assert profile.personal_website == "https://janesmith.com"
         assert profile.age == 30
@@ -70,7 +70,7 @@ class TestProfileModel:
         profile = Profile.objects.create_user(email="minimal@example.com", password="testpass123")
 
         # CharField fields with blank=True default to empty string
-        assert profile.artist_name == ""
+        assert profile.company_name == ""
         assert profile.company_name == ""
         assert profile.age is None
         assert profile.location == ""

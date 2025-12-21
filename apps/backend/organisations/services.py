@@ -105,7 +105,7 @@ def generate_application_mail_prompt(
         salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {organisation.name} organizers."
 
     artist_identity = (
-        f"{profile.first_name} {profile.last_name}".strip() or profile.artist_name or "the artist"
+        f"{profile.first_name} {profile.last_name}".strip() or profile.company_name or "the artist"
     )
     company_info = f" representing {profile.company_name}" if profile.company_name else ""
 
