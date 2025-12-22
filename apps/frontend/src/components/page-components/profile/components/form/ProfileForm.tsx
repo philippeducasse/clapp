@@ -19,7 +19,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
-import { Action } from "@/interfaces/Enums";
+import { Action, EmailHost } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
 import { getEmailSettingsFormFields } from "../../helpers/form/getEmailSettingsFormFields";
 
@@ -35,10 +35,17 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [isOtherEmailHost, setIsOtherEmailHost] = useState(profile?.emailHost === "OTHER");
+  const [selectedEmailHost, setSelectedEmailHost] = useState<EmailHost | null | undefined>(
+    profile?.emailHost
+  );
 
-  const formFields = isEmailConfig
-    ? getEmailSettingsFormFields(isOtherEmailHost)
-    : getProfileFormFields();
+  const formFields = useMemo(
+    () =>
+      isEmailConfig
+        ? getEmailSettingsFormFields(isOtherEmailHost, selectedEmailHost)
+        : getProfileFormFields(),
+    [isEmailConfig, isOtherEmailHost, selectedEmailHost]
+  );
 
   const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
 
@@ -48,12 +55,8 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
     mode: "onSubmit",
   });
 
-  const emailHost = form.watch("emailHost");
+  const emailHost = form.watch("emailHost") as EmailHost;
   console.log("State: ", emailHost, isOtherEmailHost);
-  // useEffect(() => {
-  //   if (profile?.emailHost && !profile.emailHost) {
-  //   }
-  // }, [profile]);
 
   useEffect(() => {
     if (emailHost === "OTHER") {
@@ -61,6 +64,7 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
     } else {
       setIsOtherEmailHost(false);
     }
+    setSelectedEmailHost(emailHost as EmailHost);
   }, [emailHost]);
 
   useEffect(() => {
