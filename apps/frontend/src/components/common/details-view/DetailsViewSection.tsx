@@ -11,7 +11,7 @@ interface DetailsViewSectionProps {
   ribbonType?: "tag" | "status";
   ribbonValue?: string;
   sideText?: string;
-  subtitle?: string;
+  subtitle?: React.ReactNode;
 }
 
 const DetailsViewSection = ({

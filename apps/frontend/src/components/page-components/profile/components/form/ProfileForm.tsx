@@ -144,7 +144,7 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
         submitButtonLabel="Save"
         formSubtitle={
           isEmailConfig
-            ? "Configure the app to connect with your email account. Please fill these fields out carefully!"
+            ? 'Configure the app to connect with your email account. Please fill these fields out carefully! <a href="/help/email-settings" target="_blank" class="text-blue-600 hover:text-blue-800 underline">View detailed setup guide</a>'
             : "Update your profile information and contact details"
         }
       />

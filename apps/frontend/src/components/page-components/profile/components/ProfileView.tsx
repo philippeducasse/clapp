@@ -26,6 +26,7 @@ import { Performance } from "@/interfaces/entities/Performance";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
 import { getEmailSettings } from "../helpers/getEmailSettings";
 import { useHashTab } from "@/hooks/useHashTab";
+import Link from "next/link";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -118,7 +119,18 @@ const ProfileView = () => {
             title="Email Settings"
             icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
             data={getEmailSettings(profile)}
-            subtitle="These values are used when contacting organisations"
+            subtitle={
+              <>
+                These values are used when contacting organisations.{" "}
+                <Link
+                  href="/help/email-settings"
+                  target="_blank"
+                  className="text-blue-600 hover:text-blue-800 underline"
+                >
+                  View setup guide
+                </Link>
+              </>
+            }
           />
         </Tab>
       </DetailsTabs>
