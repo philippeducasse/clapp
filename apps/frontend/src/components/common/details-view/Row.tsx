@@ -19,30 +19,35 @@ interface RowProps {
 
 const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoading }: RowProps) => {
   const [showPassword, setShowPassword] = useState(false);
-
   const renderContent = () => {
     if (value instanceof Date) {
       return value.toLocaleDateString();
     }
     if (value === null || value === undefined) {
-      return <span className="text-gray-400">-</span>;
+      return <span className="text-gray-400">&mdash;</span>;
     }
     switch (type) {
       case SectionCellType.Password:
         return (
           <div className="flex items-center gap-2">
-            <span className={`${!showPassword ? "blur-sm select-none" : ""}`}>
-              {value.toString()}
-            </span>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowPassword(!showPassword)}
-              className="h-8 w-8 p-0"
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
+            {value ? (
+              <>
+                <span className={`${!showPassword ? "blur-sm select-none" : ""}`}>
+                  {value.toString()}
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="h-8 w-8 p-0"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </>
+            ) : (
+              <span>&mdash;</span>
+            )}
           </div>
         );
       case SectionCellType.Link:
@@ -56,13 +61,7 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
           </Link>
         );
       case SectionCellType.Badge:
-        return (
-          <Badge
-            color="red"
-            // color={getBadgeColorByStatus(value as Status)}
-            variant="secondary"
-          />
-        );
+        return <Badge color="red" variant="secondary" />;
       case SectionCellType.Bool:
         return value ? "Yes" : "No";
       case SectionCellType.HTML:
@@ -73,7 +72,7 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
           />
         );
       default:
-        return value.toString() || <span className="text-gray-400">-</span>;
+        return value.toString() || <span className="text-gray-400">&mdash;</span>;
     }
   };
   return (
@@ -99,7 +98,7 @@ const Row = ({ value, type, title, disabled, linkTo, target = "_blank", isLoadin
         </>
       ) : (
         <>
-          <div /> {/* Empty first column */}
+          <div />
           <dd className="text-gray-700 dark:text-foreground">
             {isLoading ? <Skeleton /> : renderContent()}
           </dd>
