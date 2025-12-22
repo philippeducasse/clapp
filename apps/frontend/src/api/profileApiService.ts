@@ -9,7 +9,7 @@ const get = async (): Promise<Profile> => {
 
 const register = async (profile: Partial<Profile>): Promise<Profile> => {
   return await sendRequest(
-    `${endpoint}/register`,
+    `${endpoint}/register/`,
     profile,
     "POST",
     "Profile successfully created!"
