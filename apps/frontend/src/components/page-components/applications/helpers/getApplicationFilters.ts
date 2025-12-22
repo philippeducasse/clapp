@@ -7,7 +7,7 @@ import { OrganisationType } from "@/interfaces/Enums";
 export const getApplicationFilters = (): FilterConfig[] => {
   return [
     {
-      column: "applicationStatus",
+      column: "status",
       label: "Status",
       type: FilterType.MULTI_SELECT,
       options: getOptions(ApplicationStatus),
