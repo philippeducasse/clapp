@@ -84,7 +84,13 @@ const BasicForm = ({
                       <FormControl>
                         {getControlledInputs(formField, field, true, organisationType)}
                       </FormControl>
-                      <FormDescription>{formField.helpText}</FormDescription>
+                      <FormDescription>
+                        {formField.helpText?.includes('<a ') ? (
+                          <span dangerouslySetInnerHTML={{ __html: formField.helpText }} />
+                        ) : (
+                          formField.helpText
+                        )}
+                      </FormDescription>
                       <FormMessage className="text-left" />
                     </FormItem>
                   )}
