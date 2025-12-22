@@ -5,7 +5,6 @@
 - profile edit email settings
 - breadcrumbs
 - Add update button to editfestival page
-
-Mistakes:
-
-- need route handlers in apiServices??
+- add forms status to cookies
+- add tags only for user
+- Rotate some tags / status
