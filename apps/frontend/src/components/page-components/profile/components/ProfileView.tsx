@@ -106,11 +106,13 @@ const ProfileView = () => {
         </Tab>
 
         <Tab name="Performances">
-          {profile.performances && profile.performances.length > 0 && (
+          {profile.performances && profile.performances.length > 0 ? (
             <PerformanceViewSection
               performances={profile.performances}
               onDelete={(performanceId) => handleDelete("performance", performanceId)}
             />
+          ) : (
+            <p className="flex justify-center py-6">No performances</p>
           )}
           <AddSection label="performance" href={`/profile/edit/performances/new`} />
         </Tab>
