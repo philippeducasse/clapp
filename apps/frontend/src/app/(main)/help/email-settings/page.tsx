@@ -43,10 +43,9 @@ export default function EmailSettingsHelpPage() {
           </CardHeader>
           <CardContent className="text-gray-700">
             <p>
-              This application sends emails on your behalf when you submit applications to
-              festivals, venues, and residencies. By configuring your email account, you ensure that
-              recipients see emails coming from your own email address, which increases trust and
-              improves deliverability.
+              This application sends emails on your behalf when you submit applications to cultural
+              organisations. By configuring your email account, you ensure that recipients see
+              emails coming from your own email address.
             </p>
           </CardContent>
         </Card>
@@ -65,16 +64,7 @@ export default function EmailSettingsHelpPage() {
                 <div>
                   <p className="font-semibold">Email Address</p>
                   <p className="text-sm text-gray-600">
-                    The email you want to send applications from
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold">Email Provider</p>
-                  <p className="text-sm text-gray-600">
-                    Select from our list of supported providers
+                    The email you want to send applications from.
                   </p>
                 </div>
               </div>
@@ -93,7 +83,19 @@ export default function EmailSettingsHelpPage() {
                 <div>
                   <p className="font-semibold">SMTP Port</p>
                   <p className="text-sm text-gray-600">
-                    Usually 587 (automatically set based on provider)
+                    Usually 587. Changing the port might result in your emails not being sent or
+                    having a higher likelihood of going straight to spam.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Email Provider</p>
+                  <p className="text-sm text-gray-600">
+                    We'll automatically configure major email providers (Gmail, Outlook, etc.). For
+                    other providers, enter your SMTP host (e.g., ssl0.ovh.net for OVH). Check your
+                    provider's documentation if unsure.
                   </p>
                 </div>
               </div>
@@ -120,15 +122,14 @@ export default function EmailSettingsHelpPage() {
             </p>
 
             <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="pt-6">
+              <CardContent className="">
                 <div className="flex gap-3">
                   <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-blue-900">Do I Need an App Password?</p>
                     <p className="text-sm text-blue-800 mt-1">
-                      It depends on your email provider! The form will automatically show you
-                      whether your selected provider requires an app password or if you can use your
-                      regular email password.
+                      Most providers require app passwords. See the categories below to check if
+                      yours does.
                     </p>
                   </div>
                 </div>
@@ -137,7 +138,7 @@ export default function EmailSettingsHelpPage() {
 
             <div className="grid md:grid-cols-3 gap-4">
               <Card className="border-emerald-200 bg-emerald-50">
-                <CardContent className="pt-4">
+                <CardContent className="">
                   <h4 className="font-semibold text-emerald-900 text-sm mb-2">Always Required</h4>
                   <p className="text-xs text-emerald-800 mb-2">
                     These providers always require app passwords for security:
@@ -145,7 +146,7 @@ export default function EmailSettingsHelpPage() {
                   <div className="flex flex-wrap gap-1">
                     {["Gmail", "AOL", "Fastmail", "ProtonMail", "Mail.ru", "T-Online"].map(
                       (provider) => (
-                        <Badge key={provider} variant="secondary" className="text-xs">
+                        <Badge key={provider} variant="outline" className="text-xs">
                           {provider}
                         </Badge>
                       )
@@ -155,7 +156,7 @@ export default function EmailSettingsHelpPage() {
               </Card>
 
               <Card className="border-yellow-200 bg-yellow-50">
-                <CardContent className="pt-4">
+                <CardContent className="">
                   <h4 className="font-semibold text-yellow-900 text-sm mb-2">Required with 2FA</h4>
                   <p className="text-xs text-yellow-800 mb-2">
                     Only needed if you have two-factor authentication enabled:
@@ -163,7 +164,7 @@ export default function EmailSettingsHelpPage() {
                   <div className="flex flex-wrap gap-1">
                     {["Outlook", "Yahoo", "iCloud", "Zoho", "GMX", "Web.de", "Virgilio"].map(
                       (provider) => (
-                        <Badge key={provider} variant="secondary" className="text-xs">
+                        <Badge key={provider} variant="outline" className="text-xs">
                           {provider}
                         </Badge>
                       )
@@ -173,14 +174,14 @@ export default function EmailSettingsHelpPage() {
               </Card>
 
               <Card className="border-gray-200 bg-gray-50">
-                <CardContent className="pt-4">
+                <CardContent className="">
                   <h4 className="font-semibold text-gray-900 text-sm mb-2">Regular Password OK</h4>
                   <p className="text-xs text-gray-800 mb-2">
                     You can use your regular email password:
                   </p>
                   <div className="flex flex-wrap gap-1">
                     {["Orange", "Free", "Libero"].map((provider) => (
-                      <Badge key={provider} variant="secondary" className="text-xs">
+                      <Badge key={provider} variant="outline" className="text-xs">
                         {provider}
                       </Badge>
                     ))}
@@ -190,7 +191,7 @@ export default function EmailSettingsHelpPage() {
             </div>
 
             <Card className="bg-yellow-50 border-yellow-500">
-              <CardContent className="pt-6">
+              <CardContent className="">
                 <div className="flex gap-3">
                   <AlertTriangle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>

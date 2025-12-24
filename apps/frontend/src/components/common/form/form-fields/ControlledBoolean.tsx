@@ -4,7 +4,7 @@ import { BaseControlledPropsWithLabels } from "@/interfaces/forms/ControlledForm
 
 const ControlledBoolean = ({ field, showLabels }: BaseControlledPropsWithLabels) => {
   return showLabels ? (
-    <Switch className="my-4" checked={field?.value as boolean} onCheckedChange={field.onChange} />
+    <Switch className="my-1" checked={field?.value as boolean} onCheckedChange={field.onChange} />
   ) : (
     <input
       type="checkbox"
