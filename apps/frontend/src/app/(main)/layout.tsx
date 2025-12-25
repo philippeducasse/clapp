@@ -1,5 +1,5 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/ui/app-sidebar";
+import Sidebar from "@/components/common/navigation/Sidebar";
 import Navbar from "@/components/common/navigation/Navbar";
 import StoreProvider from "@/redux/StoreProvider";
 import ProfileHydrator from "@/components/ProfileHydrator";
@@ -9,7 +9,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <StoreProvider>
       <ProfileHydrator />
       <SidebarProvider>
-        <AppSidebar />
+        <Sidebar />
         <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">
           <header className="flex justify-between border-b pb-4 w-full">
             <Navbar />
