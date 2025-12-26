@@ -48,7 +48,6 @@ class TestProfileModel:
             last_name="Smith",
             company_name="Amazing Jane",
             personal_website="https://janesmith.com",
-            age=30,
             location="Paris, France",
             nationality="French",
             instagram_profile="https://instagram.com/jane",

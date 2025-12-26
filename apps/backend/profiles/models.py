@@ -7,7 +7,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from profiles.constants import LANGUAGES
 
-
 EMAIL_HOST_MAPPING = {
     "GMAIL": "smtp.gmail.com",
     "OUTLOOK": "smtp.office365.com",
@@ -55,7 +54,6 @@ class Profile(AbstractUser):
     last_name = models.CharField(max_length=255, blank=True)
     company_name = models.CharField(max_length=255, blank=True)
     personal_website = models.URLField(blank=True)
-    age = models.PositiveIntegerField(blank=True, null=True)
     location = models.CharField(max_length=255, blank=True)
     nationality = models.CharField(max_length=255, blank=True)
     instagram_profile = models.URLField(blank=True)

@@ -18,7 +18,6 @@ class CustomUserAdmin(UserAdmin):
                     "last_name",
                     "company_name",
                     "personal_website",
-                    "age",
                     "location",
                     "nationality",
                     "instagram_profile",
