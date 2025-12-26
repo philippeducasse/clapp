@@ -9,7 +9,11 @@ export const getBasicProfileInfo = (profile: Profile): SectionCellProps[] => {
     { title: "First name", value: profile.firstName },
     { title: "Last name", value: profile.lastName },
     { title: "Company name", value: profile.companyName },
-    { title: "location", value: profile.location },
+    { title: "Location", value: profile.location },
     { title: "Nationality", value: profile.nationality },
+    {
+      title: "Spoken languages",
+      value: profile.spokenLanguages?.join(", ") || undefined
+    },
   ];
 };

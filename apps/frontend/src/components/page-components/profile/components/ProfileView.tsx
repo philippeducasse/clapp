@@ -73,8 +73,8 @@ const ProfileView = () => {
         itemName={itemName}
       />
       <DetailsViewHeader
-        title={profile?.companyName ?? "Profile"}
-        subtitle={`${profile?.firstName}, ${profile.lastName}`}
+        title={profile?.companyName || "Profile"}
+        subtitle={`${profile?.firstName} ${profile.lastName}`}
         icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={profile.id}
         actionElements={

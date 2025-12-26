@@ -9,7 +9,6 @@ export interface Profile {
   lastName?: string;
   companyName?: string;
   personalWebsite?: string;
-  age?: number;
   location?: string;
   nationality?: string;
   spokenLanguages?: string[];

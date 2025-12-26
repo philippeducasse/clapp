@@ -52,11 +52,6 @@ export const getProfileFormFields = (): ControlledFormElement[] => {
       helpText: "Select all languages you can communicate in",
     },
     {
-      label: "Age",
-      fieldName: "age",
-      type: ControlledFormElementType.NUMBER,
-    },
-    {
       label: "Personal Website",
       fieldName: "personalWebsite",
       type: ControlledFormElementType.URL,
