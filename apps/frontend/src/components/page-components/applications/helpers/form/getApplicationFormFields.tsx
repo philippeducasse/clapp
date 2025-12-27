@@ -40,10 +40,7 @@ export const getApplicationFormFields = (
       fieldName: "emailSubject",
       type: ControlledFormElementType.TEXT,
       defaultValue:
-        festival?.name &&
-        `${profile?.firstName ?? "Philippe"} ${profile?.lastName ?? "Ducasse"} at ${
-          festival?.name
-        } 2026`,
+        festival?.name && `${profile?.firstName} ${profile?.lastName} at ${festival?.name} 2026`,
     },
     {
       label: "Recipients",
@@ -103,7 +100,7 @@ export const getApplicationFormFields = (
       fieldName: "applicationMethod",
       type: ControlledFormElementType.SELECT,
       options: getOptions(ApplicationMethod),
-      defaultValue: festival?.applicationType ?? "EMAIL",
+      defaultValue: festival?.applicationType || "EMAIL",
       helpText:
         applicationMethod === ApplicationMethod.FORM
           ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."
