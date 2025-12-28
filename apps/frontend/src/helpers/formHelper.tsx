@@ -226,9 +226,9 @@ export const createZodFormSchema = (
 };
 
 export const getOptions = <T extends Record<string, string>>(optionsEnum: T): SelectOptions[] => {
-  const options = Object.values(optionsEnum).map((o) => ({
-    value: o.toUpperCase(),
-    label: capitalize(o.replace(/_/g, " ").toLowerCase()),
+  const options = Object.keys(optionsEnum).map((key) => ({
+    value: key,
+    label: capitalize(optionsEnum[key].replace(/_/g, " ").toLowerCase()),
   }));
   return options;
 };

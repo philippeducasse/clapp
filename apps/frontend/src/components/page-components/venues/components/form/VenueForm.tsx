@@ -27,9 +27,7 @@ const VenueForm = ({ action }: VenueFormProps) => {
   const router = useRouter();
   const params = useParams();
   const venueId = Number(params?.id);
-  const venue = useSelector((state: RootState) =>
-    selectVenue(state, venueId || -1)
-  );
+  const venue = useSelector((state: RootState) => selectVenue(state, venueId || -1));
   const formFields = getVenueFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);

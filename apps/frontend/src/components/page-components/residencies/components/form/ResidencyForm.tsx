@@ -4,21 +4,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Residency } from "@/interfaces/entities/Residency";
-import {
-  createZodFormSchema,
-  sanitizeFormData,
-  getInitialValues,
-} from "@/helpers/formHelper";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getResidencyFormFields } from "../../helpers/getResidencyFormFields";
 import { residencyApiService } from "@/api/residencyApiService";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updateResidency,
-  selectResidency,
-  addResidency,
-  setResidency,
-} from "@/redux/slices/residencySlice";
+import { updateResidency, selectResidency, setResidency } from "@/redux/slices/residencySlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshResidency } from "../../helpers/refreshResidency";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,9 +26,7 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
   const router = useRouter();
   const params = useParams();
   const residencyId = Number(params?.id);
-  const residency = useSelector((state: RootState) =>
-    selectResidency(state, residencyId || -1)
-  );
+  const residency = useSelector((state: RootState) => selectResidency(state, residencyId || -1));
   const formFields = getResidencyFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,9 +78,7 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
     return <Skeleton />;
   }
 
-  const onCancelHref = residencyId
-    ? `/residencies/${residency?.id}`
-    : "/residencies";
+  const onCancelHref = residencyId ? `/residencies/${residency?.id}` : "/residencies";
 
   return (
     <>
