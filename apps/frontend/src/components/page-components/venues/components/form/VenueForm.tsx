@@ -9,7 +9,7 @@ import { getVenueFormFields } from "../../helpers/getVenueFormFields";
 import { venueApiService } from "@/api/venueApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { updateVenue, selectVenue } from "@/redux/slices/venueSlice";
+import { updateVenue, selectVenue, setVenue } from "@/redux/slices/venueSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshVenue } from "../../helpers/refreshVenue";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,7 +19,7 @@ import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
 
 interface VenueFormProps {
-  action: string;
+  action: Action;
 }
 
 const VenueForm = ({ action }: VenueFormProps) => {
@@ -27,7 +27,9 @@ const VenueForm = ({ action }: VenueFormProps) => {
   const router = useRouter();
   const params = useParams();
   const venueId = Number(params?.id);
-  const venue = useSelector((state: RootState) => selectVenue(state, venueId));
+  const venue = useSelector((state: RootState) =>
+    selectVenue(state, venueId || -1)
+  );
   const formFields = getVenueFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,8 +66,9 @@ const VenueForm = ({ action }: VenueFormProps) => {
         dispatch(updateVenue(updatedVenue));
         router.push(`/venues/${venue?.id}`);
       } else {
-        const newVenue = await venueApiService.create(values as Venue);
-        router.push(`/venues/${newVenue?.id}`);
+        const tempVenue = { ...values, id: -1 };
+        dispatch(setVenue(tempVenue as Venue));
+        router.push(`/venues/create/contact`);
       }
     } catch (error) {
       console.error(error);
@@ -92,6 +95,14 @@ const VenueForm = ({ action }: VenueFormProps) => {
         onCancelHref={onCancelHref}
         isLoading={isLoading}
         entity={venue}
+        action={action}
+        formTitle="Basic Information"
+        submitButtonLabel="Next"
+        formSubtitle={
+          action === Action.CREATE
+            ? "Please provide basic venue information. You will provide contact information next."
+            : ""
+        }
       />
     </>
   );

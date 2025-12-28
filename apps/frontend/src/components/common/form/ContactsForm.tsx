@@ -1,0 +1,152 @@
+"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useEffect, useState } from "react";
+import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import { useRouter, useParams } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { Skeleton } from "@/components/ui/skeleton";
+import FormHeader from "@/components/common/form/FormHeader";
+import BasicForm from "@/components/common/form/BasicForm";
+import { Action } from "@/interfaces/Enums";
+import { EntityName } from "@/interfaces/Enums";
+import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
+import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
+
+interface ContactsFormProps<T> {
+  action: string;
+  entityName: EntityName;
+  baseRoute: string; // e.g., "festivals", "venues", "residencies"
+  selectEntity: (state: RootState, id: number) => T | undefined;
+  updateEntity: (entity: T) => { type: string; payload: T };
+  apiService: {
+    create: (entity: T) => Promise<T>;
+    update: (entity: T) => Promise<T | void>;
+  };
+  refreshEntity: (id: number, dispatch: AppDispatch) => void;
+  getContactFormFields: (isEdit: boolean) => ControlledFormElement[];
+}
+
+function ContactsForm<T extends { id?: number; contacts?: OrganisationContact[] }>({
+  action,
+  entityName,
+  baseRoute,
+  selectEntity,
+  updateEntity,
+  apiService,
+  refreshEntity,
+  getContactFormFields,
+}: ContactsFormProps<T>) {
+  const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
+  const params = useParams();
+  const [entityId, contactIndex] = [Number(params?.id) || -1, Number(params?.index)];
+  const entity = useSelector((state: RootState) => selectEntity(state, entityId ?? -1));
+  const formFields = getContactFormFields(action === Action.EDIT);
+  const formSchema = createZodFormSchema(formFields);
+  const [isLoading, setIsLoading] = useState(false);
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+
+  const contactToEdit =
+    action === Action.EDIT && entity?.contacts?.[contactIndex]
+      ? entity.contacts[contactIndex]
+      : undefined;
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: getInitialValues(
+      formFields,
+      contactToEdit as unknown as Record<string, unknown>
+    ),
+    mode: "onSubmit",
+  });
+
+  // Fetch entity data if not available
+  useEffect(() => {
+    if (!entity && entityId && entityId !== -1) {
+      refreshEntity(entityId, dispatch);
+      setInitialDataLoaded(true);
+    }
+  }, [entityId, entity, dispatch, refreshEntity]);
+
+  // Reset form when entity data changes (but only once)
+  useEffect(() => {
+    if (entity && initialDataLoaded) {
+      form.reset(sanitizeFormData(entity as unknown as Record<string, unknown>));
+      setInitialDataLoaded(false);
+    }
+  }, [entity, form, initialDataLoaded]);
+
+  // Reset form when contact data is loaded (edit mode only)
+  useEffect(() => {
+    if (action === Action.EDIT && contactToEdit) {
+      form.reset(contactToEdit as unknown as Record<string, unknown>);
+    }
+  }, [contactToEdit, form, action]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      const isContactEmpty = !values.email && !values.name && !values.role && !values.phone;
+
+      if (action === Action.EDIT) {
+        const updatedContacts = [...(entity?.contacts ?? [])];
+        updatedContacts[contactIndex] = values as unknown as OrganisationContact;
+
+        const updatedEntity = {
+          ...entity,
+          contacts: updatedContacts,
+        } as T;
+        await apiService.update(updatedEntity);
+        dispatch(updateEntity(updatedEntity));
+        router.push(`/${baseRoute}/${entity?.id}`);
+      } else {
+        const existingContacts = entity?.contacts ?? [];
+
+        const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
+        const entityWithContacts = {
+          ...entity,
+          contacts: updatedContacts,
+        };
+
+        const newEntity = await apiService.create(entityWithContacts as unknown as T);
+        router.push(`/${baseRoute}/${newEntity?.id}`);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!entity && entityId && entityId !== -1) {
+    return <Skeleton />;
+  }
+
+  const onCancelHref =
+    action === Action.CREATE
+      ? `/${baseRoute}/create`
+      : entityId && entityId !== -1
+      ? `/${baseRoute}/${entity?.id}`
+      : `/${baseRoute}`;
+
+  return (
+    <>
+      <FormHeader action={action} entityName={entityName} />
+      <BasicForm
+        form={form}
+        formFields={formFields}
+        onSubmit={onSubmit}
+        onCancelHref={onCancelHref}
+        isLoading={isLoading}
+        entity={entity}
+        formTitle="Contacts"
+        formSubtitle="Here you can provide optional contact information."
+      />
+    </>
+  );
+}
+
+export default ContactsForm;

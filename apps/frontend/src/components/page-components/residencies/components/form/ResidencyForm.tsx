@@ -17,6 +17,7 @@ import {
   updateResidency,
   selectResidency,
   addResidency,
+  setResidency,
 } from "@/redux/slices/residencySlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshResidency } from "../../helpers/refreshResidency";
@@ -26,7 +27,7 @@ import BasicForm from "@/components/common/form/BasicForm";
 import { Action, EntityName } from "@/interfaces/Enums";
 import { useParams } from "next/navigation";
 interface ResidencyFormProps {
-  action: string;
+  action: Action;
 }
 
 const ResidencyForm = ({ action }: ResidencyFormProps) => {
@@ -35,7 +36,7 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
   const params = useParams();
   const residencyId = Number(params?.id);
   const residency = useSelector((state: RootState) =>
-    selectResidency(state, residencyId)
+    selectResidency(state, residencyId || -1)
   );
   const formFields = getResidencyFormFields();
   const formSchema = createZodFormSchema(formFields);
@@ -73,11 +74,9 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
         dispatch(updateResidency(updatedResidency));
         router.push(`/residencies/${residency?.id}`);
       } else {
-        const newResidency = await residencyApiService.create(
-          values as Residency
-        );
-        dispatch(addResidency(newResidency));
-        router.push(`/residencies`);
+        const tempResidency = { ...values, id: -1 };
+        dispatch(setResidency(tempResidency as Residency));
+        router.push(`/residencies/create/contact`);
       }
     } catch (error) {
       console.error(error);
@@ -104,6 +103,14 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
         onCancelHref={onCancelHref}
         isLoading={isLoading}
         entity={residency}
+        action={action}
+        formTitle="Basic Information"
+        submitButtonLabel="Next"
+        formSubtitle={
+          action === Action.CREATE
+            ? "Please provide basic residency information. You will provide contact information next."
+            : ""
+        }
       />
     </>
   );
