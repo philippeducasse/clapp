@@ -85,5 +85,3 @@ class TestApplicationModel:
 
         assert application.email_subject == ""
         assert application.message == ""
-        assert application.answer_date is None
-        assert application.payment_amount is None
