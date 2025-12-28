@@ -169,7 +169,12 @@ export const createZodFormSchema = (
         }
         break;
       case ControlledFormElementType.URL:
-        zodType = z.url();
+        zodType = z
+          .string()
+          .regex(
+            /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+            "Please enter a valid URL"
+          );
         break;
       case ControlledFormElementType.EMAIL:
         zodType = z.email();
