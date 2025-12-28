@@ -27,7 +27,9 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
   const router = useRouter();
   const params = useParams();
   const festivalId = Number(params?.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const festival = useSelector((state: RootState) =>
+    selectFestival(state, festivalId || -1)
+  );
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);

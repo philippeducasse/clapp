@@ -11,7 +11,7 @@ import { Column, Table } from "@tanstack/react-table";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
-import { getFilterInput } from "@/helpers/FilterHelper";
+import { getFilterInput } from "@/helpers/filterHelper";
 import { Dispatch, SetStateAction } from "react";
 import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
 
@@ -35,8 +35,8 @@ function TableFilters<TData>({ table, filters, open, onOpenChange }: TableFilter
                 filter.type === FilterType.MULTI_SELECT
                   ? (column?.getFilterValue() as string[]) ?? []
                   : filter.type === FilterType.BOOLEAN
-                    ? (column?.getFilterValue() as boolean) ?? false
-                    : (column?.getFilterValue() as string) ?? "";
+                  ? (column?.getFilterValue() as boolean) ?? false
+                  : (column?.getFilterValue() as string) ?? "";
 
               return (
                 <div key={filter.column} className=" gap-1">

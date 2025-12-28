@@ -16,6 +16,7 @@ import { getControlledInputs } from "@/helpers/formHelper";
 import { Action } from "@/interfaces/Enums";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useFormPersist } from "@/hooks/useFormPersist";
 interface BasicFormProps {
   form: UseFormReturn;
   formFields: ControlledFormElement[];
@@ -44,6 +45,15 @@ const BasicForm = ({
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
   const showIcon = action === Action.EDIT || action === Action.APPLY;
+  const shouldPersist =
+    !!formTitle && action !== Action.EDIT && action !== Action.LOGIN && action !== Action.REGISTER;
+
+  const { clearStorage } = useFormPersist(formTitle || "", form, shouldPersist);
+
+  const handleSubmit = async (values: Record<string, unknown>) => {
+    await onSubmit(values);
+    if (shouldPersist) clearStorage();
+  };
   return (
     <Form {...form}>
       <div className="flex">
@@ -51,7 +61,7 @@ const BasicForm = ({
           {formTitle && <h3 className="text-xl text-bold text-emerald-600">{formTitle}</h3>}
           {formSubtitle && (
             <p className="text-base mt-2">
-              {typeof formSubtitle === 'string' && formSubtitle.includes('<a ') ? (
+              {typeof formSubtitle === "string" && formSubtitle.includes("<a ") ? (
                 <span dangerouslySetInnerHTML={{ __html: formSubtitle }} />
               ) : (
                 formSubtitle
@@ -60,7 +70,7 @@ const BasicForm = ({
           )}
         </div>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="w-full caption-bottom text-sm space-y-6 max-w-4xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
         >
           {formFields.map(
@@ -93,7 +103,7 @@ const BasicForm = ({
                         {getControlledInputs(formField, field, true, organisationType)}
                       </FormControl>
                       <FormDescription>
-                        {formField.helpText?.includes('<a ') ? (
+                        {formField.helpText?.includes("<a ") ? (
                           <span dangerouslySetInnerHTML={{ __html: formField.helpText }} />
                         ) : (
                           formField.helpText
