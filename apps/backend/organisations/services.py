@@ -104,11 +104,6 @@ def generate_application_mail_prompt(
     else:
         salutation = f"Use a standard salutation using gender neutral language in {language} addressed to the {organisation.name} organizers."
 
-    artist_identity = (
-        f"{profile.first_name} {profile.last_name}".strip() or profile.company_name or "the artist"
-    )
-    company_info = f" representing {profile.company_name}" if profile.company_name else ""
-
     length_guidelines = {
         1: {
             "description": "VERY SHORT",
@@ -234,7 +229,7 @@ def generate_application_mail_prompt(
         social_links.append(f"<a href='{profile.youtube_profile}'>YouTube</a>")
     social_line = " & ".join(social_links) if social_links else ""
 
-    signature = f"{artist_identity}<br><br>"
+    signature = "<br><br>"
     if profile.company_name:
         signature += f"{profile.company_name}<br>"
     if profile.phone:
@@ -251,7 +246,7 @@ def generate_application_mail_prompt(
 
         DO NOT EXCEED {max_words} WORDS. Count your words carefully. If you go over, the email will be rejected.
 
-        You are {artist_identity}{company_info}, a performer seeking to apply to various organisations with {performance_intro}.
+        You are {profile.company_name}, a performer seeking to apply to various organisations with {performance_intro}.
 
         Generate ONLY the plain text email content (no additional messages) in {language}.
         IMPORTANT: Use the STANDARD written form of the language, NOT regional dialects or colloquial variations.
@@ -261,7 +256,6 @@ def generate_application_mail_prompt(
         {length_config["detail"]}
         
         Artist Profile:
-        - Name: {artist_identity}
         {f"- Company: {profile.company_name}" if profile.company_name else ""}
         {f"- Location: {profile.location}" if profile.location else ""}
         {f"- Nationality: {profile.nationality}" if profile.nationality else ""}
@@ -277,7 +271,7 @@ def generate_application_mail_prompt(
 
         Email Requirements:
         - Salutation: {salutation}
-        - Introduction: BRIEFLY introduce yourself as {artist_identity}. Keep it SHORT - just 1-2 sentences. Say that you would like to propose {performance_intro} for the next edition.
+        - Introduction: BRIEFLY introduce yourself. Keep it SHORT - just 1-2 sentences. Say that you would like to propose {performance_intro} for the next edition.
         - Body: Make the text playful and informal but CONCISE. Explain why {performance_intro} {"is" if len(performances) == 1 else "are"} a great fit for this organisation.
         Focus on ONE or TWO key points that align with the organisation's description. Do NOT go into exhaustive detail about the performance.
         Remember: You must stay within {max_words} words TOTAL for the ENTIRE email.
@@ -409,6 +403,8 @@ def prepare_application_email(
     """
     Prepare the application email with all attachments.
     """
+    from email.utils import formataddr
+
     from django.core.mail import EmailMultiAlternatives
     from django.utils.html import strip_tags
 
@@ -421,10 +417,12 @@ def prepare_application_email(
         f"Email connection: host={connection.host}, port={connection.port}, "
         f"user={connection.username}, tls={connection.use_tls}, ssl={connection.use_ssl}"
     )
+    formatted_from_email = formataddr((profile.company_name, profile.email_host_user))
+
     email = EmailMultiAlternatives(
         application.email_subject,
         text_content,
-        from_email=profile.email_host_user,
+        from_email=formatted_from_email,
         # "info@philippeducasse.com",
         # ["info@philippeducasse.com"],
         to=recipient_emails,
