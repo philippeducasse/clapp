@@ -27,7 +27,6 @@ const DetailsViewHeader = <T,>({
   statusApiMethod,
   updateSlice,
 }: DetailsViewHeaderProps<T>) => {
-  console.log({ title, subtitle });
   return (
     <div className="flex justify-between my-6">
       <div className="flex items-center gap-2">
