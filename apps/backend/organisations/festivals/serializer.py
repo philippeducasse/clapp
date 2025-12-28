@@ -4,6 +4,7 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from organisations.festivals.models import Festival, FestivalContact
+from circus_agent_backend.utils import NormalizedURLField
 
 
 class BlankToNullDateField(serializers.DateField):
@@ -21,6 +22,7 @@ class FestivalContactSerializer(serializers.ModelSerializer):
 
 class FestivalSerializer(WritableNestedModelSerializer):
     contacts = FestivalContactSerializer(many=True, required=False)
+    website_url = NormalizedURLField(required=False, allow_blank=True)
 
     start_date = BlankToNullDateField(required=False, allow_null=True)
     end_date = BlankToNullDateField(required=False, allow_null=True)

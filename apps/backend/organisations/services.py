@@ -417,7 +417,10 @@ def prepare_application_email(
     text_content = strip_tags(application.message)
     html_content = application.message
     connection = get_user_email_connection(profile)
-    print("CONNECTION: ", connection)
+    logger.debug(
+        f"Email connection: host={connection.host}, port={connection.port}, "
+        f"user={connection.username}, tls={connection.use_tls}, ssl={connection.use_ssl}"
+    )
     email = EmailMultiAlternatives(
         application.email_subject,
         text_content,

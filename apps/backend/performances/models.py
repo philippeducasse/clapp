@@ -6,6 +6,7 @@ from django.forms import ValidationError
 from multiselectfield import MultiSelectField
 
 from profiles.models import Profile
+from circus_agent_backend.utils import normalize_url
 
 
 class Performance(models.Model):
@@ -53,6 +54,11 @@ class Performance(models.Model):
 
     performance_type = models.CharField(max_length=50, choices=PERFORMANCE_TYPES, blank=True)
     genres = MultiSelectField(choices=GENRES, blank=True)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.trailer:
+            self.trailer = normalize_url(self.trailer)
 
     def __str__(self) -> str:
         return self.performance_title

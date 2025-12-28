@@ -135,6 +135,16 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         """
         return generate_enrich_prompt(organisation, search_results)
 
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.full_clean()
+        instance.save()
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        instance.full_clean()
+        instance.save()
+
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
         """Enrich organisation data using LLM and web search."""

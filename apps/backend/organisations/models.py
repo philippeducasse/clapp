@@ -1,6 +1,7 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from typing import List, Tuple
+from circus_agent_backend.utils import normalize_url
 
 
 class Organisation(models.Model):
@@ -22,6 +23,11 @@ class Organisation(models.Model):
     class Meta:
         abstract = True
         ordering = ["name"]
+
+    def clean(self) -> None:
+        super().clean()
+        if self.website_url:
+            self.website_url = normalize_url(self.website_url)
 
     def __str__(self) -> str:
         return self.name

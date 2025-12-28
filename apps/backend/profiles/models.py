@@ -6,6 +6,7 @@ from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from profiles.constants import LANGUAGES
+from circus_agent_backend.utils import normalize_url
 
 EMAIL_HOST_MAPPING = {
     "GMAIL": "smtp.gmail.com",
@@ -72,6 +73,20 @@ class Profile(AbstractUser):
     REQUIRED_FIELDS: list[str] = []
 
     objects = ProfileManager()
+
+    def clean(self) -> None:
+        super().clean()
+        url_fields = [
+            "personal_website",
+            "instagram_profile",
+            "facebook_profile",
+            "tiktok_profile",
+            "youtube_profile",
+        ]
+        for field_name in url_fields:
+            url = getattr(self, field_name, "")
+            if url:
+                setattr(self, field_name, normalize_url(url))
 
     def __str__(self) -> str:
         return self.email

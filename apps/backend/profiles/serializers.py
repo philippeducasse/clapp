@@ -3,6 +3,7 @@ from profiles.models import Profile
 from performances.serializers import PerformanceSerializer
 from typing import Type
 import re
+from circus_agent_backend.utils import NormalizedURLField
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -10,6 +11,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     spoken_languages = serializers.ListField(
         child=serializers.CharField(), required=False, allow_empty=True
     )
+    personal_website = NormalizedURLField(required=False, allow_blank=True)
+    instagram_profile = NormalizedURLField(required=False, allow_blank=True)
+    facebook_profile = NormalizedURLField(required=False, allow_blank=True)
+    tiktok_profile = NormalizedURLField(required=False, allow_blank=True)
+    youtube_profile = NormalizedURLField(required=False, allow_blank=True)
 
     class Meta:
         model: Type[Profile] = Profile
