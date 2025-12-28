@@ -55,7 +55,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
     setIsLoading(true);
     try {
       const cleanedData = prepareFormDataForSubmission(values, formFields);
-
+      console.log({ cleanedData, values });
       if (action === Action.EDIT && performanceId) {
         const updatedPerformance = { ...cleanedData, id: performanceId } as Performance;
         await performanceApiService.update(updatedPerformance);

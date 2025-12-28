@@ -67,5 +67,11 @@ export const getPerformanceFormFields = (): ControlledFormElement[] => {
       options: getOptions(PerformanceGenre),
       helpText: "Select all genres that apply to your performance",
     },
+    {
+      label: "Dossiers",
+      fieldName: "dossierFiles",
+      type: ControlledFormElementType.FILE,
+      helpText: "Add additional pdfs here",
+    },
   ];
 };
