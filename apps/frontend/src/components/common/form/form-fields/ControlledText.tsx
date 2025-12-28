@@ -4,7 +4,6 @@ import { BaseControlledPropsWithType } from "@/interfaces/forms/ControlledFormFi
 
 const ControlledText = ({ field, type, showLabels }: BaseControlledPropsWithType) => {
   const t = type.toLowerCase();
-  console.log("TYPE: ", t);
   return showLabels ? (
     <Input type={t === "url" ? "text" : t} {...field} value={field.value as string} />
   ) : (
