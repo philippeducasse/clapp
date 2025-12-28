@@ -12,6 +12,7 @@ interface DetailsViewSectionProps {
   ribbonValue?: string;
   sideText?: string;
   subtitle?: React.ReactNode;
+  emptyMessage?: string;
 }
 
 const DetailsViewSection = ({
@@ -41,7 +42,11 @@ const DetailsViewSection = ({
             )}
           </div>
           <div className="col-span-2">
-            <DetailsView data={data} />
+            {data.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400 italic ml-2">{`No ${title.toLowerCase()}`}</p>
+            ) : (
+              <DetailsView data={data} />
+            )}
           </div>
         </CardContent>
       </Card>
