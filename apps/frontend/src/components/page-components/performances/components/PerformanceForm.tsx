@@ -57,8 +57,10 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
       const cleanedData = prepareFormDataForSubmission(values, formFields);
       console.log({ cleanedData, values });
       if (action === Action.EDIT && performanceId) {
-        const updatedPerformance = { ...cleanedData, id: performanceId } as Performance;
-        await performanceApiService.update(updatedPerformance);
+        const updatedPerformance = await performanceApiService.update({
+          ...cleanedData,
+          id: performanceId,
+        } as Performance);
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile#performances`);
       } else if (action === Action.CREATE && profile) {

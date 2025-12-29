@@ -70,7 +70,7 @@ export const getPerformanceFormFields = (): ControlledFormElement[] => {
     {
       label: "Dossiers",
       fieldName: "dossierFiles",
-      type: ControlledFormElementType.FILE,
+      type: ControlledFormElementType.PDF,
       helpText: "Add additional pdfs here",
     },
   ];

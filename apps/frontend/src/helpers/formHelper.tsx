@@ -39,6 +39,7 @@ export const getControlledInputs = (
       case ControlledFormElementType.MULTI_EMAIL:
         return <ControlledMultiEmail field={field} />;
       case ControlledFormElementType.FILE:
+      case ControlledFormElementType.PDF:
         return <ControlledFile field={field} />;
       case ControlledFormElementType.PASSWORD:
         return <Input type="password" {...field} />;
@@ -61,6 +62,11 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(
 ): T => {
   const sanitizedData = { ...entity } as T;
 
+  // Map dossiers to dossierFiles for form initialization
+  if ("dossiers" in sanitizedData && Array.isArray(sanitizedData.dossiers)) {
+    sanitizedData["dossierFiles" as keyof T] = sanitizedData.dossiers as T[Extract<keyof T, string>];
+  }
+
   for (const key in sanitizedData) {
     const value = sanitizedData[key];
     if (value === null || value === undefined) {
@@ -68,7 +74,8 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(
       if (
         field?.type === ControlledFormElementType.MULTI_SELECT ||
         field?.type === ControlledFormElementType.MULTI_EMAIL ||
-        field?.type === ControlledFormElementType.FILE
+        field?.type === ControlledFormElementType.FILE ||
+        field?.type === ControlledFormElementType.PDF
       ) {
         sanitizedData[key] = [] as T[Extract<keyof T, string>];
       } else {
@@ -101,7 +108,7 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
       const value = preparedData[key];
       const fieldConfig = fieldConfigMap.get(key);
 
-      if ((value === "" || value === null) && !fieldConfig?.required) {
+      if ((value === "" || value === null || value === undefined) && !fieldConfig?.required) {
         if (
           fieldConfig?.type === ControlledFormElementType.DATE ||
           fieldConfig?.type === ControlledFormElementType.NUMBER ||
@@ -148,6 +155,30 @@ export const createZodFormSchema = (
         break;
       case ControlledFormElementType.FILE:
         zodType = z.array(z.instanceof(File));
+        break;
+      case ControlledFormElementType.PDF:
+        zodType = z
+          .array(
+            z.union([
+              z.instanceof(File),
+              z.object({
+                id: z.number(),
+                file: z.string(),
+                uploadedAt: z.date().or(z.string()),
+              }),
+            ])
+          )
+          .refine(
+            (items) =>
+              items.every((item) => {
+                // Only validate File objects, not existing Dossiers
+                if (item instanceof File) {
+                  return item.type === "application/pdf";
+                }
+                return true;
+              }),
+            "Please only submit PDFs"
+          );
         break;
       case ControlledFormElementType.DATE:
         zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
@@ -241,7 +272,10 @@ export const getInitialValues = (
 
   const emptyValues = formFields.reduce((acc, field) => {
     acc[field.fieldName] =
-      field.type === ControlledFormElementType.MULTI_SELECT
+      field.type === ControlledFormElementType.MULTI_SELECT ||
+      field.type === ControlledFormElementType.FILE ||
+      field.type === ControlledFormElementType.PDF ||
+      field.type === ControlledFormElementType.MULTI_EMAIL
         ? []
         : field.type === ControlledFormElementType.BOOLEAN
         ? false

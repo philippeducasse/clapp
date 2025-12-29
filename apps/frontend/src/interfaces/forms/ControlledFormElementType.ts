@@ -15,6 +15,7 @@ export enum ControlledFormElementType {
   PASSWORD = "PASSWORD",
   SLIDER = "SLIDER",
   SMTP = "SMTP",
+  PDF = "PDF",
 }
 
 export enum FilterType {

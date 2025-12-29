@@ -18,6 +18,12 @@ export const getPerformanceInfo = (performance: Performance): SectionCellProps[]
     { title: "Long Description", value: performance.longDescription, type: SectionCellType.HTML },
     { title: "Email prompt", value: performance.emailPrompt, type: SectionCellType.HTML },
     { title: "Creation Date", value: performance.trailer, type: SectionCellType.Link },
-    { title: "Dossiers", value: performance.dossiers, type: SectionCellType.Text },
+    {
+      title: "Dossiers",
+      value: performance.dossiers
+        ?.map((d) => d.file.split("/").pop() || d.file)
+        .join(", "),
+      type: SectionCellType.Text,
+    },
   ];
 };

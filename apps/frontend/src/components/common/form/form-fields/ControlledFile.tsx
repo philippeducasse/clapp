@@ -1,12 +1,20 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
+import { Dossier } from "@/interfaces/entities/Performance";
 
 const ControlledFile = ({ field }: BaseControlledProps) => {
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<Array<File | Dossier>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  console.log("files state:", files);
+  console.log("field.value:", field.value);
+  useEffect(() => {
+    if (Array.isArray(field.value) && field.value.length > 0) {
+      setFiles(field.value);
+    }
+  }, [field]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files ? Array.from(e.target.files) : [];
@@ -14,12 +22,17 @@ const ControlledFile = ({ field }: BaseControlledProps) => {
     field.onChange(newFiles);
   };
 
-  const handleClear = () => {
-    setFiles([]);
-    field.onChange([]);
-    if (inputRef.current) {
-      inputRef.current.value = "";
+  const handleRemoveFile = (index: number) => {
+    const newFiles = files.filter((_, i) => i !== index);
+    setFiles(newFiles);
+    field.onChange(newFiles);
+  };
+
+  const getFileName = (file: File | Dossier): string => {
+    if (file instanceof File) {
+      return file.name;
     }
+    return file.file.split("/").pop() || file.file;
   };
 
   return (
@@ -31,24 +44,39 @@ const ControlledFile = ({ field }: BaseControlledProps) => {
           type="file"
           multiple
           onChange={handleFileChange}
-          className="flex-1 pt-1.5 hover:cursor-pointer"
+          className="hidden"
         />
-        {files.length > 0 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={handleClear}
-            className="shrink-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        )}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => inputRef.current?.click()}
+          className="flex-1"
+        >
+          Choose Files
+        </Button>
       </div>
       {files.length > 0 && (
-        <div className="text-sm text-muted-foreground">
-          {files.length} file{files.length !== 1 ? "s" : ""} selected:{" "}
-          {files.map((f) => f.name).join(", ")}
+        <div>
+          <p className="mb-1">Existing files:</p>
+          <div className="flex flex-wrap gap-2">
+            {files.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between text-sm border rounded-md px-3 py-2  w-[calc(50%-0.25rem)]"
+              >
+                <span className="truncate">{getFileName(file)}</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemoveFile(index)}
+                  className="shrink-0 h-6 w-6 flex"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
