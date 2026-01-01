@@ -83,7 +83,7 @@ dev = [
 DJANGO_SETTINGS_MODULE = "circus_agent_backend.settings"
 python_files = ["test_*.py", "*_test.py"]
 addopts = [
-    "--reuse-db",
+    # "--reuse-db",
     "--cov=.",
     "--cov-report=html",
     "--cov-report=term-missing",
@@ -121,7 +121,7 @@ exclude = [
     ".*/tests/.*",
     "test_.*\\.py$",
     "conftest\\.py$",
-    "scripts/"
+    "scripts/",
 ]
 
 [[tool.mypy.overrides]]
@@ -131,7 +131,7 @@ module = [
     "tests.*",
     "manage",
     "conftest",
-    "scripts"
+    "scripts",
 ]
 ignore_errors = true
 
