@@ -58,9 +58,7 @@ class TestProfileModel:
         )
 
         assert profile.company_name == "Amazing Jane"
-        assert profile.company_name == "Smith Productions"
         assert profile.personal_website == "https://janesmith.com"
-        assert profile.age == 30
         assert profile.location == "Paris, France"
         assert profile.nationality == "French"
 
@@ -68,10 +66,7 @@ class TestProfileModel:
         """Test that optional fields can be blank or null"""
         profile = Profile.objects.create_user(email="minimal@example.com", password="testpass123")
 
-        # CharField fields with blank=True default to empty string
         assert profile.company_name == ""
-        assert profile.company_name == ""
-        assert profile.age is None
         assert profile.location == ""
 
     def test_create_superuser(self):

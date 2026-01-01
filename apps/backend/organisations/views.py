@@ -15,7 +15,6 @@ from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
 from performances.models import Performance
-from profiles.models import Profile
 from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
 
@@ -182,7 +181,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         try:
             organisation = self.get_object()
             logger.debug(f"Found organisation: {organisation.id}")
-        except self.queryset.model.DoesNotExist:
+        except Exception:
             logger.error(f"Organisation {pk} not found")
             return Response(
                 {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
@@ -300,8 +299,17 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def generate_email(self, request: HttpRequest, pk: int) -> Response:
         """Generate email content using LLM."""
+        from django.http import Http404
+
         try:
             organisation = self.get_object()
+        except Http404:
+            return Response(
+                {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        try:
             profile = request.user
 
             performance_ids = request.data.get("selected_performance_ids")
@@ -329,13 +337,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
             return Response({"message": message}, status=status.HTTP_200_OK)
 
-        except Organisation.DoesNotExist:
-            return Response(
-                {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        except Profile.DoesNotExist:
-            return Response({"error": "Profile not found"}, status=status.HTTP_404_NOT_FOUND)
         except ValueError as e:
             return Response(
                 {"error": f"Invalid performance ID format: {str(e)}"},

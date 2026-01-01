@@ -1,7 +1,10 @@
 import logging
+from email.utils import formataddr
 from typing import Any, List, Optional
 
+from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 from applications.models import Application
 from organisations.models import Organisation
@@ -403,11 +406,6 @@ def prepare_application_email(
     """
     Prepare the application email with all attachments.
     """
-    from email.utils import formataddr
-
-    from django.core.mail import EmailMultiAlternatives
-    from django.utils.html import strip_tags
-
     from performances.models import Dossier
 
     text_content = strip_tags(application.message)

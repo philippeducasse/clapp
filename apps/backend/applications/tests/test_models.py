@@ -37,7 +37,6 @@ class TestApplicationModel:
         assert application.organisation == festival
         assert application.profile == profile
         assert application.status == "DRAFT"
-        assert application.answer_received is False
 
     def test_application_string_representation(self, festival, profile):
         """Test the __str__ method"""

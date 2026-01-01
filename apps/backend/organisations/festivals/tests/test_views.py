@@ -1,13 +1,15 @@
-import pytest
 from datetime import date, datetime
 from unittest.mock import Mock, patch
+
+import pytest
 from django.utils import timezone
-from rest_framework.test import APIClient
 from rest_framework import status
-from organisations.festivals.models import Festival
+from rest_framework.test import APIClient
+
 from applications.models import Application
-from profiles.models import Profile
+from organisations.festivals.models import Festival
 from performances.models import Performance
+from profiles.models import Profile
 
 
 @pytest.fixture
@@ -20,8 +22,8 @@ def api_client():
 def festival():
     """Fixture to create a test festival"""
     return Festival.objects.create(
-        name="Test Festival",
-        description="Test Description",
+        name="Tst Festival",
+        description="Tst Description",
         country="France",
         town="Paris",
         festival_type="STREET",
@@ -38,7 +40,14 @@ def profile(db):
     # Delete any existing profile with id=2 first
     Profile.objects.filter(id=2).delete()
 
-    profile = Profile(id=2, email="test@example.com", first_name="Test", last_name="User")
+    profile = Profile(
+        id=2,
+        email="test@example.com",
+        first_name="Test",
+        last_name="User",
+        email_host="GMAIL",
+        email_host_user="test@gmail.com",
+    )
     profile.set_password("testpass123")
     profile.save()
     return profile
@@ -50,6 +59,24 @@ def performance(profile):
     return Performance.objects.create(performance_title="Test Performance", profile=profile)
 
 
+@pytest.fixture(autouse=True)
+def authenticate_api_client(api_client, profile):
+    """Automatically authenticate the API client for all tests"""
+    api_client.force_authenticate(user=profile)
+
+
+@pytest.fixture
+def mock_email():
+    """Fixture to provide a properly configured email mock"""
+    with patch("django.core.mail.EmailMultiAlternatives") as mock:
+        mock_instance = Mock()
+        mock_instance.send.return_value = 1  # Simulate successful send
+        mock_instance.attach_alternative = Mock()
+        mock_instance.attach = Mock()
+        mock.return_value = mock_instance
+        yield mock
+
+
 @pytest.mark.django_db
 class TestFestivalViewSet:
     """Test cases for FestivalViewSet"""
@@ -59,8 +86,9 @@ class TestFestivalViewSet:
         response = api_client.get("/api/festivals/")
 
         assert response.status_code == status.HTTP_200_OK
-        assert len(response.data) == 1
-        assert response.data[0]["name"] == "Test Festival"
+        assert response.data["count"] == 1
+        assert len(response.data["results"]) == 1
+        assert response.data["results"][0]["name"] == "Tst Festival"
 
     def test_create_festival(self, api_client):
         """Test creating a new festival"""
@@ -82,7 +110,7 @@ class TestFestivalViewSet:
         response = api_client.get(f"/api/festivals/{festival.id}/")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.data["name"] == "Test Festival"
+        assert response.data["name"] == "Tst Festival"
         assert response.data["country"] == "France"
 
     def test_update_festival(self, api_client, festival):
@@ -113,8 +141,8 @@ class TestFestivalViewSet:
 class TestFestivalEnrichAction:
     """Test cases for the enrich action"""
 
-    @patch("organisations.festivals.views.MistralClient")
-    @patch("organisations.festivals.views.GeminiClient")
+    @patch("organisations.views.MistralClient")
+    @patch("organisations.views.GeminiClient")
     def test_enrich_festival_success(
         self, mock_gemini_client, mock_mistral_client, api_client, festival
     ):
@@ -140,8 +168,8 @@ class TestFestivalEnrichAction:
         assert mock_gemini.search.called
         assert mock_mistral.chat.called
 
-    @patch("organisations.festivals.views.MistralClient")
-    @patch("organisations.festivals.views.GeminiClient")
+    @patch("organisations.views.MistralClient")
+    @patch("organisations.views.GeminiClient")
     def test_enrich_festival_not_found(self, mock_gemini_client, mock_mistral_client, api_client):
         """Test enriching a non-existent festival"""
         response = api_client.get("/api/festivals/9999/enrich/")
@@ -153,7 +181,7 @@ class TestFestivalEnrichAction:
 class TestFestivalGenerateEmailAction:
     """Test cases for the generate_email action"""
 
-    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.views.MistralClient")
     def test_generate_email_without_performances(
         self, mock_mistral_client, api_client, festival, profile
     ):
@@ -168,7 +196,7 @@ class TestFestivalGenerateEmailAction:
         assert "message" in response.data
         assert response.data["message"] == "Generated email content"
 
-    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.views.MistralClient")
     def test_generate_email_with_performances(
         self, mock_mistral_client, api_client, festival, profile, performance
     ):
@@ -184,7 +212,7 @@ class TestFestivalGenerateEmailAction:
         assert response.status_code == status.HTTP_200_OK
         assert "message" in response.data
 
-    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.views.MistralClient")
     def test_generate_email_with_multiple_performances(
         self, mock_mistral_client, api_client, festival, profile
     ):
@@ -202,7 +230,7 @@ class TestFestivalGenerateEmailAction:
 
         assert response.status_code == status.HTTP_200_OK
 
-    @patch("organisations.festivals.views.MistralClient")
+    @patch("organisations.views.MistralClient")
     def test_generate_email_festival_not_found(self, mock_mistral_client, api_client):
         """Test generating email for non-existent festival"""
         response = api_client.post("/api/festivals/9999/generate_email/", {})
@@ -211,7 +239,7 @@ class TestFestivalGenerateEmailAction:
         assert "error" in response.data
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestFestivalApplyAction:
     """Test cases for the apply action"""
 
@@ -224,21 +252,31 @@ class TestFestivalApplyAction:
 
     def test_apply_festival_not_found(self, api_client, profile):
         """Test applying to non-existent festival"""
-        data = {"message": "Test message", "email_subject": "Test Subject"}
+        data = {
+            "message": "Test message",
+            "email_subject": "Test Subject",
+            "recipients": "test@example.com",
+        }
 
         response = api_client.post("/api/festivals/9999/apply/", data)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_creates_application(self, mock_email, api_client, festival, profile):
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_creates_application(
+        self, mock_email, mock_connection, api_client, festival, profile
+    ):
         """Test that applying creates an application"""
+        mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
         data = {
             "message": "<p>Test application message</p>",
             "email_subject": "Application to Test Festival",
+            "recipients": "festival@example.com",
         }
 
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
@@ -252,16 +290,22 @@ class TestFestivalApplyAction:
         assert application.email_subject == "Application to Test Festival"
         assert application.status == "APPLIED"
 
-    @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_with_performances(self, mock_email, api_client, festival, profile, performance):
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_with_performances(
+        self, mock_email, mock_connection, api_client, festival, profile, performance
+    ):
         """Test applying with performances attached"""
+        mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
         data = {
             "message": "<p>Test message</p>",
             "email_subject": "Test Subject",
             "performances": str(performance.id),
+            "recipients": "festival@example.com",
         }
 
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
@@ -270,10 +314,15 @@ class TestFestivalApplyAction:
         application = Application.objects.first()
         assert application.performances.count() == 1
 
-    @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_duplicate_application_same_year(self, mock_email, api_client, festival, profile):
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_duplicate_application_same_year(
+        self, mock_email, mock_connection, api_client, festival, profile
+    ):
         """Test that duplicate applications for the same year are rejected"""
+        mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
         # Create first application
@@ -290,6 +339,7 @@ class TestFestivalApplyAction:
         data = {
             "message": "<p>Second application</p>",
             "email_subject": "Second Subject",
+            "recipients": "festival@example.com",
         }
 
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
@@ -297,29 +347,44 @@ class TestFestivalApplyAction:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "already exists" in response.data
 
-    @patch("organisations.festivals.views.EmailMultiAlternatives")
-    def test_apply_email_sending_failure(self, mock_email, api_client, festival, profile):
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_email_sending_failure(
+        self, mock_email, mock_connection, api_client, festival, profile
+    ):
         """Test handling of email sending failure"""
+        mock_connection.return_value = Mock()
         mock_email_instance = Mock()
         mock_email_instance.send.side_effect = Exception("Email server error")
         mock_email.return_value = mock_email_instance
 
-        data = {"message": "<p>Test message</p>", "email_subject": "Test Subject"}
+        data = {
+            "message": "<p>Test message</p>",
+            "email_subject": "Test Subject",
+            "recipients": "festival@example.com",
+        }
 
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
 
         assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
         assert "Email failed to send" in response.data["error"]
 
-    @patch("organisations.festivals.views.EmailMultiAlternatives")
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
     def test_apply_calculates_correct_application_year(
-        self, mock_email, api_client, festival, profile
+        self, mock_email, mock_connection, api_client, festival, profile
     ):
         """Test that application year is calculated correctly"""
+        mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
-        data = {"message": "<p>Test message</p>", "email_subject": "Test Subject"}
+        data = {
+            "message": "<p>Test message</p>",
+            "email_subject": "Test Subject",
+            "recipients": "festival@example.com",
+        }
 
         with patch("django.utils.timezone.now") as mock_now:
             # Test for October (should increment year)
