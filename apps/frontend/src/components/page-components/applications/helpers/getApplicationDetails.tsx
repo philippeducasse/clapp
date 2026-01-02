@@ -18,6 +18,10 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
       value: capitalizeFirst(application.status),
     },
     {
+      title: "Performances",
+      value: application.performances?.map((a) => a.performanceTitle).join(", "),
+    },
+    {
       title: "Email recipients",
       value: application.emailRecipients?.join(", "),
     },

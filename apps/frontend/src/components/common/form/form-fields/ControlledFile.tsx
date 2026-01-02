@@ -8,8 +8,6 @@ import { Dossier } from "@/interfaces/entities/Performance";
 const ControlledFile = ({ field }: BaseControlledProps) => {
   const [files, setFiles] = useState<Array<File | Dossier>>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  console.log("files state:", files);
-  console.log("field.value:", field.value);
   useEffect(() => {
     if (Array.isArray(field.value) && field.value.length > 0) {
       setFiles(field.value);

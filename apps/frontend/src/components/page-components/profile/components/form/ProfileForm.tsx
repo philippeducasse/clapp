@@ -56,7 +56,6 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   });
 
   const emailHost = form.watch("emailHost") as EmailHost;
-  console.log("State: ", emailHost, isOtherEmailHost);
 
   useEffect(() => {
     if (emailHost === "OTHER") {
@@ -99,7 +98,6 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   }, [profile, form, initialDataLoaded]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("values:", values);
     setIsLoading(true);
     try {
       if (profile) {
@@ -111,7 +109,6 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
           updatedProfile = { ...values, id: profile.id } as Profile;
         }
         const sanitisedData = prepareFormDataForSubmission(updatedProfile, formFields);
-        console.log("sanitzed profile: ", sanitisedData);
 
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));

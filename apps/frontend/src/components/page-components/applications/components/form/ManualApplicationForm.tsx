@@ -55,7 +55,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
           typeof application.organisation === "object"
             ? application.organisation?.id
             : application.organisation,
-        performances: application.performances?.map((p) => p.id) ?? [],
+        performanceIds: application.performances?.map((p) => String(p.id)) ?? [],
       };
 
       form.reset(sanitizeFormData(formData as unknown as Record<string, unknown>));
@@ -74,7 +74,11 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
           profileId: profile?.id,
         } as Application;
         await applicationApiService.update(updatedApplication);
-        dispatch(updateApplication(updatedApplication));
+
+        const selectedPerformances = performances.filter((p) =>
+          (values.performanceIds as string[])?.includes(String(p.id))
+        );
+        dispatch(updateApplication({ ...updatedApplication, performances: selectedPerformances }));
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {

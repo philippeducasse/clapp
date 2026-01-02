@@ -40,17 +40,16 @@ export const getManualApplicationFormFields = (
       required: true,
     },
     {
-      label: "Comments",
-      fieldName: "comments",
-      type: ControlledFormElementType.TEXT_EDITOR,
-    },
-    {
       label: "Performance(s)",
       fieldName: "performanceIds",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
       helpText: "Select with which performances you want to apply to this festival",
-      action: Action.CREATE,
+    },
+    {
+      label: "Comments",
+      fieldName: "comments",
+      type: ControlledFormElementType.TEXT_EDITOR,
     },
   ];
 };
