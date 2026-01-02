@@ -80,10 +80,10 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "circus_agent_backend.settings"
+DJANGO_SETTINGS_MODULE = "circus_agent_backend.settings_test"
 python_files = ["test_*.py", "*_test.py"]
 addopts = [
-    # "--reuse-db",
+    "--reuse-db",
     "--cov=.",
     "--cov-report=html",
     "--cov-report=term-missing",
