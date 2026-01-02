@@ -247,6 +247,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             application = get_or_create_application(
                 organisation,
                 profile,
+                performances,
                 application_year,
                 message,
                 subject,

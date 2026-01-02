@@ -357,6 +357,7 @@ def validate_application_recipients(recipients_input: str) -> List[str]:
 def get_or_create_application(
     organisation: Organisation,
     profile: Profile,
+    performances: List[Performance],
     application_year: int,
     message: str,
     subject: str,
@@ -391,6 +392,8 @@ def get_or_create_application(
             profile=profile,
             email_recipients=recipient_emails,
         )
+    if performances and len(performances) > 0:
+        application.performances.set(performances)
 
     return application
 
