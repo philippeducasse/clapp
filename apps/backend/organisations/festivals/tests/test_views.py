@@ -19,7 +19,7 @@ def api_client():
 
 
 @pytest.fixture
-def festival():
+def festival(db):
     """Fixture to create a test festival"""
     return Festival.objects.create(
         name="Tst Festival",
@@ -205,7 +205,7 @@ class TestFestivalGenerateEmailAction:
         mock_mistral.chat.return_value = "Generated email with performances"
         mock_mistral_client.return_value = mock_mistral
 
-        data = {"selected_performance_ids": str(performance.id)}
+        data = {"selected_performance_ids": [str(performance.id)]}
 
         response = api_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
 
@@ -300,11 +300,11 @@ class TestFestivalApplyAction:
         mock_email_instance = Mock()
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
-
+        print("PERFORMANCE", performance, "ID: ", performance.id)
         data = {
             "message": "<p>Test message</p>",
             "email_subject": "Test Subject",
-            "performances": str(performance.id),
+            "performances": [str(performance.id)],
             "recipients": "festival@example.com",
         }
 
@@ -312,6 +312,7 @@ class TestFestivalApplyAction:
 
         assert response.status_code == status.HTTP_200_OK
         application = Application.objects.first()
+        print("PERF: ", application.performances, response)
         assert application.performances.count() == 1
 
     @patch("profiles.emails.get_user_email_connection")
