@@ -329,8 +329,7 @@ def create_form_application(
     )
 
     if performances:
-        performance_ids = [int(id.strip()) for id in performances.split(",") if id.strip()]
-        application.performances.set(Performance.objects.filter(id__in=performance_ids))
+        application.performances.set(performances)
         application.save()
 
     return application
@@ -352,6 +351,29 @@ def validate_application_recipients(recipients_input: str) -> List[str]:
         raise ValueError(f"Invalid email address format: {recipient_emails}")
 
     return recipient_emails
+
+
+def parse_performance_ids(performance_ids: Any) -> List[Performance]:
+    """
+    Parse performance IDs from various input formats and return Performance objects.
+
+    Args:
+        performance_ids: Can be a comma-separated string, list of IDs, or single ID
+
+    Returns:
+        List of Performance objects
+    """
+    if not performance_ids:
+        return []
+
+    if isinstance(performance_ids, str):
+        ids = [int(id.strip()) for id in performance_ids.split(",") if id.strip()]
+    elif isinstance(performance_ids, list):
+        ids = [int(id) for id in performance_ids]
+    else:
+        ids = [int(performance_ids)]
+
+    return list(Performance.objects.filter(id__in=ids))
 
 
 def get_or_create_application(

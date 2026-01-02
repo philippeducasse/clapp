@@ -187,11 +187,15 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        from organisations.services import parse_performance_ids
+
         profile = request.user
         application_method = request.data.get("application_method")
-        performances = request.data.get("performances")
+        performance_ids = request.data.get("performances")
+        performances = parse_performance_ids(performance_ids)
         comments = request.data.get("comments", None)
         logger.debug(f"Application method: {application_method}")
+        logger.debug(f"Parsed performances: {performances}")
 
         if application_method == "FORM":
             try:
@@ -269,7 +273,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 dossiers,
                 attachments,
                 profile,
-                performances,
+                performance_ids,
             )
             logger.debug("Email prepared, sending now...")
             send_application_email(email, application)
