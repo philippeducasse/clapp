@@ -12,7 +12,7 @@ import django
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Set up Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "circus_agent_backend.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "conf.settings")
 django.setup()
 
 
