@@ -1,10 +1,11 @@
-import pytest
 from datetime import date
-from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
 
-from organisations.festivals.models import Festival, FestivalContact
+import pytest
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+
 from applications.models import Application
+from organisations.festivals.models import Festival, FestivalContact
 from profiles.models import Profile
 
 

@@ -36,23 +36,27 @@ class SoftDeleteQuerySet(QuerySet):
         return self
 
 
-class SoftDeleteManager(models.Manager):
-    """Manager that returns non-deleted objects by default"""
+class SoftDeleteManager(models.Manager.from_queryset(SoftDeleteQuerySet)):
+    """Manager that returns non-deleted objects by default
+
+    Uses from_queryset() to make queryset methods (alive, deleted, with_deleted)
+    available on the manager while preserving RelatedManager filters.
+    """
 
     def get_queryset(self) -> SoftDeleteQuerySet:
-        return SoftDeleteQuerySet(self.model, using=self._db).alive()
-
-    def alive(self) -> SoftDeleteQuerySet:
-        """Return only non-deleted objects"""
-        return SoftDeleteQuerySet(self.model, using=self._db).alive()
-
-    def deleted(self) -> SoftDeleteQuerySet:
-        """Return only deleted objects"""
-        return SoftDeleteQuerySet(self.model, using=self._db).deleted()
+        """Apply default alive filter to all queries"""
+        return super().get_queryset().alive()
 
     def with_deleted(self) -> SoftDeleteQuerySet:
-        """Return all objects including deleted"""
-        return SoftDeleteQuerySet(self.model, using=self._db).with_deleted()
+        """Return all objects including deleted, bypassing default alive filter"""
+        # Use super().get_queryset() to get base queryset without alive filter
+        # This preserves RelatedManager filters while including deleted objects
+        return super().get_queryset()
+
+    def deleted(self) -> SoftDeleteQuerySet:
+        """Return only deleted objects, bypassing default alive filter"""
+        # Use super().get_queryset() to get base queryset without alive filter
+        return super().get_queryset().deleted()
 
 
 class Organisation(models.Model):
@@ -118,13 +122,25 @@ class Organisation(models.Model):
         """Cascade soft delete to contacts"""
         from django.utils import timezone
 
-        self.contacts.with_deleted().filter(deleted_at__isnull=True).update(
-            deleted_at=timezone.now()
-        )
+        # Get the contact model from the reverse relation
+        contact_model = self.contacts.model
+        # Get the field name that points to this organisation
+        field_name = self.contacts.field.name  # e.g. 'festival', 'venue', 'residency'
+        # Use the model's manager directly with explicit filter
+        contact_model.objects.with_deleted().filter(
+            **{field_name: self, "deleted_at__isnull": True}
+        ).update(deleted_at=timezone.now())
 
     def _restore_contacts(self) -> None:
         """Restore contacts"""
-        self.contacts.with_deleted().filter(deleted_at__isnull=False).update(deleted_at=None)
+        # Get the contact model from the reverse relation
+        contact_model = self.contacts.model
+        # Get the field name that points to this organisation
+        field_name = self.contacts.field.name  # e.g. 'festival', 'venue', 'residency'
+        # Use the model's manager directly with explicit filter
+        contact_model.objects.with_deleted().filter(
+            **{field_name: self, "deleted_at__isnull": False}
+        ).update(deleted_at=None)
 
     def _soft_delete_applications(self) -> None:
         """Cascade soft delete to applications"""

@@ -53,6 +53,7 @@ class TestFestivalViewSetSoftDelete:
 
     def test_list_excludes_deleted_by_default(self, authenticated_client):
         """Test that list endpoint excludes deleted festivals by default"""
+        f1 = Festival.objects.create(name="Active")  # noqa
         f2 = Festival.objects.create(name="Deleted")
         f2.delete()
 
@@ -71,6 +72,7 @@ class TestFestivalViewSetSoftDelete:
 
     def test_list_includes_deleted_with_parameter(self, authenticated_client):
         """Test that list endpoint includes deleted when include_deleted=true"""
+        f1 = Festival.objects.create(name="Active")  # noqa
         f2 = Festival.objects.create(name="Deleted")
         f2.delete()
 
@@ -89,6 +91,7 @@ class TestFestivalViewSetSoftDelete:
 
     def test_list_includes_deleted_false_excludes_deleted(self, authenticated_client):
         """Test that include_deleted=false still excludes deleted festivals"""
+        f1 = Festival.objects.create(name="Active")  # noqa
         f2 = Festival.objects.create(name="Deleted")
         f2.delete()
 
@@ -238,6 +241,12 @@ class TestFestivalViewSetSoftDelete:
             object_id=festival.id,
             profile=user,
             application_date=date(2026, 1, 1),
+        )
+        app2 = Application.objects.create(  # noqa
+            content_type=content_type,
+            object_id=festival.id,
+            profile=user,
+            application_date=date(2026, 2, 1),
         )
 
         # Delete one application
