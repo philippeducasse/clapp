@@ -30,7 +30,7 @@ class VenueContactInline(admin.TabularInline):
     def get_queryset(self, request):
         """Include soft-deleted contacts in admin"""
         qs = super().get_queryset(request)
-        return qs.model.objects.with_deleted().filter(venue=self.parent_instance)
+        return qs.model.objects.with_deleted()
 
 
 class VenueAdmin(admin.ModelAdmin):
@@ -39,6 +39,7 @@ class VenueAdmin(admin.ModelAdmin):
     search_fields = ("name", "venue_type", "country")
     inlines = [VenueContactInline]
     readonly_fields = ("deleted_at",)
+    actions = ["restore_venues", "hard_delete_venues"]
 
     def get_queryset(self, request):
         """Show all venues (active + deleted) by default"""
@@ -52,15 +53,6 @@ class VenueAdmin(admin.ModelAdmin):
 
     deleted_status.short_description = "Status"
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        actions["restore_venues"] = (
-            self.restore_venues,
-            "restore_venues",
-            "Restore selected venues",
-        )
-        return actions
-
     def restore_venues(self, request, queryset):
         """Admin action to restore soft-deleted venues"""
         restored_count = 0
@@ -70,6 +62,18 @@ class VenueAdmin(admin.ModelAdmin):
         self.message_user(request, f"Successfully restored {restored_count} venue(s).")
 
     restore_venues.short_description = "Restore selected venues"
+
+    def hard_delete_venues(self, request, queryset):
+        """Admin action to permanently delete venues"""
+        hard_deleted_count = 0
+        for venue in queryset:
+            venue.hard_delete()
+            hard_deleted_count += 1
+        self.message_user(
+            request, f"Successfully permanently deleted {hard_deleted_count} venue(s)."
+        )
+
+    hard_delete_venues.short_description = "Permanently delete selected venues"
 
 
 admin.site.register(Venue, VenueAdmin)

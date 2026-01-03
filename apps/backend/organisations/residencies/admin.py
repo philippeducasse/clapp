@@ -30,7 +30,7 @@ class ResidencyContactInline(admin.TabularInline):
     def get_queryset(self, request):
         """Include soft-deleted contacts in admin"""
         qs = super().get_queryset(request)
-        return qs.model.objects.with_deleted().filter(residency=self.parent_instance)
+        return qs.model.objects.with_deleted()
 
 
 class ResidencyAdmin(admin.ModelAdmin):
@@ -39,6 +39,7 @@ class ResidencyAdmin(admin.ModelAdmin):
     search_fields = ("name", "country")
     inlines = [ResidencyContactInline]
     readonly_fields = ("deleted_at",)
+    actions = ["restore_residencies", "hard_delete_residencies"]
 
     def get_queryset(self, request):
         """Show all residencies (active + deleted) by default"""
@@ -52,15 +53,6 @@ class ResidencyAdmin(admin.ModelAdmin):
 
     deleted_status.short_description = "Status"
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        actions["restore_residencies"] = (
-            self.restore_residencies,
-            "restore_residencies",
-            "Restore selected residencies",
-        )
-        return actions
-
     def restore_residencies(self, request, queryset):
         """Admin action to restore soft-deleted residencies"""
         restored_count = 0
@@ -70,6 +62,18 @@ class ResidencyAdmin(admin.ModelAdmin):
         self.message_user(request, f"Successfully restored {restored_count} residency/residencies.")
 
     restore_residencies.short_description = "Restore selected residencies"
+
+    def hard_delete_residencies(self, request, queryset):
+        """Admin action to permanently delete residencies"""
+        hard_deleted_count = 0
+        for residency in queryset:
+            residency.hard_delete()
+            hard_deleted_count += 1
+        self.message_user(
+            request, f"Successfully permanently deleted {hard_deleted_count} residency/residencies."
+        )
+
+    hard_delete_residencies.short_description = "Permanently delete selected residencies"
 
 
 admin.site.register(Residency, ResidencyAdmin)
