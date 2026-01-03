@@ -3,7 +3,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import {
+  createZodFormSchema,
+  sanitizeFormData,
+  getInitialValues,
+  prepareFormDataForSubmission,
+} from "@/helpers/formHelper";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -88,12 +93,15 @@ function ContactsForm<T extends { id?: number; contacts?: OrganisationContact[] 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    const cleanedData = prepareFormDataForSubmission(values, formFields);
+
     try {
-      const isContactEmpty = !values.email && !values.name && !values.role && !values.phone;
+      const isContactEmpty =
+        !cleanedData.email && !cleanedData.name && !cleanedData.role && !cleanedData.phone;
 
       if (action === Action.EDIT) {
         const updatedContacts = [...(entity?.contacts ?? [])];
-        updatedContacts[contactIndex] = values as unknown as OrganisationContact;
+        updatedContacts[contactIndex] = cleanedData as unknown as OrganisationContact;
 
         const updatedEntity = {
           ...entity,
@@ -105,7 +113,9 @@ function ContactsForm<T extends { id?: number; contacts?: OrganisationContact[] 
       } else {
         const existingContacts = entity?.contacts ?? [];
 
-        const updatedContacts = isContactEmpty ? existingContacts : [...existingContacts, values];
+        const updatedContacts = isContactEmpty
+          ? existingContacts
+          : [...existingContacts, cleanedData];
         const entityWithContacts = {
           ...entity,
           contacts: updatedContacts,
