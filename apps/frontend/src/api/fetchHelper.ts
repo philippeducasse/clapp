@@ -58,7 +58,14 @@ const handleResponse = async <T>(
     throw new Error(`Request failed for ${url}: ${res.status} - ${error}`);
   }
 
-  const json = await res.json();
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    json = {};
+    console.info("No returned JSON");
+  }
+
   if (successMessage) {
     toast.success(successMessage);
   }
