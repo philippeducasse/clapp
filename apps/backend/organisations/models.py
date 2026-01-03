@@ -1,7 +1,58 @@
+import logging
+from typing import Any, List, Tuple
+
 from django.db import models
+from django.db.models import QuerySet
 from phonenumber_field.modelfields import PhoneNumberField
-from typing import List, Tuple
+
 from circus_agent_backend.utils import normalize_url
+
+logger = logging.getLogger(__name__)
+
+
+class SoftDeleteQuerySet(QuerySet):
+    """QuerySet that filters out soft-deleted objects by default"""
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        """Override delete to perform soft delete"""
+        from django.utils import timezone
+
+        return self.update(deleted_at=timezone.now())
+
+    def hard_delete(self) -> tuple[int, dict[str, int]]:
+        """Actually delete the objects from database"""
+        return super().delete()
+
+    def alive(self) -> "SoftDeleteQuerySet":
+        """Return only non-deleted objects"""
+        return self.filter(deleted_at__isnull=True)
+
+    def deleted(self) -> "SoftDeleteQuerySet":
+        """Return only deleted objects"""
+        return self.filter(deleted_at__isnull=False)
+
+    def with_deleted(self) -> "SoftDeleteQuerySet":
+        """Return all objects including deleted ones"""
+        return self
+
+
+class SoftDeleteManager(models.Manager):
+    """Manager that returns non-deleted objects by default"""
+
+    def get_queryset(self) -> SoftDeleteQuerySet:
+        return SoftDeleteQuerySet(self.model, using=self._db).alive()
+
+    def alive(self) -> SoftDeleteQuerySet:
+        """Return only non-deleted objects"""
+        return SoftDeleteQuerySet(self.model, using=self._db).alive()
+
+    def deleted(self) -> SoftDeleteQuerySet:
+        """Return only deleted objects"""
+        return SoftDeleteQuerySet(self.model, using=self._db).deleted()
+
+    def with_deleted(self) -> SoftDeleteQuerySet:
+        """Return all objects including deleted"""
+        return SoftDeleteQuerySet(self.model, using=self._db).with_deleted()
 
 
 class Organisation(models.Model):
@@ -19,6 +70,9 @@ class Organisation(models.Model):
     website_url = models.URLField(max_length=200, blank=True)
     comments = models.TextField(max_length=500, blank=True)
     tag = models.CharField(max_length=20, choices=TAGS, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True, default=None)
+
+    objects = SoftDeleteManager()
 
     class Meta:
         abstract = True
@@ -32,15 +86,100 @@ class Organisation(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
+        """Soft delete the organisation and cascade to contacts and applications"""
+        from django.utils import timezone
+
+        self.deleted_at = timezone.now()
+        self.save()
+        logger.info(f"Soft deleting {self.name}")
+        self._soft_delete_contacts()
+
+        self._soft_delete_applications()
+
+        return (1, {self._meta.label: 1})
+
+    def hard_delete(
+        self, using: Any = None, keep_parents: bool = False
+    ) -> tuple[int, dict[str, int]]:
+        """Actually delete from database"""
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    def restore(self) -> None:
+        """Restore a soft-deleted organisation"""
+        self.deleted_at = None
+        self.save()
+
+        self._restore_contacts()
+
+        self._restore_applications()
+
+    def _soft_delete_contacts(self) -> None:
+        """Cascade soft delete to contacts"""
+        from django.utils import timezone
+
+        self.contacts.with_deleted().filter(deleted_at__isnull=True).update(
+            deleted_at=timezone.now()
+        )
+
+    def _restore_contacts(self) -> None:
+        """Restore contacts"""
+        self.contacts.with_deleted().filter(deleted_at__isnull=False).update(deleted_at=None)
+
+    def _soft_delete_applications(self) -> None:
+        """Cascade soft delete to applications"""
+        from django.contrib.contenttypes.models import ContentType
+        from django.utils import timezone
+
+        from applications.models import Application
+
+        content_type = ContentType.objects.get_for_model(self.__class__)
+        Application.objects.with_deleted().filter(
+            content_type=content_type, object_id=self.pk
+        ).update(deleted_at=timezone.now())
+
+    def _restore_applications(self) -> None:
+        """Restore applications when organisation is restored"""
+        from django.contrib.contenttypes.models import ContentType
+
+        from applications.models import Application
+
+        content_type = ContentType.objects.get_for_model(self.__class__)
+        Application.objects.with_deleted().filter(
+            content_type=content_type, object_id=self.pk, deleted_at__isnull=False
+        ).update(deleted_at=None)
+
 
 class OrganisationContact(models.Model):
     name = models.CharField(max_length=200, blank=True)
     email = models.EmailField(max_length=200, blank=True)
     role = models.CharField(max_length=100, blank=True)
     phone = PhoneNumberField(blank=True, null=True)
+    deleted_at = models.DateTimeField(null=True, blank=True, default=None)
+
+    objects = SoftDeleteManager()
 
     class Meta:
         abstract = True
 
     def __str__(self) -> str:
         return f"{self.name} - {self.email}"
+
+    def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
+        """Soft delete the contact"""
+        from django.utils import timezone
+
+        self.deleted_at = timezone.now()
+        self.save()
+        return (1, {self._meta.label: 1})
+
+    def hard_delete(
+        self, using: Any = None, keep_parents: bool = False
+    ) -> tuple[int, dict[str, int]]:
+        """Actually delete from database"""
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    def restore(self) -> None:
+        """Restore a soft-deleted contact"""
+        self.deleted_at = None
+        self.save()

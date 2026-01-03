@@ -144,6 +144,43 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         instance.full_clean()
         instance.save()
 
+    # instance.delete() has ben overriding in organisation.views() to soft delete
+    def perform_destroy(self, instance):
+        """Override to use soft delete"""
+        logger.info("Performing destroy")
+        instance.delete()
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request: HttpRequest, pk: int) -> Response:
+        """Restore a soft-deleted organisation"""
+        # Get the model class from the serializer
+        model_class = self.get_serializer_class().Meta.model
+
+        try:
+            organisation = model_class.objects.with_deleted().get(pk=pk)
+
+            if organisation.deleted_at is None:
+                return Response(
+                    {"error": "Organisation is not deleted"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            organisation.restore()
+            serializer = self.get_serializer(organisation)
+
+            return Response(
+                {
+                    "message": f"{self.get_organisation_type_name().capitalize()} restored successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except model_class.DoesNotExist:
+            return Response(
+                {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
         """Enrich organisation data using LLM and web search."""

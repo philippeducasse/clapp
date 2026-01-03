@@ -24,18 +24,27 @@ class FestivalViewSet(OrganisationViewSet):
     ordering = ["name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
+        include_deleted = (
+            self.request.query_params.get("include_deleted", "false").lower() == "true"
+        )
+
+        base_queryset = (
+            Festival.objects.with_deleted() if include_deleted else Festival.objects.all()
+        )
+
         festival_content_type = ContentType.objects.get_for_model(Festival)
         year_start = date(2026 - 1, 9, 1)
         year_end = date(2026, 8, 31)
         user_profile_id = self.request.user.id
         queryset = (
-            Festival.objects.annotate(
+            base_queryset.annotate(
                 has_application_this_year=Exists(
                     Application.objects.filter(
                         content_type=festival_content_type,
                         object_id=OuterRef("pk"),
                         application_date__year=2026,
                         profile_id=user_profile_id,
+                        deleted_at__isnull=True,
                     )
                 ),
             )
@@ -47,6 +56,7 @@ class FestivalViewSet(OrganisationViewSet):
                         application_date__gte=year_start,
                         application_date__lte=year_end,
                         profile_id=user_profile_id,
+                        deleted_at__isnull=True,
                     ).select_related("content_type"),
                     to_attr="_prefetched_current_year_apps",
                 )

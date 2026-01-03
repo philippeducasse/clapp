@@ -10,4 +10,4 @@ class ResidencySerializer(serializers.ModelSerializer):
     class Meta:
         model: Type[Residency] = Residency
         fields: str = "__all__"
-        read_only_fields = ("id",)
+        read_only_fields = ("id", "deleted_at")

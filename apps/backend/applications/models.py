@@ -1,9 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
+from organisations.models import SoftDeleteManager
 from performances.models import Performance
 from profiles.models import Profile
 
@@ -60,10 +61,32 @@ class Application(models.Model):
     comments = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True, default=None)
+
+    objects = SoftDeleteManager()
 
     def __str__(self) -> str:
         org_name = self.organisation.name if self.organisation else "No organisation"
         return f"{self.id}:{org_name} {self.application_year}"
+
+    def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
+        """Soft delete the application"""
+        from django.utils import timezone
+
+        self.deleted_at = timezone.now()
+        self.save()
+        return (1, {self._meta.label: 1})
+
+    def hard_delete(
+        self, using: Any = None, keep_parents: bool = False
+    ) -> tuple[int, dict[str, int]]:
+        """Actually delete from database"""
+        return super().delete(using=using, keep_parents=keep_parents)
+
+    def restore(self) -> None:
+        """Restore a soft-deleted application"""
+        self.deleted_at = None
+        self.save()
 
     @property
     def application_year(self) -> int | None:

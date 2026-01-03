@@ -10,4 +10,4 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model: Type[Venue] = Venue
         fields: str = "__all__"
-        read_only_fields = ("id",)
+        read_only_fields = ("id", "deleted_at")

@@ -1,9 +1,75 @@
 from django.contrib import admin
-from organisations.residencies.models import Residency
+from django.utils.html import format_html
+
+from organisations.residencies.models import Residency, ResidencyContact
+
+
+class SoftDeleteFilter(admin.SimpleListFilter):
+    title = "Deletion Status"
+    parameter_name = "deleted"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("active", "Active only"),
+            ("deleted", "Deleted only"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "active":
+            return queryset.filter(deleted_at__isnull=True)
+        elif self.value() == "deleted":
+            return queryset.filter(deleted_at__isnull=False)
+        # Default: show all
+        return queryset
+
+
+class ResidencyContactInline(admin.TabularInline):
+    model = ResidencyContact
+    extra = 1
+
+    def get_queryset(self, request):
+        """Include soft-deleted contacts in admin"""
+        qs = super().get_queryset(request)
+        return qs.model.objects.with_deleted().filter(residency=self.parent_instance)
 
 
 class ResidencyAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "country", "deleted_status")
+    list_filter = (SoftDeleteFilter, "country")
+    search_fields = ("name", "country")
+    inlines = [ResidencyContactInline]
+    readonly_fields = ("deleted_at",)
+
+    def get_queryset(self, request):
+        """Show all residencies (active + deleted) by default"""
+        return self.model.objects.with_deleted()
+
+    def deleted_status(self, obj):
+        """Display deletion status with visual indicator"""
+        if obj.deleted_at:
+            return format_html('<span style="color: red; font-weight: bold;">🗑️ Deleted</span>')
+        return format_html('<span style="color: green;">✓ Active</span>')
+
+    deleted_status.short_description = "Status"
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        actions["restore_residencies"] = (
+            self.restore_residencies,
+            "restore_residencies",
+            "Restore selected residencies",
+        )
+        return actions
+
+    def restore_residencies(self, request, queryset):
+        """Admin action to restore soft-deleted residencies"""
+        restored_count = 0
+        for residency in queryset.filter(deleted_at__isnull=False):
+            residency.restore()
+            restored_count += 1
+        self.message_user(request, f"Successfully restored {restored_count} residency/residencies.")
+
+    restore_residencies.short_description = "Restore selected residencies"
 
 
 admin.site.register(Residency, ResidencyAdmin)
