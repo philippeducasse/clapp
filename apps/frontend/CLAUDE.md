@@ -57,19 +57,23 @@ src/
 ### Core Architectural Patterns
 
 #### 1. Route Groups
+
 - `(main)` - Authenticated pages with full layout (sidebar + navbar)
 - `(auth)` - Login/register with minimal layout
 
 #### 2. Entity CRUD Pattern
+
 All main entities (festivals, venues, residencies, applications) follow the same pattern:
 
 **Routes:**
+
 - `/{entity}` - Table listing
 - `/{entity}/[id]` - Detail view
 - `/{entity}/[id]/edit` - Edit form
 - `/{entity}/create` - Multi-step creation (step1 → step2)
 
 **Components Pattern:**
+
 ```
 page-components/{entity}/
 ├── components/
@@ -87,6 +91,7 @@ page-components/{entity}/
 #### 3. API Layer
 
 **Backend Integration:**
+
 - Backend URL: `NEXT_PUBLIC_BACKEND_URL` (default: http://localhost:8000)
 - All API calls through `fetchHelper.ts`
 - **Automatic serialization:** Frontend uses camelCase, backend uses snake_case
@@ -94,6 +99,7 @@ page-components/{entity}/
 - Toast notifications on success/error
 
 **Standard API Service Pattern:**
+
 ```typescript
 interface EntityApiService<T> {
   getAll: () => Promise<PaginatedResponse<T>>;
@@ -109,6 +115,7 @@ interface EntityApiService<T> {
 #### 4. Redux State Management
 
 **Store Structure:**
+
 ```typescript
 {
   festivals: { entities: Festival[], filters: {...} },
@@ -120,6 +127,7 @@ interface EntityApiService<T> {
 ```
 
 **Usage:**
+
 ```typescript
 const dispatch = useAppDispatch();
 const festival = useSelector((state: RootState) => selectFestival(state, id));
@@ -139,6 +147,7 @@ Forms are defined via `ControlledFormElement[]` arrays that specify field types,
 `createZodFormSchema(formFields)` automatically generates Zod schemas from field configs.
 
 **Form Helpers (formHelper.tsx):**
+
 - `createZodFormSchema()` - Generate Zod schema
 - `sanitizeFormData()` - Prepare backend data for form
 - `prepareFormDataForSubmission()` - Prepare form data for backend
@@ -146,6 +155,7 @@ Forms are defined via `ControlledFormElement[]` arrays that specify field types,
 - `getInitialValues()` - Generate initial form values
 
 **Multi-Step Form Pattern:**
+
 1. Step 1 (basic info) → Stores temp entity in Redux with `id: -1`
 2. Step 2 (contact info) → Creates final entity via API
 
@@ -155,12 +165,14 @@ Forms are defined via `ControlledFormElement[]` arrays that specify field types,
 #### 6. Table Pattern
 
 **TanStack React Table** with:
+
 - Server-side or client-side pagination
 - Column filtering & global search
 - Sortable headers
 - Fixed table layout with column sizing
 
 **Usage:**
+
 ```typescript
 const columns = useEntityColumns(); // Custom hook per entity
 <DataTable
@@ -168,7 +180,7 @@ const columns = useEntityColumns(); // Custom hook per entity
   data={entities}
   entityName={EntityName.ENTITY}
   filters={getEntityFilters()}
-/>
+/>;
 ```
 
 #### 7. Details View Pattern
@@ -189,6 +201,7 @@ Each entity has helper functions converting entity data to `SectionCellProps[]` 
 ## Key Conventions
 
 ### Naming
+
 - **Frontend:** camelCase for all data
 - **Backend:** snake_case (auto-converted by API layer)
 - **Components:** PascalCase files
@@ -197,14 +210,17 @@ Each entity has helper functions converting entity data to `SectionCellProps[]` 
 - **Routes:** kebab-case segments
 
 ### Path Aliasing
+
 `@/*` maps to `./src/*` (configured in tsconfig.json)
 
 ### Client vs Server Components
+
 - Server components by default (Next.js 15)
 - Mark with `"use client"` only when needed (hooks, state, event handlers)
 - Pages typically fetch initial data server-side, pass to client components
 
 ### Data Fetching Pattern
+
 ```typescript
 // In client components
 useEffect(() => {
@@ -215,12 +231,15 @@ useEffect(() => {
 ```
 
 ### Enums
+
 Extensive use of enums for type safety:
+
 - `Action` - CREATE, EDIT, APPLY, LOGIN, REGISTER
 - `EntityName` - FESTIVAL, VENUE, RESIDENCY, etc.
 - `TagAction` - STAR, WATCH, INACTIVE, etc.
 
 ### Authentication
+
 - Middleware checks `sessionid` cookie
 - Redirects unauthenticated users to `/login`
 - Profile data stored in Redux (`profile` slice)
