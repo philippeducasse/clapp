@@ -12,6 +12,9 @@ DATABASES = {
     }
 }
 
+# Use Django's in-memory email backend for integration tests
+# This allows testing real email sending without mocking
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 os.environ["GEMINI_API_KEY"] = "dummy_key_for_testing"
 os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"

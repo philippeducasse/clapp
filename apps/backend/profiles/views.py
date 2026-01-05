@@ -61,7 +61,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED,
             )
         logger.warning(f"Registration failed with errors: {serializer.errors}")
-        return Response(serializer.erors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=["post"], permission_classes=[permissions.AllowAny])
     def login(self, request: Request) -> Response:
