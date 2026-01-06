@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateVenue, selectVenue, setVenue } from "@/redux/slices/venueSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshVenue } from "../../helpers/refreshVenue";
-import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
@@ -74,10 +73,6 @@ const VenueForm = ({ action }: VenueFormProps) => {
       setIsLoading(false);
     }
   };
-
-  if (!venue && venueId) {
-    return <Skeleton />;
-  }
 
   const onCancelHref = venueId ? `/venues/${venue?.id}` : "/venues";
 

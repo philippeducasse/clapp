@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateFestival, selectFestival, setFestival } from "@/redux/slices/festivalSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshFestival } from "../../helpers/refreshFestival";
-import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
@@ -76,10 +75,6 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
       setIsLoading(false);
     }
   };
-
-  if (!festival && festivalId) {
-    return <Skeleton />;
-  }
 
   const onCancelHref = festivalId ? `/festivals/${festival?.id}` : "/festivals";
 

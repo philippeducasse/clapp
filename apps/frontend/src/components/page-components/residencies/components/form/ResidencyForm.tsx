@@ -12,7 +12,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateResidency, selectResidency, setResidency } from "@/redux/slices/residencySlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { refreshResidency } from "../../helpers/refreshResidency";
-import { Skeleton } from "@/components/ui/skeleton";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action, EntityName } from "@/interfaces/Enums";
@@ -73,10 +72,6 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
       setIsLoading(false);
     }
   };
-
-  if (!residency && residencyId) {
-    return <Skeleton />;
-  }
 
   const onCancelHref = residencyId ? `/residencies/${residency?.id}` : "/residencies";
 
