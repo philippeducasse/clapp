@@ -83,14 +83,14 @@ class TestFestivalSoftDelete:
 
         festival.delete()
 
-        # Application should be soft deleted (not in default queryset)
-        assert Application.objects.filter(id=application_id).count() == 0
+        # Application should  not be soft deleted
+        assert Application.objects.filter(id=application_id).count() == 1
 
         # CRITICAL: Verify application still exists in database
         assert Application.objects.with_deleted().filter(id=application_id).count() == 1
 
         deleted_app = Application.objects.with_deleted().get(id=application_id)
-        assert deleted_app.deleted_at is not None
+        assert deleted_app.deleted_at is None
         # Verify relationship data is preserved
         assert deleted_app.object_id == festival.id
         assert deleted_app.profile == profile
@@ -146,8 +146,8 @@ class TestFestivalSoftDelete:
 
         festival.delete()
 
-        # Verify application was deleted
-        assert Application.objects.filter(id=application_id).count() == 0
+        # Verify application was not deleted
+        assert Application.objects.filter(id=application_id).count() == 1
 
         # Restore festival
         deleted_festival = Festival.objects.with_deleted().get(id=festival.id)

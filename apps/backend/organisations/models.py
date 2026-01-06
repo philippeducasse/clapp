@@ -91,15 +91,13 @@ class Organisation(models.Model):
         return self.name
 
     def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
-        """Soft delete the organisation and cascade to contacts and applications"""
+        """Soft delete the organisation and cascade to contacts (but preserve applications)"""
         from django.utils import timezone
 
         self.deleted_at = timezone.now()
         self.save()
         logger.info(f"Soft deleting {self.name}")
         self._soft_delete_contacts()
-
-        self._soft_delete_applications()
 
         return (1, {self._meta.label: 1})
 
@@ -116,7 +114,8 @@ class Organisation(models.Model):
 
         self._restore_contacts()
 
-        self._restore_applications()
+        # Applications are not restored because they were never soft-deleted
+        # See delete() method above
 
     def _soft_delete_contacts(self) -> None:
         """Cascade soft delete to contacts"""

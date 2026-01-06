@@ -436,10 +436,14 @@ def prepare_application_email(
     text_content = strip_tags(application.message)
     html_content = application.message
     connection = get_user_email_connection(profile)
-    logger.debug(
-        f"Email connection: host={connection.host}, port={connection.port}, "
-        f"user={connection.username}, tls={connection.use_tls}, ssl={connection.use_ssl}"
-    )
+    try:
+        logger.debug(
+            f"Email connection: host={connection.host}, port={connection.port}, "
+            f"user={connection.username}, tls={connection.use_tls}, ssl={connection.use_ssl}"
+        )
+    except AttributeError:
+        # locmem backend doesn't have these attributes
+        pass
     formatted_from_email = formataddr((profile.company_name, profile.email_host_user))
 
     email = EmailMultiAlternatives(
