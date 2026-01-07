@@ -1,9 +1,9 @@
 import React from "react";
-import ResidencyForm from "@/components/page-components/residencies/components/form/ResidencyForm";
+import ResidencyBasicInfoForm from "@/components/page-components/residencies/components/form/ResidencyBasicInfoForm";
 import { Action } from "@/interfaces/Enums";
 
 const CreateResidencyPage = () => {
-  return <ResidencyForm action={Action.CREATE} />;
+  return <ResidencyBasicInfoForm action={Action.CREATE} />;
 };
 
 export default CreateResidencyPage;

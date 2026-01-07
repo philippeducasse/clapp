@@ -10,7 +10,7 @@ export interface Residency {
   country?: string;
   town?: string;
   approximateDate?: string;
-  contact?: OrganisationContact[];
+  contacts?: OrganisationContact[];
   startDate?: Date | string;
   endDate?: Date | string;
   applicationType?: string;
@@ -18,6 +18,8 @@ export interface Residency {
   applicationEnd?: string;
   applied?: boolean;
   description?: string;
+  comments?: string;
   status?: string;
+  tag?: string;
   lastUpdated?: string;
 }

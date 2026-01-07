@@ -1,5 +1,6 @@
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
+
 export const getResidencyFormFields = (): ControlledFormElement[] => {
   return [
     {
@@ -36,18 +37,6 @@ export const getResidencyFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.TEXT,
     },
     {
-      label: "Contact Email",
-      fieldName: "contact.email",
-      type: ControlledFormElementType.EMAIL,
-      helpText: "Email of main person of contact",
-    },
-    {
-      label: "Contact Person",
-      fieldName: "contactPerson",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Name of main person of contact",
-    },
-    {
       label: "Start Date",
       fieldName: "startDate",
       type: ControlledFormElementType.DATE,
@@ -70,13 +59,6 @@ export const getResidencyFormFields = (): ControlledFormElement[] => {
       fieldName: "applicationEnd",
       type: ControlledFormElementType.TEXT,
     },
-    // {
-    //   label: "Application type",
-    //   fieldName: "applicationType",
-    //   type: ControlledFormElementType.SELECT,
-    //   options: getOptions(ApplicationType),
-    //   helpText: "How the residency accepts applications",
-    // },
     {
       label: "Applied",
       fieldName: "applied",

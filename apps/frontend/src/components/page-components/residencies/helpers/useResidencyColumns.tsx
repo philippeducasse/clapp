@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
+import { TagBadge } from "@/components/common/TagBadge";
+import { useCallback, useMemo } from "react";
 
 interface UseResidencyColumnsProps {
   onDeleteClick: (id: number) => void;
@@ -15,10 +17,15 @@ interface UseResidencyColumnsProps {
 const useResidencyColumns = ({ onDeleteClick }: UseResidencyColumnsProps): ColumnDef<Residency>[] => {
   const router = useRouter();
 
-  const onEdit = (id: string) => {
-    router.push(`/residencies/${id}/edit`);
-  };
-  return [
+  const onEdit = useCallback(
+    (id: string) => {
+      router.push(`/residencies/${id}/edit`);
+    },
+    [router]
+  );
+
+  return useMemo(
+    () => [
     {
       accessorKey: "name",
       header: getSortableHeader("Name"),
@@ -33,9 +40,22 @@ const useResidencyColumns = ({ onDeleteClick }: UseResidencyColumnsProps): Colum
       },
     },
     {
+      accessorKey: "tag",
+      header: getSortableHeader("Tag"),
+      size: 50,
+      filterFn: (row, columnId, filterValue) => {
+        if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+        return filterValue.includes(row.getValue(columnId));
+      },
+      cell: ({ row }) => {
+        const tag = row.original?.tag;
+        return <TagBadge tag={tag} />;
+      },
+    },
+    {
       accessorKey: "country",
       header: getSortableHeader("Country"),
-      size: 100,
+      size: 70,
     },
     {
       accessorKey: "websiteUrl",
@@ -96,7 +116,9 @@ const useResidencyColumns = ({ onDeleteClick }: UseResidencyColumnsProps): Colum
         );
       },
     },
-  ];
+    ],
+    [onDeleteClick, onEdit, router]
+  );
 };
 
 export { useResidencyColumns };

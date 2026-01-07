@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useResidencyColumns } from "../../helpers/useResidencyColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
@@ -9,6 +9,7 @@ import { Residency } from "@/interfaces/entities/Residency";
 import { setResidencies, deleteResidency } from "@/redux/slices/residencySlice";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { residencyApiService } from "@/api/residencyApiService";
+import { getResidencyFilters } from "../../helpers/getResidencyFilters";
 
 interface ResidenciesTableProps {
   residencies: Residency[];
@@ -24,12 +25,12 @@ export const ResidenciesTable = ({ residencies }: ResidenciesTableProps) => {
     dispatch(setResidencies(residencyData));
   }, [dispatch, residencyData]);
 
-  const handleDeleteClick = (id: number) => {
+  const handleDeleteClick = useCallback((id: number) => {
     setDeleteResidencyId(id);
     setOpenDeleteModal(true);
-  };
+  }, []);
 
-  const onConfirmDelete = async () => {
+  const onConfirmDelete = useCallback(async () => {
     if (deleteResidencyId === null) return;
     await residencyApiService.remove(deleteResidencyId);
 
@@ -39,9 +40,11 @@ export const ResidenciesTable = ({ residencies }: ResidenciesTableProps) => {
     // Also update Redux for consistency
     dispatch(deleteResidency(deleteResidencyId));
     setDeleteResidencyId(null);
-  };
+  }, [deleteResidencyId, dispatch]);
 
   const columns = useResidencyColumns({ onDeleteClick: handleDeleteClick });
+
+  const filters = useMemo(() => getResidencyFilters(), []);
 
   return (
     <>
@@ -55,6 +58,7 @@ export const ResidenciesTable = ({ residencies }: ResidenciesTableProps) => {
         columns={columns}
         data={residencyData}
         entityName={EntityName.RESIDENCY}
+        filters={filters}
       />
     </>
   );

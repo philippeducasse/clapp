@@ -12,3 +12,9 @@ export const getResidencyDetails = (
     { title: "Last Updated", value: residency.lastUpdated },
   ];
 };
+
+export const getResidencyComments = (residency: Residency): SectionCellProps[] => {
+  if (!residency) return [];
+
+  return [{ title: "", value: residency?.comments }];
+};

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Residency } from "@/interfaces/entities/Residency";
 import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
-import { getResidencyFormFields } from "../../helpers/getResidencyFormFields";
+import { getResidencyFormFields } from "../../helpers/form/getResidencyFormFields";
 import { residencyApiService } from "@/api/residencyApiService";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +20,7 @@ interface ResidencyFormProps {
   action: Action;
 }
 
-const ResidencyForm = ({ action }: ResidencyFormProps) => {
+const ResidencyBasicInfoForm = ({ action }: ResidencyFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
@@ -97,4 +97,4 @@ const ResidencyForm = ({ action }: ResidencyFormProps) => {
     </>
   );
 };
-export default ResidencyForm;
+export default ResidencyBasicInfoForm;
