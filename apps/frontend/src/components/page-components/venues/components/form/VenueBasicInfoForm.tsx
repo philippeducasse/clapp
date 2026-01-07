@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Venue } from "@/interfaces/entities/Venue";
 import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
-import { getVenueFormFields } from "../../helpers/getVenueFormFields";
+import { getVenueFormFields } from "../../helpers/form/getVenueFormFields";
 import { venueApiService } from "@/api/venueApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +21,7 @@ interface VenueFormProps {
   action: Action;
 }
 
-const VenueForm = ({ action }: VenueFormProps) => {
+const VenueBasicInfoForm = ({ action }: VenueFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
@@ -100,4 +100,4 @@ const VenueForm = ({ action }: VenueFormProps) => {
     </>
   );
 };
-export default VenueForm;
+export default VenueBasicInfoForm;

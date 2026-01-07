@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getSortableHeader } from "@/components/common/table/getSortableHeader";
 import { useRouter } from "next/navigation";
+import { capitalizeFirst } from "@/utils/stringUtils";
+import { TagBadge } from "@/components/common/TagBadge";
+import { useCallback, useMemo } from "react";
 
 interface UseVenueColumnsProps {
   onDeleteClick: (id: number) => void;
@@ -15,10 +18,15 @@ interface UseVenueColumnsProps {
 const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Venue>[] => {
   const router = useRouter();
 
-  const onEdit = (id: string) => {
-    router.push(`/venues/${id}/edit`);
-  };
-  return [
+  const onEdit = useCallback(
+    (id: string) => {
+      router.push(`/venues/${id}/edit`);
+    },
+    [router]
+  );
+
+  return useMemo(
+    () => [
     {
       accessorKey: "name",
       header: getSortableHeader("Name"),
@@ -33,9 +41,42 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
       },
     },
     {
+      accessorKey: "tag",
+      header: getSortableHeader("Tag"),
+      size: 50,
+      filterFn: (row, columnId, filterValue) => {
+        if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+        return filterValue.includes(row.getValue(columnId));
+      },
+      cell: ({ row }) => {
+        const tag = row.original?.tag;
+        return <TagBadge tag={tag} />;
+      },
+    },
+    {
+      accessorKey: "venueType",
+      header: getSortableHeader("Type"),
+      size: 70,
+      cell: ({ row }) => capitalizeFirst(row.original.venueType),
+    },
+    {
       accessorKey: "country",
       header: getSortableHeader("Country"),
-      size: 100,
+      size: 70,
+    },
+    {
+      accessorKey: "contacted",
+      header: getSortableHeader("Contacted"),
+      size: 70,
+      filterFn: (row, _columnId, filterValue) => {
+        if (filterValue === undefined) return true;
+        const contacted = row.original?.contacted;
+        return filterValue === "CONTACTED" ? contacted : !contacted;
+      },
+      cell: ({ row }) => {
+        const contacted = row.original?.contacted;
+        return <span>{contacted ? "Yes" : "No"}</span>;
+      },
     },
     {
       accessorKey: "websiteUrl",
@@ -91,7 +132,9 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
         );
       },
     },
-  ];
+    ],
+    [onDeleteClick, onEdit, router]
+  );
 };
 
 export { useVenueColumns };

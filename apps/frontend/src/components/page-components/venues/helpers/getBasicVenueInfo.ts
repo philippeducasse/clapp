@@ -1,6 +1,6 @@
 import { Venue } from "@/interfaces/entities/Venue";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
-import { capitalize } from "lodash";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 export const getVenueBasicInfo = (venue: Venue): SectionCellProps[] => {
   if (!venue) return [];
@@ -14,7 +14,6 @@ export const getVenueBasicInfo = (venue: Venue): SectionCellProps[] => {
       value: venue.websiteUrl,
       type: SectionCellType.Link,
     },
-    { title: "Venue type", value: capitalize(venue.venueType) },
-    { title: "Approximate date", value: venue.approximateDate },
+    { title: "Venue type", value: capitalizeFirst(venue.venueType) },
   ];
 };

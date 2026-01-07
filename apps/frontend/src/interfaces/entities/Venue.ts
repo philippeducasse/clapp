@@ -8,7 +8,7 @@ export interface Venue {
   country?: string;
   town?: string;
   approximateDate?: string;
-  contact?: OrganisationContact[];
+  contacts?: OrganisationContact[];
   venueType?: VenueType;
   contacted?: boolean;
   description?: string;

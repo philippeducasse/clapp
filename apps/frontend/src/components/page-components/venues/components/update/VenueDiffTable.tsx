@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Venue } from "@/interfaces/entities/Venue";
 import VenueDiffForm from "../form/VenueDiffForm";
-import { getVenueFormFields } from "../../helpers/getVenueFormFields";
+import { getVenueFormFields } from "../../helpers/form/getVenueFormFields";
 import { Dispatch, SetStateAction } from "react";
 
 export interface DiffViewProps {

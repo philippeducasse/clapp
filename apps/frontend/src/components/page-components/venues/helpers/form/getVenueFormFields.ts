@@ -2,6 +2,7 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
 import { VenueType } from "@/interfaces/entities/Venue";
+
 export const getVenueFormFields = (): ControlledFormElement[] => {
   return [
     {
@@ -22,6 +23,12 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.URL,
     },
     {
+      label: "Approximate Date",
+      fieldName: "approximateDate",
+      type: ControlledFormElementType.TEXT,
+      helpText: "Approximate date the venue is operating",
+    },
+    {
       label: "Country",
       fieldName: "country",
       type: ControlledFormElementType.TEXT,
@@ -38,19 +45,7 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
       options: getOptions(VenueType),
     },
     {
-      label: "Contact Email",
-      fieldName: "contact.email",
-      type: ControlledFormElementType.EMAIL,
-      helpText: "Email of main person of contact",
-    },
-    {
-      label: "Contact Person",
-      fieldName: "contactPerson",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Name of main person of contact",
-    },
-    {
-      label: "Conntacted",
+      label: "Contacted",
       fieldName: "contacted",
       type: ControlledFormElementType.BOOLEAN,
     },

@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { Flag } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Flag, MessageSquare, Send } from "lucide-react";
 import { VenueUpdateDialog } from "../update/VenueUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
-import { selectVenue } from "@/redux/slices/venueSlice";
+import { selectVenue, updateVenue } from "@/redux/slices/venueSlice";
 import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getVenueBasicInfo } from "../../helpers/getBasicVenueInfo";
-import { getVenueDetails } from "../../helpers/getVenueDetails";
+import { getVenueDetails, getVenueComments } from "../../helpers/getVenueDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshVenue } from "../../helpers/refreshVenue";
@@ -19,6 +19,11 @@ import { Button } from "@/components/ui/button";
 import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
+import ContactsViewSection from "@/components/common/details-view/ContactsSection";
+import AddSection from "@/components/common/buttons/AddSection";
+import { venueApiService } from "@/api/venueApiService";
+import DeleteButton from "@/components/common/buttons/DeleteButton";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
 
 const VenueView = () => {
   const params = useParams();
@@ -26,6 +31,9 @@ const VenueView = () => {
   const venueId = Number(params.id);
   const venue = useSelector((state: RootState) => selectVenue(state, venueId));
   const router = useRouter();
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemName, setItemName] = useState<"venue" | "contact">("venue");
+  const [deleteIndex, setDeleteIndex] = useState<number | undefined>();
 
   useEffect(() => {
     if (!venue) {
@@ -41,20 +49,61 @@ const VenueView = () => {
     router.push(`${venueId}/apply`);
   };
 
+  const handleDelete = (entity: "venue" | "contact", index?: number) => {
+    setDeleteIndex(index);
+    setItemName(entity);
+    setOpenDeleteDialog(true);
+  };
+
+  const onConfirmDelete = async () => {
+    if (!venue) return;
+
+    try {
+      if (itemName === "venue") {
+        await venueApiService.remove(venueId);
+        router.push("/venues");
+      } else if (itemName === "contact" && deleteIndex !== undefined) {
+        const updatedContacts = venue.contacts?.filter((_, i) => i !== deleteIndex) ?? [];
+
+        const updatedVenue = {
+          ...venue,
+          contacts: updatedContacts,
+        };
+        await venueApiService.update(updatedVenue);
+        dispatch(updateVenue(updatedVenue));
+      }
+    } catch (error) {
+      console.error(`Error deleting ${itemName}:`, error);
+    }
+  };
+
   return (
     <DetailsViewWrapper href="/venues">
+      <DeleteModal
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        onConfirm={onConfirmDelete}
+        itemName={itemName}
+      />
       <DetailsViewHeader
         title={venue.name}
         subtitle={`${venue.town && `${venue.town}`}, ${venue.country}`}
         icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={venue.id}
+        tagApiMethod={venueApiService.tag}
+        updateSlice={updateVenue}
         actionElements={
           <>
-            <Button onClick={goToApplyPage} disabled={false}>
-              {venue.applied ? "Go to application" : "Apply to venue"}
+            <Button onClick={goToApplyPage}>
+              <Send /> Apply
             </Button>
             <VenueUpdateDialog />
             <EditButton href={`/venues/${venue.id}/edit`} />
+            <DeleteButton
+              variant={"outline"}
+              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
+              onDelete={() => handleDelete("venue", venueId)}
+            />
           </>
         }
       />
@@ -62,11 +111,32 @@ const VenueView = () => {
         title="Basic information"
         icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
         data={getVenueBasicInfo(venue)}
+        ribbonType="tag"
+        ribbonValue={venue.tag}
       />
+      {venue.comments && (
+        <DetailsViewSection
+          title="Comments"
+          icon={<MessageSquare className="text-emerald-600 dark:text-emerald-400" />}
+          data={getVenueComments(venue)}
+        />
+      )}
       <DetailsViewSection
         title="Venue details"
         icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
         data={getVenueDetails(venue)}
+      />
+      {venue.contacts && venue.contacts.length > 0 && (
+        <ContactsViewSection
+          title="Contacts"
+          contacts={venue.contacts}
+          entityId={venueId}
+          onDelete={(index) => handleDelete("contact", index)}
+        />
+      )}
+      <AddSection
+        label="contact"
+        href={`${venueId}/edit/contacts/${venue.contacts?.length ?? 0}`}
       />
     </DetailsViewWrapper>
   );

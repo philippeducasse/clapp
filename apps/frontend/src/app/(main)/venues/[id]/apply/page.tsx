@@ -1,9 +1,8 @@
 import React from "react";
-import ApplicationForm from "@/components/page-components/applications/components/form/ManualApplicationForm";
-import { Action } from "@/interfaces/Enums";
+import ApplicationForm from "@/components/page-components/applications/components/form/ApplicationForm";
 
 const VenueApplicationPage = () => {
-  return <ApplicationForm action={Action.CREATE} />;
+  return <ApplicationForm />;
 };
 
 export default VenueApplicationPage;
