@@ -3,7 +3,7 @@ from organisations.festivals.models import Festival
 import os
 import django
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "conf.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "conf.settings.local")
 django.setup()
 
 with open("../festivals_data.csv", "r") as file:

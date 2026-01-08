@@ -1,6 +1,6 @@
 """Test settings that override production settings for pytest"""
 
-from .settings import *  # noqa
+from .base import *  # noqa
 import os
 
 # Override database to use in-memory SQLite for tests
