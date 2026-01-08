@@ -1,7 +1,11 @@
 # mypy: ignore-errors
 
-from mistralai import Mistral, ConversationResponse
 import os
+
+from mistralai import ConversationResponse, Mistral
+from rest_framework.exceptions import Throttled
+
+from .rate_limit import check_llm_rate_limit, increment_llm_call_counter
 
 
 class MistralClient:
@@ -20,13 +24,18 @@ class MistralClient:
             },
         )
 
-    def chat(self, prompt: str) -> str:
+    def chat(self, prompt: str, tenant_schema: str) -> str:
+        allowed, remaining = check_llm_rate_limit(tenant_schema)
+
+        if not allowed:
+            raise Throttled(detail="Daily LLM generation limit reached. Try again tomorrow.")
+
         try:
-            # Call the Mistral API to get a chat response
             chat_response = self.client.chat.complete(
                 model=self.model, messages=[{"role": "user", "content": prompt}]
             )
-            # Extract and return the content of the response
+            # TODO: return limit to frontend?
+            new_count = increment_llm_call_counter(tenant_schema)  # noqa
             return chat_response.choices[0].message.content
 
         except Exception as e:

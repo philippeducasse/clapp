@@ -3,7 +3,7 @@ services:
     image: postgres:16-apline
     container_name: cab_db
     environment:
-      POSTGRES_DB: ${DB_NAME:-cab}
+      POSTGRES_DB: ${DB_NAME:-cab} #TODO: fix these
       POSTGRES_USER: ${DB_USER:-philippe}
       POSTGRES_PASSWORD: 0306
     volumes:
@@ -68,7 +68,11 @@ services:
       - next
     networks:
       - ca-network
-
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 volumes:
   postgres_data:
   static_volume:

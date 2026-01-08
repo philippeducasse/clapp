@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from .base import *  # noqa
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -44,5 +45,6 @@ CACHES = {
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
+        "KEY_PREFIX": "cab",
     }
 }
