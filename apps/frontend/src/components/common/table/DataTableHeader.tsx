@@ -12,21 +12,23 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import {
   selectColumnFilters,
-  selectGlobalFilter,
+  selectSearchBarFilter,
   setColumnFilters,
-  setGlobalFilter as setReduxGlobalFilter,
+  setSearchBarFilter as setReduxsearchBarFilter,
   removeColumnFilter,
 } from "@/redux/slices/festivalSlice";
 
 interface DataTableHeaderProps<TData> {
-  globalFilter: string;
+  searchBarFilter: string;
+  setSearchBarFilter: (value: string) => void;
   entityName: string;
   table: Table<TData>;
   filters?: FilterConfig[];
 }
 
 const DataTableHeader = <TData,>({
-  globalFilter,
+  searchBarFilter,
+  setSearchBarFilter,
   entityName,
   table,
   filters,
@@ -34,27 +36,27 @@ const DataTableHeader = <TData,>({
   const dispatch = useDispatch();
 
   const reduxFilters = useSelector(selectColumnFilters);
-  const reduxGlobalFilter = useSelector(selectGlobalFilter);
+  const reduxsearchBarFilter = useSelector(selectSearchBarFilter);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
+  console.log({ reduxsearchBarFilter, filters });
 
   useEffect(() => {
     if (reduxFilters.length > 0) {
       table.setColumnFilters(reduxFilters);
     }
-    if (reduxGlobalFilter) {
-      table.setGlobalFilter(reduxGlobalFilter);
+    if (reduxsearchBarFilter) {
+      setSearchBarFilter(reduxsearchBarFilter);
     }
-  }, [table, reduxFilters, reduxGlobalFilter]);
+  }, [table, reduxFilters, reduxsearchBarFilter, setSearchBarFilter]);
 
   useEffect(() => {
     const columnFilters = table.getState().columnFilters;
     dispatch(setColumnFilters(columnFilters));
-  }, [table, dispatch]);
+  }, [table, dispatch, openFilterDialog]);
 
   useEffect(() => {
-    const globalFilter = table.getState().globalFilter ?? "";
-    dispatch(setReduxGlobalFilter(globalFilter));
-  }, [table, dispatch]);
+    dispatch(setReduxsearchBarFilter(searchBarFilter));
+  }, [searchBarFilter, dispatch]);
 
   const activeFilters =
     filters
@@ -97,9 +99,8 @@ const DataTableHeader = <TData,>({
     }
   };
 
-  const handleGlobalFilterChange = (value: string) => {
-    table.setGlobalFilter(value);
-    dispatch(setReduxGlobalFilter(value));
+  const handlesearchBarFilterChange = (value: string) => {
+    setSearchBarFilter(value);
   };
 
   return (
@@ -110,8 +111,8 @@ const DataTableHeader = <TData,>({
             <Search className="h-[16px] w-[16px] text-emerald-600" />
             <input
               placeholder="Search"
-              value={globalFilter}
-              onChange={(event) => handleGlobalFilterChange(event.target.value)}
+              value={searchBarFilter}
+              onChange={(event) => handlesearchBarFilterChange(event.target.value)}
               type="search"
               className="w-full p-2 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-foreground"
             />

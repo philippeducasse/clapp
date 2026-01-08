@@ -51,7 +51,7 @@ export function DataTable<TData, TValue>({
 }: // isLoading = false,
 DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
-  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [searchBarFilter, setSearchBarFilter] = useState<string>("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [internalPagination, setInternalPagination] = useState({
     pageIndex: 0,
@@ -70,7 +70,6 @@ DataTableProps<TData, TValue>) {
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
@@ -78,7 +77,6 @@ DataTableProps<TData, TValue>) {
     pageCount: isServerSide && totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
     state: {
       sorting,
-      globalFilter,
       columnFilters,
       pagination,
     },
@@ -88,7 +86,8 @@ DataTableProps<TData, TValue>) {
     <>
       <Card className="rounded-md border px-6">
         <DataTableHeader
-          globalFilter={globalFilter}
+          searchBarFilter={searchBarFilter}
+          setSearchBarFilter={setSearchBarFilter}
           entityName={entityName}
           table={table}
           filters={filters}

@@ -11,7 +11,7 @@ interface ApplicationsState extends FilterableState {
 const initialState: ApplicationsState = {
   applications: [],
   filters: [],
-  globalFilter: "",
+  searchBarFilter: "",
 };
 
 export const fetchApplications = createAsyncThunk("applications/fetchApplications", async () => {
@@ -70,7 +70,7 @@ export const {
   setColumnFilter,
   removeColumnFilter,
   clearColumnFilters,
-  setGlobalFilter,
+  setSearchBarFilter,
 } = applicationSlice.actions;
 
 export const selectAllApplications = (state: RootState) => state.applications.applications;
@@ -79,6 +79,6 @@ export const selectApplication = (state: RootState, applicationId: number) =>
     (application: Application) => application.id === applicationId
   );
 export const selectColumnFilters = (state: RootState) => state.applications.filters;
-export const selectGlobalFilter = (state: RootState) => state.applications.globalFilter;
+export const selectsearchBarFilter = (state: RootState) => state.applications.searchBarFilter;
 
 export default applicationSlice.reducer;

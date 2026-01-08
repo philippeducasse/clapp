@@ -3,7 +3,7 @@ import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 
 export interface FilterableState {
   filters: ColumnFilter[];
-  globalFilter: string;
+  searchBarFilter: string;
 }
 
 export const createFilterReducers = <T extends FilterableState>() => ({
@@ -28,7 +28,7 @@ export const createFilterReducers = <T extends FilterableState>() => ({
   clearColumnFilters(state: T) {
     state.filters = [];
   },
-  setGlobalFilter(state: T, action: PayloadAction<string>) {
-    state.globalFilter = action.payload;
+  setSearchBarFilter(state: T, action: PayloadAction<string>) {
+    state.searchBarFilter = action.payload;
   },
 });

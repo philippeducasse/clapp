@@ -11,7 +11,7 @@ interface FestivalsState extends FilterableState {
 const initialState: FestivalsState = {
   festivals: [],
   filters: [],
-  globalFilter: "",
+  searchBarFilter: "",
 };
 
 export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
@@ -69,13 +69,13 @@ export const {
   setColumnFilter,
   removeColumnFilter,
   clearColumnFilters,
-  setGlobalFilter,
+  setSearchBarFilter,
 } = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;
 export const selectFestival = (state: RootState, festivalId: number) =>
   state.festivals.festivals.find((festival: Festival) => festival.id === festivalId);
 export const selectColumnFilters = (state: RootState) => state.festivals.filters;
-export const selectGlobalFilter = (state: RootState) => state.festivals.globalFilter;
+export const selectSearchBarFilter = (state: RootState) => state.festivals.searchBarFilter;
 
 export default festivalSlice.reducer;
