@@ -189,11 +189,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         query = f"{organisation.website_url} {organisation.name} {organisation.country} {datetime.now().year} {org_type}"
         search_results = self.gemini_client.search(query=query)
-        # print("SEARCH: ", search_results)
+        logger.info("SEARCH: ", search_results)
         prompt: str = self.get_enrich_prompt(organisation, search_results)
-        # print("prompt: ", prompt)
-        llm_response: str = self.mistral_client.chat(prompt=prompt)
-        # print("RESPONSE", llm_response)
+        logger.info("prompt: ", prompt)
+
+        # TODO: after postgres migration, change to tenant_schema
+        llm_response: str = self.mistral_client.chat(prompt, request.user.id)
+        logger.info("RESPONSE", llm_response)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
 
@@ -375,7 +377,8 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             prompt = generate_application_mail_prompt(
                 organisation, profile, performance_objects, language, email_length
             )
-            message = self.mistral_client.chat(prompt=prompt)
+            # TODO: after postgres migration, change to tenant_schema
+            message = self.mistral_client.chat(prompt, request.user.id)
 
             return Response({"message": message}, status=status.HTTP_200_OK)
 
