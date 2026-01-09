@@ -38,7 +38,6 @@ const DataTableHeader = <TData,>({
   const reduxFilters = useSelector(selectColumnFilters);
   const reduxsearchBarFilter = useSelector(selectSearchBarFilter);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
-  console.log({ reduxsearchBarFilter, filters });
 
   useEffect(() => {
     if (reduxFilters.length > 0) {

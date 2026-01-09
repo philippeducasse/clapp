@@ -114,7 +114,6 @@ const ApplicationForm = () => {
           objectType: "Festival",
           objectId: festivalId,
         };
-        console.log({ applicationData, attachmentsSent });
         const response = await festivalApiService.apply(
           festivalId,
           applicationData as ApplicationCreate,

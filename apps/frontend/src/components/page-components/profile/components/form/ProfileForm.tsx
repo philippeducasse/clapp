@@ -104,7 +104,6 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
         let updatedProfile;
         if (isEmailConfig) {
           updatedProfile = { ...profile, ...values } as Profile;
-          console.log("updated profile: ", updatedProfile);
         } else {
           updatedProfile = { ...values, id: profile.id } as Profile;
         }
