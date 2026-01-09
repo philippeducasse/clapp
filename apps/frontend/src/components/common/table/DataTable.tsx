@@ -71,6 +71,7 @@ DataTableProps<TData, TValue>) {
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setSearchBarFilter,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
     manualPagination: isServerSide,
@@ -78,6 +79,7 @@ DataTableProps<TData, TValue>) {
     state: {
       sorting,
       columnFilters,
+      globalFilter: searchBarFilter,
       pagination,
     },
   });
