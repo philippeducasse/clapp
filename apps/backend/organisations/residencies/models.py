@@ -1,5 +1,8 @@
-from django.db import models
 from typing import List, Tuple
+
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+
 from organisations.models import Organisation, OrganisationContact
 
 
@@ -25,6 +28,11 @@ class Residency(Organisation):
         blank=True,
     )
     applied = models.BooleanField(default=False)
+    applications = GenericRelation(
+        "applications.Application",
+        content_type_field="content_type",
+        object_id_field="object_id",
+    )
 
     class Meta:
         db_table = "residencies_residency"

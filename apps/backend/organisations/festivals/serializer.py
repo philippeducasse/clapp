@@ -4,20 +4,17 @@ from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
 from organisations.festivals.models import Festival, FestivalContact
+from organisations.serializers import (
+    BlankToNullDateField,
+    BaseContactSerializer,
+    handle_nested_contacts,
+)
 from circus_agent_backend.utils import NormalizedURLField
 
 
-class BlankToNullDateField(serializers.DateField):
-    def to_internal_value(self, data: Any) -> Any:
-        if data in ("", None):
-            return None
-        return super().to_internal_value(data)
-
-
-class FestivalContactSerializer(serializers.ModelSerializer):
-    class Meta:
+class FestivalContactSerializer(BaseContactSerializer):
+    class Meta(BaseContactSerializer.Meta):
         model = FestivalContact
-        fields = ["id", "name", "email"]
 
 
 class FestivalSerializer(WritableNestedModelSerializer):
@@ -72,22 +69,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
         instance = super().update(instance, validated_data)
 
         if contacts_data is not None:
-            existing_contacts = {c.id: c for c in instance.contacts.all()}
-            incoming_ids = {c.get("id") for c in contacts_data if c.get("id")}
-
-            to_delete = set(existing_contacts.keys()) - incoming_ids
-            FestivalContact.objects.filter(id__in=to_delete).delete()
-
-            for contact_data in contacts_data:
-                contact_id = contact_data.get("id")
-                if contact_id and contact_id in existing_contacts:
-                    # print("updated contact")
-                    for attr, value in contact_data.items():
-                        setattr(existing_contacts[contact_id], attr, value)
-                    existing_contacts[contact_id].save()
-                else:
-                    # print("created new contact")
-                    FestivalContact.objects.create(festival=instance, **contact_data)
+            handle_nested_contacts(instance, contacts_data, FestivalContact)
 
         return instance
 
