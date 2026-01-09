@@ -16,6 +16,7 @@ export default defineConfig([
       },
     },
     rules: {
+      "no-console": "warn",
       "prefer-arrow-callback": "error",
       "func-style": ["error", "expression", { allowArrowFunctions: true }],
       "prefer-arrow-functions/prefer-arrow-functions": [
@@ -33,6 +34,12 @@ export default defineConfig([
       react: {
         version: "detect",
       },
+    },
+  },
+  {
+    files: ["src/redux/store.ts"],
+    rules: {
+      "no-console": "off",
     },
   },
   js.configs.recommended,
