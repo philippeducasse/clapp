@@ -32,7 +32,7 @@ export const getResidencyFilters = (): FilterConfig[] => {
       multiple: true,
     },
     {
-      column: "applied",
+      column: "currentYearApplications",
       label: "Applied?",
       type: FilterType.SELECT,
       options: [
