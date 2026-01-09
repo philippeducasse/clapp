@@ -11,74 +11,45 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Home } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { selectFestival } from "@/redux/slices/festivalSlice";
-import { selectApplication } from "@/redux/slices/applicationSlice";
+import {
+  detectEntityType,
+  getEntityData,
+  extractAction,
+  buildStandardEntityBreadcrumbs,
+  buildApplicationBreadcrumbs,
+  Breadcrumb as BreadcrumbType,
+} from "./breadcrumbsHelper";
 
 const Breadcrumbs = () => {
   const pathname = usePathname();
 
-  // Extract IDs from URL path
-  const pathSegments = pathname.split("/").filter(Boolean);
-  const festivalId = pathname.includes("/festivals/") ? Number(pathSegments[1]) : undefined;
-  const applicationId = pathname.includes("/applications/") ? Number(pathSegments[1]) : undefined;
+  const entityType = detectEntityType(pathname);
 
-  // Get data from Redux slices using selectors
-  const festival = useSelector((state: RootState) =>
-    festivalId ? selectFestival(state, festivalId) : undefined
-  );
-  const application = useSelector((state: RootState) =>
-    applicationId ? selectApplication(state, applicationId) : undefined
-  );
+  const entityData = useSelector((state: RootState) => {
+    if (!entityType) return null;
 
-  // Determine which entity we're dealing with
-  let entityName = "";
-  let entityPath = "";
+    const entityIdMatch = pathname.match(
+      /\/(festivals|venues|residencies|applications|profile)\/(\d+)/
+    );
+    const entityId = entityIdMatch ? Number(entityIdMatch[2]) : undefined;
 
-  if (pathname.includes("/festivals/") && festival) {
-    entityName = festival.name ?? "Festival";
-    entityPath = `/festivals/${festival.id}`;
-  } else if (pathname.includes("/applications/") && application) {
-    entityName = application.emailSubject ?? `Application for ${typeof application.organisation === 'object' ? application.organisation.name : 'Unknown'}`;
-    entityPath = `/applications/${application.id}`;
-  }
+    return getEntityData(state, entityType, entityId);
+  });
 
-  // Build breadcrumbs based on current route
-  const buildBreadcrumbs = () => {
-    const breadcrumbs = [
+  const action = extractAction(pathname);
+
+  const buildBreadcrumbs = (): BreadcrumbType[] => {
+    const breadcrumbs: BreadcrumbType[] = [
       { path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> },
     ];
 
-    if (pathSegments.includes("festivals")) {
-      breadcrumbs.push({ path: "/festivals", label: <span>Festivals</span> });
+    if (!entityType) return breadcrumbs;
 
-      if (festival?.id) {
-        breadcrumbs.push({ path: entityPath, label: <span>{entityName}</span> });
-
-        // Add action if we're on an edit/new page
-        if (pathSegments.includes("edit")) {
-          breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
-        } else if (pathSegments.includes("apply")) {
-          breadcrumbs.push({ path: pathname, label: <span>Apply</span> });
-        }
-      } else if (pathSegments.includes("create")) {
-        breadcrumbs.push({ path: pathname, label: <span>Create</span> });
-      }
-    } else if (pathSegments.includes("applications")) {
-      breadcrumbs.push({ path: "/applications", label: <span>Applications</span> });
-
-      if (application?.id) {
-        breadcrumbs.push({ path: entityPath, label: <span>entityName</span> });
-
-        // Add action if we're on an edit/new page
-        if (pathSegments.includes("edit")) {
-          breadcrumbs.push({ path: pathname, label: <span>Edit</span> });
-        } else if (pathSegments.includes("new")) {
-          breadcrumbs.push({ path: pathname, label: <span>New</span> });
-        }
-      }
+    if (entityType === "applications") {
+      return buildApplicationBreadcrumbs(breadcrumbs, entityData, pathname, action);
+    } else {
+      return buildStandardEntityBreadcrumbs(breadcrumbs, entityType, entityData, pathname, action);
     }
-
-    return breadcrumbs;
   };
 
   const breadcrumbs = buildBreadcrumbs();
