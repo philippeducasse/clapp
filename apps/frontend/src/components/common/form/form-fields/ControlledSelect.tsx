@@ -16,6 +16,7 @@ const ControlledSelect = ({
   return showLabels ? (
     <Select
       defaultValue={field.value as string | undefined}
+      value={field.value as string}
       onValueChange={(val) => {
         field.onChange(val);
       }}

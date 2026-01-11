@@ -46,8 +46,6 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     mode: "onSubmit",
   });
 
-  const organisation = form.watch("organisation");
-  console.log("org", organisation);
   useEffect(() => {
     if (application && !initialDataLoaded) {
       const formData = {

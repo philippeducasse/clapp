@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { organisationApiService, OrganisationSearchResponse } from "@/api/organisationApiService";
 import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
+import { useFormContext } from "react-hook-form";
 import _ from "lodash";
 
 interface ControlledSearchProps extends BaseControlledProps {
@@ -9,6 +10,7 @@ interface ControlledSearchProps extends BaseControlledProps {
 }
 
 const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) => {
+  const { setValue, getValues } = useFormContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<OrganisationSearchResponse[]>([]);
   const [isLoading, setLoading] = useState(false);
@@ -71,6 +73,12 @@ const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) =>
     setSearchResults([]);
     setIsSelected(true);
     setShowDropdown(false);
+
+    const currentOrganisationType = getValues("organisationType");
+    if (!currentOrganisationType && org.type) {
+      console.log("type: ", org.type.toUpperCase());
+      setValue("organisationType", org.type.toUpperCase());
+    }
   };
 
   return (
