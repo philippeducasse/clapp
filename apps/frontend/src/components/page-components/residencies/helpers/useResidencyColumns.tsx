@@ -55,7 +55,7 @@ const useResidencyColumns = ({
           const application = row.original?.currentYearApplication as Application;
           return (
             <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-              <Link href={`/applications/${application.id}`}>{application.applicationDate}</Link>
+              <Link href={`/applications/${application?.id}`}>{application?.applicationDate}</Link>
             </div>
           );
         },
