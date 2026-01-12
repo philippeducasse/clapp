@@ -54,7 +54,11 @@ const handleResponse = async <T>(
 ): Promise<T> => {
   if (!res.ok) {
     const error = await res.text();
-    toast.error(`Error: ${error}`);
+    toast.error(`Error: ${error}`, {
+      closeButton: true,
+      className: "border border-red-600",
+      duration: 10000,
+    });
     throw new Error(`Request failed for ${url}: ${res.status} - ${error}`);
   }
 
@@ -67,7 +71,7 @@ const handleResponse = async <T>(
   }
 
   if (successMessage) {
-    toast.success(successMessage);
+    toast.success(successMessage, { className: "border border-emerald-400" });
   }
   return transformKeysToCamelCase(json);
 };
