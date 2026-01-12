@@ -2,6 +2,8 @@ from typing import Any
 
 from rest_framework import serializers
 
+from .models import Reminder
+
 
 class BlankToNullDateField(serializers.DateField):
     """Convert blank strings to None for date fields."""
@@ -17,6 +19,26 @@ class BaseContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ["id", "name", "email"]
+
+
+class ReminderSerializer(serializers.ModelSerializer):
+    organisation_type = serializers.CharField(source="content_type.model", read_only=True)
+    organisation_name = serializers.CharField(source="organisation.name", read_only=True)
+
+    class Meta:
+        model = Reminder
+        fields = [
+            "id",
+            "content_type",
+            "object_id",
+            "organisation_type",
+            "organisation_name",
+            "message",
+            "remind_at",
+            "is_sent",
+            "created_at",
+        ]
+        read_only_fields = ["is_sent", "created_at", "organisation_type", "organisation_name"]
 
 
 def handle_nested_contacts(instance: Any, contacts_data: Any, contact_model: type) -> None:

@@ -1,12 +1,16 @@
 import logging
 from typing import Any, List, Tuple
 
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import QuerySet
 from phonenumber_field.modelfields import PhoneNumberField
 
 from circus_agent_backend.utils import normalize_url
 
+User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
@@ -143,7 +147,6 @@ class Organisation(models.Model):
 
     def _soft_delete_applications(self) -> None:
         """Cascade soft delete to applications"""
-        from django.contrib.contenttypes.models import ContentType
         from django.utils import timezone
 
         from applications.models import Application
@@ -155,7 +158,6 @@ class Organisation(models.Model):
 
     def _restore_applications(self) -> None:
         """Restore applications when organisation is restored"""
-        from django.contrib.contenttypes.models import ContentType
 
         from applications.models import Application
 
@@ -198,3 +200,21 @@ class OrganisationContact(models.Model):
         """Restore a soft-deleted contact"""
         self.deleted_at = None
         self.save()
+
+
+class Reminder(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    organisation = GenericForeignKey("content_type", "object_id")
+
+    profile = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reminders")
+    message = models.TextField()
+    remind_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_sent = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["remind_at"]
+
+    def __str__(self):
+        return f"Reminder for {self.organisation} at {self.remind_at}"

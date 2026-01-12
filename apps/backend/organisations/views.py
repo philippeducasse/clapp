@@ -13,12 +13,13 @@ from rest_framework.response import Response
 
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
+from organisations.serializers import ReminderSerializer
 from organisations.venues.models import Venue
 from performances.models import Performance
 from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
 
-from .models import Organisation
+from .models import Organisation, Reminder
 from .services import (
     create_form_application,
     generate_application_mail_prompt,
@@ -411,3 +412,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(organisation)
         return Response(serializer.data)
+
+
+class ReminderViewSet(viewsets.ModelViewSet):
+    serializer_class = ReminderSerializer
+
+    def get_queryset(self):
+        return Reminder.objects.filter(profile=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user)
