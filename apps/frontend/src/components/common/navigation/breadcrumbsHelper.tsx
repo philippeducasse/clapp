@@ -17,7 +17,13 @@ export interface EntityData {
   organisationName?: string;
 }
 
-export type EntityType = "festivals" | "venues" | "residencies" | "applications" | "profile";
+export type EntityType =
+  | "festivals"
+  | "venues"
+  | "residencies"
+  | "applications"
+  | "profile"
+  | "dashboard";
 
 const ENTITY_LABELS: Record<EntityType, string> = {
   festivals: "Festivals",
@@ -25,6 +31,7 @@ const ENTITY_LABELS: Record<EntityType, string> = {
   residencies: "Residencies",
   applications: "Applications",
   profile: "Profile",
+  dashboard: "Dashboard",
 };
 
 export const extractEntityId = (pathname: string, entityType: EntityType): number | undefined => {
@@ -36,13 +43,13 @@ export const extractEntityId = (pathname: string, entityType: EntityType): numbe
     : undefined;
 };
 
-export const detectEntityType = (pathname: string): EntityType | null => {
+export const detectEntityType = (pathname: string): EntityType => {
   if (pathname.includes("/festivals")) return "festivals";
   if (pathname.includes("/venues")) return "venues";
   if (pathname.includes("/residencies")) return "residencies";
   if (pathname.includes("/applications")) return "applications";
   if (pathname.includes("/profile")) return "profile";
-  return null;
+  return "dashboard";
 };
 
 export const getEntityData = (
@@ -74,7 +81,7 @@ export const getEntityData = (
       return entity ? { id: entity.id, name: entity.email } : null;
     }
     default:
-      return null;
+      return { id: undefined, name: "Dashboard" };
   }
 };
 
