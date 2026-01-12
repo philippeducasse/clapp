@@ -1,11 +1,14 @@
 # mypy: ignore-errors
 
+import logging
 import os
 
 from mistralai import ConversationResponse, Mistral
 from rest_framework.exceptions import Throttled
 
 from .rate_limit import check_llm_rate_limit, increment_llm_call_counter
+
+logger = logging.getLogger(__name__)
 
 
 class MistralClient:
@@ -25,8 +28,8 @@ class MistralClient:
         )
 
     def chat(self, prompt: str, tenant_schema: str) -> str:
-        allowed, remaining = check_llm_rate_limit(tenant_schema)
-
+        allowed, _remaining = check_llm_rate_limit(tenant_schema)
+        logger.info(f"user {tenant_schema} rate: {allowed}, left: {_remaining}")
         if not allowed:
             raise Throttled(detail="Daily LLM generation limit reached. Try again tomorrow.")
 
@@ -36,6 +39,7 @@ class MistralClient:
             )
             # TODO: return limit to frontend?
             new_count = increment_llm_call_counter(tenant_schema)  # noqa
+            logger.info(f"user {tenant_schema} new LLM rate: {new_count}")
             return chat_response.choices[0].message.content
 
         except Exception as e:

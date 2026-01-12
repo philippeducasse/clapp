@@ -188,14 +188,14 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         org_type = self.get_organisation_type_name()
 
         query = f"{organisation.website_url} {organisation.name} {organisation.country} {datetime.now().year} {org_type}"
-        search_results = self.gemini_client.search(query=query)
-        logger.info("SEARCH: ", search_results)
+        search_results = self.gemini_client.search(query, request.user.id)
+        logger.info("SEARCH: %s", search_results)
         prompt: str = self.get_enrich_prompt(organisation, search_results)
-        logger.info("prompt: ", prompt)
+        logger.info("prompt: %s", prompt)
 
         # TODO: after postgres migration, change to tenant_schema
         llm_response: str = self.mistral_client.chat(prompt, request.user.id)
-        logger.info("RESPONSE", llm_response)
+        logger.info("RESPONSE: %s", llm_response)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
 
