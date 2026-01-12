@@ -54,6 +54,7 @@ const BasicForm = ({
     await onSubmit(values);
     if (shouldPersist) clearStorage();
   };
+
   return (
     <Form {...form}>
       <div className="flex">

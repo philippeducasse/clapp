@@ -87,7 +87,7 @@ const ResidencyBasicInfoForm = ({ action }: ResidencyFormProps) => {
         entity={residency}
         action={action}
         formTitle="Basic Information"
-        submitButtonLabel="Next"
+        submitButtonLabel={action === Action.CREATE ? "Next" : "Save"}
         formSubtitle={
           action === Action.CREATE
             ? "Please provide basic residency information. You will provide contact information next."

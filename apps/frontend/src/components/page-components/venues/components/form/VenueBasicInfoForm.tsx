@@ -75,9 +75,6 @@ const VenueBasicInfoForm = ({ action }: VenueFormProps) => {
   };
 
   const onCancelHref = venueId ? `/venues/${venue?.id}` : "/venues";
-
-  // const updateButton = GenericButton
-
   return (
     <>
       <FormHeader action={action} entityName={EntityName.VENUE} />
@@ -90,7 +87,7 @@ const VenueBasicInfoForm = ({ action }: VenueFormProps) => {
         entity={venue}
         action={action}
         formTitle="Basic Information"
-        submitButtonLabel="Next"
+        submitButtonLabel={action === Action.CREATE ? "Next" : "Save"}
         formSubtitle={
           action === Action.CREATE
             ? "Please provide basic venue information. You will provide contact information next."

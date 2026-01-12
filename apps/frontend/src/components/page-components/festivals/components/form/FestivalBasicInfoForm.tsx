@@ -26,9 +26,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
   const router = useRouter();
   const params = useParams();
   const festivalId = Number(params?.id);
-  const festival = useSelector((state: RootState) =>
-    selectFestival(state, festivalId || -1)
-  );
+  const festival = useSelector((state: RootState) => selectFestival(state, festivalId || -1));
   const formFields = getFestivalFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +88,7 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
         entity={festival}
         action={action}
         formTitle="Basic Information"
-        submitButtonLabel="Next"
+        submitButtonLabel={action === Action.CREATE ? "Next" : "Save"}
         formSubtitle={
           action === Action.CREATE
             ? "Please provide basic festival information. You will provide contact information next."
