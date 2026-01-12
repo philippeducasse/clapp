@@ -1,4 +1,5 @@
 import os
+
 from .base import *  # noqa
 
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -29,6 +30,12 @@ CACHES = {
         },
     }
 }
+
+
+# Celery Configuration (from environment)
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379/0")
+CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "UTC")
 
 # Production security settings
 SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True").lower() == "true"
