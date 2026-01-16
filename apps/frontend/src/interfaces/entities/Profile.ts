@@ -1,6 +1,13 @@
 import { Performance } from "./Performance";
 import { EmailHost } from "../Enums";
 
+export interface EmailTemplate {
+  [key: string]: unknown;
+  id: number;
+  name: string;
+  content: string;
+}
+
 export interface Profile {
   [key: string]: unknown;
   id: number;
@@ -17,6 +24,7 @@ export interface Profile {
   tiktokProfile?: string;
   youtubeProfile?: string;
   performances: Performance[];
+  emailTemplates?: EmailTemplate[];
   emailHost?: EmailHost;
   otherEmailHost?: string;
   emailPort?: number;

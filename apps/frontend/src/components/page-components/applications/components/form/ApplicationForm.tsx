@@ -41,12 +41,14 @@ const ApplicationForm = () => {
 
   const formFields = useMemo(() => {
     const performances = profile?.performances ?? [];
+    const emailTemplates = profile?.emailTemplates ?? [];
     return getApplicationFormFields(
       festival as Festival,
       performances,
       applicationMethod,
       profile as Profile,
-      dossiers
+      dossiers,
+      emailTemplates
     );
   }, [festival, applicationMethod, profile, dossiers]);
 
@@ -64,6 +66,7 @@ const ApplicationForm = () => {
   const performanceSelection = form.watch("performances") as string[];
   const language = form.watch("language") as string;
   const messageLength = form.watch("messageLength");
+  const selectedTemplateId = form.watch("emailTemplate") as string;
 
   useEffect(() => {
     setApplicationMethod(
@@ -102,6 +105,16 @@ const ApplicationForm = () => {
       refreshFestival(festivalId, dispatch);
     }
   }, [festivalId, festival, dispatch]);
+
+  // Populate message when email template is selected
+  useEffect(() => {
+    if (!selectedTemplateId || applicationMethod !== ApplicationMethod.EMAIL) return;
+
+    const template = profile?.emailTemplates?.find((t) => t.id === Number(selectedTemplateId));
+    if (!template) return;
+
+    form.setValue("message", template.content);
+  }, [selectedTemplateId, applicationMethod, profile, form]);
 
   const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);

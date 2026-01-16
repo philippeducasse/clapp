@@ -16,11 +16,11 @@ import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrap
 import AddSection from "@/components/common/buttons/AddSection";
 import { profileApiService } from "@/api/profileApiService";
 import { performanceApiService } from "@/api/performanceApiService";
-import { selectProfile } from "@/redux/slices/authSlice";
-import { updateProfile } from "@/redux/slices/authSlice";
+import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
 import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
+import EmailTemplatesSection from "./EmailTemplatesSection";
 import { Profile } from "@/interfaces/entities/Profile";
 import { Performance } from "@/interfaces/entities/Performance";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
@@ -34,11 +34,13 @@ const ProfileView = () => {
   const profile = useSelector((state: RootState) => selectProfile(state));
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemName, setItemName] = useState<"profile" | "performance">("performance");
+  const [itemName, setItemName] = useState<"profile" | "performance" | "email template">(
+    "performance"
+  );
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
   const { activeTab, handleTabChange } = useHashTab("basic-information");
 
-  const handleDelete = (entity: "profile" | "performance", index?: number) => {
+  const handleDelete = (entity: "profile" | "performance" | "email template", index?: number) => {
     setIdToDelete(index);
     setItemName(entity);
     setOpenDeleteDialog(true);
@@ -58,6 +60,13 @@ const ProfileView = () => {
           performances: updatedperformances,
         };
         dispatch(updateProfile(updatedProfile));
+      } else if (itemName === "email template" && idToDelete !== undefined && profile) {
+        const updatedTemplates = profile.emailTemplates?.filter((t) => t.id !== idToDelete) ?? [];
+        const updatedProfileData = await profileApiService.update({
+          ...profile,
+          emailTemplates: updatedTemplates,
+        });
+        dispatch(updateProfile(updatedProfileData));
       }
     } catch (error) {
       console.error(`Error deleting ${itemName}:`, error);
@@ -116,6 +125,19 @@ const ProfileView = () => {
           )}
           <AddSection label="performance" href={`/profile/edit/performances/new`} />
         </Tab>
+
+        <Tab name="Email Templates">
+          {profile.emailTemplates && profile.emailTemplates.length > 0 ? (
+            <EmailTemplatesSection
+              emailTemplates={profile.emailTemplates}
+              onDelete={(templateId) => handleDelete("email template", templateId)}
+            />
+          ) : (
+            <p className="flex justify-center py-6">No email templates</p>
+          )}
+          <AddSection label="email template" href={`/profile/edit/email-templates/new`} />
+        </Tab>
+
         <Tab name="Email Settings">
           <DetailsViewSection
             title="Email Settings"

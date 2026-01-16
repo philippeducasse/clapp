@@ -2,10 +2,19 @@ import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/Control
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { Festival } from "@/interfaces/entities/Festival";
-import { Profile } from "@/interfaces/entities/Profile";
+import { Profile, EmailTemplate } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { LANGUAGES } from "@/constants/languages";
 import { getOptions } from "@/helpers/formHelper";
+
+export const getEmailTemplateOptions = (emailTemplates: EmailTemplate[]): SelectOptions[] => {
+  return [
+    ...emailTemplates.map((t) => ({
+      value: String(t.id),
+      label: t.name,
+    })),
+  ];
+};
 
 export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
   return performances.map((p) => ({
@@ -27,13 +36,15 @@ export const getApplicationFormFields = (
   performances: Performance[],
   applicationMethod: ApplicationMethod,
   profile: Profile,
-  dossiers: Dossier[]
+  dossiers: Dossier[],
+  emailTemplates: EmailTemplate[] = []
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
+  const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
   const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
-
+  console.log("emailtemp0", emailTemplateOptions);
   const emailApplicationFields: ControlledFormElement[] = [
     {
       label: "Email subject",
@@ -56,6 +67,14 @@ export const getApplicationFormFields = (
       options: userLanguages.map((l) => ({ value: l.code, label: l.name })),
       helpText: "Provide the language for the email generation",
       defaultValue: userLanguages[0]?.code ?? "en",
+    },
+    {
+      label: "Email Template",
+      fieldName: "emailTemplate",
+      type: ControlledFormElementType.SELECT,
+      options: emailTemplateOptions,
+      helpText: "Select a template to auto-fill the message",
+      hidden: !emailTemplateOptions.length,
     },
     {
       label: "Message",
