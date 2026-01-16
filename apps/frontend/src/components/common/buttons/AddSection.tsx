@@ -7,13 +7,10 @@ interface AddSectionProps {
 
 const AddSection = ({ label, href }: AddSectionProps) => {
   return (
-    <div className="flex items-center relative my-6">
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-      <CreateButton
-        href={href}
-        className="absolute left-1/2 -translate-x-1/2"
-        label={`Add ${label} `}
-      />
+    <div className="flex items-center gap-1 py-4">
+      <div className="flex-1 h-px bg-gradient-to-r from-transparent to-gray-300"></div>
+      <CreateButton href={href} label={`Add ${label} `} />
+      <div className="flex-1 h-px bg-gradient-to-l from-transparent to-gray-300"></div>
     </div>
   );
 };
