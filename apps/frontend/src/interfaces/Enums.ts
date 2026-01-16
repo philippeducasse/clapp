@@ -13,6 +13,7 @@ export enum EntityName {
   VENUE = "venue",
   PROFILE = "profile",
   PERFORMANCE = "performance",
+  EMAIL_TEMPLATE = "email template",
 }
 
 export enum TagAction {
