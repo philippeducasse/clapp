@@ -90,3 +90,9 @@ class Profile(AbstractUser):
 
     def __str__(self) -> str:
         return self.email
+
+
+class EmailTemplate(models.Model):
+    name = models.CharField(max_length=255, blank=True)
+    content = models.TextField(max_length=10000, blank=True)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="email_templates")

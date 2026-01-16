@@ -1,12 +1,18 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import Profile
+from .models import EmailTemplate, Profile
+
+
+class EmailTemplateInline(admin.TabularInline):
+    model = EmailTemplate
+    extra = 0
 
 
 class CustomUserAdmin(UserAdmin):
     model = Profile
     list_display = ("email", "first_name", "last_name", "is_staff", "is_active")
+    inlines = [EmailTemplateInline]
     list_filter = ("is_staff", "is_active")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
@@ -34,8 +40,6 @@ class CustomUserAdmin(UserAdmin):
                     "is_staff",
                     "is_active",
                     "is_superuser",
-                    "groups",
-                    "user_permissions",
                 )
             },
         ),

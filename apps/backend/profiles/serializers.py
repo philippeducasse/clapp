@@ -1,9 +1,16 @@
 from rest_framework import serializers
-from profiles.models import Profile
+from profiles.models import EmailTemplate, Profile
 from performances.serializers import PerformanceSerializer
 from typing import Type
 import re
 from circus_agent_backend.utils import NormalizedURLField
+
+
+class EmailTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EmailTemplate
+        fields = ["id", "name", "content"]
+        read_only_fields = ["id"]
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -11,6 +18,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     spoken_languages = serializers.ListField(
         child=serializers.CharField(), required=False, allow_empty=True
     )
+    email_templates = EmailTemplateSerializer(many=True)
     personal_website = NormalizedURLField(required=False, allow_blank=True)
     instagram_profile = NormalizedURLField(required=False, allow_blank=True)
     facebook_profile = NormalizedURLField(required=False, allow_blank=True)
@@ -19,8 +27,24 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model: Type[Profile] = Profile
-        exclude = ("password",)
+        exclude = ("password", "groups", "user_permissions")
         read_only_fields = ("id",)
+
+    def update(self, instance, validated_data):
+        email_templates = validated_data.pop("email_templates", [])
+        email_templates_ids = validated_data.pop("email_templates_ids", [])
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if email_templates_ids is not None:
+            instance.email_templates.exclude(id__in=email_templates_ids).delete()
+
+        for email_template in email_templates:
+            EmailTemplate.objects.create(profile=instance, **email_template)
+
+        return instance
 
 
 class RegisterSerializer(serializers.ModelSerializer):
