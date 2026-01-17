@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { CardTitle, CardDescription } from "@/components/ui/card";
 import { TagsButton } from "../buttons/TagsButton";
 import { StatusButton } from "../buttons/StatusButton";
 import { TagAction } from "@/interfaces/Enums";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { ApplicationStatus } from "@/interfaces/entities/Application";
+import { Button } from "@/components/ui/button";
+import { AlarmClock } from "lucide-react";
+import { ReminderModal } from "../modals/ReminderModal";
 
 interface DetailsViewHeaderProps<T = unknown> {
   title: string;
@@ -27,6 +30,8 @@ const DetailsViewHeader = <T,>({
   statusApiMethod,
   updateSlice,
 }: DetailsViewHeaderProps<T>) => {
+  const [openReminderModal, setOpenReminderModal] = useState(false);
+
   return (
     <div className="flex justify-between my-6">
       <div className="flex items-center gap-2">
@@ -42,6 +47,11 @@ const DetailsViewHeader = <T,>({
           {entityId && tagApiMethod && updateSlice && (
             <TagsButton tag={tagApiMethod} entityId={entityId} updateSlice={updateSlice} />
           )}
+          {entityId && updateSlice && (
+            <Button variant="tertiary" onClick={() => setOpenReminderModal(true)}>
+              <AlarmClock />
+            </Button>
+          )}
           {entityId && statusApiMethod && updateSlice && (
             <StatusButton
               updateStatus={statusApiMethod}
@@ -50,6 +60,9 @@ const DetailsViewHeader = <T,>({
             />
           )}
         </div>
+      )}
+      {openReminderModal && (
+        <ReminderModal open={openReminderModal} onOpenChange={setOpenReminderModal} />
       )}
     </div>
   );
