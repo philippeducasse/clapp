@@ -1,6 +1,7 @@
 import { Profile } from "@/interfaces/entities/Profile";
 import { fetchRequest, sendRequest, deleteRequest } from "./fetchHelper";
 import { Credentials } from "@/interfaces/api/ApiService";
+
 const endpoint = "/api/profiles";
 
 const get = async (): Promise<Profile> => {
@@ -12,7 +13,7 @@ const register = async (profile: Partial<Profile>): Promise<Profile> => {
     `${endpoint}/register/`,
     profile,
     "POST",
-    "Profile successfully created!"
+    "Profile successfully created!",
   );
 };
 
@@ -26,7 +27,7 @@ const update = async (profile: Partial<Profile>): Promise<Profile> => {
     profile,
     "PUT",
     "Profile successfully updated",
-    true
+    true,
   );
 };
 
@@ -36,7 +37,7 @@ const login = async (credentials: Credentials) => {
     credentials,
     "POST",
     `Welcome ${credentials.email}, you have successfully logged in`,
-    true
+    true,
   );
 };
 const logout = async () => {
