@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Flag, MessageSquare, Send } from "lucide-react";
+import { Flag, Send } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getFestivalBasicInfo } from "../../helpers/getBasicFestivalInfo";
-import { getFestivalDetails, getFestivalComments } from "../../helpers/getFestivalDetails";
+import { getFestivalDetails } from "../../helpers/getFestivalDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshFestival } from "../../helpers/refreshFestival";
@@ -20,6 +20,8 @@ import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeade
 import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
 import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
 import ContactsViewSection from "@/components/common/details-view/ContactsSection";
+import RemindersCard from "@/components/common/details-view/RemindersCard";
+import CommentsCard from "@/components/common/details-view/CommentsCard";
 import AddSection from "@/components/common/buttons/AddSection";
 import { festivalApiService } from "@/api/festivalApiService";
 import { updateFestival } from "@/redux/slices/festivalSlice";
@@ -92,9 +94,7 @@ const FestivalView = () => {
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
         icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={festival.id}
-        organisationType={OrganisationType.FESTIVAL}
         tagApiMethod={festivalApiService.tag}
-        reminderApiMethod={festivalApiService.setReminder}
         updateSlice={updateFestival}
         actionElements={
           <>
@@ -111,20 +111,28 @@ const FestivalView = () => {
           </>
         }
       />
-      <DetailsViewSection
-        title="Basic information"
-        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
-        data={getFestivalBasicInfo(festival)}
-        ribbonType="tag"
-        ribbonValue={festival.tag}
-      />
-      {festival.comments && (
-        <DetailsViewSection
-          title="Comments"
-          icon={<MessageSquare className="text-emerald-600 dark:text-emerald-400" />}
-          data={getFestivalComments(festival)}
-        />
-      )}
+      <div className="flex gap-6">
+        <div className="flex-1">
+          <DetailsViewSection
+            title="Basic information"
+            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            data={getFestivalBasicInfo(festival)}
+            ribbonType="tag"
+            ribbonValue={festival.tag}
+          />
+        </div>
+        <div className="w-80 space-y-6">
+          <CommentsCard
+            comments={festival.comments || ""}
+            onSave={async (comments) => {
+              const updatedFestival = { ...festival, comments };
+              await festivalApiService.update(updatedFestival);
+              dispatch(updateFestival(updatedFestival));
+            }}
+          />
+          <RemindersCard organisationType={OrganisationType.FESTIVAL} entityId={festivalId} />
+        </div>
+      </div>
       <DetailsViewSection
         title="Festival details"
         icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
