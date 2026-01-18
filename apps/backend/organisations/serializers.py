@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
 from .models import Reminder
@@ -22,14 +23,13 @@ class BaseContactSerializer(serializers.ModelSerializer):
 
 
 class ReminderSerializer(serializers.ModelSerializer):
-    organisation_type = serializers.CharField(source="content_type.model", read_only=True)
+    organisation_type = serializers.CharField(required=False)
     organisation_name = serializers.CharField(source="organisation.name", read_only=True)
 
     class Meta:
         model = Reminder
         fields = [
             "id",
-            "content_type",
             "object_id",
             "organisation_type",
             "organisation_name",
@@ -38,7 +38,23 @@ class ReminderSerializer(serializers.ModelSerializer):
             "is_sent",
             "created_at",
         ]
-        read_only_fields = ["is_sent", "created_at", "organisation_type", "organisation_name"]
+        read_only_fields = ["is_sent", "created_at", "organisation_name"]
+
+    def to_representation(self, instance: Reminder) -> dict[str, Any]:
+        """Return organisation_type as uppercase to match frontend enum."""
+        data = super().to_representation(instance)
+        data["organisation_type"] = instance.content_type.model.upper()
+        return data
+
+    def create(self, validated_data: dict[str, Any]) -> Reminder:
+        """Convert organisation_type string to ContentType on create."""
+        organisation_type = validated_data.pop("organisation_type", None)
+        if organisation_type:
+            # Convert to lowercase to match Django's ContentType model names
+            validated_data["content_type"] = ContentType.objects.get(
+                model=organisation_type.lower()
+            )
+        return super().create(validated_data)
 
 
 def handle_nested_contacts(instance: Any, contacts_data: Any, contact_model: type) -> None:
