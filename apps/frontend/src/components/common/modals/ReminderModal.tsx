@@ -26,6 +26,7 @@ interface ReminderModalProps {
   reminderApiMethod: (reminder: ReminderCreate) => Promise<Reminder>;
   organisationType: OrganisationType;
   entityId: number;
+  onReminderCreated?: (reminder: Reminder) => void;
 }
 
 export const ReminderModal = ({
@@ -34,6 +35,7 @@ export const ReminderModal = ({
   reminderApiMethod,
   organisationType,
   entityId,
+  onReminderCreated,
 }: ReminderModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,7 +56,9 @@ export const ReminderModal = ({
         message: values.message as string,
         remindAt: values.remindAt as string,
       };
-      await reminderApiMethod(reminderData);
+      const createdReminder = await reminderApiMethod(reminderData);
+      onReminderCreated?.(createdReminder);
+      form.reset();
       onOpenChange(false);
     } catch (error) {
       console.error(error);
