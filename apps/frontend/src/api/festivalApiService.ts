@@ -10,8 +10,6 @@ import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { EntityApiService, reminderEndpoint } from "@/interfaces/api/ApiService";
-import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
 
 const endpoint = "/api/festivals/";
 
@@ -87,21 +85,7 @@ const apply = (
   );
 };
 
-const setReminder = (reminder: ReminderCreate): Promise<Reminder> => {
-  return sendRequest<ReminderCreate, Reminder>(
-    `${reminderEndpoint}`,
-    reminder,
-    "POST",
-    "Reminder successfully set",
-    true,
-  );
-};
-
-const deleteReminder = (reminderId: number): Promise<void> => {
-  return deleteRequest(`${reminderEndpoint}${reminderId}/`, "Reminder successfully deleted");
-};
-
-export const festivalApiService: EntityApiService<Festival> = {
+export const festivalApiService = {
   getAll,
   get,
   create,
@@ -111,6 +95,4 @@ export const festivalApiService: EntityApiService<Festival> = {
   enrich,
   apply,
   generateEmail,
-  setReminder,
-  deleteReminder,
 };
