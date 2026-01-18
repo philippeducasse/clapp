@@ -9,8 +9,8 @@ from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from profiles.models import Profile
-from profiles.serializers import ProfileSerializer, RegisterSerializer
+from profiles.models import Profile, Reminder
+from profiles.serializers import ProfileSerializer, RegisterSerializer, ReminderSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -84,3 +84,26 @@ class ProfileViewSet(viewsets.ModelViewSet):
         django_logout(request)
         logger.info(f"User {user_id} logged out")
         return Response({"message": "Logged out successfully"})
+
+
+class ReminderViewSet(viewsets.ModelViewSet):
+    serializer_class = ReminderSerializer
+    pagination_class = None
+
+    def get_queryset(self) -> QuerySet[Reminder]:
+        from django.contrib.contenttypes.models import ContentType
+
+        queryset = Reminder.objects.filter(profile=self.request.user)
+
+        organisation_type = self.request.query_params.get("organisation_type")
+        object_id = self.request.query_params.get("object_id")
+
+        if organisation_type and object_id:
+            content_type = ContentType.objects.filter(model=organisation_type.lower()).first()
+            if content_type:
+                queryset = queryset.filter(content_type=content_type, object_id=object_id)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(profile=self.request.user)

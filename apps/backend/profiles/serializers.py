@@ -1,9 +1,46 @@
-from rest_framework import serializers
-from profiles.models import EmailTemplate, Profile
-from performances.serializers import PerformanceSerializer
-from typing import Type
+from typing import Any, Type
 import re
+
+from django.contrib.contenttypes.models import ContentType
+from rest_framework import serializers
+
+from profiles.models import EmailTemplate, Profile, Reminder
+from performances.serializers import PerformanceSerializer
 from circus_agent_backend.utils import NormalizedURLField
+
+
+class ReminderSerializer(serializers.ModelSerializer):
+    organisation_type = serializers.CharField(required=False)
+    organisation_name = serializers.CharField(source="organisation.name", read_only=True)
+
+    class Meta:
+        model = Reminder
+        fields = [
+            "id",
+            "object_id",
+            "organisation_type",
+            "organisation_name",
+            "message",
+            "remind_at",
+            "is_sent",
+            "created_at",
+        ]
+        read_only_fields = ["id", "is_sent", "created_at", "organisation_name"]
+
+    def to_representation(self, instance: Reminder) -> dict[str, Any]:
+        """Return organisation_type as uppercase to match frontend enum."""
+        data = super().to_representation(instance)
+        data["organisation_type"] = instance.content_type.model.upper()
+        return data
+
+    def create(self, validated_data: dict[str, Any]) -> Reminder:
+        """Convert organisation_type string to ContentType on create."""
+        organisation_type = validated_data.pop("organisation_type", None)
+        if organisation_type:
+            validated_data["content_type"] = ContentType.objects.get(
+                model=organisation_type.lower()
+            )
+        return super().create(validated_data)
 
 
 class EmailTemplateSerializer(serializers.ModelSerializer):

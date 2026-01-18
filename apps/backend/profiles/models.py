@@ -1,6 +1,8 @@
 from typing import Any
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
@@ -96,3 +98,21 @@ class EmailTemplate(models.Model):
     name = models.CharField(max_length=255, blank=True)
     content = models.TextField(max_length=10000, blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="email_templates")
+
+
+class Reminder(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    organisation = GenericForeignKey("content_type", "object_id")
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="reminders")
+    message = models.TextField()
+    remind_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_sent = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["remind_at"]
+
+    def __str__(self):
+        return f"Reminder for {self.organisation} at {self.remind_at}"

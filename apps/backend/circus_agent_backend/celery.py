@@ -14,7 +14,7 @@ EVERY_HOUR = 0
 
 app.conf.beat_schedule = {
     "check-reminders-every-hour": {
-        "task": "organisations.tasks.check_and_send_reminders",
+        "task": "profiles.tasks.check_and_set_reminders",
         "schedule": crontab(minute=EVERY_HOUR),
     }
 }
