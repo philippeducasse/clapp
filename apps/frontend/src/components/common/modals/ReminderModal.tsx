@@ -1,3 +1,8 @@
+"use client";
+import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   Dialog,
   DialogClose,
@@ -9,20 +14,53 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlarmClock } from "lucide-react";
-// import BasicForm from "../form/BasicForm";
+import { getReminderFormFields } from "./helpers/getReminderFormFields";
+import BasicForm from "../form/BasicForm";
+import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
+import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
+import { OrganisationType } from "@/interfaces/Enums";
 
 interface ReminderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm?: () => void | Promise<void> | Promise<unknown>;
+  reminderApiMethod: (reminder: ReminderCreate) => Promise<Reminder>;
+  organisationType: OrganisationType;
+  entityId: number;
 }
 
-export const ReminderModal = ({ open, onOpenChange, onConfirm }: ReminderModalProps) => {
-  const handleConfirm = async () => {
-    if (onConfirm) {
-      await onConfirm();
+export const ReminderModal = ({
+  open,
+  onOpenChange,
+  reminderApiMethod,
+  organisationType,
+  entityId,
+}: ReminderModalProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const formFields = getReminderFormFields();
+  const formSchema = createZodFormSchema(formFields);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: getInitialValues(formFields),
+    mode: "onSubmit",
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    try {
+      const reminderData: ReminderCreate = {
+        organisationType,
+        objectId: entityId,
+        message: values.message as string,
+        remindAt: values.remindAt as string,
+      };
+      await reminderApiMethod(reminderData);
+      onOpenChange(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    onOpenChange(false);
   };
 
   return (
@@ -45,7 +83,12 @@ export const ReminderModal = ({ open, onOpenChange, onConfirm }: ReminderModalPr
               Here you can set your reminder for this organisation. You will receive an email at the
               specified time with the specified message
             </DialogDescription>
-            {/* <BasicForm /> */}
+            <BasicForm
+              form={form}
+              formFields={formFields}
+              onSubmit={onSubmit}
+              isLoading={isLoading}
+            />
           </div>
 
           <DialogFooter className="flex gap-3 sm:gap-3">
@@ -57,9 +100,9 @@ export const ReminderModal = ({ open, onOpenChange, onConfirm }: ReminderModalPr
                 Cancel
               </Button>
             </DialogClose>
-            <Button onClick={handleConfirm} className=" h-11 text-base font-medium ">
+            {/* <Button onClick={handleConfirm} className=" h-11 text-base font-medium ">
               Set reminder
-            </Button>
+            </Button> */}
           </DialogFooter>
         </div>
       </DialogContent>

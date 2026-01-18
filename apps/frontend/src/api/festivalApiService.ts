@@ -10,7 +10,8 @@ import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { EntityApiService } from "@/interfaces/api/ApiService";
+import { EntityApiService, reminderEndpoint } from "@/interfaces/api/ApiService";
+import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
 
 const endpoint = "/api/festivals/";
 
@@ -28,14 +29,14 @@ const create = (festival: Festival): Promise<Festival> => {
     festival,
     "POST",
     "Festival successfully created",
-    true
+    true,
   );
 };
 
 const tag = (festivalId: number, action: TagAction): Promise<Festival> => {
   return patchRequest<Festival>(
     `${endpoint}${festivalId}/tag/${action}/`,
-    "Festival successfully tagged"
+    "Festival successfully tagged",
   );
 };
 
@@ -53,20 +54,20 @@ const update = (festival: Festival): Promise<Festival> => {
     festival,
     "PUT",
     "Festival successfully updated",
-    true
+    true,
   );
 };
 
 const generateEmail = (
   festivalId: number,
-  data: { profile: Profile; selectedPerformanceIds?: number[] }
+  data: { profile: Profile; selectedPerformanceIds?: number[] },
 ): Promise<{ message: string }> => {
   return sendRequest<{ profile: Profile; selectedPerformanceIds?: number[] }, { message: string }>(
     `${endpoint}${festivalId}/generate_email/`,
     data,
     "POST",
     "Email successfully generated",
-    true
+    true,
   );
 };
 
@@ -74,7 +75,7 @@ const apply = (
   festivalId: number,
   application: ApplicationCreate,
   files: File[],
-  fileFieldName: string
+  fileFieldName: string,
 ): Promise<{ message: string; applicationId: number }> => {
   return sendFormDataRequest<ApplicationCreate, { message: string; applicationId: number }>(
     `${endpoint}${festivalId}/apply/`,
@@ -82,8 +83,22 @@ const apply = (
     files,
     fileFieldName,
     "POST",
-    "Application successfully sent"
+    "Application successfully sent",
   );
+};
+
+const setReminder = (reminder: ReminderCreate): Promise<Reminder> => {
+  return sendRequest<ReminderCreate, Reminder>(
+    `${reminderEndpoint}`,
+    reminder,
+    "POST",
+    "Reminder successfully set",
+    true,
+  );
+};
+
+const deleteReminder = (reminderId: number): Promise<void> => {
+  return deleteRequest(`${reminderEndpoint}${reminderId}/`, "Reminder successfully deleted");
 };
 
 export const festivalApiService: EntityApiService<Festival> = {
@@ -96,4 +111,6 @@ export const festivalApiService: EntityApiService<Festival> = {
   enrich,
   apply,
   generateEmail,
+  setReminder,
+  deleteReminder,
 };

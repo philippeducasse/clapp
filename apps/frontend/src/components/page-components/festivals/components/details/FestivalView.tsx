@@ -23,6 +23,7 @@ import ContactsViewSection from "@/components/common/details-view/ContactsSectio
 import AddSection from "@/components/common/buttons/AddSection";
 import { festivalApiService } from "@/api/festivalApiService";
 import { updateFestival } from "@/redux/slices/festivalSlice";
+import { OrganisationType } from "@/interfaces/Enums";
 import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 
@@ -91,7 +92,9 @@ const FestivalView = () => {
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
         icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={festival.id}
+        organisationType={OrganisationType.FESTIVAL}
         tagApiMethod={festivalApiService.tag}
+        reminderApiMethod={festivalApiService.setReminder}
         updateSlice={updateFestival}
         actionElements={
           <>

@@ -21,7 +21,7 @@ interface BasicFormProps {
   form: UseFormReturn;
   formFields: ControlledFormElement[];
   onSubmit: (values: Record<string, unknown>) => Promise<void>;
-  onCancelHref: string;
+  onCancelHref?: string;
   isLoading: boolean;
   entity?: unknown;
   formTitle?: string;
@@ -114,7 +114,7 @@ const BasicForm = ({
                     </FormItem>
                   )}
                 />
-              )
+              ),
           )}
           <div className="flex justify-between mt-6">
             {action === Action.LOGIN ? (
@@ -125,9 +125,9 @@ const BasicForm = ({
               <Button variant={"outline"}>
                 <Link href="/login">Login</Link>
               </Button>
-            ) : (
+            ) : onCancelHref ? (
               <BackButton href={onCancelHref} />
-            )}
+            ) : null}
             <div className="flex gap-4">
               {additionalActions}
               {action === Action.APPLY ? (

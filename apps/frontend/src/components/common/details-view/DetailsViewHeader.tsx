@@ -2,20 +2,23 @@ import React, { useState } from "react";
 import { CardTitle, CardDescription } from "@/components/ui/card";
 import { TagsButton } from "../buttons/TagsButton";
 import { StatusButton } from "../buttons/StatusButton";
-import { TagAction } from "@/interfaces/Enums";
+import { OrganisationType, TagAction } from "@/interfaces/Enums";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { ApplicationStatus } from "@/interfaces/entities/Application";
 import { Button } from "@/components/ui/button";
 import { AlarmClock } from "lucide-react";
 import { ReminderModal } from "../modals/ReminderModal";
+import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
 
 interface DetailsViewHeaderProps<T = unknown> {
   title: string;
   icon: React.ReactNode;
   entityId?: number;
+  organisationType?: OrganisationType;
   subtitle?: string;
   actionElements?: React.ReactNode;
   tagApiMethod?: (entityId: number, action: TagAction) => Promise<T>;
+  reminderApiMethod?: (reminder: ReminderCreate) => Promise<Reminder>;
   statusApiMethod?: (entityId: number, status: ApplicationStatus) => Promise<T>;
   updateSlice?: (entity: T) => PayloadAction<T>;
 }
@@ -26,8 +29,10 @@ const DetailsViewHeader = <T,>({
   subtitle,
   actionElements,
   entityId,
+  organisationType,
   tagApiMethod,
   statusApiMethod,
+  reminderApiMethod,
   updateSlice,
 }: DetailsViewHeaderProps<T>) => {
   const [openReminderModal, setOpenReminderModal] = useState(false);
@@ -47,10 +52,21 @@ const DetailsViewHeader = <T,>({
           {entityId && tagApiMethod && updateSlice && (
             <TagsButton tag={tagApiMethod} entityId={entityId} updateSlice={updateSlice} />
           )}
-          {entityId && updateSlice && (
-            <Button variant="tertiary" onClick={() => setOpenReminderModal(true)}>
-              <AlarmClock />
-            </Button>
+          {entityId && reminderApiMethod && organisationType && (
+            <>
+              <Button variant="tertiary" onClick={() => setOpenReminderModal(true)}>
+                <AlarmClock />
+              </Button>
+              {openReminderModal && (
+                <ReminderModal
+                  open={openReminderModal}
+                  onOpenChange={setOpenReminderModal}
+                  reminderApiMethod={reminderApiMethod}
+                  organisationType={organisationType}
+                  entityId={entityId}
+                />
+              )}
+            </>
           )}
           {entityId && statusApiMethod && updateSlice && (
             <StatusButton
@@ -60,9 +76,6 @@ const DetailsViewHeader = <T,>({
             />
           )}
         </div>
-      )}
-      {openReminderModal && (
-        <ReminderModal open={openReminderModal} onOpenChange={setOpenReminderModal} />
       )}
     </div>
   );
