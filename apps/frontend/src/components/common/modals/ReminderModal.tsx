@@ -8,7 +8,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -48,6 +47,15 @@ export const ReminderModal = ({
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const selectedDate = new Date(values.remindAt as string);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      form.setError("remindAt", { message: "Date cannot be in the past" });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const reminderData: ReminderCreate = {
@@ -72,18 +80,16 @@ export const ReminderModal = ({
       <DialogContent
         className={`w-1/3 p-0 gap-0 overflow-hidden shadow-2xl [&>button]:text-white [&>button:hover]:text-white/80`}
       >
-        <DialogHeader className={`text-white py-2 pt-6`}>
+        <DialogHeader className={` py-2 pt-6 -mb-12`}>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <AlarmClock className={`w-8 h-8`} strokeWidth={2.5} />
-            <DialogTitle className={`text-white text-xl font-bold`}>
-              Set reminder for {}
-            </DialogTitle>
+            <AlarmClock className={`w-8 h-8 text-emerald-600`} strokeWidth={2.5} />
+            <DialogTitle className={` text-xl `}>Set reminder</DialogTitle>
           </div>
         </DialogHeader>
 
         <div className="px-6 py-8">
-          <div className={`rounded-lg p-4 mb-6`}>
-            <DialogDescription className="text-center text-base text-gray-800">
+          <div className={`rounded-lg mb-6`}>
+            <DialogDescription className="text-left text-sm text-gray-800 mt-4">
               Here you can set your reminder for this organisation. You will receive an email at the
               specified time with the specified message
             </DialogDescription>
@@ -92,22 +98,18 @@ export const ReminderModal = ({
               formFields={formFields}
               onSubmit={onSubmit}
               isLoading={isLoading}
+              additionalActions={
+                <DialogClose asChild>
+                  <Button
+                    variant="outline"
+                    className="flex mr-auto text-base font-medium hover:bg-gray-100"
+                  >
+                    Cancel
+                  </Button>
+                </DialogClose>
+              }
             />
           </div>
-
-          <DialogFooter className="flex gap-3 sm:gap-3">
-            <DialogClose asChild>
-              <Button
-                variant="outline"
-                className="flex-1 h-11 text-base font-medium hover:bg-gray-100"
-              >
-                Cancel
-              </Button>
-            </DialogClose>
-            {/* <Button onClick={handleConfirm} className=" h-11 text-base font-medium ">
-              Set reminder
-            </Button> */}
-          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>
