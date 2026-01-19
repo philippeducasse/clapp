@@ -39,7 +39,7 @@ export enum ApplicationMethod {
 }
 
 export enum ApplicationStatus {
-  NOT_APPLIED = "NOT_APPLIED",
+  DRAFT = "DRAFT",
   APPLIED = "APPLIED",
   IN_DISCUSSION = "IN_DISCUSSION",
   REJECTED = "REJECTED",
@@ -48,5 +48,4 @@ export enum ApplicationStatus {
   POSTPONED = "POSTPONED",
   CANCELLED = "CANCELLED",
   OTHER = "OTHER",
-  DRAFT = "DRAFT",
 }
