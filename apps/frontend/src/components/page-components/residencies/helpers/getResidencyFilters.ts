@@ -37,7 +37,6 @@ export const getResidencyFilters = (): FilterConfig[] => {
       type: FilterType.SELECT,
       options: [
         { value: "APPLIED", label: "Applied" },
-        { value: "NOT_APPLIED", label: "Not applied" },
       ],
     },
   ];

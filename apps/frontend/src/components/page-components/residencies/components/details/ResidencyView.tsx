@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { University, MessageSquare, Send } from "lucide-react";
+import { University, Send } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { selectResidency, updateResidency } from "@/redux/slices/residencySlice";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getResidencyBasicInfo } from "../../helpers/getResidencyBasicInfo";
-import { getResidencyDetails, getResidencyComments } from "../../helpers/getResidencyDetails";
+import { getResidencyDetails } from "../../helpers/getResidencyDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshResidency } from "../../helpers/refreshResidency";
@@ -24,6 +24,9 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { ResidencyUpdateDialog } from "../update/ResidencyUpdateDialog";
 import { useParams } from "next/navigation";
+import RemindersCard from "@/components/common/details-view/RemindersCard";
+import CommentsCard from "@/components/common/details-view/CommentsCard";
+import { OrganisationType } from "@/interfaces/Enums";
 
 const ResidencyView = () => {
   const params = useParams();
@@ -107,20 +110,28 @@ const ResidencyView = () => {
           </>
         }
       />
-      <DetailsViewSection
-        title="Basic information"
-        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
-        data={getResidencyBasicInfo(residency)}
-        ribbonType="tag"
-        ribbonValue={residency.tag}
-      />
-      {residency.comments && (
-        <DetailsViewSection
-          title="Comments"
-          icon={<MessageSquare className="text-emerald-600 dark:text-emerald-400" />}
-          data={getResidencyComments(residency)}
-        />
-      )}
+      <div className="flex gap-6">
+        <div className="flex-1">
+          <DetailsViewSection
+            title="Basic information"
+            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            data={getResidencyBasicInfo(residency)}
+            ribbonType="tag"
+            ribbonValue={residency.tag}
+          />
+        </div>
+        <div className="w-80 space-y-6">
+          <CommentsCard
+            comments={residency.comments || ""}
+            onSave={async (comments) => {
+              const updatedResidency = { ...residency, comments };
+              await residencyApiService.update(updatedResidency);
+              dispatch(updateResidency(updatedResidency));
+            }}
+          />
+          <RemindersCard organisationType={OrganisationType.RESIDENCY} entityId={residencyId} />
+        </div>
+      </div>
       <DetailsViewSection
         title="Residency details"
         icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}

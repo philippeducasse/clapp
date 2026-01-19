@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Flag, MessageSquare, Send } from "lucide-react";
+import { Flag, Send } from "lucide-react";
 import { VenueUpdateDialog } from "../update/VenueUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { useDispatch } from "react-redux";
 import { getVenueBasicInfo } from "../../helpers/getBasicVenueInfo";
-import { getVenueDetails, getVenueComments } from "../../helpers/getVenueDetails";
+import { getVenueDetails } from "../../helpers/getVenueDetails";
 import { useRouter } from "next/navigation";
 import { Info, NotebookTabs } from "lucide-react";
 import { refreshVenue } from "../../helpers/refreshVenue";
@@ -24,6 +24,9 @@ import AddSection from "@/components/common/buttons/AddSection";
 import { venueApiService } from "@/api/venueApiService";
 import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
+import RemindersCard from "@/components/common/details-view/RemindersCard";
+import CommentsCard from "@/components/common/details-view/CommentsCard";
+import { OrganisationType } from "@/interfaces/Enums";
 
 const VenueView = () => {
   const params = useParams();
@@ -107,20 +110,28 @@ const VenueView = () => {
           </>
         }
       />
-      <DetailsViewSection
-        title="Basic information"
-        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
-        data={getVenueBasicInfo(venue)}
-        ribbonType="tag"
-        ribbonValue={venue.tag}
-      />
-      {venue.comments && (
-        <DetailsViewSection
-          title="Comments"
-          icon={<MessageSquare className="text-emerald-600 dark:text-emerald-400" />}
-          data={getVenueComments(venue)}
-        />
-      )}
+      <div className="flex gap-6">
+        <div className="flex-1">
+          <DetailsViewSection
+            title="Basic information"
+            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            data={getVenueBasicInfo(venue)}
+            ribbonType="tag"
+            ribbonValue={venue.tag}
+          />
+        </div>
+        <div className="w-80 space-y-6">
+          <CommentsCard
+            comments={venue.comments || ""}
+            onSave={async (comments) => {
+              const updatedVenue = { ...venue, comments };
+              await venueApiService.update(updatedVenue);
+              dispatch(updateVenue(updatedVenue));
+            }}
+          />
+          <RemindersCard organisationType={OrganisationType.VENUE} entityId={venueId} />
+        </div>
+      </div>
       <DetailsViewSection
         title="Venue details"
         icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
