@@ -49,7 +49,7 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
   };
 
   return (
-    <Card className="h-fit">
+    <Card className="h-fit max-h-[250px] overflow-auto mb-6">
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -84,14 +84,7 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
         ) : (
           <div className="space-y-3">
             {reminders?.map((reminder) => (
-              <div
-                key={reminder.id}
-                className={`p-3 rounded-lg border ${
-                  reminder.isSent
-                    ? "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                    : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800"
-                }`}
-              >
+              <div key={reminder.id} className="p-3 rounded-lg border">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
