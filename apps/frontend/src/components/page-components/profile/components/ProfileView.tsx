@@ -27,6 +27,7 @@ import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
 import { getEmailSettings } from "../helpers/getEmailSettings";
 import { useHashTab } from "@/hooks/useHashTab";
 import Link from "next/link";
+import ProfileRemindersCard from "./ProfileRemindersCard";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -156,6 +157,10 @@ const ProfileView = () => {
               </>
             }
           />
+        </Tab>
+
+        <Tab name="Reminders">
+          <ProfileRemindersCard />
         </Tab>
       </DetailsTabs>
     </DetailsViewWrapper>
