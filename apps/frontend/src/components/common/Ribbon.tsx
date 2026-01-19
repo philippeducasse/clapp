@@ -32,6 +32,7 @@ const TAG_CONFIG = {
 };
 
 const STATUS_CONFIG = {
+  [ApplicationStatus.DRAFT]: { color: "bg-gray-500", icon: FileText },
   [ApplicationStatus.APPLIED]: { color: "bg-blue-600", icon: Send },
   [ApplicationStatus.IN_DISCUSSION]: { color: "bg-purple-600", icon: MessageCircle },
   [ApplicationStatus.ACCEPTED]: { color: "bg-green-600", icon: CheckCircle },
@@ -39,8 +40,6 @@ const STATUS_CONFIG = {
   [ApplicationStatus.IGNORED]: { color: "bg-gray-600", icon: EyeOff },
   [ApplicationStatus.POSTPONED]: { color: "bg-yellow-600", icon: Clock },
   [ApplicationStatus.CANCELLED]: { color: "bg-orange-600", icon: Ban },
-  [ApplicationStatus.DRAFT]: { color: "bg-gray-500", icon: FileText },
-  [ApplicationStatus.NOT_APPLIED]: { color: "bg-gray-400", icon: X },
   [ApplicationStatus.OTHER]: { color: "bg-purple-700", icon: CircleQuestionMark },
 };
 

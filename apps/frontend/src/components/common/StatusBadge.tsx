@@ -7,8 +7,8 @@ import { Badge } from "../ui/badge";
 const statusBadgeVariants = cva("", {
   variants: {
     status: {
-      [ApplicationStatus.NOT_APPLIED]:
-        "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600",
+      [ApplicationStatus.DRAFT]:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/40",
       [ApplicationStatus.APPLIED]:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/40",
       [ApplicationStatus.IN_DISCUSSION]:
@@ -25,12 +25,10 @@ const statusBadgeVariants = cva("", {
         "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 border-orange-200 dark:border-orange-800/40",
       [ApplicationStatus.OTHER]:
         "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800/40",
-      [ApplicationStatus.DRAFT]:
-        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/40",
     },
   },
   defaultVariants: {
-    status: ApplicationStatus.NOT_APPLIED,
+    status: ApplicationStatus.DRAFT,
   },
 });
 
