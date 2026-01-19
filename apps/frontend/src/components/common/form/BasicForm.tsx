@@ -58,18 +58,21 @@ const BasicForm = ({
   return (
     <Form {...form}>
       <div className="flex">
-        <div className="flex flex-col max-w-[200px]  mt-8 ml-8">
-          {formTitle && <h3 className="text-xl text-bold text-emerald-600">{formTitle}</h3>}
-          {formSubtitle && (
-            <p className="text-base mt-2">
-              {typeof formSubtitle === "string" && formSubtitle.includes("<a ") ? (
-                <span dangerouslySetInnerHTML={{ __html: formSubtitle }} />
-              ) : (
-                formSubtitle
-              )}
-            </p>
-          )}
-        </div>
+        {formTitle && (
+          <div className="flex flex-col max-w-[200px]  m-8">
+            <h3 className="text-xl text-bold text-emerald-600">{formTitle}</h3>
+            {formSubtitle && (
+              <p className="text-base mt-2">
+                {typeof formSubtitle === "string" && formSubtitle.includes("<a ") ? (
+                  <span dangerouslySetInnerHTML={{ __html: formSubtitle }} />
+                ) : (
+                  formSubtitle
+                )}
+              </p>
+            )}
+          </div>
+        )}
+
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
           className="w-full caption-bottom text-sm space-y-6 max-w-4xl mx-auto mt-6 border py-6 px-12 rounded-2xl shadow"
@@ -128,7 +131,7 @@ const BasicForm = ({
             ) : onCancelHref ? (
               <BackButton href={onCancelHref} />
             ) : null}
-            <div className="flex gap-4">
+            <div className="flex gap-4 w-full">
               {additionalActions}
               {action === Action.APPLY ? (
                 <Button disabled={isLoading}>Send application</Button>
