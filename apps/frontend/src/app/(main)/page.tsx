@@ -14,6 +14,8 @@ import DashboardCard, {
 } from "@/components/page-components/dashboard/components/DashboardCard";
 import ApplicationStats from "@/components/page-components/dashboard/components/ApplicationStats";
 import ProfileCompletionCard from "@/components/page-components/dashboard/components/ProfileCompletionCard";
+import { RootState } from "@/redux/store";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Page = () => {
   const dispatch = useAppDispatch();
@@ -23,26 +25,46 @@ const Page = () => {
   const residencies = useSelector(selectAllResidencies);
   const profile = useSelector(selectProfile);
 
+  const festivalsLoading = useSelector((state: RootState) => state.festivals.loading);
+  const venuesLoading = useSelector((state: RootState) => state.venues.loading);
+  const residenciesLoading = useSelector((state: RootState) => state.residencies.loading);
+  const applicationsLoading = useSelector((state: RootState) => state.applications.loading);
+
+  // TODO: consider refactoring these multiple calls into a single fetch to the api.
   useEffect(() => {
-    if (festivals.length === 0) {
-      dispatch(fetchFestivals());
-    }
-    if (applications.length === 0) {
-      dispatch(fetchApplications());
-    }
-    if (venues.length === 0) {
-      dispatch(fetchVenues());
-    }
-    if (residencies.length === 0) {
-      dispatch(fetchResidencies());
-    }
-  }, [dispatch, festivals.length, applications.length, venues.length, residencies.length]);
+    Promise.all([
+      dispatch(fetchFestivals()),
+      dispatch(fetchApplications()),
+      dispatch(fetchVenues()),
+      dispatch(fetchResidencies()),
+    ]);
+  }, [dispatch]);
 
   const overviewCardData: DashboardCardProps[] = [
-    { title: "Total Applications", value: applications.length, subtitle: "All submissions" },
-    { title: "Total Festivals", value: festivals.length },
-    { title: "Total Venues", value: venues.length },
-    { title: "Total Residencies", value: residencies.length },
+    {
+      title: "Total Applications",
+      value: applications.length,
+      subtitle: "All submissions",
+      loading: applicationsLoading,
+    },
+    {
+      title: "Total Festivals",
+      value: festivals.length,
+      subtitle: "In database",
+      loading: festivalsLoading,
+    },
+    {
+      title: "Total Venues",
+      value: venues.length,
+      subtitle: "In database",
+      loading: venuesLoading,
+    },
+    {
+      title: "Total Residencies",
+      value: residencies.length,
+      subtitle: "In database",
+      loading: residenciesLoading,
+    },
   ];
 
   return (
@@ -65,6 +87,7 @@ const Page = () => {
             value={data.value}
             subtitle={data.subtitle}
             key={`${data.title}_${index}`}
+            loading={data.loading}
           />
         ))}
       </div>
@@ -82,7 +105,13 @@ const Page = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {applications.length === 0 ? (
+              {applicationsLoading ? (
+                <>
+                  <Skeleton className="h-6 mt-2 w-full" />
+                  <Skeleton className="h-6 mt-2 w-full" />
+                  <Skeleton className="h-6 mt-2 w-full" />
+                </>
+              ) : applications.length === 0 ? (
                 <div className="text-muted-foreground text-sm">No applications yet</div>
               ) : (
                 <ApplicationStats applications={applications} />
