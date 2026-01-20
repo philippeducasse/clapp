@@ -27,3 +27,10 @@ export interface Credentials {
   email: string;
   password: string;
 }
+
+export interface GetAllParams {
+  offset?: number;
+  limit?: number;
+  search?: string;
+  filters?: Record<string, unknown>;
+}
