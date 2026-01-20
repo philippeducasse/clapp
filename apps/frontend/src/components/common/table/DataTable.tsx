@@ -74,12 +74,15 @@ export function DataTable<TData, TValue>({
   // Reset to page 0 when filters or search changes
   useEffect(() => {
     if (columnFilters.length > 0) {
+      console.log("calling 1");
+
       setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
     }
   }, [columnFilters]);
 
   useEffect(() => {
     if (searchBarFilter.length > 0) {
+      console.log("calling 2");
       setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
     }
   }, [searchBarFilter]);
@@ -115,6 +118,7 @@ export function DataTable<TData, TValue>({
     onGlobalFilterChange: setSearchBarFilter,
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: handlePaginationChange,
+    manualPagination: true,
     pageCount: totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
     state: {
       sorting,

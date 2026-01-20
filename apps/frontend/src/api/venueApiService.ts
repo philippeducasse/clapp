@@ -6,15 +6,18 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
+import { buildQueryParams } from "./helpers/buildQueryParams";
 import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { EntityApiService } from "@/interfaces/api/ApiService";
+import { GetAllParams, EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "/api/venues/";
 
-const getAll = (): Promise<PaginatedResponse<Venue>> => {
-  return fetchRequest<PaginatedResponse<Venue>>(endpoint);
+const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Venue>> => {
+  const queryString = buildQueryParams(params);
+  const url = `${endpoint}?${queryString}`;
+  return fetchRequest<PaginatedResponse<Venue>>(url);
 };
 
 const get = (venueId: number): Promise<Venue> => {
