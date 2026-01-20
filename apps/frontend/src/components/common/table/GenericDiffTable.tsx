@@ -38,8 +38,8 @@ export const GenericDiffTable = <T extends Record<string, unknown>>({
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/3">Field</TableHead>
-              <TableHead className="w-2/3">Original</TableHead>
+              <TableHead className="w-1/3 text-xl text-emerald-600">Field</TableHead>
+              <TableHead className="w-2/3 text-xl text-emerald-600">Original</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -52,13 +52,9 @@ export const GenericDiffTable = <T extends Record<string, unknown>>({
 
                 return (
                   <TableRow key={String(fieldName)}>
-                    <TableCell className="font-medium truncate">
-                      {field.label}
-                    </TableCell>
+                    <TableCell className="font-medium truncate">{field.label}</TableCell>
                     <TableCell
-                      className={`truncate ${
-                        hasChanged ? "bg-red-50 dark:bg-red-950" : ""
-                      }`}
+                      className={`truncate ${hasChanged ? "bg-red-50 dark:bg-red-950" : ""}`}
                     >
                       {String(originalVal)}
                     </TableCell>
@@ -72,7 +68,7 @@ export const GenericDiffTable = <T extends Record<string, unknown>>({
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
-              <TableHead className="w-full">Updated</TableHead>
+              <TableHead className="w-full text-xl text-emerald-600">Updated</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
