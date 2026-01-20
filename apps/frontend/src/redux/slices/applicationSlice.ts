@@ -2,9 +2,9 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Application } from "@/interfaces/entities/Application";
 import { RootState } from "../store";
 import { applicationApiService } from "@/api/applicationApiService";
-import { createFilterReducers, FilterableState } from "../shared/filterReducers";
+import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
 
-interface ApplicationsState extends FilterableState {
+interface ApplicationsState extends BaseSliceState {
   applications: Application[];
 }
 
@@ -12,6 +12,8 @@ const initialState: ApplicationsState = {
   applications: [],
   filters: [],
   searchBarFilter: "",
+  loading: false,
+  error: null,
 };
 
 export const fetchApplications = createAsyncThunk("applications/fetchApplications", async () => {
@@ -28,7 +30,7 @@ const applicationSlice = createSlice({
     },
     setApplication(state, action: PayloadAction<Application>) {
       const existingIndex = state.applications.findIndex(
-        (application) => application.id === action.payload.id
+        (application) => application.id === action.payload.id,
       );
       if (existingIndex >= 0) {
         state.applications[existingIndex] = action.payload;
@@ -48,16 +50,12 @@ const applicationSlice = createSlice({
     },
     deleteApplication(state, action: PayloadAction<number>) {
       state.applications = state.applications.filter(
-        (application) => application.id !== action.payload
+        (application) => application.id !== action.payload,
       );
     },
     ...createFilterReducers<ApplicationsState>(),
   },
-  extraReducers: (builder) => {
-    builder.addCase(fetchApplications.fulfilled, (state, action) => {
-      state.applications = action.payload.results;
-    });
-  },
+  extraReducers: createAsyncExtraReducers(fetchApplications, "applications"),
 });
 
 export const {
@@ -76,7 +74,7 @@ export const {
 export const selectAllApplications = (state: RootState) => state.applications.applications;
 export const selectApplication = (state: RootState, applicationId: number) =>
   state.applications.applications.find(
-    (application: Application) => application.id === applicationId
+    (application: Application) => application.id === applicationId,
   );
 export const selectColumnFilters = (state: RootState) => state.applications.filters;
 export const selectsearchBarFilter = (state: RootState) => state.applications.searchBarFilter;

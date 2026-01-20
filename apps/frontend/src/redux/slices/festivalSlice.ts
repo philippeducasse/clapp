@@ -2,9 +2,13 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Festival } from "@/interfaces/entities/Festival";
 import { RootState } from "../store";
 import { festivalApiService } from "@/api/festivalApiService";
-import { createFilterReducers, FilterableState } from "../shared/filterReducers";
+import {
+  createFilterReducers,
+  BaseSliceState,
+  createAsyncExtraReducers,
+} from "../shared/sharedReducers";
 
-interface FestivalsState extends FilterableState {
+interface FestivalsState extends BaseSliceState {
   festivals: Festival[];
 }
 
@@ -12,6 +16,8 @@ const initialState: FestivalsState = {
   festivals: [],
   filters: [],
   searchBarFilter: "",
+  loading: false,
+  error: null,
 };
 
 export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
@@ -28,7 +34,7 @@ const festivalSlice = createSlice({
     },
     setFestival(state, action: PayloadAction<Festival>) {
       const existingIndex = state.festivals.findIndex(
-        (festival) => festival.id === action.payload.id
+        (festival) => festival.id === action.payload.id,
       );
       if (existingIndex >= 0) {
         state.festivals[existingIndex] = action.payload;
@@ -51,12 +57,7 @@ const festivalSlice = createSlice({
     },
     ...createFilterReducers<FestivalsState>(),
   },
-
-  extraReducers: (builder) => {
-    builder.addCase(fetchFestivals.fulfilled, (state, action) => {
-      state.festivals = action.payload.results;
-    });
-  },
+  extraReducers: createAsyncExtraReducers(fetchFestivals, "festivals"),
 });
 
 export const {

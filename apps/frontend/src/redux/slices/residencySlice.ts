@@ -2,13 +2,18 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Residency } from "@/interfaces/entities/Residency";
 import { RootState } from "../store";
 import { residencyApiService } from "@/api/residencyApiService";
+import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
 
-interface ResidenciesState {
+interface ResidenciesState extends BaseSliceState {
   residencies: Residency[];
 }
 
 const initialState: ResidenciesState = {
   residencies: [],
+  filters: [],
+  searchBarFilter: "",
+  loading: false,
+  error: null,
 };
 
 export const fetchResidencies = createAsyncThunk("residencies/fetchResidencies", async () => {
@@ -46,19 +51,28 @@ const residencySlice = createSlice({
     deleteResidency(state, action: PayloadAction<number>) {
       state.residencies = state.residencies.filter((residency) => residency.id !== action.payload);
     },
+    ...createFilterReducers<ResidenciesState>(),
   },
-  extraReducers: (builder) => {
-    builder.addCase(fetchResidencies.fulfilled, (state, action) => {
-      state.residencies = action.payload.results;
-    });
-  },
+  extraReducers: createAsyncExtraReducers(fetchResidencies, "residencies"),
 });
 
-export const { setResidencies, setResidency, addResidency, updateResidency, deleteResidency } =
-  residencySlice.actions;
+export const {
+  setResidencies,
+  setResidency,
+  addResidency,
+  updateResidency,
+  deleteResidency,
+  setColumnFilters,
+  setColumnFilter,
+  removeColumnFilter,
+  clearColumnFilters,
+  setSearchBarFilter,
+} = residencySlice.actions;
 
 export const selectAllResidencies = (state: RootState) => state.residencies.residencies;
 export const selectResidency = (state: RootState, residencyId: number) =>
   state.residencies.residencies.find((residency: Residency) => residency.id === residencyId);
+export const selectColumnFilters = (state: RootState) => state.residencies.filters;
+export const selectSearchBarFilter = (state: RootState) => state.residencies.searchBarFilter;
 
 export default residencySlice.reducer;
