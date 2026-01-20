@@ -1,11 +1,15 @@
 import { fetchRequest, sendRequest, deleteRequest, patchRequest } from "./fetchHelper";
+import { buildQueryParams } from "./helpers/buildQueryParams";
 import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
+import { GetAllParams } from "@/interfaces/api/ApiService";
 
 const endpoint = "/api/applications/";
 
-const getAll = (): Promise<PaginatedResponse<Application>> => {
-  return fetchRequest<PaginatedResponse<Application>>(endpoint);
+const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Application>> => {
+  const queryString = buildQueryParams(params);
+  const url = `${endpoint}?${queryString}`;
+  return fetchRequest<PaginatedResponse<Application>>(url);
 };
 
 const get = (applicationId: number): Promise<Application> => {
@@ -17,7 +21,7 @@ const create = (application: Application): Promise<Application> => {
     `${endpoint}`,
     application,
     "POST",
-    "Application successfully created"
+    "Application successfully created",
   );
 };
 
@@ -30,14 +34,14 @@ const update = (application: Application): Promise<Application> => {
     `${endpoint}${application.id}/`,
     application,
     "PUT",
-    "Application successfully updated"
+    "Application successfully updated",
   );
 };
 
 const changeStatus = (entityId: number, action: ApplicationStatus): Promise<Application> => {
   return patchRequest<Application>(
     `${endpoint}${entityId}/status/${action}/`,
-    "Festival status successfully updated"
+    "Festival status successfully updated",
   );
 };
 
