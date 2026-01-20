@@ -6,15 +6,18 @@ import {
   sendFormDataRequest,
   patchRequest,
 } from "./fetchHelper";
+import { buildQueryParams } from "./helpers/buildQueryParams";
 import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { EntityApiService } from "@/interfaces/api/ApiService";
+import { GetAllParams, EntityApiService } from "@/interfaces/api/ApiService";
 
 const endpoint = "/api/residencies/";
 
-const getAll = (): Promise<PaginatedResponse<Residency>> => {
-  return fetchRequest<PaginatedResponse<Residency>>(endpoint);
+const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Residency>> => {
+  const queryString = buildQueryParams(params);
+  const url = `${endpoint}?${queryString}`;
+  return fetchRequest<PaginatedResponse<Residency>>(url);
 };
 
 const get = (id: number): Promise<Residency> => {
