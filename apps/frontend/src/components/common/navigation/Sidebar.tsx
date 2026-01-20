@@ -1,4 +1,4 @@
-import { Calendar, Home, Flag, ClipboardEdit, Settings, University, Theater } from "lucide-react";
+import { Home, Flag, ClipboardEdit, Settings, University, Theater } from "lucide-react";
 
 import {
   Sidebar as ShadcnSidebar,
@@ -37,11 +37,6 @@ const items = [
     title: "Applications",
     url: "/applications",
     icon: ClipboardEdit,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
   },
   {
     title: "Settings",
