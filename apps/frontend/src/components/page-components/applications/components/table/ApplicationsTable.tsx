@@ -1,10 +1,14 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
-import { setApplications, deleteApplication, updateApplication } from "@/redux/slices/applicationSlice";
+import {
+  setApplications,
+  deleteApplication,
+  updateApplication,
+} from "@/redux/slices/applicationSlice";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
@@ -21,10 +25,6 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     useState<PaginatedResponse<Application>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(null);
-
-  useEffect(() => {
-    dispatch(setApplications(applicationData.results));
-  }, [dispatch, applicationData.results]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteApplicationId(id);
@@ -45,22 +45,31 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     setDeleteApplicationId(null);
   }, [deleteApplicationId, dispatch]);
 
-  const handleStatusChange = useCallback(async (id: number, status: ApplicationStatus) => {
-    const updatedApplication = await applicationApiService.changeStatus(id, status);
+  const handleStatusChange = useCallback(
+    async (id: number, status: ApplicationStatus) => {
+      const updatedApplication = await applicationApiService.changeStatus(id, status);
 
-    setApplicationData((prev) => ({
-      ...prev,
-      results: prev.results.map((app) =>
-        app.id === id ? updatedApplication : app
-      ),
-    }));
+      setApplicationData((prev) => ({
+        ...prev,
+        results: prev.results.map((app) => (app.id === id ? updatedApplication : app)),
+      }));
 
-    dispatch(updateApplication(updatedApplication));
-  }, [dispatch]);
+      dispatch(updateApplication(updatedApplication));
+    },
+    [dispatch],
+  );
+
+  const handleDataFetched = useCallback(
+    (data: PaginatedResponse<Application>) => {
+      setApplicationData(data);
+      dispatch(setApplications(data.results));
+    },
+    [dispatch],
+  );
 
   const columns = useApplicationColumns({
     onDeleteClick: handleDeleteClick,
-    onStatusChange: handleStatusChange
+    onStatusChange: handleStatusChange,
   });
   const filters = useMemo(() => getApplicationFilters(), []);
   return (
@@ -77,6 +86,9 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         entityName={EntityName.APPLICATION}
         filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
+        totalCount={applicationData.count}
+        fetchData={applicationApiService.getAll}
+        onDataFetched={handleDataFetched}
       />
     </>
   );
