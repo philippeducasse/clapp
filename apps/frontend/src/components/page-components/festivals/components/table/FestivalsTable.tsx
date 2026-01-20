@@ -20,33 +20,10 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
   const [festivalData, setFestivalData] = useState<PaginatedResponse<Festival>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteFestivalId, setDeleteFestivalId] = useState<number | null>(null);
-  const [pagination, setPagination] = useState({
-    pageIndex: 0,
-    pageSize: 50,
-  });
-  // const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     dispatch(setFestivals(festivalData.results));
   }, [dispatch, festivalData.results]);
-
-  // Pagination is client-side only since all data is loaded
-  // useEffect(() => {
-  //   console.log("📄 Pagination changed:", pagination.pageIndex);
-  //   if (pagination.pageIndex === 0) return;
-
-  //   const fetchFestivals = async () => {
-  //     setIsLoading(true);
-  //     // const offset = pagination.pageIndex * pagination.pageSize;
-  //     const data = await festivalApiService.getAll();
-  //     // pagination.pageSize,
-  //     // offset
-  //     setFestivalData(data);
-  //     setIsLoading(false);
-  //   };
-
-  //   fetchFestivals();
-  // }, [pagination]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteFestivalId(id);
@@ -69,6 +46,14 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
     setDeleteFestivalId(null);
   }, [deleteFestivalId, dispatch]);
 
+  const handleDataFetched = useCallback(
+    (data: PaginatedResponse<Festival>) => {
+      setFestivalData(data);
+      dispatch(setFestivals(data.results));
+    },
+    [dispatch],
+  );
+
   const columns = useFestivalColumns({ onDeleteClick: handleDeleteClick });
 
   const filters = useMemo(() => getFestivalFilters(), []);
@@ -85,11 +70,10 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
         columns={columns}
         data={festivalData.results}
         entityName={EntityName.FESTIVAL}
-        pagination={pagination}
-        setPagination={setPagination}
         totalCount={festivalData.count}
-        // isLoading={isLoading}
         filters={filters}
+        fetchData={festivalApiService.getAll}
+        onDataFetched={handleDataFetched}
       />
     </>
   );

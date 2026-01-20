@@ -10,11 +10,15 @@ import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
+import { GetAllParams } from "@/interfaces/api/ApiService";
+import { buildQueryParams } from "./helpers/buildQueryParams";
 
 const endpoint = "/api/festivals/";
 
-const getAll = (): Promise<PaginatedResponse<Festival>> => {
-  return fetchRequest<PaginatedResponse<Festival>>(endpoint);
+const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Festival>> => {
+  const queryString = buildQueryParams(params);
+  const url = `${endpoint}?${queryString}`;
+  return fetchRequest<PaginatedResponse<Festival>>(url);
 };
 
 const get = (festivalId: number): Promise<Festival> => {
