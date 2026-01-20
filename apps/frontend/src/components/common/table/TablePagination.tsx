@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Pagination,
@@ -8,6 +10,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table } from "@tanstack/react-table";
 import { EntityName } from "@/interfaces/Enums";
 
@@ -19,7 +28,6 @@ interface TablePaginationProps<TData> {
     pageSize: number;
   };
   totalCount?: number;
-  isServerSide?: boolean;
 }
 
 function TablePagination<TData>({
@@ -27,22 +35,15 @@ function TablePagination<TData>({
   pagination,
   entityName,
   totalCount,
-  isServerSide = false
 }: TablePaginationProps<TData>) {
-  // Calculate the current page number (1-based)
   const currentPage = pagination.pageIndex + 1;
 
-  // Calculate the total number of pages
-  const totalPages = isServerSide && totalCount
+  const totalPages = totalCount
     ? Math.ceil(totalCount / pagination.pageSize)
     : Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
 
-  // Calculate total items count
-  const totalItems = isServerSide && totalCount
-    ? totalCount
-    : table.getFilteredRowModel().rows.length;
+  const totalItems = totalCount ? totalCount : table.getFilteredRowModel().rows.length;
 
-  // Generate page numbers to display
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 5; // Max number of page links to show
@@ -57,13 +58,37 @@ function TablePagination<TData>({
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
-
     return pageNumbers;
   };
+
+  const handlePageSizeChange = (newPageSize: string) => {
+    const size = parseInt(newPageSize);
+    table.setPageSize(size);
+    table.setPageIndex(0);
+  };
+
+  const pageSizeOptions = [10, 25, 50, 100];
   return (
     <Pagination className="justify-between mt-8">
-      <div className="">
-        Page {currentPage} of {totalPages} | Total {entityName}s: {totalItems}
+      <div className="flex items-center gap-4">
+        <div>
+          Page {currentPage} of {totalPages} | Total {entityName}s: {totalItems}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm">Per page:</span>
+          <Select value={String(pagination.pageSize)} onValueChange={handlePageSizeChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {pageSizeOptions.map((size) => (
+                <SelectItem key={size} value={String(size)}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <PaginationContent>
         <PaginationItem>
@@ -89,7 +114,10 @@ function TablePagination<TData>({
         {/* Show page numbers */}
         {getPageNumbers().map((pageNumber) => (
           <PaginationItem key={pageNumber}>
-            <PaginationLink onClick={() => table.setPageIndex(pageNumber - 1)} isActive={currentPage === pageNumber}>
+            <PaginationLink
+              onClick={() => table.setPageIndex(pageNumber - 1)}
+              isActive={currentPage === pageNumber}
+            >
               {pageNumber}
             </PaginationLink>
           </PaginationItem>
@@ -104,7 +132,10 @@ function TablePagination<TData>({
               </PaginationItem>
             )}
             <PaginationItem>
-              <PaginationLink onClick={() => table.setPageIndex(totalPages - 1)} isActive={currentPage === totalPages}>
+              <PaginationLink
+                onClick={() => table.setPageIndex(totalPages - 1)}
+                isActive={currentPage === totalPages}
+              >
                 {totalPages}
               </PaginationLink>
             </PaginationItem>

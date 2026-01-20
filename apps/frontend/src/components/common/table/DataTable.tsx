@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -26,42 +26,83 @@ import TablePagination from "./TablePagination";
 import { EntityName } from "@/interfaces/Enums";
 import DataTableHeader from "./DataTableHeader";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
+
+interface FetchParams {
+  offset: number;
+  limit: number;
+  search?: string;
+  filters?: Record<string, unknown>;
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   entityName: EntityName;
-  pagination?: PaginationState;
-  setPagination?: OnChangeFn<PaginationState>;
   totalCount?: number;
-  isLoading?: boolean;
   filters?: FilterConfig[];
   defaultSorting?: SortingState;
+  fetchData?: (params: FetchParams) => Promise<PaginatedResponse<TData>>;
+  onDataFetched?: (data: PaginatedResponse<TData>) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   entityName,
-  pagination: externalPagination,
-  setPagination: setExternalPagination,
   totalCount,
   filters,
   defaultSorting = [],
-}: // isLoading = false,
-DataTableProps<TData, TValue>) {
+  fetchData,
+  onDataFetched,
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
   const [searchBarFilter, setSearchBarFilter] = useState<string>("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [internalPagination, setInternalPagination] = useState({
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 30,
+    pageSize: 25,
   });
 
-  // Use external pagination if provided, otherwise use internal
-  const pagination = externalPagination || internalPagination;
-  const setPagination = setExternalPagination || setInternalPagination;
-  const isServerSide = !!externalPagination;
+  const handlePaginationChange: OnChangeFn<PaginationState> = useCallback((updater) => {
+    setPagination((prev) => {
+      const newPagination = typeof updater === "function" ? updater(prev) : updater;
+      return newPagination;
+    });
+  }, []);
+
+  // Reset to page 0 when filters or search changes
+  useEffect(() => {
+    if (columnFilters.length > 0) {
+      setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
+    }
+  }, [columnFilters]);
+
+  useEffect(() => {
+    if (searchBarFilter.length > 0) {
+      setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
+    }
+  }, [searchBarFilter]);
+
+  // Fetch data when pagination, filters, or search changes
+  useEffect(() => {
+    if (fetchData) {
+      const offset = pagination.pageIndex * pagination.pageSize;
+
+      // Convert columnFilters to a simple object for the API
+      const filterParams: Record<string, unknown> = {};
+      columnFilters.forEach((filter) => {
+        filterParams[filter.id] = filter.value;
+      });
+
+      fetchData({
+        offset,
+        limit: pagination.pageSize,
+        search: searchBarFilter || undefined,
+        filters: Object.keys(filterParams).length > 0 ? filterParams : undefined,
+      }).then(onDataFetched);
+    }
+  }, [pagination, columnFilters, searchBarFilter, fetchData, onDataFetched]);
 
   const table = useReactTable({
     data,
@@ -73,9 +114,8 @@ DataTableProps<TData, TValue>) {
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setSearchBarFilter,
     getFilteredRowModel: getFilteredRowModel(),
-    onPaginationChange: setPagination,
-    manualPagination: isServerSide,
-    pageCount: isServerSide && totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
+    onPaginationChange: handlePaginationChange,
+    pageCount: totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
     state: {
       sorting,
       columnFilters,
@@ -134,7 +174,6 @@ DataTableProps<TData, TValue>) {
         pagination={pagination}
         entityName={entityName}
         totalCount={totalCount}
-        isServerSide={isServerSide}
       />
     </>
   );
