@@ -141,7 +141,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 500,
+    "PAGE_SIZE": 25,
 }
 
 LOGGING = {
