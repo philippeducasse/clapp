@@ -23,12 +23,6 @@ export const getVenueFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.URL,
     },
     {
-      label: "Approximate Date",
-      fieldName: "approximateDate",
-      type: ControlledFormElementType.TEXT,
-      helpText: "Approximate date the venue is operating",
-    },
-    {
       label: "Country",
       fieldName: "country",
       type: ControlledFormElementType.TEXT,

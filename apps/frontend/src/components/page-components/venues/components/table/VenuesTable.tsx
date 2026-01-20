@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Venue } from "@/interfaces/entities/Venue";
 import { useVenueColumns } from "../../helpers/useVenueColumns";
 import { DataTable } from "@/components/common/table/DataTable";
@@ -9,20 +9,17 @@ import { EntityName } from "@/interfaces/Enums";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { venueApiService } from "@/api/venueApiService";
 import { getVenueFilters } from "../../helpers/getVenueFilters";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
 interface VenuesTableProps {
-  venues: Venue[];
+  initialData: PaginatedResponse<Venue>;
 }
 
-export const VenuesTable = ({ venues }: VenuesTableProps) => {
+export const VenuesTable = ({ initialData }: VenuesTableProps) => {
   const dispatch = useDispatch();
-  const [venueData, setVenueData] = useState<Venue[]>(venues);
+  const [venueData, setVenueData] = useState<PaginatedResponse<Venue>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteVenueId, setDeleteVenueId] = useState<number | null>(null);
-
-  useEffect(() => {
-    dispatch(setVenues(venueData));
-  }, [dispatch, venueData]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteVenueId(id);
@@ -33,13 +30,23 @@ export const VenuesTable = ({ venues }: VenuesTableProps) => {
     if (deleteVenueId === null) return;
     await venueApiService.remove(deleteVenueId);
 
-    // Update local state by filtering out the deleted venue
-    setVenueData(prev => prev.filter(venue => venue.id !== deleteVenueId));
+    setVenueData((prev) => ({
+      ...prev,
+      results: prev.results.filter((venue) => venue.id !== deleteVenueId),
+      count: prev.count - 1,
+    }));
 
-    // Also update Redux for consistency
     dispatch(deleteVenue(deleteVenueId));
     setDeleteVenueId(null);
   }, [deleteVenueId, dispatch]);
+
+  const handleDataFetched = useCallback(
+    (data: PaginatedResponse<Venue>) => {
+      setVenueData(data);
+      dispatch(setVenues(data.results));
+    },
+    [dispatch],
+  );
 
   const columns = useVenueColumns({ onDeleteClick: handleDeleteClick });
 
@@ -53,7 +60,15 @@ export const VenuesTable = ({ venues }: VenuesTableProps) => {
         onConfirm={onConfirmDelete}
         itemName="venue"
       />
-      <DataTable columns={columns} data={venueData} entityName={EntityName.VENUE} filters={filters} />
+      <DataTable
+        columns={columns}
+        data={venueData.results}
+        entityName={EntityName.VENUE}
+        filters={filters}
+        totalCount={venueData.count}
+        fetchData={venueApiService.getAll}
+        onDataFetched={handleDataFetched}
+      />
     </>
   );
 };
