@@ -9,9 +9,15 @@ const ControlledTextArea = ({ field, showLabels }: BaseControlledPropsWithLabels
         aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
       {...field}
       value={field.value as string}
+      style={undefined}
     />
   ) : (
-    <textarea className="p-2 " {...field} value={field.value as string} />
+    <textarea
+      className="p-2 min-h-full"
+      {...field}
+      value={field.value as string}
+      style={{ resize: "none", minHeight: "300px" }}
+    />
   );
 };
 
