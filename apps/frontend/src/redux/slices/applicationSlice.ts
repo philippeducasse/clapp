@@ -2,6 +2,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Application } from "@/interfaces/entities/Application";
 import { RootState } from "../store";
 import { applicationApiService } from "@/api/applicationApiService";
+import { GetAllParams } from "@/interfaces/api/ApiService";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
 
 interface ApplicationsState extends BaseSliceState {
@@ -16,10 +18,13 @@ const initialState: ApplicationsState = {
   error: null,
 };
 
-export const fetchApplications = createAsyncThunk("applications/fetchApplications", async () => {
-  const response = await applicationApiService.getAll();
-  return response;
-});
+export const fetchApplications = createAsyncThunk<PaginatedResponse<Application>, GetAllParams | undefined>(
+  "applications/fetchApplications",
+  async (params?: GetAllParams) => {
+    const response = await applicationApiService.getAll(params);
+    return response;
+  },
+);
 
 const applicationSlice = createSlice({
   name: "applications",

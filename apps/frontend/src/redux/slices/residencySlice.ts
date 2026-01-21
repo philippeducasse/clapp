@@ -2,6 +2,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Residency } from "@/interfaces/entities/Residency";
 import { RootState } from "../store";
 import { residencyApiService } from "@/api/residencyApiService";
+import { GetAllParams } from "@/interfaces/api/ApiService";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
 
 interface ResidenciesState extends BaseSliceState {
@@ -16,10 +18,13 @@ const initialState: ResidenciesState = {
   error: null,
 };
 
-export const fetchResidencies = createAsyncThunk("residencies/fetchResidencies", async () => {
-  const response = await residencyApiService.getAll();
-  return response;
-});
+export const fetchResidencies = createAsyncThunk<PaginatedResponse<Residency>, GetAllParams | undefined>(
+  "residencies/fetchResidencies",
+  async (params?: GetAllParams) => {
+    const response = await residencyApiService.getAll(params);
+    return response;
+  },
+);
 
 const residencySlice = createSlice({
   name: "residencies",

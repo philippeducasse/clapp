@@ -2,6 +2,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Venue } from "@/interfaces/entities/Venue";
 import { RootState } from "../store";
 import { venueApiService } from "@/api/venueApiService";
+import { GetAllParams } from "@/interfaces/api/ApiService";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
 
 interface VenuesState extends BaseSliceState {
@@ -16,10 +18,13 @@ const initialState: VenuesState = {
   error: null,
 };
 
-export const fetchVenues = createAsyncThunk("venues/fetchVenues", async () => {
-  const response = await venueApiService.getAll();
-  return response;
-});
+export const fetchVenues = createAsyncThunk<PaginatedResponse<Venue>, GetAllParams | undefined>(
+  "venues/fetchVenues",
+  async (params?: GetAllParams) => {
+    const response = await venueApiService.getAll(params);
+    return response;
+  },
+);
 
 const venueSlice = createSlice({
   name: "venues",

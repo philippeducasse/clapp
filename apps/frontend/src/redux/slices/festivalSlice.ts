@@ -2,6 +2,8 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { Festival } from "@/interfaces/entities/Festival";
 import { RootState } from "../store";
 import { festivalApiService } from "@/api/festivalApiService";
+import { GetAllParams } from "@/interfaces/api/ApiService";
+import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import {
   createFilterReducers,
   BaseSliceState,
@@ -20,10 +22,13 @@ const initialState: FestivalsState = {
   error: null,
 };
 
-export const fetchFestivals = createAsyncThunk("festivals/fetchFestivals", async () => {
-  const response = await festivalApiService.getAll();
-  return response;
-});
+export const fetchFestivals = createAsyncThunk<PaginatedResponse<Festival>, GetAllParams | undefined>(
+  "festivals/fetchFestivals",
+  async (params?: GetAllParams) => {
+    const response = await festivalApiService.getAll(params);
+    return response;
+  },
+);
 
 const festivalSlice = createSlice({
   name: "festivals",
