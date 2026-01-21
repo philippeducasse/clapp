@@ -87,7 +87,7 @@ export const UpdateDialog = <T,>({
         )}
       >
         <DialogHeader>
-          <DialogTitle className="text-3xl text-emerald-600">Update {entityName}</DialogTitle>
+          <DialogTitle className="text-2xl text-emerald-600">Update {entityName}</DialogTitle>
           <DialogDescription>
             {updatedFields ? "Review changes" : "Updating information...."}
           </DialogDescription>
