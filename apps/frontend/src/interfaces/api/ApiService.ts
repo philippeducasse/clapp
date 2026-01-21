@@ -4,7 +4,7 @@ import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { Profile } from "../entities/Profile";
 
 export interface EntityApiService<T> {
-  getAll: () => Promise<PaginatedResponse<T>>;
+  getAll: (params?: GetAllParams) => Promise<PaginatedResponse<T>>;
   get: (id: number) => Promise<T>;
   create: (entity: T) => Promise<T>;
   update: (entity: T) => Promise<T>;

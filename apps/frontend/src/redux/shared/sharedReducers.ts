@@ -37,8 +37,8 @@ export const createFilterReducers = <T extends BaseSliceState>() => ({
 });
 
 export const createAsyncExtraReducers =
-  <Entity, T extends BaseSliceState>(
-    asyncThunk: AsyncThunk<PaginatedResponse<Entity>, void, object>,
+  <Entity, T extends BaseSliceState, TArg = void>(
+    asyncThunk: AsyncThunk<PaginatedResponse<Entity>, TArg, object>,
     dataKey: string,
   ) =>
   (builder: ActionReducerMapBuilder<T>) => {

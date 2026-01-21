@@ -19,11 +19,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const Page = () => {
   const dispatch = useAppDispatch();
-  const festivals = useSelector(selectAllFestivals);
-  const applications = useSelector(selectAllApplications);
-  const venues = useSelector(selectAllVenues);
-  const residencies = useSelector(selectAllResidencies);
   const profile = useSelector(selectProfile);
+  const applications = useSelector(selectAllApplications);
+  const festivals = useSelector(selectAllFestivals);
+  const residencies = useSelector(selectAllResidencies);
+  const venues = useSelector(selectAllVenues);
 
   const festivalsLoading = useSelector((state: RootState) => state.festivals.loading);
   const venuesLoading = useSelector((state: RootState) => state.venues.loading);
@@ -33,10 +33,10 @@ const Page = () => {
   // TODO: consider refactoring these multiple calls into a single fetch to the api.
   useEffect(() => {
     Promise.all([
-      dispatch(fetchFestivals()),
-      dispatch(fetchApplications()),
-      dispatch(fetchVenues()),
-      dispatch(fetchResidencies()),
+      dispatch(fetchFestivals({ limit: 10000 })),
+      dispatch(fetchApplications({ limit: 10000 })),
+      dispatch(fetchVenues({ limit: 10000 })),
+      dispatch(fetchResidencies({ limit: 10000 })),
     ]);
   }, [dispatch]);
 
