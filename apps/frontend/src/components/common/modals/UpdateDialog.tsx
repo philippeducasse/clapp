@@ -15,6 +15,7 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { Hammer, X } from "lucide-react";
 import SubmitButton from "../buttons/SubmitButton";
 import { DynamicProgress } from "../DynamicProgress";
+import { cn } from "@/lib/utils";
 
 export interface UpdateDialogProps<T> {
   entity: T | undefined;
@@ -79,10 +80,17 @@ export const UpdateDialog = <T,>({
           Update
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-full md:w-[90vw] max-w-full h-[90vh] overflow-y-auto">
+      <DialogContent
+        className={cn(
+          "overflow-y-auto transition-all duration-300",
+          updatedFields ? "h-[90vh]  w-full md:w-[90vw] max-w-full" : "w-md h-fit",
+        )}
+      >
         <DialogHeader>
           <DialogTitle>Update {entityName}</DialogTitle>
-          <DialogDescription>Review changes</DialogDescription>
+          <DialogDescription>
+            {updatedFields ? "Review changes" : "Updating information...."}
+          </DialogDescription>
         </DialogHeader>
         {updatedFields ? (
           <DiffTableComponent
@@ -99,11 +107,7 @@ export const UpdateDialog = <T,>({
               <X className="text-red-500" /> Cancel
             </Button>
           </DialogClose>
-          <SubmitButton
-            isLoading={loading}
-            onClick={handleSubmit}
-            label="Save changes"
-          />
+          <SubmitButton isLoading={loading} onClick={handleSubmit} label="Save changes" />
         </DialogFooter>
       </DialogContent>
     </Dialog>
