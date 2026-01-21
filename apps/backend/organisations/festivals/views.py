@@ -8,10 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
+from organisations.festivals.utils import generate_enrich_prompt as generate_festival_enrich_prompt
 from organisations.models import Organisation
-from organisations.services import (
-    generate_enrich_prompt as generate_festival_enrich_prompt,
-)
 from organisations.views import OrganisationViewSet
 
 

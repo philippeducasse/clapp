@@ -15,6 +15,77 @@ from profiles.models import Profile
 logger = logging.getLogger(__name__)
 
 
+def _format_contacts_for_prompt(organisation: Organisation) -> str:
+    """Format organisation contacts for display in prompt."""
+    contacts_list = []
+    for contact in organisation.contacts.all():
+        contact_str = f"{contact.email}"
+        if contact.name:
+            contact_str = f"{contact.name} ({contact.email})"
+        if contact.role:
+            contact_str += f" - {contact.role}"
+        contacts_list.append(contact_str)
+    return "; ".join(contacts_list) if contacts_list else "No contacts"
+
+
+def _build_enrich_prompt(
+    organisation: Organisation,
+    search_results: Optional[str],
+    org_type_display: str,
+    current_record_fields: str,
+    output_keys: str,
+    type_field_section: str,
+    required_json_example: str,
+) -> str:
+    """
+    Build enrichment prompt with shared structure and type-specific content.
+
+    Args:
+        organisation: The organisation to enrich
+        search_results: Web search snippets
+        org_type_display: Display name (e.g., "festival", "venue", "residency")
+        current_record_fields: The CURRENT RECORD section content
+        output_keys: The exact output keys required
+        type_field_section: Type-specific recognition hints section (can be empty)
+        required_json_example: Example JSON output for this type
+    """
+    sr = search_results or "No search results provided."
+
+    prompt = f"""
+    You are enriching {org_type_display} data for a cultural booking app.
+
+    TASK
+    - Read the current record and the web search snippets.
+    - If the web snippets provide better or newer information for a field, **you must update it**.
+    - If a field is missing in the snippets, keep the existing value.
+    - Translate non-English data to English.
+    - Normalize dates to ISO 8601 as strings: "YYYY-MM-DD".
+
+    SOURCES & CONFLICTS
+    - Prefer official organisation website > reputable cultural listings > news > blogs.
+    - If sources conflict, pick the **most recent official source**.
+
+    OUTPUT FORMAT
+    - Return **only** a single JSON object, no prose.
+    - Valid JSON. No comments. No trailing commas.
+    - Exactly these keys (strings):
+      {output_keys}
+    - contacts should be an array of objects with: email (required), name (optional), role (optional).
+      **IMPORTANT: Only include contacts if you find actual email addresses in the search results.
+      If no email addresses are found, return an empty array []. Do NOT invent or guess email addresses.**
+
+    CURRENT RECORD
+    {current_record_fields}
+
+    WEB SEARCH SNIPPETS (include URLs if you have them)
+    {sr}
+{type_field_section}
+    REQUIRED JSON SHAPE (example, syntactically correct — values are illustrative):
+    {required_json_example}
+    """
+    return prompt
+
+
 def generate_enrich_prompt(organisation: Organisation, search_results: Optional[str]) -> str:
     """Generate enrichment prompt for any organisation type."""
     sr = search_results or "No search results provided."

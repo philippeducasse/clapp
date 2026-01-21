@@ -1,8 +1,12 @@
+from typing import Optional
+
 from django.db.models import QuerySet
 
 from organisations.venues.models import Venue
 from organisations.venues.serializer import VenueSerializer
 from organisations.views import OrganisationViewSet
+from organisations.venues.utils import generate_enrich_prompt
+from organisations.models import Organisation
 
 
 class VenueViewSet(OrganisationViewSet):
@@ -20,3 +24,7 @@ class VenueViewSet(OrganisationViewSet):
 
     def get_organisation_type_name(self) -> str:
         return "venue"
+
+    def get_enrich_prompt(self, organisation: Organisation, search_results: Optional[str]) -> str:
+        """Use venue-specific enrichment prompt."""
+        return generate_enrich_prompt(organisation, search_results)
