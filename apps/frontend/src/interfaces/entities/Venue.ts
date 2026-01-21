@@ -13,6 +13,7 @@ export interface Venue {
   contacted?: boolean;
   description?: string;
   comments?: string;
+  tag?: string;
 }
 
 export enum VenueType {

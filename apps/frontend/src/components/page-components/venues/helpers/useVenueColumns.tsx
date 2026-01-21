@@ -22,118 +22,119 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
     (id: string) => {
       router.push(`/venues/${id}/edit`);
     },
-    [router]
+    [router],
   );
 
   return useMemo(
     () => [
-    {
-      accessorKey: "name",
-      header: getSortableHeader("Name"),
-      size: 200,
-      cell: ({ row }) => {
-        const venue = row.original;
-        return (
-          <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
-            <Link href={`/venues/${venue.id}`}>{venue.name}</Link>
-          </div>
-        );
+      {
+        accessorKey: "name",
+        header: getSortableHeader("Name"),
+        size: 100,
+        cell: ({ row }) => {
+          const venue = row.original;
+          return (
+            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+              <Link href={`/venues/${venue.id}`}>{venue.name}</Link>
+            </div>
+          );
+        },
       },
-    },
-    {
-      accessorKey: "tag",
-      header: getSortableHeader("Tag"),
-      size: 50,
-      filterFn: (row, columnId, filterValue) => {
-        if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-        return filterValue.includes(row.getValue(columnId));
+      {
+        accessorKey: "tag",
+        header: getSortableHeader("Tag"),
+        size: 50,
+        filterFn: (row, columnId, filterValue): boolean => {
+          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+          return filterValue.includes(row.getValue(columnId));
+        },
+        cell: ({ row }) => {
+          const tag = row.original?.tag;
+          return <TagBadge tag={tag} />;
+        },
       },
-      cell: ({ row }) => {
-        const tag = row.original?.tag;
-        return <TagBadge tag={tag} />;
+      {
+        accessorKey: "venueType",
+        header: getSortableHeader("Type"),
+        size: 70,
+        cell: ({ row }) => capitalizeFirst(row.original.venueType),
       },
-    },
-    {
-      accessorKey: "venueType",
-      header: getSortableHeader("Type"),
-      size: 70,
-      cell: ({ row }) => capitalizeFirst(row.original.venueType),
-    },
-    {
-      accessorKey: "country",
-      header: getSortableHeader("Country"),
-      size: 70,
-    },
-    {
-      accessorKey: "contacted",
-      header: getSortableHeader("Contacted"),
-      size: 70,
-      filterFn: (row, _columnId, filterValue) => {
-        if (filterValue === undefined) return true;
-        const contacted = row.original?.contacted;
-        return filterValue === "CONTACTED" ? contacted : !contacted;
+      {
+        accessorKey: "country",
+        header: getSortableHeader("Country"),
+        size: 70,
       },
-      cell: ({ row }) => {
-        const contacted = row.original?.contacted;
-        return <span>{contacted ? "Yes" : "No"}</span>;
+      {
+        accessorKey: "contacted",
+        header: getSortableHeader("Contacted"),
+        size: 70,
+        filterFn: (row, _columnId, filterValue): boolean => {
+          if (filterValue === undefined) return true;
+          const contacted = !!row.original?.contacted;
+          return filterValue === "CONTACTED" ? contacted : !contacted;
+        },
+        cell: ({ row }) => {
+          const contacted = row.original?.contacted;
+          return <span>{contacted ? "Yes" : "No"}</span>;
+        },
       },
-    },
-    {
-      accessorKey: "websiteUrl",
-      header: "Website",
-      size: 100,
-      cell: ({ row }) => {
-        const venue = row.original;
-        return (
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
-            <Link href={venue.websiteUrl ?? "#"} target="_blank" title={venue.websiteUrl}>
-              {venue.websiteUrl}
-            </Link>
-          </div>
-        );
+      {
+        accessorKey: "websiteUrl",
+        header: "Website",
+        size: 100,
+        cell: ({ row }) => {
+          const venue = row.original;
+          return (
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap text-sky-600 font-semibold hover:text-sky-500">
+              <Link href={venue.websiteUrl ?? "#"} target="_blank" title={venue.websiteUrl}>
+                {venue.websiteUrl}
+              </Link>
+            </div>
+          );
+        },
       },
-    },
-    {
-      header: "Actions",
-      id: "actions", size: 75,
-      cell: ({ row }) => {
-        const venue = row.original;
-        const applyRoute = venue.applied ? `/application/${1}` : `/venues/${venue.id}/apply`; // find way to reference application id
-        const onApply = () => {
-          router.push(applyRoute);
-        };
-        return (
-          <div className="flex gap-2 align-middle">
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
-              onClick={() => onEdit(String(venue.id))}
-            >
-              <Pencil />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
-              onClick={onApply}
-            >
-              <Send />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="size-8 hover:text-red-500"
-              onClick={() => onDeleteClick(venue.id)}
-            >
-              <Trash />
-            </Button>
-          </div>
-        );
+      {
+        header: "Actions",
+        id: "actions",
+        size: 75,
+        cell: ({ row }) => {
+          const venue = row.original;
+          const applyRoute = venue.applied ? `/application/${1}` : `/venues/${venue.id}/apply`; // find way to reference application id
+          const onApply = () => {
+            router.push(applyRoute);
+          };
+          return (
+            <div className="flex gap-2 align-middle">
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                onClick={() => onEdit(String(venue.id))}
+              >
+                <Pencil />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                onClick={onApply}
+              >
+                <Send />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8 hover:text-red-500"
+                onClick={() => onDeleteClick(venue.id)}
+              >
+                <Trash />
+              </Button>
+            </div>
+          );
+        },
       },
-    },
     ],
-    [onDeleteClick, onEdit, router]
+    [onDeleteClick, onEdit, router],
   );
 };
 
