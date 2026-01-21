@@ -1,5 +1,6 @@
 import React from "react";
 import { BaseControlledPropsWithLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
+import TextareaAutosize from "react-textarea-autosize";
 
 const ControlledTextArea = ({ field, showLabels }: BaseControlledPropsWithLabels) => {
   return showLabels ? (
@@ -12,12 +13,7 @@ const ControlledTextArea = ({ field, showLabels }: BaseControlledPropsWithLabels
       style={undefined}
     />
   ) : (
-    <textarea
-      className="p-2 min-h-full"
-      {...field}
-      value={field.value as string}
-      style={{ resize: "none", minHeight: "300px" }}
-    />
+    <TextareaAutosize className="p-2 w-full min-h-fit" {...field} value={field.value as string} />
   );
 };
 
