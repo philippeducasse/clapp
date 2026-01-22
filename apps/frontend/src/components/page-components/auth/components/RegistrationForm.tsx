@@ -45,7 +45,6 @@ const RegistrationForm = () => {
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
-        onCancelHref={"index"}
         isLoading={isLoading}
         submitButtonLabel="Register"
         action={Action.REGISTER}
