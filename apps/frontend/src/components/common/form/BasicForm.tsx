@@ -17,6 +17,8 @@ import { Action } from "@/interfaces/Enums";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useFormPersist } from "@/hooks/useFormPersist";
+import { Upload } from "lucide-react";
+
 interface BasicFormProps {
   form: UseFormReturn;
   formFields: ControlledFormElement[];
@@ -44,7 +46,7 @@ const BasicForm = ({
   submitButtonLabel,
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
-  const showIcon = action === Action.EDIT || action === Action.APPLY;
+  const showIcon = action === Action.EDIT || action === Action.APPLY || action === Action.UPLOAD;
   const shouldPersist =
     !!formTitle && action !== Action.EDIT && action !== Action.LOGIN && action !== Action.REGISTER;
 
@@ -54,7 +56,6 @@ const BasicForm = ({
     await onSubmit(values);
     if (shouldPersist) clearStorage();
   };
-
   return (
     <Form {...form}>
       <div className="flex">
@@ -131,10 +132,14 @@ const BasicForm = ({
             ) : onCancelHref ? (
               <BackButton href={onCancelHref} />
             ) : null}
-            <div className="flex gap-4 w-full">
+            <div className="flex gap-4 w-full justify-end">
               {additionalActions}
               {action === Action.APPLY ? (
                 <Button disabled={isLoading}>Send application</Button>
+              ) : action === Action.UPLOAD ? (
+                <Button disabled={isLoading}>
+                  <Upload /> Upload
+                </Button>
               ) : (
                 <SubmitButton
                   label={submitButtonLabel ?? "Save"}
