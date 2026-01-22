@@ -1,19 +1,15 @@
 import React, { ReactNode } from "react";
-import { Pencil, Send, Plus } from "lucide-react";
+import { Pencil, Send, Plus, Upload } from "lucide-react";
 import { Action } from "@/interfaces/Enums";
 import { capitalize } from "lodash";
 import { EntityName } from "@/interfaces/Enums";
 
 interface FormHeaderProps {
-  action: string;
-  entityName: EntityName;
+  action: Action;
+  entityName?: EntityName;
   additionalActions?: ReactNode;
 }
-const FormHeader = ({
-  action,
-  entityName,
-  additionalActions,
-}: FormHeaderProps) => {
+const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) => {
   const getActionIcon = (action: string) => {
     const iconProps = {
       className:
@@ -26,10 +22,13 @@ const FormHeader = ({
         return <Pencil {...iconProps} />;
       case Action.APPLY:
         return <Send {...iconProps} />;
+      case Action.UPLOAD:
+        return <Upload {...iconProps} />;
       default:
         return <Plus {...iconProps} />;
     }
   };
+
   return (
     <div className="border-gray-200 border-b ">
       <div className="p-6">
@@ -40,7 +39,9 @@ const FormHeader = ({
             <p className="text-gray-400">
               {action === Action.EDIT
                 ? `Edit ${entityName}`
-                : `Create a new ${entityName}`}
+                : action === Action.UPLOAD
+                  ? `Upload your own organisations`
+                  : `Create a new ${entityName}`}
             </p>
           </div>
         </div>
