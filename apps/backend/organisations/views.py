@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List
 
+import pandas as pd
 from django.apps import apps
 from django.db.models import Q
 from django.http import HttpRequest
@@ -11,9 +12,9 @@ from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from organisations.festivals.models import Festival
-from organisations.residencies.models import Residency
-from organisations.venues.models import Venue
+from organisations.festivals.models import Festival, FestivalContact
+from organisations.residencies.models import Residency, ResidencyContact
+from organisations.venues.models import Venue, VenueContact
 from performances.models import Performance
 from services.gemini_service import GeminiClient
 from services.mistral_service import MistralClient
@@ -411,3 +412,155 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(organisation)
         return Response(serializer.data)
+
+    @action(detail=False, methods=["post"], url_path="upload")
+    def upload(self, request: HttpRequest) -> Response:
+        """Import organisations from Excel file."""
+        excel_file = request.data.get("excel")
+
+        if not excel_file:
+            logger.warning("Upload called without excel file")
+            return Response(
+                {"error": "No Excel file provided"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            df: pd.DataFrame = pd.read_excel(excel_file, dtype=str)
+        except Exception as e:
+            logger.error(f"Failed to read Excel file: {str(e)}")
+            return Response(
+                {"error": f"Invalid Excel file: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        stats = {
+            "festivals_imported": 0,
+            "festivals_skipped": 0,
+            "residencies_imported": 0,
+            "residencies_skipped": 0,
+            "venues_imported": 0,
+            "venues_skipped": 0,
+            "errors": [],
+        }
+
+        def get_case_insensitive(d: Dict[str, str], key: str, default: str = "") -> str:
+            """Get value from dict with case-insensitive key lookup."""
+            key_lower = key.lower()
+            for k, v in d.items():
+                if k.lower() == key_lower:
+                    return str(v or "").strip()
+            return default
+
+        try:
+            for index, row in df.iterrows():
+                try:
+                    row_dict = {k.lower(): v for k, v in row.to_dict().items()}
+
+                    name = get_case_insensitive(row_dict, "name").lower()
+                    organisation_type = get_case_insensitive(
+                        row_dict, "type", get_case_insensitive(row_dict, "event_type")
+                    ).lower()
+
+                    if not name:
+                        continue
+
+                    contact_email = get_case_insensitive(row_dict, "email")
+                    contact_person = get_case_insensitive(row_dict, "contact")
+                    country = get_case_insensitive(row_dict, "country")
+                    website = get_case_insensitive(row_dict, "website")
+                    date_str = get_case_insensitive(row_dict, "date")
+                    comments = get_case_insensitive(row_dict, "comments")
+
+                    if (
+                        organisation_type == "festival"
+                        or organisation_type == "juggling convention"
+                    ):
+                        if Festival.objects.filter(name__iexact=name).exists():
+                            logger.info(f"Row {index}: Festival '{name}' already exists")
+                            stats["festivals_skipped"] += 1
+                            continue
+
+                        festival = Festival(
+                            name=name,
+                            country=country,
+                            website_url=website,
+                            approximate_date=date_str,
+                            comments=comments,
+                        )
+                        festival.save()
+
+                        if contact_email:
+                            FestivalContact.objects.create(
+                                name=contact_person,
+                                email=contact_email,
+                                festival=festival,
+                            )
+
+                        logger.info(f"Imported Festival: {festival.name}")
+                        stats["festivals_imported"] += 1
+
+                    elif "residenc" in name or "residenc" in organisation_type:
+                        if Residency.objects.filter(name__iexact=name).exists():
+                            logger.info(f"Row {index}: Residency '{name}' already exists")
+                            stats["residencies_skipped"] += 1
+                            continue
+
+                        residency = Residency(
+                            name=name,
+                            country=country,
+                            website_url=website,
+                            approximate_date=date_str,
+                            comments=comments,
+                        )
+                        residency.save()
+
+                        if contact_email:
+                            ResidencyContact.objects.create(
+                                name=contact_person,
+                                email=contact_email,
+                                residency=residency,
+                            )
+
+                        logger.info(f"Imported Residency: {residency.name}")
+                        stats["residencies_imported"] += 1
+
+                    else:
+                        if Venue.objects.filter(name__iexact=name).exists():
+                            logger.info(f"Row {index}: Venue '{name}' already exists")
+                            stats["venues_skipped"] += 1
+                            continue
+
+                        venue = Venue(
+                            name=name,
+                            country=country,
+                            website_url=website,
+                            comments=comments,
+                        )
+                        venue.save()
+
+                        if contact_email:
+                            VenueContact.objects.create(
+                                name=contact_person, email=contact_email, venue=venue
+                            )
+
+                        logger.info(f"Imported Venue: {venue.name}")
+                        stats["venues_imported"] += 1
+
+                except Exception as e:
+                    error_msg = f"Row {index}: {str(e)}"
+                    logger.error(error_msg)
+                    stats["errors"].append(error_msg)
+
+            logger.info(
+                f"Upload completed: {stats['festivals_imported']} festivals, "
+                f"{stats['residencies_imported']} residencies, {stats['venues_imported']} venues"
+            )
+            return Response(stats, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.error(f"Unexpected error during upload: {str(e)}", exc_info=True)
+            return Response(
+                {"error": f"Upload failed: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
