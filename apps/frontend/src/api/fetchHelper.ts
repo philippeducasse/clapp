@@ -23,7 +23,7 @@ const getServerCookies = async (): Promise<string> => {
 const baseRequest = async (
   url: string,
   options: RequestInit = {},
-  includeCredentials: boolean = true
+  includeCredentials: boolean = true,
 ): Promise<Response> => {
   const headers: Record<string, string> = {
     Accept: "application/json",
@@ -50,7 +50,7 @@ const baseRequest = async (
 const handleResponse = async <T>(
   res: Response,
   url: string,
-  successMessage?: string
+  successMessage?: string,
 ): Promise<T> => {
   if (!res.ok) {
     const error = await res.text();
@@ -86,7 +86,7 @@ export const sendRequest = async <TReq, TRes>(
   data: TReq,
   method: "POST" | "PUT" | "PATCH" = "POST",
   toastMessage?: string,
-  includeCredentials: boolean = true
+  includeCredentials: boolean = true,
 ): Promise<TRes> => {
   const res = await baseRequest(
     url,
@@ -95,7 +95,7 @@ export const sendRequest = async <TReq, TRes>(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(transformKeysToSnakeCase(data)),
     },
-    includeCredentials
+    includeCredentials,
   );
   return handleResponse<TRes>(res, url, toastMessage ?? "Success");
 };
@@ -103,7 +103,7 @@ export const sendRequest = async <TReq, TRes>(
 export const deleteRequest = async (
   url: string,
   toastMessage?: string,
-  includeCredentials: boolean = true
+  includeCredentials: boolean = true,
 ): Promise<void> => {
   const res = await baseRequest(url, { method: "DELETE" }, includeCredentials);
   await handleResponse(res, url, toastMessage ?? "Successfully deleted");
@@ -111,18 +111,20 @@ export const deleteRequest = async (
 
 export const sendFormDataRequest = async <TReq, TRes = TReq>(
   url: string,
-  data: TReq,
+  data?: TReq,
   files?: File[],
   fileFieldName?: string,
   method: "POST" | "PUT" | "PATCH" = "POST",
-  toastMessage?: string
+  toastMessage?: string,
 ): Promise<TRes> => {
   const formData = new FormData();
 
-  const jsonData = transformKeysToSnakeCase(data);
-  Object.keys(jsonData).forEach((key) => {
-    formData.append(key, jsonData[key]);
-  });
+  if (data) {
+    const jsonData = transformKeysToSnakeCase(data);
+    Object.keys(jsonData).forEach((key) => {
+      formData.append(key, jsonData[key]);
+    });
+  }
 
   if (files && fileFieldName) {
     files.forEach((file) => {
