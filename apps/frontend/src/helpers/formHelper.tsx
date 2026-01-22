@@ -9,6 +9,7 @@ import ControlledTextArea from "@/components/common/form/form-fields/ControlledT
 import { ControllerRenderProps } from "react-hook-form";
 import { ControlledTextEditor } from "@/components/common/form/form-fields/ControlledTextEditor";
 import ControlledFile from "@/components/common/form/form-fields/ControlledFile";
+import ControlledSingleFile from "@/components/common/form/form-fields/ControlledSingleFile";
 import ControlledMultiSelect from "@/components/common/form/form-fields/ControlledMultiSelect";
 import ControlledSearch from "@/components/common/form/form-fields/ControlledSearch";
 import ControlledMultiEmail from "@/components/common/form/form-fields/ControlledMultiEmail";
@@ -18,7 +19,7 @@ export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
   showLabels: boolean,
-  organisationType?: string
+  organisationType?: string,
 ) => {
   {
     switch (formField.type) {
@@ -41,6 +42,8 @@ export const getControlledInputs = (
       case ControlledFormElementType.FILE:
       case ControlledFormElementType.PDF:
         return <ControlledFile field={field} />;
+      case ControlledFormElementType.EXCEL:
+        return <ControlledSingleFile field={field} accept=".xlsx,.xls" />;
       case ControlledFormElementType.PASSWORD:
         return <Input type="password" {...field} />;
 
@@ -58,13 +61,16 @@ export const getControlledInputs = (
 
 export const sanitizeFormData = <T extends Record<string, unknown>>(
   entity: T,
-  formFields?: ControlledFormElement[]
+  formFields?: ControlledFormElement[],
 ): T => {
   const sanitizedData = { ...entity } as T;
 
   // Map dossiers to dossierFiles for form initialization
   if ("dossiers" in sanitizedData && Array.isArray(sanitizedData.dossiers)) {
-    sanitizedData["dossierFiles" as keyof T] = sanitizedData.dossiers as T[Extract<keyof T, string>];
+    sanitizedData["dossierFiles" as keyof T] = sanitizedData.dossiers as T[Extract<
+      keyof T,
+      string
+    >];
   }
 
   for (const key in sanitizedData) {
@@ -94,7 +100,7 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(
  */
 export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
   data: T,
-  formFields?: ControlledFormElement[]
+  formFields?: ControlledFormElement[],
 ): T => {
   const preparedData = { ...data } as T;
 
@@ -134,7 +140,7 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
 };
 
 export const createZodFormSchema = (
-  formFields: ControlledFormElement[]
+  formFields: ControlledFormElement[],
 ): ZodObject<Record<string, ZodType>> => {
   const schema: Record<string, ZodType> = {};
 
@@ -156,6 +162,27 @@ export const createZodFormSchema = (
       case ControlledFormElementType.FILE:
         zodType = z.array(z.instanceof(File));
         break;
+      case ControlledFormElementType.EXCEL:
+        const ACCEPTED_EXCEL_MIME_TYPES = [
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+          "application/vnd.ms-excel", // .xls
+        ];
+
+        const ACCEPTED_EXCEL_EXTENSIONS = [".xlsx", ".xls"];
+        zodType = z.instanceof(File).refine(
+          (data) => {
+            if (!(data instanceof File)) return false;
+            const isValidExtension = ACCEPTED_EXCEL_EXTENSIONS.some((ext) =>
+              data.name.toLowerCase().endsWith(ext),
+            );
+            const isValidMimeType = !data.type || ACCEPTED_EXCEL_MIME_TYPES.includes(data.type);
+            return isValidExtension && isValidMimeType;
+          },
+          {
+            message: "Only Excel files (.xlsx, .xls) are allowed.",
+          },
+        );
+        break;
       case ControlledFormElementType.PDF:
         zodType = z
           .array(
@@ -166,7 +193,7 @@ export const createZodFormSchema = (
                 file: z.string(),
                 uploadedAt: z.date().or(z.string()),
               }),
-            ])
+            ]),
           )
           .refine(
             (items) =>
@@ -177,7 +204,7 @@ export const createZodFormSchema = (
                 }
                 return true;
               }),
-            "Please only submit PDFs"
+            "Please only submit PDFs",
           );
         break;
       case ControlledFormElementType.DATE:
@@ -193,7 +220,7 @@ export const createZodFormSchema = (
             .regex(/\d/, "Password must contain at least one digit")
             .regex(
               /[!@#$%^&*(),.?":{}|<>]/,
-              "Password must contain at least one special character"
+              "Password must contain at least one special character",
             );
         } else {
           zodType = z.string().min(1, "Password is required");
@@ -204,7 +231,7 @@ export const createZodFormSchema = (
           .string()
           .regex(
             /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
-            "Please enter a valid URL"
+            "Please enter a valid URL",
           );
         break;
       case ControlledFormElementType.EMAIL:
@@ -222,7 +249,7 @@ export const createZodFormSchema = (
           .min(1, "SMTP server is required")
           .regex(
             /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?){2,}$/,
-            "Must be a valid hostname (e.g., mail.myserver.com)"
+            "Must be a valid hostname (e.g., mail.myserver.com)",
           );
         break;
       case ControlledFormElementType.TEXT:
@@ -266,24 +293,29 @@ export const getOptions = <T extends Record<string, string>>(optionsEnum: T): Se
 
 export const getInitialValues = (
   formFields: ControlledFormElement[],
-  entity?: Record<string, unknown>
+  entity?: Record<string, unknown>,
 ) => {
   if (entity) return sanitizeFormData(entity, formFields);
 
-  const emptyValues = formFields.reduce((acc, field) => {
-    acc[field.fieldName] =
-      field.type === ControlledFormElementType.MULTI_SELECT ||
-      field.type === ControlledFormElementType.FILE ||
-      field.type === ControlledFormElementType.PDF ||
-      field.type === ControlledFormElementType.MULTI_EMAIL
-        ? []
-        : field.type === ControlledFormElementType.BOOLEAN
-        ? false
-        : // : field.type === ControlledFormElementType.NUMBER
-          // ? undefined
-          field.defaultValue ?? "";
-    return acc;
-  }, {} as Record<string, unknown>);
+  const emptyValues = formFields.reduce(
+    (acc, field) => {
+      acc[field.fieldName] =
+        field.type === ControlledFormElementType.MULTI_SELECT ||
+        field.type === ControlledFormElementType.FILE ||
+        field.type === ControlledFormElementType.PDF ||
+        field.type === ControlledFormElementType.MULTI_EMAIL
+          ? []
+          : field.type === ControlledFormElementType.EXCEL
+            ? null
+            : field.type === ControlledFormElementType.BOOLEAN
+              ? false
+              : // : field.type === ControlledFormElementType.NUMBER
+                // ? undefined
+                (field.defaultValue ?? "");
+      return acc;
+    },
+    {} as Record<string, unknown>,
+  );
 
   return emptyValues;
 };
