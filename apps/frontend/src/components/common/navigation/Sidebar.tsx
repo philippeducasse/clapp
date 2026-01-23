@@ -21,7 +21,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-// Menu items.
+import Image from "next/image";
+
 const items = [
   {
     title: "Home",
@@ -76,7 +77,8 @@ const Sidebar = () => {
       <SidebarContent>
         <SidebarGroup className="h-full">
           <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 text-lg dark:text-emerald-400">
-            Application Agent
+            Clapp
+            <img src={"/logo.png"} width={32} height={32} alt="Clapping hands" />
           </SidebarGroupLabel>
           <SidebarGroupContent className="h-full">
             <SidebarMenu className="flex h-full">
