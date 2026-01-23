@@ -23,6 +23,10 @@ export type EntityType =
   | "residencies"
   | "applications"
   | "profile"
+  | "help"
+  | "report-bug"
+  | "upload"
+  | "preferences"
   | "dashboard";
 
 const ENTITY_LABELS: Record<EntityType, string> = {
@@ -31,6 +35,10 @@ const ENTITY_LABELS: Record<EntityType, string> = {
   residencies: "Residencies",
   applications: "Applications",
   profile: "Profile",
+  help: "Help",
+  "report-bug": "Report Bug",
+  upload: "Upload",
+  preferences: "Preferences",
   dashboard: "Dashboard",
 };
 
@@ -44,12 +52,39 @@ export const extractEntityId = (pathname: string, entityType: EntityType): numbe
 };
 
 export const detectEntityType = (pathname: string): EntityType => {
-  if (pathname.includes("/festivals")) return "festivals";
-  if (pathname.includes("/venues")) return "venues";
-  if (pathname.includes("/residencies")) return "residencies";
-  if (pathname.includes("/applications")) return "applications";
-  if (pathname.includes("/profile")) return "profile";
-  return "dashboard";
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const firstSegment = pathSegments[0];
+  const secondSegment = pathSegments[1];
+  const thirdSegment = pathSegments[2];
+
+  // Handle /profile/edit/preferences specifically
+  if (firstSegment === "profile" && secondSegment === "edit" && thirdSegment === "preferences") {
+    return "preferences";
+  }
+
+  // Default behavior based on first segment
+  switch (firstSegment) {
+    case "festivals":
+      return "festivals";
+    case "venues":
+      return "venues";
+    case "residencies":
+      return "residencies";
+    case "applications":
+      return "applications";
+    case "profile":
+      return "profile";
+    case "help":
+      return "help";
+    case "report-bug":
+      return "report-bug";
+    case "upload":
+      return "upload";
+    case "preferences":
+      return "preferences";
+    default:
+      return "dashboard";
+  }
 };
 
 export const getEntityData = (
@@ -115,37 +150,86 @@ export const buildStandardEntityBreadcrumbs = (
 ): Breadcrumb[] => {
   const result = [...breadcrumbs];
 
-  result.push({
-    path: `/${entityType}`,
-    label: <span>{ENTITY_LABELS[entityType]}</span>,
-  });
+  try {
+    // Handle special pages
+    if (entityType === "help") {
+      result.push({
+        path: "/help",
+        label: <span>{ENTITY_LABELS.help}</span>,
+      });
+      if (pathname.includes("/importing-organizations")) {
+        result.push({
+          path: pathname,
+          label: <span>Importing Organizations</span>,
+        });
+      }
+      return result;
+    }
 
-  if (entityType == "profile" && action) {
-    result.push({
-      path: pathname,
-      label: <span>Edit</span>,
-    });
-  }
-
-  if (entityData?.id) {
-    const entityPath = getEntityPath(entityType, entityData?.id);
-    result.push({
-      path: entityPath,
-      label: <span>{getEntityDisplayName(entityData)}</span>,
-    });
-
-    if (action && action !== "create") {
+    if (entityType === "report-bug") {
       result.push({
         path: pathname,
-        label: <span>{action.charAt(0).toUpperCase() + action.slice(1)}</span>,
+        label: <span>{ENTITY_LABELS["report-bug"]}</span>,
+      });
+      return result;
+    }
+
+    if (entityType === "upload") {
+      result.push({
+        path: pathname,
+        label: <span>{ENTITY_LABELS.upload}</span>,
+      });
+      return result;
+    }
+
+    if (entityType === "preferences") {
+      result.push({
+        path: "/profile/edit",
+        label: <span>Edit Profile</span>,
+      });
+      result.push({
+        path: pathname,
+        label: <span>{ENTITY_LABELS.preferences}</span>,
+      });
+      return result;
+    }
+
+    // Handle standard entity pages
+    result.push({
+      path: `/${entityType}`,
+      label: <span>{ENTITY_LABELS[entityType]}</span>,
+    });
+
+    if (entityType == "profile" && action) {
+      result.push({
+        path: pathname,
+        label: <span>Edit</span>,
       });
     }
-  } else if (action === "create") {
-    result.push({
-      path: pathname,
-      label: <span>Create</span>,
-    });
+
+    if (entityData?.id) {
+      const entityPath = getEntityPath(entityType, entityData?.id);
+      result.push({
+        path: entityPath,
+        label: <span>{getEntityDisplayName(entityData)}</span>,
+      });
+
+      if (action && action !== "create") {
+        result.push({
+          path: pathname,
+          label: <span>{action.charAt(0).toUpperCase() + action.slice(1)}</span>,
+        });
+      }
+    } else if (action === "create") {
+      result.push({
+        path: pathname,
+        label: <span>Create</span>,
+      });
+    }
+  } catch (error) {
+    console.error("Error building breadcrumbs:", error);
   }
+
   return result;
 };
 
