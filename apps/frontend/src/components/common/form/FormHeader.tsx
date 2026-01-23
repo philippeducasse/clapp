@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
-import { Pencil, Send, Plus, Upload } from "lucide-react";
+import { Pencil, Send, Plus, Upload, Bug } from "lucide-react";
 import { Action } from "@/interfaces/Enums";
-import { capitalize } from "lodash";
 import { EntityName } from "@/interfaces/Enums";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 interface FormHeaderProps {
   action: Action;
@@ -24,8 +24,23 @@ const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) 
         return <Send {...iconProps} />;
       case Action.UPLOAD:
         return <Upload {...iconProps} />;
+      case Action.REPORT_BUG:
+        return <Bug {...iconProps} />;
       default:
         return <Plus {...iconProps} />;
+    }
+  };
+
+  const getSubtitle = (action: Action) => {
+    switch (action) {
+      case Action.EDIT:
+        return `Edit ${entityName?.toLowerCase()}`;
+      case Action.UPLOAD:
+        return "Upload your own organisations";
+      case Action.REPORT_BUG:
+        return "Help us fix issues and improve the platform";
+      default:
+        return `Create a new ${entityName?.toLowerCase()}`;
     }
   };
 
@@ -35,14 +50,8 @@ const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) 
         <div className="flex items-center">
           {getActionIcon(action)}
           <div className="ml-4">
-            <h3 className="text-xl font-semibold">{capitalize(action)}</h3>
-            <p className="text-gray-400">
-              {action === Action.EDIT
-                ? `Edit ${entityName}`
-                : action === Action.UPLOAD
-                  ? `Upload your own organisations`
-                  : `Create a new ${entityName}`}
-            </p>
+            <h3 className="text-xl font-semibold">{capitalizeFirst(action)}</h3>
+            <p className="text-gray-400">{getSubtitle(action)}</p>
           </div>
         </div>
       </div>
