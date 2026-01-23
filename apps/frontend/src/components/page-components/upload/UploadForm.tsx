@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { createZodFormSchema } from "@/helpers/formHelper";
 import BasicForm from "@/components/common/form/BasicForm";
 import { z } from "zod";
@@ -12,8 +13,10 @@ import { Action } from "@/interfaces/Enums";
 import { organisationApiService } from "@/api/organisationApiService";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { UploadStatCard } from "./UploadStatCard";
+import { Button } from "@/components/ui/button";
+import { HelpCircle } from "lucide-react";
 
-interface UploadStats {
+export interface UploadStats {
   errors: string[];
   festivalsImported: number;
   festivalsSkipped: number;
@@ -39,7 +42,7 @@ const UploadForm = () => {
     try {
       console.log("values", values, values.exce);
       const excelFile = values.excel as File;
-      const stats = await organisationApiService.upload([excelFile]);
+      const stats: UploadStats = await organisationApiService.upload([excelFile]);
       setUploadStats(stats);
     } catch (error) {
       console.error(error);
@@ -50,7 +53,24 @@ const UploadForm = () => {
   return (
     <>
       <FormHeader action={Action.UPLOAD} />
-      <div className="flex flex-col max-w-xl mx-auto">
+      <div className="flex justify-center align-middle mx-auto gap-6">
+        <Card className="mt-6">
+          <CardContent className="pt-4">
+            <div className="flex gap-3">
+              <HelpCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semiboldtext-sm mb-2">Need help formatting your file?</p>
+                <p className="text-sm mb-3">
+                  Learn about the Excel file format and step-by-step import instructions.
+                </p>
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/help/importing-organizations">View Import Guide</Link>
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <BasicForm
           form={form}
           formFields={formFields}
