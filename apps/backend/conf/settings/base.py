@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "organisations.festivals",
     "organisations.residencies",
     "organisations.venues",
+    "support",
 ]
 
 MIDDLEWARE = [
