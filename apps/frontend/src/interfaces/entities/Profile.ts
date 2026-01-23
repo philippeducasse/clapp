@@ -31,4 +31,6 @@ export interface Profile {
   emailUseTls?: boolean;
   emailHostUser?: string;
   emailHostPassword?: string;
+  dateFormat?: string;
+  tableSize?: string;
 }

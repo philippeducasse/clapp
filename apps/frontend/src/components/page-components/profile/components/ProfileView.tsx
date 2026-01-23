@@ -25,6 +25,7 @@ import { Profile } from "@/interfaces/entities/Profile";
 import { Performance } from "@/interfaces/entities/Performance";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
 import { getEmailSettings } from "../helpers/getEmailSettings";
+import { getPreferencesInfo } from "../helpers/getPreferencesInfo";
 import { useHashTab } from "@/hooks/useHashTab";
 import Link from "next/link";
 import ProfileRemindersCard from "./ProfileRemindersCard";
@@ -36,7 +37,7 @@ const ProfileView = () => {
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [itemName, setItemName] = useState<"profile" | "performance" | "email template">(
-    "performance"
+    "performance",
   );
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
   const { activeTab, handleTabChange } = useHashTab("basic-information");
@@ -91,12 +92,13 @@ const ProfileView = () => {
           <>
             {activeTab === "basic-information" && <EditButton href={`/profile/edit`} />}
             {activeTab === "email-settings" && <EditButton href={`/profile/edit/email-settings`} />}
-            <DeleteButton
+            {activeTab === "preferences" && <EditButton href={`/profile/edit/preferences`} />}
+            {/* <DeleteButton
               label="Delete account"
               variant={"outline"}
               className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
               onDelete={() => handleDelete("profile", profile.id)}
-            />
+            /> */}
           </>
         }
       />
@@ -156,6 +158,14 @@ const ProfileView = () => {
                 </Link>
               </>
             }
+          />
+        </Tab>
+
+        <Tab name="Preferences">
+          <DetailsViewSection
+            title="Preferences"
+            icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
+            data={getPreferencesInfo(profile)}
           />
         </Tab>
 
