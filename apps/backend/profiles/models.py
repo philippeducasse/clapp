@@ -7,8 +7,8 @@ from django.db import models
 from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
 
-from profiles.constants import LANGUAGES
 from circus_agent_backend.utils import normalize_url
+from profiles.constants import LANGUAGES
 
 EMAIL_HOST_MAPPING = {
     "GMAIL": "smtp.gmail.com",
@@ -71,6 +71,9 @@ class Profile(AbstractUser):
     email_use_tls = models.BooleanField(default=True)
     email_host_password = models.CharField(max_length=255, blank=True)
     email_host_user = models.CharField(max_length=255, blank=True)
+    date_format = models.CharField(max_length=50, blank=True, null=True)
+    table_size = models.IntegerField(blank=True, null=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []
 
