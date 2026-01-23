@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Table } from "@tanstack/react-table";
 import { EntityName } from "@/interfaces/Enums";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 interface TablePaginationProps<TData> {
   table: Table<TData>;
@@ -62,17 +63,21 @@ function TablePagination<TData>({
   };
 
   const handlePageSizeChange = (newPageSize: string) => {
-    const size = parseInt(newPageSize);
-    table.setPageSize(size);
+    if (newPageSize === "All") {
+      table.setPageSize(totalItems);
+    } else {
+      const size = parseInt(newPageSize);
+      table.setPageSize(size);
+    }
     table.setPageIndex(0);
   };
 
-  const pageSizeOptions = [10, 25, 50, 100];
+  const pageSizeOptions = [10, 25, 50, 100, "All"];
   return (
     <Pagination className="justify-between mt-8">
       <div className="flex items-center gap-4">
         <div>
-          Page {currentPage} of {totalPages} | Total {entityName}s: {totalItems}
+          Page {currentPage} of {totalPages} | Total {capitalizeFirst(entityName)}s: {totalItems}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm">Per page:</span>

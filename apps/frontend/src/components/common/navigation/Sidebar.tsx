@@ -2,12 +2,12 @@ import {
   Home,
   Flag,
   ClipboardEdit,
-  Settings,
   Upload,
   CircleQuestionMark,
   University,
   Theater,
   Bug,
+  PersonStanding,
 } from "lucide-react";
 
 import {
@@ -50,7 +50,7 @@ const items = [
   },
   {
     title: "Report a bug",
-    url: "/bug",
+    url: "/report-bug",
     icon: Bug,
   },
   {
@@ -64,9 +64,9 @@ const items = [
     icon: Upload,
   },
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
+    title: "Profile",
+    url: "/profile",
+    icon: PersonStanding,
   },
 ];
 
