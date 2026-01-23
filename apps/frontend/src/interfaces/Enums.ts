@@ -5,6 +5,7 @@ export enum Action {
   REGISTER = "REGISTER",
   LOGIN = "LOGIN",
   UPLOAD = "UPLOAD",
+  REPORT_BUG = "REPORT_BUG",
 }
 
 export enum EntityName {
@@ -15,6 +16,7 @@ export enum EntityName {
   PROFILE = "PROFILE",
   PERFORMANCE = "PERFORMANCE",
   EMAIL_TEMPLATE = "EMAIL_TEMPLATE",
+  PREFERENCES = "PREFERENCES",
 }
 
 export enum TagAction {

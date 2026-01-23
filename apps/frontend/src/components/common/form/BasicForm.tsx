@@ -1,3 +1,5 @@
+"use client";
+
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 import React from "react";
 import { UseFormReturn } from "react-hook-form";

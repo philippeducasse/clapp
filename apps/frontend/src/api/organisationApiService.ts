@@ -1,3 +1,4 @@
+import { UploadStats } from "@/components/page-components/upload/UploadForm";
 import { fetchRequest, sendFormDataRequest } from "./fetchHelper";
 
 const endpoint = "/api/organisations";
@@ -20,7 +21,7 @@ const search = async (
   const typeParam = type ? `&type=${type.toLowerCase()}` : "";
   return await fetchRequest(`${endpoint}/search/?q=${searchQuery}${typeParam}`);
 };
-const upload = async (excelFile: File[]) => {
+const upload = async (excelFile: File[]): Promise<UploadStats> => {
   return await sendFormDataRequest(`${endpoint}/upload/`, undefined, excelFile, "excel", "POST");
 };
 
