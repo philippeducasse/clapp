@@ -53,44 +53,15 @@ export const extractEntityId = (pathname: string, entityType: EntityType): numbe
 
 export const detectEntityType = (pathname: string): EntityType => {
   const pathSegments = pathname.split("/").filter(Boolean);
-  const firstSegment = pathSegments[0];
-  const secondSegment = pathSegments[1];
-  const thirdSegment = pathSegments[2];
+  const entityName = pathSegments[0] as EntityType;
 
-  // Handle /profile/edit/preferences specifically
-  if (firstSegment === "profile" && secondSegment === "edit" && thirdSegment === "preferences") {
-    return "preferences";
-  }
-
-  // Default behavior based on first segment
-  switch (firstSegment) {
-    case "festivals":
-      return "festivals";
-    case "venues":
-      return "venues";
-    case "residencies":
-      return "residencies";
-    case "applications":
-      return "applications";
-    case "profile":
-      return "profile";
-    case "help":
-      return "help";
-    case "report-bug":
-      return "report-bug";
-    case "upload":
-      return "upload";
-    case "preferences":
-      return "preferences";
-    default:
-      return "dashboard";
-  }
+  return entityName ?? "dashboard";
 };
 
 export const getEntityData = (
   state: RootState,
   entityType: EntityType | null,
-  entityId: number | undefined
+  entityId: number | undefined,
 ): EntityData | null => {
   if (!entityType || !entityId) return null;
 
@@ -146,7 +117,7 @@ export const buildStandardEntityBreadcrumbs = (
   entityType: EntityType,
   entityData: EntityData | null,
   pathname: string,
-  action: "create" | "edit" | "apply" | null
+  action: "create" | "edit" | "apply" | null,
 ): Breadcrumb[] => {
   const result = [...breadcrumbs];
 
@@ -237,7 +208,7 @@ export const buildApplicationBreadcrumbs = (
   breadcrumbs: Breadcrumb[],
   entityData: EntityData | null,
   pathname: string,
-  action: "create" | "edit" | "apply" | null
+  action: "create" | "edit" | "apply" | null,
 ): Breadcrumb[] => {
   const result = [...breadcrumbs];
 

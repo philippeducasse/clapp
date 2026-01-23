@@ -40,7 +40,6 @@ const UploadForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      console.log("values", values, values.exce);
       const excelFile = values.excel as File;
       const stats: UploadStats = await organisationApiService.upload([excelFile]);
       setUploadStats(stats);

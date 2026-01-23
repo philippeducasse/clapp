@@ -19,13 +19,7 @@ export default function EmailSettingsHelpPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <Link
-          href="/profile#email-settings"
-          className="text-emerald-600 hover:text-emerald-800 text-sm mb-4 inline-flex items-center gap-2"
-        >
-          ← Back to Email Settings
-        </Link>
-        <h1 className="text-4xl font-bold text-emerald-700 mb-2 mt-4">
+        <h1 className="text-2xl font-bold text-emerald-700 mb-2 mt-4">
           Email Settings Configuration Guide
         </h1>
         <p className="text-gray-600 text-lg">
@@ -149,7 +143,7 @@ export default function EmailSettingsHelpPage() {
                         <Badge key={provider} variant="outline" className="text-xs">
                           {provider}
                         </Badge>
-                      )
+                      ),
                     )}
                   </div>
                 </CardContent>
@@ -167,7 +161,7 @@ export default function EmailSettingsHelpPage() {
                         <Badge key={provider} variant="outline" className="text-xs">
                           {provider}
                         </Badge>
-                      )
+                      ),
                     )}
                   </div>
                 </CardContent>

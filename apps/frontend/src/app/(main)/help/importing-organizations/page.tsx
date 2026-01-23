@@ -15,7 +15,7 @@ export default function ImportingOrganizationsHelpPage() {
         >
           ← Back to Getting Started
         </Link>
-        <h1 className="text-4xl font-bold text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
+        <h1 className="text-2xl font-bold text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
         <p className="text-gray-600 text-lg">
           Bulk import festivals, venues, and residencies from an Excel file
         </p>
@@ -45,7 +45,9 @@ export default function ImportingOrganizationsHelpPage() {
         <Card>
           <CardHeader>
             <CardTitle>Excel File Format</CardTitle>
-            <CardDescription>Your Excel file must have these columns (order doesn't matter)</CardDescription>
+            <CardDescription>
+              Your Excel file must have these columns (order doesn't matter)
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="overflow-x-auto">
@@ -159,9 +161,9 @@ export default function ImportingOrganizationsHelpPage() {
                 <div>
                   <p className="font-semibold text-blue-900 mb-1">Column Headers Must Match</p>
                   <p className="text-sm text-blue-800">
-                    The column headers in your first row must match the exact names: Type, Name, Country,
-                    Website, Date, Email, Contact, Comments. The columns can be in any order. You can
-                    have empty cells for optional fields.
+                    The column headers in your first row must match the exact names: Type, Name,
+                    Country, Website, Date, Email, Contact, Comments. The columns can be in any
+                    order. You can have empty cells for optional fields.
                   </p>
                 </div>
               </div>
@@ -187,8 +189,13 @@ export default function ImportingOrganizationsHelpPage() {
                     follow the format exactly:
                   </p>
                   <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside ml-2">
-                    <li>First row contains the column headers (Type, Name, Country, Website, Date, Email, Contact, Comments)</li>
-                    <li>Columns can be in any order - the system reads the headers to match columns</li>
+                    <li>
+                      First row contains the column headers (Type, Name, Country, Website, Date,
+                      Email, Contact, Comments)
+                    </li>
+                    <li>
+                      Columns can be in any order - the system reads the headers to match columns
+                    </li>
                     <li>Each subsequent row is one organization</li>
                     <li>For Type, use: "Festival", "Venue", or "Residency"</li>
                     <li>Leave cells empty if you don't have data for optional fields</li>
