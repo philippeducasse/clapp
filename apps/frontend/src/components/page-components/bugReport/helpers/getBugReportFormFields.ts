@@ -8,10 +8,11 @@ export const getBugReportFormFields = (): ControlledFormElement[] => {
       fieldName: "message",
       type: ControlledFormElementType.TEXT_EDITOR,
       required: true,
-      helpText: "Please provide a detailed description of the bug. Include steps to reproduce if possible.",
+      helpText:
+        "Please provide a detailed description of the bug. Include steps to reproduce if possible.",
     },
     {
-      label: "Attachments (optional)",
+      label: "Attachments",
       fieldName: "attachments",
       type: ControlledFormElementType.FILE,
       required: false,

@@ -110,7 +110,7 @@ const ReportBugPage = () => {
         onSubmit={onSubmit}
         isLoading={isLoading}
         action={Action.CREATE}
-        submitButtonLabel="Submit Bug Report"
+        submitButtonLabel="Submit"
       />
     </>
   );

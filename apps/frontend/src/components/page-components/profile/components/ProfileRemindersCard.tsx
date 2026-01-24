@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import { AlarmClock, Plus, Trash2 } from "lucide-react";
+import { AlarmClock, CheckCheck, Plus, Trash2 } from "lucide-react";
 import { Reminder } from "@/interfaces/entities/Reminder";
 import { reminderApiService } from "@/api/reminderApiService";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ const ProfileRemindersCard = () => {
   };
 
   return (
-    <Card className="h-fit">
+    <Card className="h-fit max-w-2xl mx-auto">
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -82,20 +82,18 @@ const ProfileRemindersCard = () => {
               <div key={reminder.id} className="p-3 rounded-lg border">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    <p className="text-emerald-600 mb-1">
                       {reminder.organisationName || reminder.organisationType}
                     </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
-                      {reminder.message}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {formatDate(reminder.remindAt)}
-                      {reminder.isSent && (
-                        <span className="ml-2 text-gray-400 dark:text-gray-500">(sent)</span>
-                      )}
-                    </p>
+                    <p className="text-forground break-words">{reminder.message}</p>
+                    <p className="mt-1">{formatDate(reminder.remindAt)}</p>
                   </div>
-                  {!reminder.isSent && (
+                  {reminder.isSent ? (
+                    <div className="flex gap-2">
+                      <p className="">Sent</p>
+                      <CheckCheck size={25} className="text-emerald-600" />
+                    </div>
+                  ) : (
                     <Button
                       variant="ghost"
                       size="sm"

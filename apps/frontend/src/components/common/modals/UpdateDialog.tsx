@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState, Dispatch, SetStateAction } from "react";
-import { Hammer, X } from "lucide-react";
+import { Bot, X } from "lucide-react";
 import SubmitButton from "../buttons/SubmitButton";
 import { DynamicProgress } from "../DynamicProgress";
 import { cn } from "@/lib/utils";
@@ -76,7 +76,7 @@ export const UpdateDialog = <T,>({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="secondary" onClick={handleUpdate}>
-          <Hammer />
+          <Bot />
           Update
         </Button>
       </DialogTrigger>

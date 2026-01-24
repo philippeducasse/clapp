@@ -146,7 +146,7 @@ const DataTableHeader = <TData,>({
             </Button>
           )}
           <CreateButton
-            label={`Create new ${entityName}`}
+            label={`Create new ${capitalizeFirst(entityName)}`}
             href={entityName !== "residency" ? `${entityName}s/create` : "residencies/create"}
           />
         </div>
