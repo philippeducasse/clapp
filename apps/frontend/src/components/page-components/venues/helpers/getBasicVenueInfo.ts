@@ -15,5 +15,6 @@ export const getVenueBasicInfo = (venue: Venue): SectionCellProps[] => {
       type: SectionCellType.Link,
     },
     { title: "Venue type", value: capitalizeFirst(venue.venueType) },
+    { title: "Approximate date", value: venue.approximateDate },
   ];
 };

@@ -1,5 +1,6 @@
 import { Venue } from "@/interfaces/entities/Venue";
 import { SectionCellProps, SectionCellType } from "@/interfaces/DetailsView";
+
 export const getVenueDetails = (venue: Venue): SectionCellProps[] => {
   if (!venue) return [];
 
