@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { AlertModal } from "../modals/AlertModal";
 import { useState } from "react";
 import { profileApiService } from "@/api/profileApiService";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 const Navbar = () => {
   const confirmLogout = async () => {
     await profileApiService.logout();
@@ -19,6 +20,7 @@ const Navbar = () => {
     <nav className="flex justify-between w-full items-center">
       <Breadcrumbs />
       <div className="flex gap-4 items-center">
+        <SidebarTrigger className="w-9 h-9" variant={"outline"} size={"icon"} />
         <DarkModeToggle />
         <Button
           className="cursor-pointer"

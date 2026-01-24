@@ -19,9 +19,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
-
-import Image from "next/image";
 
 const items = [
   {
@@ -76,11 +75,11 @@ const Sidebar = () => {
     <ShadcnSidebar>
       <SidebarContent>
         <SidebarGroup className="h-full">
-          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 text-lg dark:text-emerald-400">
-            Clapp
-            <img src={"/logo.png"} width={32} height={32} alt="Clapping hands" />
+          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 dark:text-emerald-400 gap-4">
+            <img src={"/logo.png"} width={60} height={60} alt="Clapping hands" />
+            <h1 className="font-clapp text-4xl">Clapp</h1>
           </SidebarGroupLabel>
-          <SidebarGroupContent className="h-full">
+          <SidebarGroupContent className="h-full my-6">
             <SidebarMenu className="flex h-full">
               {items.map((item, index) => (
                 <SidebarMenuItem key={item.title} className={index == 5 ? `mt-auto` : ""}>
