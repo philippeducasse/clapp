@@ -1,15 +1,14 @@
 services:
   db:
-    image: postgres:16-apline
-    container_name: cab_db
+    image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${DB_NAME:-cab} #TODO: fix these
+      POSTGRES_DB: ${DB_NAME:-clapp} #TODO: fix these
       POSTGRES_USER: ${DB_USER:-philippe}
       POSTGRES_PASSWORD: 0306
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ca-network
+      - clapp-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-philippe}"]
       interval: 10s
@@ -18,42 +17,38 @@ services:
   
   django:
     build:
-      context: .
-      dockerfile: Dockerfile
-      container_name: cab
-      environment:
-        - DB_HOST=db
-        - DB_NAME=${DB_NAME:-cab}
-        - DB_USER=${DB_USER:-philippe}
-        - DB_PASSWORD=${DB_PASSWORD:-0306}
-        - DB_PORT=5432
-        - SECRET_KEY=${SECRET_KEY}
-        - DEBUG=${DEBUG:-False}
-        - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
-        - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
-
-      depends_on:
-        db:
-          condition: service_healthy
-      networks: 
-        - ca-network
-      volumes:
-        - static_volume:/app/staticfiles
-        - media_colume:/app/media
+      context: ..
+      dockerfile: docker/dockerfile
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-clapp}
+      - DB_USER=${DB_USER:-philippe}
+      - DB_PASSWORD=${DB_PASSWORD:-0306}
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - clapp-network
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
 
   next:
-    image: ${REGISTRY_URL}/circus-frontend:${FRONTEND_VERSION:-latest}
-    container_name: caf
+    image: ${REGISTRY_URL}/clapp_frontend:latest
     environment:
       - NEXT_PUBLIC_API_URL=http://nginx
     depends_on:
       - django
     networks:
-      - ca-network
+      - clapp-network
 
   nginx:
     image: nginx:alpine
-    container_name: ca_nginx
     ports:
       - "80:80"
       - "443:443"
@@ -67,17 +62,71 @@ services:
       - django
       - next
     networks:
-      - ca-network
+      - clapp-network
   
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
+    networks:
+      - clapp-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+    command: celery -A config worker --loglevel=info
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-clapp}
+      - DB_USER=${DB_USER:-philippe}
+      - DB_PASSWORD=${DB_PASSWORD:-0306}
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - clapp-network
+    volumes:
+      - media_volume:/app/media
+
+  celery_beat:
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+    command: celery -A config beat --loglevel=info
+    environment:
+      - DB_HOST=db
+      - DB_NAME=${DB_NAME:-clapp}
+      - DB_USER=${DB_USER:-philippe}
+      - DB_PASSWORD=${DB_PASSWORD:-0306}
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - clapp-network
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
 
 networks:
-  circus-network:
+  clapp-network:
     driver: bridge
