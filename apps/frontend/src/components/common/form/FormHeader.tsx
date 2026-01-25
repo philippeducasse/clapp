@@ -10,7 +10,7 @@ interface FormHeaderProps {
   additionalActions?: ReactNode;
 }
 const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) => {
-  const getActionIcon = (action: string) => {
+  const getActionIcon = (action: Action) => {
     const iconProps = {
       className:
         "text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400",

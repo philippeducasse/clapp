@@ -22,7 +22,7 @@ import { Action, EntityName } from "@/interfaces/Enums";
 import { selectProfile, addPerformance, updatePerformance } from "@/redux/slices/authSlice";
 
 interface PerformanceFormProps {
-  action: string;
+  action: Action;
 }
 
 const PerformanceForm = ({ action }: PerformanceFormProps) => {

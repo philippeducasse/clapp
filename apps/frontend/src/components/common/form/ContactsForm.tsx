@@ -21,7 +21,7 @@ import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
 
 interface ContactsFormProps<T> {
-  action: string;
+  action: Action;
   entityName: EntityName;
   baseRoute: string; // e.g., "festivals", "venues", "residencies"
   selectEntity: (state: RootState, id: number) => T | undefined;
@@ -63,7 +63,7 @@ function ContactsForm<T extends { id?: number; contacts?: OrganisationContact[] 
     resolver: zodResolver(formSchema),
     defaultValues: getInitialValues(
       formFields,
-      contactToEdit as unknown as Record<string, unknown>
+      contactToEdit as unknown as Record<string, unknown>,
     ),
     mode: "onSubmit",
   });
@@ -139,8 +139,8 @@ function ContactsForm<T extends { id?: number; contacts?: OrganisationContact[] 
     action === Action.CREATE
       ? `/${baseRoute}/create`
       : entityId && entityId !== -1
-      ? `/${baseRoute}/${entity?.id}`
-      : `/${baseRoute}`;
+        ? `/${baseRoute}/${entity?.id}`
+        : `/${baseRoute}`;
 
   return (
     <>

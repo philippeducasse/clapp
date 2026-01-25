@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle2, AlertCircle, Download, FileText } from "lucide-react";
+import { CheckCircle2, AlertCircle, FileText } from "lucide-react";
 
 export default function ImportingOrganizationsHelpPage() {
   return (

@@ -23,7 +23,7 @@ import { Action, EntityName } from "@/interfaces/Enums";
 import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
 
 interface EmailTemplateFormProps {
-  action: string;
+  action: Action;
 }
 
 const EmailTemplateForm = ({ action }: EmailTemplateFormProps) => {
@@ -66,7 +66,7 @@ const EmailTemplateForm = ({ action }: EmailTemplateFormProps) => {
 
       if (action === Action.EDIT && templateId) {
         updatedTemplates = existingTemplates.map((t) =>
-          t.id === templateId ? ({ ...cleanedData, id: templateId } as EmailTemplate) : t
+          t.id === templateId ? ({ ...cleanedData, id: templateId } as EmailTemplate) : t,
         );
       } else {
         updatedTemplates = [...existingTemplates, { ...cleanedData } as EmailTemplate];

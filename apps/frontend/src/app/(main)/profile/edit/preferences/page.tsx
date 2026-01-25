@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -19,7 +17,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { getPreferencesFormFields } from "@/components/page-components/profile/helpers/form/getPreferencesFormFields";
 import { profileApiService } from "@/api/profileApiService";
-import { Action } from "@/interfaces/Enums";
+import { Action, EntityName } from "@/interfaces/Enums";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const EditPreferencesPage = () => {
@@ -76,7 +74,7 @@ const EditPreferencesPage = () => {
   if (!profile) {
     return (
       <div>
-        <FormHeader action={Action.EDIT} entityName={"Preferences" as any} />
+        <FormHeader action={Action.EDIT} entityName={EntityName.PREFERENCES} />
         <div className="flex flex-col max-w-xl mx-auto">
           <Skeleton className="h-80 w-full" />
         </div>
@@ -86,7 +84,7 @@ const EditPreferencesPage = () => {
 
   return (
     <>
-      <FormHeader action={Action.EDIT} entityName={"Preferences" as any} />
+      <FormHeader action={Action.EDIT} entityName={EntityName.PREFERENCES} />
 
       <BasicForm
         form={form}

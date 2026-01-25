@@ -17,7 +17,6 @@ import AddSection from "@/components/common/buttons/AddSection";
 import { profileApiService } from "@/api/profileApiService";
 import { performanceApiService } from "@/api/performanceApiService";
 import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
-import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import EmailTemplatesSection from "./EmailTemplatesSection";

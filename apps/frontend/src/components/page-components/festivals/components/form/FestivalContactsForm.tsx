@@ -4,11 +4,11 @@ import { Festival } from "@/interfaces/entities/Festival";
 import { selectFestival, updateFestival } from "@/redux/slices/festivalSlice";
 import { festivalApiService } from "@/api/festivalApiService";
 import { refreshFestival } from "../../helpers/refreshFestival";
-import { EntityName } from "@/interfaces/Enums";
+import { Action, EntityName } from "@/interfaces/Enums";
 import { getContactFormFields } from "@/helpers/getContactFormFields";
 
 interface FestivalContactsFormProps {
-  action: string;
+  action: Action;
 }
 
 const FestivalContactsForm = ({ action }: FestivalContactsFormProps) => {
