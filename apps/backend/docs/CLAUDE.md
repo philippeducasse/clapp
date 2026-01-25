@@ -4,26 +4,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CAB (Circus Agent Backend) is a Django REST Framework application for managing circus/street performance bookings. The application helps performers track organisations (festivals, venues, residencies), performances, and applications to perform at various events.
+Clapp is a Django REST Framework application for managing circus/street performance bookings. The application helps performers track organisations (festivals, venues, residencies), performances, and applications to perform at various events.
 
 ## Development Commands
 
 ### Package Management
+
 - Install dependencies: `uv sync`
 - Install with dev dependencies: `uv sync --dev`
 
 ### Running the Application
+
 - Start development server: `python manage.py runserver`
 - Run migrations: `python manage.py migrate`
 - Create migrations: `python manage.py makemigrations`
 
 ### Testing
+
 - Run all tests: `uv run pytest`
 - Run specific test file: `uv run pytest path/to/test_file.py`
 - Run with coverage: `uv run pytest --cov=. --cov-report=html`
 - Tests use in-memory SQLite database (configured in conftest.py)
 
 ### Code Quality
+
 - Format code: `ruff format .`
 - Lint code: `ruff check . --fix`
 - Type check: `mypy .`
@@ -36,19 +40,23 @@ CAB (Circus Agent Backend) is a Django REST Framework application for managing c
 The application uses Django's model inheritance and generic relations to handle multiple organisation types:
 
 **Abstract Base Models:**
+
 - `Organisation` (organisations/models.py): Abstract base for all organisation types (festivals, venues, residencies)
 - `OrganisationContact`: Abstract base for contact information
 
 **Concrete Organisation Types:**
+
 - `Festival` (organisations/festivals/models.py): Extends Organisation with festival-specific fields (dates, application periods)
 - `Venue` (organisations/venues/models.py): Extends Organisation with venue-specific fields
 - `Residency` (organisations/residencies/models.py): Extends Organisation with residency-specific fields
 
 **Applications & Performances:**
+
 - `Application` (applications/models.py): Uses Django's `GenericForeignKey` to link to any organisation type (Festival, Venue, or Residency). The `content_type` and `object_id` fields enable polymorphic relationships.
 - `Performance` (performances/models.py): Represents a show/act with associated dossiers (PDF files)
 
 **User Management:**
+
 - `Profile` (profiles/models.py): Custom user model extending Django's AbstractUser. Uses email as USERNAME_FIELD instead of username. Includes email configuration for sending applications directly from user accounts.
 
 ### Generic Relations Pattern

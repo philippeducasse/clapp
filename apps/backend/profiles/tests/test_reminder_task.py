@@ -170,7 +170,7 @@ class TestReminderTask:
         assert "Custom reminder message" in email.body
         assert festival.name in email.body
         assert festival.website_url in email.body
-        assert "Circus Agent" in email.body  # Signature
+        assert "Clapp Team" in email.body  # Signature
 
     def test_task_with_multiple_profiles(self, festival):
         """Test that reminders are sent to correct profiles."""

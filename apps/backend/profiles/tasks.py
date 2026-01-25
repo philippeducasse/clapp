@@ -52,7 +52,7 @@ Organisation details:
 - Website: {reminder.organisation.website_url or "N/A"}
 
 Best regards,
-Circus Agent
+Clapp Team
     """.strip()
 
     send_mail(
