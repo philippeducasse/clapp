@@ -21,8 +21,8 @@ export default function GettingStartedPage() {
         <div>
           <h1 className="text-4xl font-bold text-emerald-700 mb-3">Getting Started Guide</h1>
           <p className="text-lg text-gray-600">
-            Welcome to Circus Agent Frontend! This guide will walk you through the key features and
-            help you get the most out of the platform.
+            Welcome to Clapp! This guide will walk you through the key features and help you get the
+            most out of the platform.
           </p>
         </div>
 
@@ -55,13 +55,13 @@ export default function GettingStartedPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-emerald-600" />
-            What is Circus Agent?
+            What is Clapp?
           </CardTitle>
         </CardHeader>
         <CardContent className="text-gray-700 space-y-3">
           <p>
-            Circus Agent is your personal assistant for managing your performance arts career. It
-            helps you:
+            Clapp is your personal assistant for managing your performance arts career. It helps
+            you:
           </p>
           <ul className="space-y-2 ml-4">
             <li className="flex items-start gap-3">
@@ -304,8 +304,8 @@ export default function GettingStartedPage() {
                 <h4 className="font-semibold text-gray-900 mb-2">Configure Email Settings</h4>
                 <p className="text-gray-700 text-sm mb-3">
                   <strong>This is required to send applications.</strong> You&apos;ll set up your
-                  email account so that when you apply through Circus Agent, organizations receive
-                  emails from your personal email address. This is a one-time setup.
+                  email account so that when you apply through Clapp, organizations receive emails
+                  from your personal email address. This is a one-time setup.
                 </p>
                 <div className="space-y-2 space-x-2">
                   <Button asChild size="sm">

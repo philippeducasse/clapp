@@ -73,8 +73,8 @@ const ReportBugPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-gray-700">
-              We appreciate you helping us improve Circus Agent. Our team will review your report
-              and investigate the issue.
+              We appreciate you helping us improve Clapp. Our team will review your report and
+              investigate the issue.
             </p>
             <p className="text-sm text-gray-600">
               If you&apos;d like to report additional issues or need further assistance, feel free

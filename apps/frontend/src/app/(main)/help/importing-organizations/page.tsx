@@ -9,12 +9,6 @@ export default function ImportingOrganizationsHelpPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <Link
-          href="/help"
-          className="text-emerald-600 hover:text-emerald-800 text-sm mb-4 inline-flex items-center gap-2"
-        >
-          ← Back to Getting Started
-        </Link>
         <h1 className="text-2xl font-bold text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
         <p className="text-gray-600 text-lg">
           Bulk import festivals, venues, and residencies from an Excel file
@@ -211,8 +205,8 @@ export default function ImportingOrganizationsHelpPage() {
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-2">Go to Upload Page</h3>
                     <p className="text-gray-600 mb-3">
-                      Navigate to the Upload page in your Circus Agent dashboard. You can find it in
-                      the sidebar menu.
+                      Navigate to the Upload page in your Clapp dashboard. You can find it in the
+                      sidebar menu.
                     </p>
                   </div>
                 </div>
@@ -422,12 +416,6 @@ export default function ImportingOrganizationsHelpPage() {
             </Button>
           </CardContent>
         </Card>
-
-        <div className="text-center pt-8 border-t border-gray-200">
-          <Link href="/help" className="text-emerald-600 hover:text-emerald-800 text-sm">
-            ← Back to Getting Started
-          </Link>
-        </div>
       </div>
     </div>
   );

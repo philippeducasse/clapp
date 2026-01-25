@@ -75,9 +75,9 @@ const Sidebar = () => {
     <ShadcnSidebar>
       <SidebarContent>
         <SidebarGroup className="h-full">
-          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 dark:text-emerald-400 gap-4">
-            <img src={"/logo.png"} width={60} height={60} alt="Clapping hands" />
+          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 dark:text-emerald-400 gap-1">
             <h1 className="font-clapp text-4xl">Clapp</h1>
+            <img src={"/logo.png"} width={60} height={60} alt="Clapping hands" />
           </SidebarGroupLabel>
           <SidebarGroupContent className="h-full my-6">
             <SidebarMenu className="flex h-full">
