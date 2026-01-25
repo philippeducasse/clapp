@@ -4,11 +4,11 @@ import { Residency } from "@/interfaces/entities/Residency";
 import { selectResidency, updateResidency } from "@/redux/slices/residencySlice";
 import { residencyApiService } from "@/api/residencyApiService";
 import { refreshResidency } from "../../helpers/refreshResidency";
-import { EntityName } from "@/interfaces/Enums";
+import { Action, EntityName } from "@/interfaces/Enums";
 import { getContactFormFields } from "@/helpers/getContactFormFields";
 
 interface ResidencyContactsFormProps {
-  action: string;
+  action: Action;
 }
 
 const ResidencyContactsForm = ({ action }: ResidencyContactsFormProps) => {
