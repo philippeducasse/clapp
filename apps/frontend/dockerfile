@@ -31,11 +31,11 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# copies public files (images, fonts, pdfs, logos, robots.xtx, etc)
-COPY --from=build /app/public ./public
-# copy next app
+# copy next app (standalone output)
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
-# copies static files 
+# copies public files (images, fonts, pdfs, logos, robots.txt, etc) - must be after standalone
+COPY --from=build --chown=nextjs:nodejs /app/public ./public
+# copies static files
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static  
 
 USER nextjs

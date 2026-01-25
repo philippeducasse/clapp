@@ -1,6 +1,8 @@
 import { applicationApiService } from "@/api/applicationApiService";
 import { ApplicationsTable } from "@/components/page-components/applications/components/table/ApplicationsTable";
 
+export const dynamic = "force-dynamic";
+
 const ApplicationsPage = async () => {
   const data = await applicationApiService.getAll();
   return (
