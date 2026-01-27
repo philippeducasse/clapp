@@ -3,7 +3,7 @@ from typing import Any, List, Type
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 from rest_framework import serializers
 
-from circus_agent_backend.utils import NormalizedURLField
+from clapp_backend.utils import NormalizedURLField
 from organisations.residencies.models import Residency, ResidencyContact
 from organisations.serializers import (
     BaseContactSerializer,

@@ -9,7 +9,7 @@ from organisations.serializers import (
     BaseContactSerializer,
     handle_nested_contacts,
 )
-from circus_agent_backend.utils import NormalizedURLField
+from clapp_backend.utils import NormalizedURLField
 
 
 class FestivalContactSerializer(BaseContactSerializer):

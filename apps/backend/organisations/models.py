@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import QuerySet
 from phonenumber_field.modelfields import PhoneNumberField
 
-from circus_agent_backend.utils import normalize_url
+from clapp_backend.utils import normalize_url
 
 logger = logging.getLogger(__name__)
 
@@ -197,5 +197,3 @@ class OrganisationContact(models.Model):
         """Restore a soft-deleted contact"""
         self.deleted_at = None
         self.save()
-
-

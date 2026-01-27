@@ -3,7 +3,7 @@ from typing import Type
 
 from rest_framework import serializers
 
-from circus_agent_backend.utils import NormalizedURLField
+from clapp_backend.utils import NormalizedURLField
 from performances.models import Dossier, Performance
 
 logger = logging.getLogger(__name__)

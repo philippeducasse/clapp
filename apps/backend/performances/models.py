@@ -6,7 +6,7 @@ from django.forms import ValidationError
 from multiselectfield import MultiSelectField
 
 from profiles.models import Profile
-from circus_agent_backend.utils import normalize_url
+from clapp_backend.utils import normalize_url
 
 
 class Performance(models.Model):

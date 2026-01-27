@@ -7,7 +7,7 @@ from django.db import models
 from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
 
-from circus_agent_backend.utils import normalize_url
+from clapp_backend.utils import normalize_url
 from profiles.constants import LANGUAGES
 
 EMAIL_HOST_MAPPING = {

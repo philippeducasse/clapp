@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from profiles.models import EmailTemplate, Profile, Reminder
 from performances.serializers import PerformanceSerializer
-from circus_agent_backend.utils import NormalizedURLField
+from clapp_backend.utils import NormalizedURLField
 
 
 class ReminderSerializer(serializers.ModelSerializer):
