@@ -1,0 +1,17 @@
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.coverage
+*.db
+.env
+.envrc
+node_modules
+.next
+*.log
+.DS_Store
+.idea
+.vscode
+docker-compose.yml
