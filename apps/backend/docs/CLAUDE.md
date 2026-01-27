@@ -70,7 +70,7 @@ This pattern allows a single Application model to work with multiple organisatio
 
 ### URL Normalization
 
-All URL fields use the `normalize_url()` utility (circus_agent_backend/utils.py) to automatically add `https://` if no protocol is specified. This happens in model `clean()` methods and via the custom `NormalizedURLField` serializer.
+All URL fields use the `normalize_url()` utility (clapp_backend/utils.py) to automatically add `https://` if no protocol is specified. This happens in model `clean()` methods and via the custom `NormalizedURLField` serializer.
 
 ### Services Layer
 
@@ -90,7 +90,7 @@ All URL fields use the `normalize_url()` utility (circus_agent_backend/utils.py)
 
 ### Settings & Configuration
 
-- Main settings: `circus_agent_backend/settings.py`
+- Main settings: `clapp_backend/settings.py`
 - Custom user model: `AUTH_USER_MODEL = "profiles.Profile"`
 - Database: SQLite for development (PostgreSQL config commented out)
 - CORS configured for frontend running on localhost:3000 and localhost:3020
@@ -99,7 +99,7 @@ All URL fields use the `normalize_url()` utility (circus_agent_backend/utils.py)
 ### Testing Configuration
 
 - pytest configured with Django plugin (pyproject.toml)
-- Tests use separate settings file: `circus_agent_backend/settings_test.py`
+- Tests use separate settings file: `clapp_backend/settings_test.py`
 - Test database: in-memory SQLite (configured in settings_test.py)
 - API keys for Gemini/Mistral set to dummy values in conftest.py for testing
 - Coverage configured to exclude tests, migrations, and certain files

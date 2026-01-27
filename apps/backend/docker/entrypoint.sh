@@ -3,7 +3,7 @@
 set -e 
 
 echo "waiting for database..."
-while ! pg_isready -h "${DB_HOST:-cab}" -p "${DB_PORT:-5432}" -U "${DB_USER:-philippe}" > /dev/null 2>&1; do
+while ! pg_isready -h "${DB_HOST:-db}" -p "${DB_PORT:-5432}" -U "${DB_USER:-philippe}" > /dev/null 2>&1; do
   sleep 1
 done
 echo "Database is ready!"
@@ -19,4 +19,4 @@ exec gunicorn \
     --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
     --access-logfile - \
     --error-logfile - \
-    circus_agent_project.wsgi:application
+    clapp_backend.wsgi:application

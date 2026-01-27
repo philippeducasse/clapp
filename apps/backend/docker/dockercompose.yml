@@ -1,16 +1,19 @@
 services:
   db:
     image: postgres:16-alpine
+    env_file:
+      - ../.env
     environment:
-      POSTGRES_DB: ${DB_NAME:-clapp} #TODO: fix these
-      POSTGRES_USER: ${DB_USER:-philippe}
-      POSTGRES_PASSWORD: 0306
+      - DJANGO_SETTINGS_MODULE=conf.settings.prod 
+      # - POSTGRES_DB=${DB_NAME}
+      # - POSTGRES_USER=${DB_USER}
+      # - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - clapp-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-philippe}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-philippe} -d ${DB_NAME:-clapp}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -19,16 +22,11 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile
+    env_file:
+      - ../.env
     environment:
+      - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
-      - DB_NAME=${DB_NAME:-clapp}
-      - DB_USER=${DB_USER:-philippe}
-      - DB_PASSWORD=${DB_PASSWORD:-0306}
-      - DB_PORT=5432
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=${DEBUG:-False}
-      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
-      - GUNICORN_WORKERS=${GUNICORN_WORKERS:-3}
     depends_on:
       db:
         condition: service_healthy
@@ -40,8 +38,10 @@ services:
 
   next:
     image: ${REGISTRY_URL}/clapp_frontend:latest
+    ports:                                                                                                     
+      - "3000:3000"    
     environment:
-      - NEXT_PUBLIC_API_URL=http://nginx
+      - NEXT_PUBLIC_BACKEND_URL=http://django:8000
     depends_on:
       - django
     networks:
@@ -53,11 +53,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
-      - ./nginx/ssl:/etc/nginx/ssl:ro  # For SSL certificates
     depends_on:
       - django
       - next
@@ -66,8 +63,8 @@ services:
   
   redis:
     image: redis:alpine
-    ports:
-      - "6379:6379"
+    # ports:
+      # - "6379:6379"
     networks:
       - clapp-network
     healthcheck:
@@ -81,15 +78,11 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     command: celery -A config worker --loglevel=info
+    env_file:
+      - ../.env
     environment:
+      - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
-      - DB_NAME=${DB_NAME:-clapp}
-      - DB_USER=${DB_USER:-philippe}
-      - DB_PASSWORD=${DB_PASSWORD:-0306}
-      - DB_PORT=5432
-      - SECRET_KEY=${SECRET_KEY}
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
@@ -105,15 +98,11 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     command: celery -A config beat --loglevel=info
+    env_file:
+      - ../.env
     environment:
+      - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
-      - DB_NAME=${DB_NAME:-clapp}
-      - DB_USER=${DB_USER:-philippe}
-      - DB_PASSWORD=${DB_PASSWORD:-0306}
-      - DB_PORT=5432
-      - SECRET_KEY=${SECRET_KEY}
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
