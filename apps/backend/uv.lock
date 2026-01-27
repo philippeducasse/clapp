@@ -232,12 +232,14 @@ dependencies = [
     { name = "googleapis-common-protos" },
     { name = "grpcio" },
     { name = "grpcio-status" },
+    { name = "gunicorn" },
     { name = "h11" },
     { name = "httpcore" },
     { name = "httplib2" },
     { name = "httpx" },
     { name = "idna" },
     { name = "mistralai" },
+    { name = "pandas" },
     { name = "proto-plus" },
     { name = "protobuf" },
     { name = "psycopg2-binary" },
@@ -272,7 +274,6 @@ dev = [
     { name = "mypy" },
     { name = "numpy" },
     { name = "openpyxl" },
-    { name = "pandas" },
     { name = "pre-commit" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -311,12 +312,14 @@ requires-dist = [
     { name = "googleapis-common-protos", specifier = "==1.70.0" },
     { name = "grpcio", specifier = "==1.74.0" },
     { name = "grpcio-status", specifier = "==1.71.2" },
+    { name = "gunicorn", specifier = ">=21.2.0" },
     { name = "h11", specifier = "==0.16.0" },
     { name = "httpcore", specifier = "==1.0.9" },
     { name = "httplib2", specifier = "==0.22.0" },
     { name = "httpx", specifier = "==0.28.1" },
     { name = "idna", specifier = "==3.10" },
     { name = "mistralai", specifier = "==1.9.1" },
+    { name = "pandas", specifier = "==2.3.0" },
     { name = "proto-plus", specifier = "==1.26.1" },
     { name = "protobuf", specifier = "==5.29.5" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
@@ -351,7 +354,6 @@ dev = [
     { name = "mypy", specifier = ">=1.18.2" },
     { name = "numpy", specifier = "==2.0.2" },
     { name = "openpyxl", specifier = "==3.1.5" },
-    { name = "pandas", specifier = "==2.3.0" },
     { name = "pre-commit", specifier = ">=4.3.0" },
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-cov", specifier = ">=4.1.0" },
@@ -896,6 +898,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fd/d1/b6e9877fedae3add1afdeae1f89d1927d296da9cf977eca0eb08fb8a460e/grpcio_status-1.71.2.tar.gz", hash = "sha256:c7a97e176df71cdc2c179cd1847d7fc86cca5832ad12e9798d7fed6b7a1aab50", size = 13677, upload-time = "2025-06-28T04:24:05.426Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/67/58/317b0134129b556a93a3b0afe00ee675b5657f0155509e22fcb853bafe2d/grpcio_status-1.71.2-py3-none-any.whl", hash = "sha256:803c98cb6a8b7dc6dbb785b1111aed739f241ab5e9da0bba96888aa74704cfd3", size = 14424, upload-time = "2025-06-28T04:23:42.136Z" },
+]
+
+[[package]]
+name = "gunicorn"
+version = "24.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/78/0a/10739c03537ec5b131a867bf94df2e412b437696c7e5d26970e2198a80d2/gunicorn-24.1.1.tar.gz", hash = "sha256:f006d110e5cb3102859b4f5cd48335dbd9cc28d0d27cd24ddbdafa6c60929408", size = 287567, upload-time = "2026-01-24T01:15:31.359Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/90/cfe637677916fc6f53cd2b05d5746e249f683e1fa14c9e745a88c66f7290/gunicorn-24.1.1-py3-none-any.whl", hash = "sha256:757f6b621fc4f7581a90600b2cd9df593461f06a41d7259cb9b94499dc4095a8", size = 114920, upload-time = "2026-01-24T01:15:29.656Z" },
 ]
 
 [[package]]
