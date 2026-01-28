@@ -1,9 +1,12 @@
-from django.contrib import admin
-from django.urls import path, include, URLPattern
 from typing import List
+
+from django.contrib import admin
+from django.http import JsonResponse
+from django.urls import URLPattern, include, path
 
 urlpatterns: List[URLPattern] = [
     path("admin/", admin.site.urls),
+    path("health/", lambda request: JsonResponse({"status": "ok"})),
     path(
         "api/",
         include(

@@ -30,6 +30,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 
