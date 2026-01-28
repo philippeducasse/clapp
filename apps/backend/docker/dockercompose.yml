@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     env_file:
-      - ../.env
+      - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod 
       # - POSTGRES_DB=${DB_NAME}
@@ -25,7 +25,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ../.env
+      - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
@@ -100,7 +100,7 @@ services:
       dockerfile: docker/dockerfile
     command: celery -A config worker --loglevel=info
     env_file:
-      - ../.env
+      - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
@@ -120,7 +120,7 @@ services:
       dockerfile: docker/dockerfile
     command: celery -A config beat --loglevel=info
     env_file:
-      - ../.env
+      - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
