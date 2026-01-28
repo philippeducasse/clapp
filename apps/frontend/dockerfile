@@ -12,6 +12,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 FROM base AS build
+ARG NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
 WORKDIR ${APP_HOME}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -19,8 +20,9 @@ COPY . .
 # nextjs default data collection disabled
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
+ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
 
-RUN npm run build
+RUN npm run build 
 
 FROM base AS run
 WORKDIR ${APP_HOME}
