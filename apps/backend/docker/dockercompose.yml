@@ -5,9 +5,9 @@ services:
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod 
-      # - POSTGRES_DB=${DB_NAME}
-      # - POSTGRES_USER=${DB_USER}
-      # - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=clapp
+      - POSTGRES_USER=philippe
+      - POSTGRES_PASSWORD=0306
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -56,7 +56,7 @@ services:
   #     - clapp-network
   next:
     build:
-      context: ../../caf
+      context: ../../clapp_frontend
       dockerfile: dockerfile
       args:
         NEXT_PUBLIC_BACKEND_URL: http://localhost:8000                                                                                            
@@ -98,6 +98,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile
+    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config worker --loglevel=info
     env_file:
       - ../.env.docker
@@ -105,7 +106,7 @@ services:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
-      db:
+      django:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -118,6 +119,7 @@ services:
     build:
       context: ..
       dockerfile: docker/dockerfile
+    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config beat --loglevel=info
     env_file:
       - ../.env.docker
@@ -125,7 +127,7 @@ services:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
-      db:
+      django:
         condition: service_healthy
       redis:
         condition: service_healthy
