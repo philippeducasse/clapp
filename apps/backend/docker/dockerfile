@@ -39,9 +39,10 @@ RUN addgroup --system --gid 999 django && \
 
 COPY --from=deps --chown=django:django /app/.venv ./.venv
 COPY --from=build --chown=django:django /app/docker/entrypoint.sh .
+COPY --from=build --chown=django:django /app/docker/entrypoint-celery.sh .
 COPY --from=build --chown=django:django /app .
 
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh /app/entrypoint-celery.sh
 
 USER django
 
