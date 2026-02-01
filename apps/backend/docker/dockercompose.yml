@@ -3,11 +3,10 @@ services:
     image: postgres:16-alpine
     env_file:
       - ../.env.docker
-      - ../.env.docker
     environment:
-      - POSTGRES_DB=clapp
-      - POSTGRES_USER=philippe
-      - POSTGRES_PASSWORD=0306
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -15,9 +14,9 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-philippe} -d ${DB_NAME:-clapp}"]
       interval: 10s
-      timeout: 5ss
+      timeout: 5s
       retries: 5
-  
+
   django:
     build:
       context: ..
@@ -25,7 +24,6 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
@@ -43,7 +41,6 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-
   # next:
   #   image: ${REGISTRY_URL}/clapp_frontend:latest
   #   ports:                                                                                                     
@@ -58,18 +55,17 @@ services:
   next:
     build:
       context: ../../clapp_frontend
-      context: ../../clapp_frontend
       dockerfile: dockerfile
-      args:
-        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL:-http://localhost:8000}                                                                                            
-    depends_on:                                                                                                                                
-      django:                                                                                                                                  
-        condition: service_healthy                                                                                                             
-    ports:                                                                                                                                     
-      - "3000:3000"                                                                                                                            
-    networks:                                                                                                                                  
-      - clapp-network   
-            
+    environment:
+      - BACKEND_URL=http://django:8000
+    depends_on:
+      django:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks:
+      - clapp-network
+
   nginx:
     image: nginx:alpine
     ports:
@@ -84,11 +80,9 @@ services:
       - next
     networks:
       - clapp-network
-  
+
   redis:
     image: redis:alpine
-    # ports:
-      # - "6379:6379"
     networks:
       - clapp-network
     healthcheck:
@@ -102,16 +96,13 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
-    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config worker --loglevel=info
     env_file:
-      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
-      django:
       django:
         condition: service_healthy
       redis:
@@ -126,16 +117,13 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
-    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config beat --loglevel=info
     env_file:
-      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
-      django:
       django:
         condition: service_healthy
       redis:
