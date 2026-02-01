@@ -3,6 +3,7 @@ services:
     image: postgres:16-alpine
     env_file:
       - ../.env.docker
+      - ../.env.docker
     environment:
       - POSTGRES_DB=clapp
       - POSTGRES_USER=philippe
@@ -24,6 +25,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
+      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
@@ -55,6 +57,7 @@ services:
   #     - clapp-network
   next:
     build:
+      context: ../../clapp_frontend
       context: ../../clapp_frontend
       dockerfile: dockerfile
       args:
@@ -99,13 +102,16 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
+    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config worker --loglevel=info
     env_file:
+      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
+      django:
       django:
         condition: service_healthy
       redis:
@@ -120,13 +126,16 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
+    entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config beat --loglevel=info
     env_file:
+      - ../.env.docker
       - ../.env.docker
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
     depends_on:
+      django:
       django:
         condition: service_healthy
       redis:
