@@ -16,10 +16,12 @@ class SchemaCreationError(Exception):
 
 
 @receiver(post_save, sender=Profile, dispatch_uid="send_confirmation_email")
-def send_confirmation_email(sender, instance, created, **kwargs):
-    logger.info(f"Sending confirmation email to {instance.email}")
+def send_confirmation_email(sender, instance, created, raw, **kwargs):
+    if raw:
+        return  # Skip during fixture loading (loaddata)
 
     if created:
+        logger.info(f"Sending confirmation email to {instance.email}")
         send_mail(
             "Welcome! Please confirm your email",
             "CONFIRMATION URL GOES HERE",
