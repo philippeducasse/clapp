@@ -2,8 +2,18 @@ import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/se
 import { toast } from "sonner";
 
 const getFullUrl = (url: string): string => {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
-  return url.startsWith("http") ? url : `${backendUrl}${url}`;
+  if (url.startsWith("http")) {
+    return url;
+  }
+
+  // SSR: use internal Docker network URL (server-side only env var)
+  // Browser: use relative URL (Next.js rewrites will proxy to backend)
+  const baseUrl =
+    typeof window === "undefined"
+      ? process.env.BACKEND_URL || "http://localhost:8000"
+      : "";
+
+  return `${baseUrl}${url}`;
 };
 
 const getServerCookies = async (): Promise<string> => {
