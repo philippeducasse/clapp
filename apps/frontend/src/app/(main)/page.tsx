@@ -30,7 +30,6 @@ const Page = () => {
   const residenciesLoading = useSelector((state: RootState) => state.residencies.loading);
   const applicationsLoading = useSelector((state: RootState) => state.applications.loading);
 
-  // TODO: consider refactoring these multiple calls into a single fetch to the api.
   useEffect(() => {
     Promise.all([
       dispatch(fetchFestivals({ limit: 10000 })),
