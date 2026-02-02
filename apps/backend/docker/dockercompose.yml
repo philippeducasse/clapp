@@ -56,8 +56,10 @@ services:
     build:
       context: ../../clapp_frontend
       dockerfile: dockerfile
+      args:
+      - NEXT_PUBLIC_BACKEND_URL=http://django:8000 
     environment:
-      - BACKEND_URL=http://django:8000
+      - BACKEND_URL=http://django:8000 
     depends_on:
       django:
         condition: service_healthy
