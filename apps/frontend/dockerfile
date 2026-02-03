@@ -13,6 +13,7 @@ RUN npm ci
 
 FROM base AS build
 ARG NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+# ARG BACKEND_URL=http://localhost:8000
 WORKDIR ${APP_HOME}
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -21,6 +22,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
 ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+# ENV BACKEND_URL=${BACKEND_URL}
 
 RUN npm run build 
 
