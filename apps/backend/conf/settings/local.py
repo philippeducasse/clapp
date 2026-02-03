@@ -6,6 +6,7 @@ from .base import *  # noqa
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEBUG = True
+ENVIRONMENT = "local"
 
 # Disable secure cookie requirements for local HTTP development
 CSRF_COOKIE_SECURE = False

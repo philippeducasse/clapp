@@ -4,6 +4,7 @@ from .base import *  # noqa
 
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DEBUG = False
+ENVIRONMENT = "prod"
 
 # Production database configuration - all from environment variables
 DATABASES = {
