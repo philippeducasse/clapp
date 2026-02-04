@@ -57,7 +57,7 @@ services:
       context: ../../caf
       dockerfile: dockerfile
       args:
-      - NEXT_PUBLIC_BACKEND_URL=http://django:8000 
+       - NEXT_PUBLIC_BACKEND_URL=http://django:8000
     environment:
       - BACKEND_URL=http://django:8000 
     depends_on:
@@ -98,7 +98,7 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
-    command: celery -A config worker --loglevel=info
+    command: celery -A clapp_backend worker --loglevel=info
     env_file:
       - .env
     environment:
@@ -119,7 +119,7 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     entrypoint: ["/app/entrypoint-celery.sh"]
-    command: celery -A config beat --loglevel=info
+    command: celery -A clapp_backend beat --loglevel=info
     env_file:
       - .env
     environment:
