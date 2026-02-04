@@ -1,12 +1,13 @@
-from typing import Any, Type
 import re
+from typing import Any, Type
 
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from rest_framework import serializers
 
-from profiles.models import EmailTemplate, Profile, Reminder
-from performances.serializers import PerformanceSerializer
 from clapp_backend.utils import NormalizedURLField
+from performances.serializers import PerformanceSerializer
+from profiles.models import EmailTemplate, Profile, Reminder
 
 
 class ReminderSerializer(serializers.ModelSerializer):
@@ -116,5 +117,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data.pop("password_confirm")
-        return Profile.objects.create_user(**validated_data)
+        with transaction.atomic():
+            validated_data.pop("password_confirm")
+            return Profile.objects.create_user(**validated_data)
