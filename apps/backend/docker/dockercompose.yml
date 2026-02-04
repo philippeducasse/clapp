@@ -2,7 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     env_file:
-      - ../.env.docker
+      - .env
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -24,7 +24,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ../.env.docker
+      - .env
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
@@ -54,7 +54,7 @@ services:
   #     - clapp-network
   next:
     build:
-      context: ../../clapp_frontend
+      context: ../../caf
       dockerfile: dockerfile
       args:
       - NEXT_PUBLIC_BACKEND_URL=http://django:8000 
@@ -100,7 +100,7 @@ services:
     entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config worker --loglevel=info
     env_file:
-      - ../.env.docker
+      - .env
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db
@@ -121,7 +121,7 @@ services:
     entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A config beat --loglevel=info
     env_file:
-      - ../.env.docker
+      - .env
     environment:
       - DJANGO_SETTINGS_MODULE=conf.settings.prod
       - DB_HOST=db

@@ -1,0 +1,150 @@
+# Inititalising the production database from SQLITE
+
+## Prepare PostgreSQL
+
+CREATE SCHEMA IF NOT EXISTS template;
+CREATE SCHEMA IF NOT EXISTS user_2;
+
+## Run Django migrations in PostgreSQL
+
+python manage.py migrate
+
+-- Run directly in PostgreSQL
+CREATE SCHEMA template;
+CREATE SCHEMA user_2;
+
+-- Copy org tables to template
+CREATE TABLE template.venues_venue (LIKE public.venues_venue INCLUDING ALL);
+CREATE TABLE template.venues_venuecontact (LIKE public.venues_venuecontact INCLUDING ALL);
+CREATE TABLE template.festivals_festival (LIKE public.festivals_festival INCLUDING ALL);
+CREATE TABLE template.festivals_festivalcontact (LIKE public.festivals_festivalcontact INCLUDING ALL);
+CREATE TABLE template.residencies_residency (LIKE public.residencies_residency INCLUDING ALL);
+CREATE TABLE template.residencies_residencycontact (LIKE public.residencies_residencycontact INCLUDING ALL);
+
+-- Copy user tables to user_2
+CREATE TABLE user_2.applications_application (LIKE public.applications_application INCLUDING ALL);
+CREATE TABLE user_2.applications_application_performances (LIKE public.applications_application_performances INCLUDING ALL);
+CREATE TABLE user_2.performances_performance (LIKE public.performances_performance INCLUDING ALL);
+CREATE TABLE user_2.performances_dossier (LIKE public.performances_dossier INCLUDING ALL);
+
+## Export SQLITE data
+
+### Export organizations for template
+
+# Export organizations
+sqlite3 db.sqlite3 << EOF
+.mode insert template.venues_venue
+SELECT * FROM venues_venue;
+.mode insert template.venues_venuecontact
+SELECT * FROM venues_venuecontact;
+.mode insert template.festivals_festival
+SELECT * FROM festivals_festival;
+.mode insert template.festivals_festivalcontact
+SELECT * FROM festivals_festivalcontact;
+.mode insert template.residencies_residency
+SELECT * FROM residencies_residency;
+.mode insert template.residencies_residencycontact
+SELECT * FROM residencies_residencycontact;
+EOF
+
+DO I STILL NEED THIS ???
+
+sqlite3 db.sqlite3 <<EOF
+.mode insert
+.output template_orgs.sql
+SELECT * FROM venues_venue;
+SELECT * FROM venues_venuecontact;
+SELECT * FROM festivals_festival;
+SELECT * FROM festivals_festivalcontact;
+SELECT * FROM residencies_residency;
+SELECT * FROM residencies_residencycontact;
+.quit
+EOF
+
+### Export user_2 private data
+
+sqlite3 db.sqlite3 <<EOF
+.mode insert
+.output user_2_data.sql
+SELECT * FROM profiles_profile WHERE id = 2;
+SELECT * FROM performances_performance WHERE profile_id = 2;
+SELECT * FROM applications_application WHERE profile_id = 2;
+.quit
+EOF
+
+
+
+************************************************************
+
+
+Production Database Migration Instructions
+Prerequisites
+
+Docker containers running (django + db)
+SQLite db.sqlite3 file with production data
+PostgreSQL configured in settings
+
+Step 1: Run Django Migrations
+bashdocker compose -f docker/dockercompose.yml exec django python manage.py migrate
+Result: Creates all tables in public schema
+Step 2: Load SQLite Data into PostgreSQL
+bashdocker compose -f docker/dockercompose.yml exec django python manage.py loaddata data_dump.json
+Result: Loads all 875 objects into public schema
+Step 3: Connect to PostgreSQL
+bashdocker compose -f docker/dockercompose.yml exec -it db /bin/bash
+psql -U philippe -d clapp
+Step 4: Create Schemas
+sqlCREATE SCHEMA template;
+CREATE SCHEMA user_2;
+Step 5: Create Table Structures in Schemas
+sql-- Template schema (organizations)
+CREATE TABLE template.venues_venue (LIKE public.venues_venue INCLUDING ALL);
+CREATE TABLE template.venues_venuecontact (LIKE public.venues_venuecontact INCLUDING ALL);
+CREATE TABLE template.festivals_festival (LIKE public.festivals_festival INCLUDING ALL);
+CREATE TABLE template.festivals_festivalcontact (LIKE public.festivals_festivalcontact INCLUDING ALL);
+CREATE TABLE template.residencies_residency (LIKE public.residencies_residency INCLUDING ALL);
+CREATE TABLE template.residencies_residencycontact (LIKE public.residencies_residencycontact INCLUDING ALL);
+
+-- User_2 schema (private data)
+CREATE TABLE user_2.applications_application (LIKE public.applications_application INCLUDING ALL);
+CREATE TABLE user_2.applications_application_performances (LIKE public.applications_application_performances INCLUDING ALL);
+CREATE TABLE user_2.performances_performance (LIKE public.performances_performance INCLUDING ALL);
+CREATE TABLE user_2.performances_dossier (LIKE public.performances_dossier INCLUDING ALL);
+Step 6: Copy Data into Schemas
+sql-- Copy organizations to template
+INSERT INTO template.venues_venue SELECT * FROM public.venues_venue;
+INSERT INTO template.venues_venuecontact SELECT * FROM public.venues_venuecontact;
+INSERT INTO template.festivals_festival SELECT * FROM public.festivals_festival;
+INSERT INTO template.festivals_festivalcontact SELECT * FROM public.festivals_festivalcontact;
+INSERT INTO template.residencies_residency SELECT * FROM public.residencies_residency;
+INSERT INTO template.residencies_residencycontact SELECT * FROM public.residencies_residencycontact;
+
+-- Copy user_2 private data
+INSERT INTO user_2.performances_performance 
+SELECT * FROM public.performances_performance WHERE profile_id = 2;
+
+INSERT INTO user_2.performances_dossier 
+SELECT * FROM public.performances_dossier 
+WHERE performance_id IN (SELECT id FROM public.performances_performance WHERE profile_id = 2);
+
+INSERT INTO user_2.applications_application 
+SELECT * FROM public.applications_application WHERE profile_id = 2;
+
+INSERT INTO user_2.applications_application_performances 
+SELECT * FROM public.applications_application_performances 
+WHERE application_id IN (SELECT id FROM public.applications_application WHERE profile_id = 2);
+Step 7: Verify Data
+Check the INSERT counts match your expectations:
+
+Venues: ~187
+Festivals: ~361
+Residencies: ~6
+Performances: 4
+Applications: 129
+
+Notes for Production
+
+Replace philippe with production PostgreSQL username
+Replace clapp with production database name
+Make sure data_dump.json contains your production data
+Middleware will auto-create schemas for new users via the signal handler
