@@ -11,6 +11,18 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
+def send_registration_confirmation_email(email: str):
+    logger.info(f"Sending confirmation email to {email}")
+    send_mail(
+        "Welcome! Please confirm your email",
+        "CONFIRMATION URL GOES HERE",
+        "info@philippeducasse.com",
+        [email],
+        fail_silently=False,
+    )
+
+
+@shared_task
 def check_and_set_reminders() -> int:
     """
     Check for due reminders and send notifications.
