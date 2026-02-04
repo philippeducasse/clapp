@@ -12,7 +12,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 FROM base AS build
-ARG NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+ARG NEXT_PUBLIC_BACKEND_URL
 # ARG BACKEND_URL=http://localhost:8000
 WORKDIR ${APP_HOME}
 COPY --from=deps /app/node_modules ./node_modules

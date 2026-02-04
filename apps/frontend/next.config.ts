@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   output: "standalone",
   async rewrites() {
-    const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
-    console.log("🔧 Next.js rewrites using BACKEND_URL:", backendUrl);
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+    console.log("🔧 Next.js rewrites using NEXT_PUBLIC_BACKEND_URL:", process.env.NEXT_PUBLIC_BACKEND_URL);
     return [
       {
         source: "/api/:path(.*)",
