@@ -12,7 +12,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 const Navbar = () => {
   const confirmLogout = async () => {
     await profileApiService.logout();
-    router.push("/");
+    router.push("/login");
   };
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
