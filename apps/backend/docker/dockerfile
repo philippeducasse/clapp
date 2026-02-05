@@ -19,7 +19,6 @@ FROM base AS build
 WORKDIR ${APP_HOME}
 
 COPY . .
-# RUN .venv/bin/python manage.py collectstatic --noinput
 
 FROM base AS run
 WORKDIR ${APP_HOME}
@@ -33,14 +32,31 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-
 RUN addgroup --system --gid 999 django && \
     adduser --system --uid 999 --gid 999 django
 
-COPY --from=deps --chown=django:django /app/.venv ./.venv
+# Copy venv and strip unnecessary files
+COPY --from=deps /app/.venv /app/.venv
+RUN find /app/.venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
+    find /app/.venv -type f -name '*.pyc' -delete && \
+    find /app/.venv -type f -name '*.pyo' -delete && \
+    find /app/.venv -type f -name '*.dist-info/RECORD' -delete
+
+# Copy entrypoint scripts
 COPY --from=build --chown=django:django /app/docker/entrypoint.sh .
 COPY --from=build --chown=django:django /app/docker/entrypoint-celery.sh .
-COPY --from=build --chown=django:django /app .
+
+# Copy Django application
+COPY --from=build --chown=django:django /app/manage.py .
+COPY --from=build --chown=django:django /app/clapp_backend ./clapp_backend
+COPY --from=build --chown=django:django /app/conf ./conf
+COPY --from=build --chown=django:django /app/applications ./applications
+COPY --from=build --chown=django:django /app/organisations ./organisations
+COPY --from=build --chown=django:django /app/performances ./performances
+COPY --from=build --chown=django:django /app/profiles ./profiles
+COPY --from=build --chown=django:django /app/services ./services
+COPY --from=build --chown=django:django /app/support ./support
+
 
 RUN chmod +x /app/entrypoint.sh /app/entrypoint-celery.sh
 
