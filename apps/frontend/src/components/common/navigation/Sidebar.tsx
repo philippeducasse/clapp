@@ -7,7 +7,7 @@ import {
   University,
   Theater,
   Bug,
-  PersonStanding,
+  UserRound,
 } from "lucide-react";
 
 import {
@@ -66,7 +66,7 @@ const items = [
   {
     title: "Profile",
     url: "/profile",
-    icon: PersonStanding,
+    icon: UserRound,
   },
 ];
 
