@@ -25,3 +25,6 @@ CELERY_RESULT_BACKEND = "cache+memory://"
 
 os.environ["GEMINI_API_KEY"] = "dummy_key_for_testing"
 os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
+
+# Never use tenant partitioning in tests
+ENVIRONMENT = "test"
