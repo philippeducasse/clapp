@@ -56,7 +56,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     spoken_languages = serializers.ListField(
         child=serializers.CharField(), required=False, allow_empty=True
     )
-    email_templates = EmailTemplateSerializer(many=True)
+    email_templates = EmailTemplateSerializer(many=True, required=False, allow_blank=True)
     personal_website = NormalizedURLField(required=False, allow_blank=True)
     instagram_profile = NormalizedURLField(required=False, allow_blank=True)
     facebook_profile = NormalizedURLField(required=False, allow_blank=True)
