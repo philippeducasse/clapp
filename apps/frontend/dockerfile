@@ -18,18 +18,17 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # nextjs default data collection disabled
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
 ENV NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
-# ENV BACKEND_URL=${BACKEND_URL}
 
 RUN npm run build 
 
 FROM base AS run
 WORKDIR ${APP_HOME}
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -45,7 +44,7 @@ USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
+ENV PORT=3000
 
 ENV HOSTNAME "0.0.0.0"
 
