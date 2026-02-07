@@ -9,15 +9,10 @@ const getFullUrl = (url: string): string => {
   // SSR: use internal Docker network URL (server-side only env var)
   // Browser: use relative URL (Next.js rewrites will proxy to backend)
   const baseUrl =
-    typeof window === "undefined" ? process.env.BACKEND_URL || "http://localhost:8000" : "";
-  console.log(
-    "BASE URL: ",
-    baseUrl,
-    "BACKEND_URL: ",
-    process.env.BACKEND_URL,
-    "PUBLIC_BACKEND_URL ",
-    process.env.NEXT_PUBLIC_BACKEND_URL,
-  );
+    typeof window === "undefined"
+      ? process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
+      : "";
+  console.log("BASE URL: ", baseUrl, "PUBLIC_BACKEND_URL ", process.env.NEXT_PUBLIC_BACKEND_URL);
   return `${baseUrl}${url}`;
 };
 
