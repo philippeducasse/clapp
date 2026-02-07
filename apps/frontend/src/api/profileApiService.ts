@@ -31,8 +31,8 @@ const update = async (profile: Partial<Profile>): Promise<Profile> => {
   );
 };
 
-const login = async (credentials: Credentials) => {
-  return await sendRequest(
+const login = async (credentials: Credentials): Promise<Profile> => {
+  return await sendRequest<Credentials, Profile>(
     `${endpoint}/login/`,
     credentials,
     "POST",

@@ -173,7 +173,7 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   }
 
   // Convert camelCase body to snake_case for backend
-  let body: FormData | string | null | undefined = options.body;
+  let body: BodyInit | null | undefined = options.body;
 
   if (body instanceof FormData) {
     // Convert FormData field names to snake_case

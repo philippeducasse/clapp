@@ -19,7 +19,7 @@ export interface EntityApiService<T> {
   ) => Promise<{ message: string; applicationId: number } | ApplicationCreate>;
   generateEmail: (
     entityId: number,
-    data: { profile: Profile; selectedPerformanceIds?: number[]; language: string },
+    data?: { profile: Profile; selectedPerformanceIds?: number[]; language?: string },
   ) => Promise<{ message: string }>;
 }
 
@@ -33,4 +33,5 @@ export interface GetAllParams {
   limit?: number;
   search?: string;
   filters?: Record<string, unknown>;
+  columnFilters?: Record<string, unknown>;
 }

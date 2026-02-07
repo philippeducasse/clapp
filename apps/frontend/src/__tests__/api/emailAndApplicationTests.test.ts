@@ -212,7 +212,7 @@ describe("Email and Application Functionality", () => {
         "POST",
         "Application successfully sent",
       );
-      expect(result.applicationId).toBe(42);
+      expect((result as { applicationId: number }).applicationId).toBe(42);
     });
 
     it("should apply to festival with multiple attachments", async () => {
@@ -230,8 +230,7 @@ describe("Email and Application Functionality", () => {
         emailSubject: "Performance Application",
         message: "Please review my attached materials",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "All files uploaded successfully",
@@ -253,7 +252,7 @@ describe("Email and Application Functionality", () => {
         "POST",
         "Application successfully sent",
       );
-      expect(result.applicationId).toBe(43);
+      expect((result as { applicationId: number }).applicationId).toBe(43);
     });
 
     it("should apply to festival without attachments", async () => {
@@ -284,7 +283,7 @@ describe("Email and Application Functionality", () => {
         "POST",
         "Application successfully sent",
       );
-      expect(result.applicationId).toBe(44);
+      expect((result as { applicationId: number }).applicationId).toBe(44);
     });
 
     it("should apply with selected performances in email", async () => {
@@ -299,8 +298,7 @@ describe("Email and Application Functionality", () => {
         applicationMethod: ApplicationMethod.EMAIL,
         message: "Applying with specific performances",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Application with performances sent",
@@ -309,7 +307,7 @@ describe("Email and Application Functionality", () => {
 
       const result = await festivalApiService.apply(1, application, [mockFile], "attachments");
 
-      expect(result.applicationId).toBe(45);
+      expect((result as { applicationId: number }).applicationId).toBe(45);
     });
   });
 
@@ -327,8 +325,7 @@ describe("Email and Application Functionality", () => {
         emailSubject: "Residency Application",
         message: "Applying for artistic residency",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Residency application sent",
@@ -345,7 +342,7 @@ describe("Email and Application Functionality", () => {
         "POST",
         "Application successfully sent",
       );
-      expect(result.applicationId).toBe(50);
+      expect((result as { applicationId: number }).applicationId).toBe(50);
     });
 
     it("should apply to residency without files", async () => {
@@ -394,8 +391,7 @@ describe("Email and Application Functionality", () => {
         emailSubject: "Performance Booking Inquiry",
         message: "Interested in performing at your venue",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Booking inquiry sent",
@@ -429,8 +425,7 @@ describe("Email and Application Functionality", () => {
         emailSubject: "Street Performance at Your Venue",
         message: "See attached media of my performance",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-16T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Media files received",
@@ -456,8 +451,7 @@ describe("Email and Application Functionality", () => {
         emailSubject: "Application with Custom Recipients",
         message: "Message",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Application sent to custom recipients",
@@ -466,7 +460,7 @@ describe("Email and Application Functionality", () => {
 
       const result = await festivalApiService.apply(1, application, [], "attachments");
 
-      expect(result.applicationId).toBe(70);
+      expect((result as { applicationId: number }).applicationId).toBe(70);
     });
 
     it("should handle large file uploads", async () => {
@@ -483,8 +477,7 @@ describe("Email and Application Functionality", () => {
         applicationMethod: ApplicationMethod.EMAIL,
         message: "Application with large file",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Large file processed",
@@ -494,7 +487,7 @@ describe("Email and Application Functionality", () => {
       const result = await festivalApiService.apply(1, application, [largeFile], "attachments");
 
       expect(mockSendFormDataRequest).toHaveBeenCalled();
-      expect(result.applicationId).toBe(71);
+      expect((result as { applicationId: number }).applicationId).toBe(71);
     });
 
     it("should handle application with rich text message", async () => {
@@ -509,8 +502,7 @@ describe("Email and Application Functionality", () => {
         message:
           "<p>Dear Festival Organizers,</p><p>I am a <b>professional performer</b> with <i>20 years</i> of experience...</p>",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Rich text message received",
@@ -520,7 +512,7 @@ describe("Email and Application Functionality", () => {
       const result = await festivalApiService.apply(1, application, [], "attachments");
 
       expect(mockSendFormDataRequest).toHaveBeenCalled();
-      expect(result.applicationId).toBe(72);
+      expect((result as { applicationId: number }).applicationId).toBe(72);
     });
 
     it("should apply with FORM method instead of EMAIL", async () => {
@@ -533,8 +525,7 @@ describe("Email and Application Functionality", () => {
         applicationMethod: ApplicationMethod.FORM,
         message: "Form submission",
         status: ApplicationStatus.APPLIED,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Form application received",
@@ -544,7 +535,7 @@ describe("Email and Application Functionality", () => {
       const result = await festivalApiService.apply(1, application, [], "attachments");
 
       expect(mockSendFormDataRequest).toHaveBeenCalled();
-      expect(result.applicationId).toBe(73);
+      expect((result as { applicationId: number }).applicationId).toBe(73);
     });
 
     it("should handle application DRAFT status", async () => {
@@ -557,8 +548,7 @@ describe("Email and Application Functionality", () => {
         applicationMethod: ApplicationMethod.EMAIL,
         message: "Draft application",
         status: ApplicationStatus.DRAFT,
-        createdAt: "2024-01-15T10:00:00Z",
-      };
+              };
 
       mockSendFormDataRequest.mockResolvedValue({
         message: "Draft saved",
@@ -567,7 +557,7 @@ describe("Email and Application Functionality", () => {
 
       const result = await festivalApiService.apply(1, application, [], "attachments");
 
-      expect(result.applicationId).toBe(74);
+      expect((result as { applicationId: number }).applicationId).toBe(74);
     });
   });
 
