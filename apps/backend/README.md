@@ -21,3 +21,16 @@ django@6d8a3cbddea5:/$ du -sh /app/.venv/lib/python3.12/site-packages/\* | sort 
 1.7M /app/.venv/lib/python3.12/site-packages/prompt_toolkit
 1016K /app/.venv/lib/python3.12/site-packages/pyasn1_modules
 900K /app/.venv/lib/python3.12/site-packages/kombu
+
+# build image
+
+docker build -f docker/dockerfile -t pducasse/clapp_backend:latest .
+
+# Push to Docker Hub
+
+docker push pducasse/clapp_backend:latest
+
+# loading postgres into container:
+
+docker cp data_dump.json clapp-django-1:/app/data_dump.json
+docker compose exec django python manage.py loaddata /app/data_dump.json
