@@ -32,7 +32,7 @@ const LoginForm = () => {
     setIsLoading(true);
     try {
       await profileApiService.login(prepareFormDataForSubmission(values) as unknown as Credentials);
-      router.push(`/`);
+      router.push(`/dashboard`);
     } catch (error) {
       console.error(error);
     } finally {
