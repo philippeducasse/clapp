@@ -36,19 +36,21 @@ else:
     }
 
 # Cache
-CACHE_BACKEND = os.getenv("CACHE_BACKEND", "django_redis.cache.RedisCache")
-CACHE_LOCATION = os.getenv("CACHE_LOCATION", "redis://127.0.0.1:6379/1")
+CACHE_BACKEND = os.getenv("CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache")
+CACHE_LOCATION = os.getenv("CACHE_LOCATION", "unique-snowflake")
 
 CACHES = {
     "default": {
         "BACKEND": CACHE_BACKEND,
         "LOCATION": CACHE_LOCATION,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
         "KEY_PREFIX": "cab",
     }
 }
+
+if CACHE_BACKEND == "django_redis.cache.RedisCache":
+    CACHES["default"]["OPTIONS"] = {
+        "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    }
 
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
