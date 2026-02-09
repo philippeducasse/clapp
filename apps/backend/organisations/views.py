@@ -16,8 +16,7 @@ from organisations.festivals.models import Festival, FestivalContact
 from organisations.residencies.models import Residency, ResidencyContact
 from organisations.venues.models import Venue, VenueContact
 from performances.models import Performance
-from services.gemini_service import GeminiClient
-from services.mistral_service import MistralClient
+from services.mistral_service import MistralClient, ConversationResponse
 
 from .models import Organisation
 from .services import (
@@ -28,6 +27,7 @@ from .services import (
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
+    extract_search_results,
 )
 from .utils import clean_organisation_data, extract_fields_from_llm
 
@@ -115,12 +115,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             self._mistral_client = MistralClient()
         return self._mistral_client
 
-    @property
-    def gemini_client(self) -> GeminiClient:
-        if self._gemini_client is None:
-            self._gemini_client = GeminiClient()
-        return self._gemini_client
-
     def get_organisation_type_name(self) -> str:
         """
         Override in subclasses to return the organisation type name.
@@ -189,9 +183,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         org_type = self.get_organisation_type_name()
 
         query = f"{organisation.website_url} {organisation.name} {organisation.country} {datetime.now().year} {org_type}"
-        search_results = self.gemini_client.search(query, request.user.id)
+        # search_results = self.gemini_client.search(query, request.user.id)
+
+        search_results: ConversationResponse = self.mistral_client.search(query=query)
+        parsed_results: str = extract_search_results(search_results)
+
         logger.info("SEARCH: %s", search_results)
-        prompt: str = self.get_enrich_prompt(organisation, search_results)
+        prompt: str = self.get_enrich_prompt(organisation, parsed_results)
         logger.info("prompt: %s", prompt)
 
         # TODO: after postgres migration, change to tenant_schema

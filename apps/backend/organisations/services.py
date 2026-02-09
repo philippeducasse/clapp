@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from django.utils.html import strip_tags
+from mistralai import ConversationResponse, TextChunk
 
 from applications.models import Application
 from organisations.models import Organisation
@@ -382,6 +383,17 @@ def generate_application_mail_prompt(
         {performances[0].email_prompt if len(performances) == 1 else chr(10).join([f"For {p.performance_title}:" + chr(10) + p.email_prompt for p in performances if hasattr(p, "email_prompt") and p.email_prompt])}
         """
     return prompt.strip()
+
+
+def extract_search_results(search_results: ConversationResponse):
+    content = next((o for o in search_results.outputs if o.type == "message.output"), None)
+    # print("content", content)
+
+    chunks = getattr(content, "content", [])
+
+    parsed_text = " ".join(chunk.text for chunk in chunks if isinstance(chunk, TextChunk))
+
+    return parsed_text
 
 
 def create_form_application(
