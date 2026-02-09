@@ -1,5 +1,4 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export const middleware = (request: NextRequest) => {
   const sessionid = request.cookies.get("sessionid");
@@ -10,10 +9,9 @@ export const middleware = (request: NextRequest) => {
   if (!sessionid && !pathname.startsWith("/login") && !pathname.startsWith("/register")) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
-
   return NextResponse.next();
 };
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|logo.png).*)"],
 };
