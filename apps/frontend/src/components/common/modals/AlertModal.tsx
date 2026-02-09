@@ -82,7 +82,7 @@ export const AlertModal = ({
 
         <div className="px-6 py-8">
           <div className={`rounded-lg p-4 mb-6`}>
-            <DialogDescription className="text-center text-base text-gray-800">
+            <DialogDescription className="text-center text-base text-foreground">
               {description}
             </DialogDescription>
           </div>
