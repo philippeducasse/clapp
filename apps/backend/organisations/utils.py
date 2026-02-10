@@ -2,6 +2,7 @@ from typing import Dict, Any
 from organisations.models import Organisation
 import json
 import re
+from urllib.parse import urlparse
 
 
 def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
@@ -47,3 +48,16 @@ def clean_organisation_data(organisation: Organisation) -> None:
         if not desc.endswith("."):
             desc += "."
         organisation.description = desc
+
+
+def normalize_domain(url: str) -> str:
+    if not url:
+        return ""
+
+    if not url.startswith(("http://", "https://")):
+        url = f"https://{url}"
+
+    parsed = urlparse(url.lower())
+    domain = parsed.netloc or parsed.path.split("/")[0]
+
+    return domain.replace("www", "")

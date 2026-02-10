@@ -29,7 +29,7 @@ from .services import (
     validate_application_recipients,
     extract_search_results,
 )
-from .utils import clean_organisation_data, extract_fields_from_llm
+from .utils import clean_organisation_data, extract_fields_from_llm, normalize_domain
 
 logger = logging.getLogger(__name__)
 
@@ -442,108 +442,116 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             "errors": [],
         }
 
-        def get_case_insensitive(d: Dict[str, str], key: str, default: str = "") -> str:
-            """Get value from dict with case-insensitive key lookup."""
+        type_config = {
+            "festival": {
+                "model": Festival,
+                "contact_model": FestivalContact,
+                "contact_fk": "festival",
+                "stats_key": "festivals",
+            },
+            "residency": {
+                "model": Residency,
+                "contact_model": ResidencyContact,
+                "contact_fk": "residency",
+                "stats_key": "residencies",
+            },
+            "venue": {
+                "model": Venue,
+                "contact_model": VenueContact,
+                "contact_fk": "venue",
+                "stats_key": "venues",
+            },
+        }
+
+        def get_cell(row_dict: Dict[str, str], key: str, default: str = "") -> str:
+            """Get value from row dict with case-insensitive key lookup."""
             key_lower = key.lower()
-            for k, v in d.items():
+            for k, v in row_dict.items():
                 if k.lower() == key_lower:
                     return str(v or "").strip()
             return default
+
+        def domain_exists(model_class, website: str, index: int) -> bool:
+            if not website:
+                return False
+            normalized_domain = normalize_domain(website)
+            if model_class.objects.filter(website_url__icontains=normalized_domain).exists():
+                logger.info(
+                    f"Row {index}: {model_class._meta.object_name} with domain '{normalized_domain}' already exists"
+                )
+                return True
+            return False
+
+        def resolve_org_type(name: str, organisation_type: str) -> str | None:
+            if "festival" in name or organisation_type == "festival":
+                return "festival"
+            if "residenc" in name or "residenc" in organisation_type:
+                return "residency"
+            if organisation_type == "venue":
+                return "venue"
+            return None
 
         try:
             for index, row in df.iterrows():
                 try:
                     row_dict = {k.lower(): v for k, v in row.to_dict().items()}
 
-                    name = get_case_insensitive(row_dict, "name").lower()
-                    organisation_type = get_case_insensitive(
-                        row_dict, "type", get_case_insensitive(row_dict, "event_type")
+                    name = get_cell(row_dict, "name").lower()
+                    organisation_type = get_cell(
+                        row_dict, "type", get_cell(row_dict, "event_type")
                     ).lower()
 
                     if not name:
                         continue
 
-                    contact_email = get_case_insensitive(row_dict, "email")
-                    contact_person = get_case_insensitive(row_dict, "contact")
-                    country = get_case_insensitive(row_dict, "country")
-                    website = get_case_insensitive(row_dict, "website")
-                    date_str = get_case_insensitive(row_dict, "date")
-                    comments = get_case_insensitive(row_dict, "comments")
+                    resolved_type = resolve_org_type(name, organisation_type)
+                    if not resolved_type:
+                        error_msg = f"Row {index}: Invalid organisation type: {organisation_type}"
+                        logger.error(error_msg)
+                        stats["errors"].append(error_msg)
+                        continue
 
-                    if (
-                        organisation_type == "festival"
-                        or organisation_type == "juggling convention"
-                    ):
-                        if Festival.objects.filter(name__iexact=name).exists():
-                            logger.info(f"Row {index}: Festival '{name}' already exists")
-                            stats["festivals_skipped"] += 1
-                            continue
+                    config = type_config[resolved_type]
+                    model_class = config["model"]
+                    stats_key = config["stats_key"]
 
-                        festival = Festival(
-                            name=name,
-                            country=country,
-                            website_url=website,
-                            approximate_date=date_str,
-                            comments=comments,
+                    contact_email = get_cell(row_dict, "email")
+                    contact_person = get_cell(row_dict, "contact")
+                    country = get_cell(row_dict, "country")
+                    website = get_cell(row_dict, "website")
+                    date_str = get_cell(row_dict, "date")
+                    comments = get_cell(row_dict, "comments")
+
+                    if model_class.objects.filter(name__iexact=name).exists():
+                        logger.info(f"Row {index}: {resolved_type} '{name}' already exists")
+                        stats[f"{stats_key}_skipped"] += 1
+                        continue
+
+                    if domain_exists(model_class, website, index):
+                        stats[f"{stats_key}_skipped"] += 1
+                        continue
+
+                    fields = {
+                        "name": name,
+                        "country": country,
+                        "website_url": website,
+                        "comments": comments,
+                    }
+                    if model_class != Venue:
+                        fields["approximate_date"] = date_str
+
+                    org = model_class(**fields)
+                    org.save()
+
+                    if contact_email:
+                        config["contact_model"].objects.create(
+                            name=contact_person,
+                            email=contact_email,
+                            **{config["contact_fk"]: org},
                         )
-                        festival.save()
 
-                        if contact_email:
-                            FestivalContact.objects.create(
-                                name=contact_person,
-                                email=contact_email,
-                                festival=festival,
-                            )
-
-                        logger.info(f"Imported Festival: {festival.name}")
-                        stats["festivals_imported"] += 1
-
-                    elif "residenc" in name or "residenc" in organisation_type:
-                        if Residency.objects.filter(name__iexact=name).exists():
-                            logger.info(f"Row {index}: Residency '{name}' already exists")
-                            stats["residencies_skipped"] += 1
-                            continue
-
-                        residency = Residency(
-                            name=name,
-                            country=country,
-                            website_url=website,
-                            approximate_date=date_str,
-                            comments=comments,
-                        )
-                        residency.save()
-
-                        if contact_email:
-                            ResidencyContact.objects.create(
-                                name=contact_person,
-                                email=contact_email,
-                                residency=residency,
-                            )
-
-                        logger.info(f"Imported Residency: {residency.name}")
-                        stats["residencies_imported"] += 1
-
-                    else:
-                        if Venue.objects.filter(name__iexact=name).exists():
-                            logger.info(f"Row {index}: Venue '{name}' already exists")
-                            stats["venues_skipped"] += 1
-                            continue
-
-                        venue = Venue(
-                            name=name,
-                            country=country,
-                            website_url=website,
-                            comments=comments,
-                        )
-                        venue.save()
-
-                        if contact_email:
-                            VenueContact.objects.create(
-                                name=contact_person, email=contact_email, venue=venue
-                            )
-
-                        logger.info(f"Imported Venue: {venue.name}")
-                        stats["venues_imported"] += 1
+                    logger.info(f"Imported {resolved_type}: {org.name}")
+                    stats[f"{stats_key}_imported"] += 1
 
                 except Exception as e:
                     error_msg = f"Row {index}: {str(e)}"
