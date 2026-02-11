@@ -27,7 +27,7 @@ def festival(db):
         country="France",
         town="Paris",
         festival_type="STREET",
-        website_url="https://testfestival.com",
+        website_url="https://festival.com",
         start_date=date(2025, 7, 15),
         end_date=date(2025, 7, 20),
         application_type="EMAIL",
