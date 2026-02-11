@@ -37,14 +37,13 @@ export const getApplicationFormFields = (
   applicationMethod: ApplicationMethod,
   profile: Profile,
   dossiers: Dossier[],
-  emailTemplates: EmailTemplate[] = []
+  emailTemplates: EmailTemplate[] = [],
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
   const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
   const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
-  console.log("emailtemp0", emailTemplateOptions);
   const emailApplicationFields: ControlledFormElement[] = [
     {
       label: "Email subject",
@@ -124,8 +123,8 @@ export const getApplicationFormFields = (
         applicationMethod === ApplicationMethod.FORM
           ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."
           : applicationMethod === ApplicationMethod.UNKNOWN
-          ? "Please check the organisation website before you submit an application"
-          : "",
+            ? "Please check the organisation website before you submit an application"
+            : "",
     },
     {
       label: "Performance(s)",

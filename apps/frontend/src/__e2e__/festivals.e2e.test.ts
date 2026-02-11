@@ -145,19 +145,26 @@ describe("E2E: Festivals and Applications", () => {
     });
     const profile = await profileResponse.json();
 
-    // Create application
-    const formData = new FormData();
-    formData.append("profile", profile.id.toString());
-    formData.append("organisation_type", "Festival");
-    formData.append("email_subject", "E2E Test Application");
-    formData.append("message", "Testing application submission via E2E tests");
-    formData.append("application_date", new Date().toISOString().split("T")[0]);
-    formData.append("email_recipients", profile.email); // At least one recipient required
-
+    // Create application using JSON format
     const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/apply/`, {
       method: "POST",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        profile: profile.id,
+        organisationType: "Festival",
+        emailSubject: "E2E Test Application",
+        message: "Testing application submission via E2E tests",
+        applicationDate: new Date().toISOString().split("T")[0],
+        recipients: "test@test.com" + ",test@festival.com",
+      }),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Application creation failed:", errorData);
+    }
 
     expect(response.ok).toBe(true);
     const data = await response.json();

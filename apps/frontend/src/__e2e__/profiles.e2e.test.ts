@@ -77,16 +77,21 @@ describe("E2E: Profiles and Performances", () => {
         body: JSON.stringify({
           id: profile.id,
           email: profile.email,
-          instagramProfile: "@testuser",
-          facebookProfile: "testuser",
-          youtubeProfile: "TestUserChannel",
-          tiktokProfile: "@testuser",
+          instagramProfile: "https://instagram.com/testuser",
+          facebookProfile: "https://facebook.com/testuser",
+          youtubeProfile: "https://youtube.com/@TestUserChannel",
+          tiktokProfile: "https://tiktok.com/@testuser",
         }),
       });
 
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        console.error("Profile update failed:", errorData);
+      }
+
       expect(updateResponse.ok).toBe(true);
       const updated = await updateResponse.json();
-      expect(updated.instagramProfile).toBe("@testuser");
+      expect(updated.instagramProfile).toBe("https://instagram.com/testuser");
     });
   });
 
@@ -134,7 +139,7 @@ describe("E2E: Profiles and Performances", () => {
         const created = await response.json();
         expect(created.id).toBeDefined();
         expect(created.performanceTitle).toBe("E2E Test Performance");
-        trackEntity('performance', created.id);
+        trackEntity("performance", created.id);
       } else {
         console.log(`Skipping: API returned ${response.status}`);
       }
@@ -160,7 +165,7 @@ describe("E2E: Profiles and Performances", () => {
         const created = await response.json();
         expect(created.id).toBeDefined();
         expect(created.performanceTitle).toBe("E2E Performance with Dossier");
-        trackEntity('performance', created.id);
+        trackEntity("performance", created.id);
       } else {
         console.log(`Skipping: API returned ${response.status}`);
       }
@@ -215,7 +220,7 @@ describe("E2E: Profiles and Performances", () => {
 
       const created = await createResponse.json();
       const performanceId = created.id;
-      trackEntity('performance', performanceId);
+      trackEntity("performance", performanceId);
 
       // Update it
       const updateResponse = await fetchWithAuth(`${API_BASE}/performances/${performanceId}/`, {

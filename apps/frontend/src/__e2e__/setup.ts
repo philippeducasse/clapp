@@ -21,6 +21,7 @@ export const TEST_USER = {
   password: "TestPassword123!",
   firstName: "Test",
   lastName: "User",
+  emailHost: "GMAIL",
 };
 
 export const TEST_USER_2 = {
@@ -28,6 +29,7 @@ export const TEST_USER_2 = {
   password: "TestPassword123!",
   firstName: "Test",
   lastName: "User2",
+  emailHost: "GMAIL",
 };
 
 // Store cookies and CSRF token between requests
@@ -60,28 +62,40 @@ export const waitForBackend = async (maxAttempts = 30, delayMs = 1000) => {
 
 // Helper to extract and store cookies from response
 const handleCookies = (response: Response) => {
-  const setCookieHeader = response.headers.get("set-cookie");
-  if (setCookieHeader) {
-    // Django sends multiple Set-Cookie headers, need to parse them
-    const cookies = setCookieHeader.split(",").map((c) => c.trim());
+  // Get all Set-Cookie headers - use getSetCookie() for Node.js 18.17+
+  let setCookieHeaders: string[] = [];
 
-    cookies.forEach((cookieStr) => {
-      // Extract session id from Set-Cookie header
-      const sessionMatch = cookieStr.match(/sessionid=([^;]+)/);
-      if (sessionMatch) {
-        globalCookies = [`sessionid=${sessionMatch[1]}`];
-        console.log("✓ Session cookie stored");
-      }
-
-      // Extract CSRF token from Set-Cookie header
-      const csrfMatch = cookieStr.match(/csrftoken=([^;]+)/);
-      if (csrfMatch) {
-        csrfToken = csrfMatch[1];
-        globalCookies.push(`csrftoken=${csrfMatch[1]}`);
-        console.log("✓ CSRF token stored");
-      }
-    });
+  // Try the modern getSetCookie() method first (Node.js 18.17+)
+  if (typeof response.headers.getSetCookie === "function") {
+    setCookieHeaders = response.headers.getSetCookie();
+  } else {
+    // Fallback for older Node.js versions
+    const setCookieHeader = response.headers.get("set-cookie");
+    if (setCookieHeader) {
+      setCookieHeaders = [setCookieHeader];
+    }
   }
+
+  setCookieHeaders.forEach((cookieStr) => {
+    // Extract session id from Set-Cookie header
+    const sessionMatch = cookieStr.match(/sessionid=([^;]+)/);
+    if (sessionMatch) {
+      // Remove existing sessionid if present, then add new one
+      globalCookies = globalCookies.filter((c) => !c.startsWith("sessionid="));
+      globalCookies.push(`sessionid=${sessionMatch[1]}`);
+      console.log("✓ Session cookie stored");
+    }
+
+    // Extract CSRF token from Set-Cookie header
+    const csrfMatch = cookieStr.match(/csrftoken=([^;]+)/);
+    if (csrfMatch) {
+      csrfToken = csrfMatch[1];
+      // Remove existing csrftoken if present, then add new one
+      globalCookies = globalCookies.filter((c) => !c.startsWith("csrftoken="));
+      globalCookies.push(`csrftoken=${csrfMatch[1]}`);
+      console.log("✓ CSRF token stored");
+    }
+  });
 };
 
 // Helper to login and get session cookie
@@ -89,6 +103,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
   console.log(`\nLogging in as ${credentials.email}...`);
 
   // First, make a GET request to establish CSRF cookie (Django requirement)
+  console.log("  → Requesting CSRF token...");
   const getResponse = await fetch(`${API_BASE}/profiles/me/`, {
     method: "GET",
     headers: {
@@ -98,6 +113,8 @@ export const loginTestUser = async (credentials = TEST_USER) => {
 
   // Extract CSRF cookie from initial request
   handleCookies(getResponse);
+  console.log(`  → CSRF Token: ${csrfToken ? csrfToken.substring(0, 10) + "..." : "NOT SET"}`);
+  console.log(`  → Cookies: [${globalCookies.join(", ")}]`);
 
   // Now login with the CSRF cookie
   const response = await fetch(`${API_BASE}/profiles/login/`, {
@@ -107,10 +124,12 @@ export const loginTestUser = async (credentials = TEST_USER) => {
       Cookie: globalCookies.join("; "),
       "X-CSRFToken": csrfToken,
     },
-    body: JSON.stringify(transformKeysToSnakeCase({
-      email: credentials.email,
-      password: credentials.password,
-    })),
+    body: JSON.stringify(
+      transformKeysToSnakeCase({
+        email: credentials.email,
+        password: credentials.password,
+      }),
+    ),
   });
 
   // Store cookies from login response
@@ -134,10 +153,12 @@ export const logoutTestUser = async () => {
     method: "POST",
     headers: {
       Cookie: globalCookies.join("; "),
+      "X-CSRFToken": csrfToken,
     },
   });
 
   globalCookies = [];
+  csrfToken = "";
 };
 
 // Wrapper Response class that auto-converts snake_case to camelCase
@@ -154,7 +175,7 @@ const convertFormDataToSnakeCase = (formData: FormData): FormData => {
   formData.forEach((value, key) => {
     // Simple camelCase to snake_case conversion for FormData keys
     const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
-    console.log(`  FormData: ${key} → ${snakeKey}`);
+    console.log(`  FormData: ${key} → ${snakeKey} = ${value}`);
     newFormData.append(snakeKey, value);
   });
   return newFormData;
@@ -163,6 +184,11 @@ const convertFormDataToSnakeCase = (formData: FormData): FormData => {
 // Helper to make authenticated requests with auto serialization
 export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const headers = new Headers(options.headers || {});
+
+  console.log(`  → ${options.method} ${url}`);
+  if (options.headers) {
+    console.log(`  Headers:`, options.headers);
+  }
 
   // Add cookies for authentication
   headers.set("Cookie", globalCookies.join("; "));
@@ -178,11 +204,17 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   if (body instanceof FormData) {
     // Convert FormData field names to snake_case
     body = convertFormDataToSnakeCase(body);
-  } else if (body && typeof body === "string" && headers.get("Content-Type")?.includes("application/json")) {
+  } else if (
+    body &&
+    typeof body === "string" &&
+    headers.get("Content-Type")?.includes("application/json")
+  ) {
     // Convert JSON body
     try {
       const parsed = JSON.parse(body);
+      console.log(`  JSON body before conversion:`, parsed);
       const converted = transformKeysToSnakeCase(parsed);
+      console.log(`  JSON body after conversion:`, converted);
       body = JSON.stringify(converted);
     } catch {
       // If not JSON, leave as is
