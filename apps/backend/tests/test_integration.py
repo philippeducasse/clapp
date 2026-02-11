@@ -351,24 +351,28 @@ class TestFestivalEnrichmentIntegration:
     """Tst festival enrichment with LLM services (still mocked, but integrated)"""
 
     @patch("organisations.views.MistralClient")
-    @patch("organisations.views.GeminiClient")
     def test_enrich_festival_updates_database_fields(
-        self, mock_gemini_client, mock_mistral_client, authenticated_client, festival
+        self, mock_mistral_client, authenticated_client, festival
     ):
         """
         Integration test: Enrichment should update festival fields in database
         based on LLM responses.
         """
-        # Mock the search service
-        mock_gemini = Mock()
-        mock_gemini.search.return_value = (
-            "Tst Festival is a renowned street arts festival in Paris, France. "
-            "It takes place annually in July and features international circus performers."
-        )
-        mock_gemini_client.return_value = mock_gemini
+        from mistralai import TextChunk
 
-        # Mock the chat service to return enriched data
+        # Mock the Mistral service (search and chat)
         mock_mistral = Mock()
+
+        # Mock search response with proper ConversationResponse structure
+        mock_text_chunk = Mock(
+            spec=TextChunk,
+            text="Tst Festival is a renowned street arts festival in Paris, France. "
+            "It takes place annually in July and features international circus performers.",
+        )
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
         mock_mistral.chat.return_value = """
         {
             "description": "A renowned street arts festival featuring international circus performers",
@@ -382,14 +386,12 @@ class TestFestivalEnrichmentIntegration:
         """
         mock_mistral_client.return_value = mock_mistral
 
-        # Store original values
-
         response = authenticated_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
 
-        # Verify LLM services were called
-        assert mock_gemini.search.called
+        # Verify Mistral service was called
+        assert mock_mistral.search.called
         assert mock_mistral.chat.called
 
         # Note: Enrichment endpoint returns data but doesn't auto-save

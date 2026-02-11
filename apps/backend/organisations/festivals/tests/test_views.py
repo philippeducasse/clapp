@@ -142,17 +142,19 @@ class TestFestivalEnrichAction:
     """Test cases for the enrich action"""
 
     @patch("organisations.views.MistralClient")
-    @patch("organisations.views.GeminiClient")
-    def test_enrich_festival_success(
-        self, mock_gemini_client, mock_mistral_client, api_client, festival
-    ):
+    def test_enrich_festival_success(self, mock_mistral_client, api_client, festival):
         """Test enriching a festival with LLM data"""
-        # Mock the clients
-        mock_gemini = Mock()
-        mock_gemini.search.return_value = "Search results about the festival"
-        mock_gemini_client.return_value = mock_gemini
+        from mistralai import TextChunk
 
+        # Mock the Mistral client
         mock_mistral = Mock()
+
+        # Mock search response with proper ConversationResponse structure
+        mock_text_chunk = Mock(spec=TextChunk, text="Search results about the festival")
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
         mock_mistral.chat.return_value = """
         {
             "description": "Enriched description",
@@ -165,12 +167,11 @@ class TestFestivalEnrichAction:
         response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
-        assert mock_gemini.search.called
+        assert mock_mistral.search.called
         assert mock_mistral.chat.called
 
     @patch("organisations.views.MistralClient")
-    @patch("organisations.views.GeminiClient")
-    def test_enrich_festival_not_found(self, mock_gemini_client, mock_mistral_client, api_client):
+    def test_enrich_festival_not_found(self, mock_mistral_client, api_client):
         """Test enriching a non-existent festival"""
         response = api_client.get("/api/festivals/9999/enrich/")
 
