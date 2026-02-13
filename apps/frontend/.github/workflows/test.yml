@@ -1,4 +1,4 @@
-name: test
+name: Run tests
 
 on: [push, pull_request]
 
@@ -37,7 +37,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
-      - name: Run e2e tests
+      - name: Run tests
         run: npm run test
 
       - name: Show Django logs on failure
