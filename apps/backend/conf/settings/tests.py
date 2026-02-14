@@ -29,3 +29,10 @@ os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
 # Never use tenant partitioning in tests
 ENVIRONMENT = "test"
 SECRET_KEY = "test-secret-key-for-ci"
+
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+EMAIL_HOST = "GMAIL"
+EMAIL_PORT = "587"
+EMAIL_USE_TLS = "True"
+EMAIL_HOST_USER = "test@test.com"
+EMAIL_HOST_PASSWORD = "TestPassword123!"
