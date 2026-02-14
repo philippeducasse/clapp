@@ -30,7 +30,7 @@ jobs:
             -e DJANGO_SETTINGS_MODULE=conf.settings.test \
             --entrypoint /bin/bash \
             ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest \
-            -c "python manage.py create_test_user && python manage.py runserver 0.0.0.0:8000"
+            -c "python manage.py migrate && python manage.py create_test_user && python manage.py runserver 0.0.0.0:8000"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
