@@ -28,3 +28,4 @@ os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
 
 # Never use tenant partitioning in tests
 ENVIRONMENT = "test"
+SECRET_KEY = "test-secret-key-for-ci"
