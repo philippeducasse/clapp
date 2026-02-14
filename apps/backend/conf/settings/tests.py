@@ -1,7 +1,18 @@
 """Test settings that override production settings for pytest"""
 
-from .base import *  # noqa
 import os
+from .base import *  # noqa
+
+os.environ["SECRET_KEY"] = "test-secret-key-for-ci"
+os.environ["ENVIRONMENT"] = "test"
+os.environ["EMAIL_BACKEND"] = "django.core.mail.backends.locmem.EmailBackend"
+os.environ["EMAIL_HOST"] = "GMAIL"
+os.environ["EMAIL_PORT"] = "587"
+os.environ["EMAIL_USE_TLS"] = "True"
+os.environ["EMAIL_HOST_USER"] = "test@test.com"
+os.environ["EMAIL_HOST_PASSWORD"] = "TestPassword123!"
+os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
+
 
 # Override database to use in-memory SQLite for tests
 DATABASES = {
@@ -12,27 +23,12 @@ DATABASES = {
     }
 }
 
-# Use Django's in-memory email backend for integration tests
-# This allows testing real email sending without mocking
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 # Celery Configuration for tests - run tasks synchronously (eager mode)
-# This allows testing Celery tasks without needing Redis or a worker
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 CELERY_BROKER_URL = "memory://"
 CELERY_RESULT_BACKEND = "cache+memory://"
-
-os.environ["GEMINI_API_KEY"] = "dummy_key_for_testing"
-os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
-
-# Never use tenant partitioning in tests
 ENVIRONMENT = "test"
 SECRET_KEY = "test-secret-key-for-ci"
-
-EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
-EMAIL_HOST = "GMAIL"
-EMAIL_PORT = "587"
-EMAIL_USE_TLS = "True"
-EMAIL_HOST_USER = "test@test.com"
-EMAIL_HOST_PASSWORD = "TestPassword123!"
