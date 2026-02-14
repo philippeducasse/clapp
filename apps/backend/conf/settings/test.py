@@ -18,7 +18,7 @@ os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "NAME": "/tmp/test_db.sqlite3",  # /tmp is a writable folder
         "ATOMIC_REQUESTS": False,
     }
 }
