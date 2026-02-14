@@ -76,7 +76,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "conf.settings.tests"
+DJANGO_SETTINGS_MODULE = "conf.settings.test"
 python_files = ["test_*.py", "*_test.py"]
 addopts = [
     "--reuse-db",
