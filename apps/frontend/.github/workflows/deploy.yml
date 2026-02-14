@@ -72,6 +72,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /path/to/your/docker-compose
+            cd ~/clapp
             docker compose pull next
             docker compose up -d next
