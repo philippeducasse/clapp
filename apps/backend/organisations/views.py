@@ -16,18 +16,18 @@ from organisations.festivals.models import Festival, FestivalContact
 from organisations.residencies.models import Residency, ResidencyContact
 from organisations.venues.models import Venue, VenueContact
 from performances.models import Performance
-from services.mistral_service import MistralClient, ConversationResponse
+from services.mistral_service import ConversationResponse, MistralClient
 
 from .models import Organisation
 from .services import (
     create_form_application,
+    extract_search_results,
     generate_application_mail_prompt,
     generate_enrich_prompt,
     get_or_create_application,
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
-    extract_search_results,
 )
 from .utils import clean_organisation_data, extract_fields_from_llm, normalize_domain
 
@@ -261,9 +261,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-        logger.debug("Validating recipients for email application")
         try:
             recipients_input = request.data.get("recipients", "")
+            logger.debug(f"Validating recipients for email application {recipients_input}")
             recipient_emails = validate_application_recipients(recipients_input)
             logger.debug(f"Valid recipients: {recipient_emails}")
         except ValueError as e:

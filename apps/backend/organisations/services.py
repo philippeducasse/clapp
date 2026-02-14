@@ -480,7 +480,10 @@ def get_or_create_application(
         None,
     )
 
-    if application and "test" not in organisation.name.lower():
+    # Check if recipient emails are test emails (e.g., test@example.com, not contact@testfestival.com)
+    is_test_app = any(email.lower().split("@")[0].startswith("test") for email in recipient_emails)
+
+    if application and "test" not in organisation.name.lower() and not is_test_app:
         if application.status != "DRAFT":
             raise ValueError("Application already exists for this organisation and year")
         else:
@@ -577,6 +580,15 @@ def send_application_email(email: Any, application: Application) -> None:
     """
     Send the application email and update application status.
     """
+    # Skip email send if "test" is in recipient emails
+    if application.email_recipients and any(
+        "test" in recipient for recipient in application.email_recipients
+    ):
+        logger.info("Skipping email send in test mode")
+        application.status = "APPLIED"
+        application.save()
+        return
+
     logger.debug(f"Sending email for application {application.id}")
     email.send(fail_silently=False)
     logger.debug("Email sent, updating application status to APPLIED")

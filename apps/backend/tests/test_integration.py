@@ -79,7 +79,7 @@ def festival(db, authenticated_user):
         country="France",
         town="Paris",
         festival_type="STREET",
-        website_url="https://testfestival.com",
+        website_url="https://festival.com",
         start_date=date(2026, 7, 15),
         end_date=date(2026, 7, 20),
         application_type="EMAIL",
@@ -351,24 +351,28 @@ class TestFestivalEnrichmentIntegration:
     """Tst festival enrichment with LLM services (still mocked, but integrated)"""
 
     @patch("organisations.views.MistralClient")
-    @patch("organisations.views.GeminiClient")
     def test_enrich_festival_updates_database_fields(
-        self, mock_gemini_client, mock_mistral_client, authenticated_client, festival
+        self, mock_mistral_client, authenticated_client, festival
     ):
         """
         Integration test: Enrichment should update festival fields in database
         based on LLM responses.
         """
-        # Mock the search service
-        mock_gemini = Mock()
-        mock_gemini.search.return_value = (
-            "Tst Festival is a renowned street arts festival in Paris, France. "
-            "It takes place annually in July and features international circus performers."
-        )
-        mock_gemini_client.return_value = mock_gemini
+        from mistralai import TextChunk
 
-        # Mock the chat service to return enriched data
+        # Mock the Mistral service (search and chat)
         mock_mistral = Mock()
+
+        # Mock search response with proper ConversationResponse structure
+        mock_text_chunk = Mock(
+            spec=TextChunk,
+            text="Tst Festival is a renowned street arts festival in Paris, France. "
+            "It takes place annually in July and features international circus performers.",
+        )
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
         mock_mistral.chat.return_value = """
         {
             "description": "A renowned street arts festival featuring international circus performers",
@@ -382,14 +386,12 @@ class TestFestivalEnrichmentIntegration:
         """
         mock_mistral_client.return_value = mock_mistral
 
-        # Store original values
-
         response = authenticated_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
 
-        # Verify LLM services were called
-        assert mock_gemini.search.called
+        # Verify Mistral service was called
+        assert mock_mistral.search.called
         assert mock_mistral.chat.called
 
         # Note: Enrichment endpoint returns data but doesn't auto-save
@@ -425,7 +427,7 @@ class TestApplicationWorkflowIntegration:
         data = {
             "message": "<p>I would like to apply to your festival with my circus act.</p>",
             "email_subject": "Application to Tst Festival 2026",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
@@ -445,7 +447,7 @@ class TestApplicationWorkflowIntegration:
         assert application.status == "APPLIED"
         assert application.message == data["message"]
         assert application.email_subject == data["email_subject"]
-        assert application.email_recipients == ["contact@testfestival.com"]
+        assert application.email_recipients == ["contact@festival.com"]
 
         # Verify GenericForeignKey relationship
         assert application.organisation == festival
@@ -465,7 +467,7 @@ class TestApplicationWorkflowIntegration:
         assert len(mail.outbox) == 1
         sent_email = mail.outbox[0]
         assert sent_email.subject == data["email_subject"]
-        assert "contact@testfestival.com" in sent_email.to
+        assert "contact@festival.com" in sent_email.to
         assert "I would like to apply" in sent_email.body
 
     def test_apply_with_performances_creates_many_to_many_relationship(
@@ -495,7 +497,7 @@ class TestApplicationWorkflowIntegration:
         data = {
             "message": "<p>Please consider my shows for your festival.</p>",
             "email_subject": "Multiple Performance Application",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
             "performances": [str(performance.id), str(performance2.id)],
         }
 
@@ -547,14 +549,14 @@ class TestApplicationWorkflowIntegration:
             status="APPLIED",
             message="First application",
             email_subject="First Subject",
-            email_recipients=["contact@testfestival.com"],
+            email_recipients=["contact@festival.com"],
         )
 
         # Try to create second application for the same year
         data = {
             "message": "<p>Second application</p>",
             "email_subject": "Second Subject",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
@@ -620,7 +622,7 @@ class TestApplicationWorkflowIntegration:
         data = {
             "message": "<p>Test message</p>",
             "email_subject": "Test Subject",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
 
         # Test applying in August (should use current year)
@@ -673,7 +675,7 @@ class TestDatabaseRelationshipsIntegration:
         data = {
             "message": "<p>Application message</p>",
             "email_subject": "Application Subject",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
         print("RESPONSE: ", response)
@@ -713,7 +715,7 @@ class TestDatabaseRelationshipsIntegration:
         data = {
             "message": "<p>Application message</p>",
             "email_subject": "Application Subject",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
         assert response.status_code == status.HTTP_200_OK
@@ -757,7 +759,7 @@ class TestDatabaseRelationshipsIntegration:
             data = {
                 "message": "<p>2025 application</p>",
                 "email_subject": "2025 Subject",
-                "recipients": "contact@testfestival.com",
+                "recipients": "contact@festival.com",
             }
             response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
             assert response.status_code == status.HTTP_200_OK
@@ -779,7 +781,7 @@ class TestDatabaseRelationshipsIntegration:
             data = {
                 "message": "<p>2026 application</p>",
                 "email_subject": "2026 Subject",
-                "recipients": "contact@testfestival2.com",
+                "recipients": "contact@festival2.com",
             }
             response = authenticated_client.post(f"/api/festivals/{festival2.id}/apply/", data)
             assert response.status_code == status.HTTP_200_OK
@@ -951,7 +953,7 @@ class TestApplicationSoftDeleteIntegration:
         data = {
             "message": "<p>Test application</p>",
             "email_subject": "Test Subject",
-            "recipients": "contact@testfestival.com",
+            "recipients": "contact@festival.com",
         }
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
         assert response.status_code == status.HTTP_200_OK
