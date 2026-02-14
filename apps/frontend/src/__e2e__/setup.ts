@@ -12,7 +12,7 @@
 
 import { transformKeysToCamelCase, transformKeysToSnakeCase } from "../helpers/serializer";
 
-export const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+export const BACKEND_URL = "http://localhost:8000";
 export const API_BASE = `${BACKEND_URL}/api`;
 
 // Test user credentials - should be created in your test database
