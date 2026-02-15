@@ -68,7 +68,7 @@ def create_database_schema(sender, instance, created, **kwargs):
 
                 cursor.execute(f"""
                     INSERT INTO {quoted_schema}.{quoted_table}
-                    SELECT * FROM template.{quoted_table}
+                    SELECT * FROM public.{quoted_table}
                 """)
 
             logger.info(f"Schema {schema_name} created successfully for user {instance.email}")
