@@ -134,7 +134,7 @@ export function DataTable<TData, TValue>({
         <DataTableHeader
           searchBarFilter={searchBarFilter}
           setSearchBarFilter={setSearchBarFilter}
-          entityName={entityName}
+          entityName={entityName.toLowerCase()}
           table={table}
           filters={filters}
         />
