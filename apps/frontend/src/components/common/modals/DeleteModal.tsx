@@ -53,10 +53,10 @@ export const DeleteModal = ({
 
         <div className="px-6 py-8">
           <div className="p-4 mb-6">
-            <p className="text-center text-lg font-semibold text-gray-800 mb-2">
+            <p className="text-center text-lg font-semibold text-foreground mb-2">
               Are you sure you want to delete this {itemName}?
             </p>
-            <DialogDescription className="text-center text-base text-gray-600">
+            <DialogDescription className="text-center text-base text-foreground">
               {description}
             </DialogDescription>
           </div>
