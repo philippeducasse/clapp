@@ -1,6 +1,6 @@
 from typing import Optional
 
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 
 from organisations.residencies.models import Residency
 from organisations.residencies.serializer import ResidencySerializer
@@ -17,10 +17,17 @@ class ResidencyViewSet(OrganisationViewSet):
             self.request.query_params.get("include_deleted", "false").lower() == "true"
         )
 
-        if include_deleted:
-            return Residency.objects.with_deleted().filter(user=self.request.user)
+        if self.request.user.is_staff:
+            visibility_filter = Q(user=self.request.user) | Q(
+                is_seed_clone=False, user__isnull=False
+            )
         else:
-            return Residency.objects.filter(user=self.request.user)
+            visibility_filter = Q(user=self.request.user)
+
+        if include_deleted:
+            return Residency.objects.with_deleted().filter(visibility_filter).distinct()
+        else:
+            return Residency.objects.filter(visibility_filter).distinct()
 
     def get_organisation_type_name(self) -> str:
         return "residency"

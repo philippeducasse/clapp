@@ -135,7 +135,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         return generate_enrich_prompt(organisation, search_results)
 
     def perform_create(self, serializer):
-        instance = serializer.save(user=self.request.user)
+        instance = serializer.save(user=self.request.user, is_seed_clone=False)
         instance.full_clean()
         instance.save()
 
