@@ -28,4 +28,16 @@ class TenantMiddleware:
                 logger.error(f"Failed to set schema for user {request.user.id}: {e}")
                 raise
 
-        return self.get_response(request)
+        try:
+            response = self.get_response(request)
+        finally:
+            # Reset search_path to prevent schema leaking between requests
+            if self.use_tenant_partitioning:
+                set_tenant_schema("public")
+                try:
+                    with connection.cursor() as cursor:
+                        cursor.execute("SET search_path TO public")
+                except Exception:
+                    pass
+
+        return response
