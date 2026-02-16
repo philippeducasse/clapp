@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -16,7 +17,10 @@ logger = logging.getLogger(__name__)
 @receiver(post_save, sender=Profile, dispatch_uid="send_confirmation_email")
 def send_confirmation_email(sender, instance, created, raw, **kwargs):
     if raw:
-        return  # Skip during fixture loading (loaddata)
+        return
+
+    if settings.ENVIRONMENT == "local":
+        return
 
     if created:
         send_registration_confirmation_email.delay(instance.email)
