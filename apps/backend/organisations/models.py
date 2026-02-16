@@ -77,6 +77,16 @@ class Organisation(models.Model):
     tag = models.CharField(max_length=20, choices=TAGS, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True, default=None)
 
+    user = models.ForeignKey(
+        "profiles.Profile",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        # create a unique related name for each type of organisation
+        # -> festivals_festival_set
+        related_name="%(app_label)s_%(class)s_set",
+    )
+
     objects = SoftDeleteManager()
 
     class Meta:
@@ -170,6 +180,14 @@ class OrganisationContact(models.Model):
     role = models.CharField(max_length=100, blank=True)
     phone = PhoneNumberField(blank=True, null=True)
     deleted_at = models.DateTimeField(null=True, blank=True, default=None)
+
+    user = models.ForeignKey(
+        "profiles.Profile",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="%(app_label)s_%(class)s_set",
+    )
 
     objects = SoftDeleteManager()
 
