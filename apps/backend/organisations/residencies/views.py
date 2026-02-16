@@ -18,9 +18,7 @@ class ResidencyViewSet(OrganisationViewSet):
         )
 
         if self.request.user.is_staff:
-            visibility_filter = Q(user=self.request.user) | Q(
-                is_seed_clone=False, user__isnull=False
-            )
+            visibility_filter = Q(user__isnull=True) | Q(is_seed_clone=False, user__isnull=False)
         else:
             visibility_filter = Q(user=self.request.user)
 
