@@ -19,13 +19,16 @@ class BaseContactSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "email"]
 
 
-def handle_nested_contacts(instance: Any, contacts_data: Any, contact_model: type) -> None:
+def handle_nested_contacts(
+    instance: Any, contacts_data: Any, contact_model: type, user: Any = None
+) -> None:
     """Handle creation, update, and deletion of nested contacts.
 
     Args:
         instance: The organisation instance (Festival, Residency, etc.)
         contacts_data: The contact data from validated_data
         contact_model: The contact model class (FestivalContact, ResidencyContact, etc.)
+        user: The user who owns the organisation (used when creating new contacts)
     """
     existing_contacts = {c.id: c for c in instance.contacts.all()}
     incoming_ids = {c.get("id") for c in contacts_data if c.get("id")}
@@ -49,4 +52,7 @@ def handle_nested_contacts(instance: Any, contacts_data: Any, contact_model: typ
                 for f in contact_model._meta.get_fields()
                 if hasattr(f, "related_model") and f.related_model == instance.__class__
             )
-            contact_model.objects.create(**{fk_field.name: instance, **contact_data})
+            create_kwargs = {fk_field.name: instance, **contact_data}
+            if user:
+                create_kwargs["user"] = user
+            contact_model.objects.create(**create_kwargs)

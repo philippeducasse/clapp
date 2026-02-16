@@ -69,7 +69,7 @@ class FestivalSerializer(WritableNestedModelSerializer):
         instance = super().update(instance, validated_data)
 
         if contacts_data is not None:
-            handle_nested_contacts(instance, contacts_data, FestivalContact)
+            handle_nested_contacts(instance, contacts_data, FestivalContact, user=instance.user)
 
         return instance
 

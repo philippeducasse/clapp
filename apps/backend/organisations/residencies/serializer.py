@@ -68,7 +68,7 @@ class ResidencySerializer(WritableNestedModelSerializer):
         instance = super().update(instance, validated_data)
 
         if contacts_data is not None:
-            handle_nested_contacts(instance, contacts_data, ResidencyContact)
+            handle_nested_contacts(instance, contacts_data, ResidencyContact, user=instance.user)
 
         return instance
 
