@@ -19,7 +19,7 @@ def api_client():
 
 
 @pytest.fixture
-def festival(db):
+def festival(db, profile):
     """Fixture to create a test festival"""
     return Festival.objects.create(
         name="Tst Festival",
@@ -31,6 +31,7 @@ def festival(db):
         start_date=date(2025, 7, 15),
         end_date=date(2025, 7, 20),
         application_type="EMAIL",
+        user=profile,
     )
 
 

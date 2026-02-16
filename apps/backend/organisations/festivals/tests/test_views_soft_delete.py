@@ -27,9 +27,9 @@ class TestFestivalViewSetSoftDelete:
         client.force_authenticate(user=user)
         return client
 
-    def test_delete_endpoint_soft_deletes(self, authenticated_client):
+    def test_delete_endpoint_soft_deletes(self, authenticated_client, user):
         """Test that DELETE endpoint performs soft delete"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         festival_id = festival.id
 
         response = authenticated_client.delete(f"/api/festivals/{festival.id}/")
@@ -51,10 +51,10 @@ class TestFestivalViewSetSoftDelete:
         deleted_festival = Festival.objects.with_deleted().get(id=festival_id)
         assert deleted_festival.deleted_at is not None
 
-    def test_list_excludes_deleted_by_default(self, authenticated_client):
+    def test_list_excludes_deleted_by_default(self, authenticated_client, user):
         """Test that list endpoint excludes deleted festivals by default"""
-        f1 = Festival.objects.create(name="Active")  # noqa
-        f2 = Festival.objects.create(name="Deleted")
+        f1 = Festival.objects.create(name="Active", user=user)  # noqa
+        f2 = Festival.objects.create(name="Deleted", user=user)
         f2.delete()
 
         response = authenticated_client.get("/api/festivals/")
@@ -70,10 +70,10 @@ class TestFestivalViewSetSoftDelete:
         assert "Active" in festival_names
         assert "Deleted" not in festival_names
 
-    def test_list_includes_deleted_with_parameter(self, authenticated_client):
+    def test_list_includes_deleted_with_parameter(self, authenticated_client, user):
         """Test that list endpoint includes deleted when include_deleted=true"""
-        f1 = Festival.objects.create(name="Active")  # noqa
-        f2 = Festival.objects.create(name="Deleted")
+        f1 = Festival.objects.create(name="Active", user=user)  # noqa
+        f2 = Festival.objects.create(name="Deleted", user=user)
         f2.delete()
 
         response = authenticated_client.get("/api/festivals/?include_deleted=true")
@@ -89,10 +89,10 @@ class TestFestivalViewSetSoftDelete:
         assert "Active" in festival_names
         assert "Deleted" in festival_names
 
-    def test_list_includes_deleted_false_excludes_deleted(self, authenticated_client):
+    def test_list_includes_deleted_false_excludes_deleted(self, authenticated_client, user):
         """Test that include_deleted=false still excludes deleted festivals"""
-        f1 = Festival.objects.create(name="Active")  # noqa
-        f2 = Festival.objects.create(name="Deleted")
+        f1 = Festival.objects.create(name="Active", user=user)  # noqa
+        f2 = Festival.objects.create(name="Deleted", user=user)
         f2.delete()
 
         response = authenticated_client.get("/api/festivals/?include_deleted=false")
@@ -108,9 +108,9 @@ class TestFestivalViewSetSoftDelete:
         assert "Active" in festival_names
         assert "Deleted" not in festival_names
 
-    def test_retrieve_deleted_festival_fails_by_default(self, authenticated_client):
+    def test_retrieve_deleted_festival_fails_by_default(self, authenticated_client, user):
         """Test that retrieving a deleted festival fails without include_deleted"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         festival_id = festival.id
         festival.delete()
 
@@ -118,9 +118,9 @@ class TestFestivalViewSetSoftDelete:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_restore_endpoint(self, authenticated_client):
+    def test_restore_endpoint(self, authenticated_client, user):
         """Test the restore endpoint"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         festival_id = festival.id
         festival.delete()
 
@@ -142,9 +142,9 @@ class TestFestivalViewSetSoftDelete:
         festival_ids = [f["id"] for f in results]
         assert festival_id in festival_ids
 
-    def test_restore_active_festival_returns_error(self, authenticated_client):
+    def test_restore_active_festival_returns_error(self, authenticated_client, user):
         """Test that restoring a non-deleted festival returns error"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/restore/")
 
@@ -157,9 +157,9 @@ class TestFestivalViewSetSoftDelete:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_deleted_at_in_serializer_response(self, authenticated_client):
+    def test_deleted_at_in_serializer_response(self, authenticated_client, user):
         """Test that deleted_at field is included in API responses"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
 
         # Get active festival
         response = authenticated_client.get(f"/api/festivals/{festival.id}/")
@@ -176,14 +176,14 @@ class TestFestivalViewSetSoftDelete:
         assert "deleted_at" in response.data
         assert response.data["deleted_at"] is not None
 
-    def test_delete_cascades_shown_in_response(self, authenticated_client):
+    def test_delete_cascades_shown_in_response(self, authenticated_client, user):
         """Test that deleting festival with contacts cascades properly"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         FestivalContact.objects.create(
-            festival=festival, name="Contact 1", email="contact1@example.com"
+            festival=festival, name="Contact 1", email="contact1@example.com", user=user
         )
         FestivalContact.objects.create(
-            festival=festival, name="Contact 2", email="contact2@example.com"
+            festival=festival, name="Contact 2", email="contact2@example.com", user=user
         )
 
         response = authenticated_client.delete(f"/api/festivals/{festival.id}/")
@@ -194,11 +194,11 @@ class TestFestivalViewSetSoftDelete:
         assert FestivalContact.objects.count() == 0
         assert FestivalContact.objects.with_deleted().count() == 2
 
-    def test_restore_cascades_to_contacts_via_api(self, authenticated_client):
+    def test_restore_cascades_to_contacts_via_api(self, authenticated_client, user):
         """Test that restore endpoint restores contacts"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         contact = FestivalContact.objects.create(
-            festival=festival, name="Contact", email="contact@example.com"
+            festival=festival, name="Contact", email="contact@example.com", user=user
         )
         contact_id = contact.id
 
@@ -233,7 +233,7 @@ class TestFestivalViewSetSoftDelete:
 
     def test_applications_filtered_in_deleted_festival(self, authenticated_client, user):
         """Test that deleted festivals don't show deleted applications"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
 
         content_type = ContentType.objects.get_for_model(Festival)
         app1 = Application.objects.create(
@@ -259,9 +259,9 @@ class TestFestivalViewSetSoftDelete:
         # has_application_this_year should be True (app2 exists)
         assert response.data["has_application_this_year"] is True
 
-    def test_unauthenticated_cannot_delete(self, client):
+    def test_unauthenticated_cannot_delete(self, client, user):
         """Test that unauthenticated users cannot delete festivals"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
 
         response = client.delete(f"/api/festivals/{festival.id}/")
 
@@ -271,9 +271,9 @@ class TestFestivalViewSetSoftDelete:
         # Festival should still exist
         assert Festival.objects.filter(id=festival.id).exists()
 
-    def test_unauthenticated_cannot_restore(self, client):
+    def test_unauthenticated_cannot_restore(self, client, user):
         """Test that unauthenticated users cannot restore festivals"""
-        festival = Festival.objects.create(name="Test Festival")
+        festival = Festival.objects.create(name="Test Festival", user=user)
         festival.delete()
 
         response = client.post(f"/api/festivals/{festival.id}/restore/")

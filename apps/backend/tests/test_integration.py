@@ -83,6 +83,7 @@ def festival(db, authenticated_user):
         start_date=date(2026, 7, 15),
         end_date=date(2026, 7, 20),
         application_type="EMAIL",
+        user=authenticated_user,
     )
 
 
@@ -770,6 +771,7 @@ class TestDatabaseRelationshipsIntegration:
             name="Tst Festival 2",
             country="Spain",
             town="Madrid",
+            user=authenticated_user,
         )
 
         mail.outbox.clear()
