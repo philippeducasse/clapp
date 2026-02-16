@@ -87,6 +87,8 @@ class Organisation(models.Model):
         related_name="%(app_label)s_%(class)s_set",
     )
 
+    is_seed_clone = models.BooleanField(default=False)
+
     objects = SoftDeleteManager()
 
     class Meta:
