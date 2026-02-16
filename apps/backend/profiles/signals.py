@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from organisations.festivals.models import Festival, FestivalContact
 from organisations.residencies.models import Residency, ResidencyContact
 from organisations.venues.models import Venue, VenueContact
+
 from .models import Profile
 from .tasks import send_registration_confirmation_email
 
@@ -61,6 +62,7 @@ def seed_user_organisations(sender, instance, created, raw, **kwargs):
                 application_date_start=fest.application_date_start,
                 application_date_end=fest.application_date_end,
                 application_type=fest.application_type,
+                is_seed_clone=True,
             )
             for fest in seed_festivals
         ]
@@ -81,6 +83,7 @@ def seed_user_organisations(sender, instance, created, raw, **kwargs):
                 tag=venue.tag,
                 venue_type=venue.venue_type,
                 contacted=venue.contacted,
+                is_seed_clone=True,
             )
             for venue in seed_venues
         ]
@@ -105,6 +108,7 @@ def seed_user_organisations(sender, instance, created, raw, **kwargs):
                 application_date_start=res.application_date_start,
                 application_date_end=res.application_date_end,
                 application_type=res.application_type,
+                is_seed_clone=True,
             )
             for res in seed_residencies
         ]
