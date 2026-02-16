@@ -1,10 +1,10 @@
 # TODOS
 
-- table pagination
-- breadcrumbs
-- Add update button to editfestival page
 - Rotate some tags / status
-- add reminders
+- add color coding to orgs added by other users
+- add confirmation mail logic
+- add user deletion logic
+- add invoices
 
 # building the image
 
