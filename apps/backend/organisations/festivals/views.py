@@ -27,7 +27,9 @@ class FestivalViewSet(OrganisationViewSet):
         )
 
         base_queryset = (
-            Festival.objects.with_deleted() if include_deleted else Festival.objects.all()
+            Festival.objects.with_deleted().filter(user=self.request.user)
+            if include_deleted
+            else Festival.objects.filter(user=self.request.user)
         )
 
         festival_content_type = ContentType.objects.get_for_model(Festival)

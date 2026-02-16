@@ -18,9 +18,9 @@ class ResidencyViewSet(OrganisationViewSet):
         )
 
         if include_deleted:
-            return Residency.objects.with_deleted()
+            return Residency.objects.with_deleted().filter(user=self.request.user)
         else:
-            return Residency.objects.all()
+            return Residency.objects.filter(user=self.request.user)
 
     def get_organisation_type_name(self) -> str:
         return "residency"

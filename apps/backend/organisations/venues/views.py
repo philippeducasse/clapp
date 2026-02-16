@@ -18,9 +18,9 @@ class VenueViewSet(OrganisationViewSet):
         )
 
         if include_deleted:
-            return Venue.objects.with_deleted()
+            return Venue.objects.with_deleted().filter(user=self.request.user)
         else:
-            return Venue.objects.all()
+            return Venue.objects.filter(user=self.request.user)
 
     def get_organisation_type_name(self) -> str:
         return "venue"

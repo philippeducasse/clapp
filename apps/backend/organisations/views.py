@@ -69,16 +69,22 @@ def search(request: Request) -> Response:
 
         try:
             Entity = apps.get_model(app_label, model_name)
-            results = Entity.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
+            results = Entity.objects.filter(search_filter, user=request.user).values(
+                *ORGANISATION_SEARCH_FIELDS
+            )[:20]
         except LookupError:
             return Response({"error": "Model not found"}, status=400)
 
     else:
-        festivals = Festival.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
-        venues = Venue.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[:20]
-        residencies = Residency.objects.filter(search_filter).values(*ORGANISATION_SEARCH_FIELDS)[
-            :20
-        ]
+        festivals = Festival.objects.filter(search_filter, user=request.user).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
+        venues = Venue.objects.filter(search_filter, user=request.user).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
+        residencies = Residency.objects.filter(search_filter, user=request.user).values(
+            *ORGANISATION_SEARCH_FIELDS
+        )[:20]
 
         results: List[Dict[str, Any]] = []
 
@@ -107,7 +113,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self._mistral_client = None
-        self._gemini_client = None
 
     @property
     def mistral_client(self) -> MistralClient:
@@ -130,7 +135,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         return generate_enrich_prompt(organisation, search_results)
 
     def perform_create(self, serializer):
-        instance = serializer.save()
+        instance = serializer.save(user=self.request.user)
         instance.full_clean()
         instance.save()
 
@@ -152,7 +157,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         model_class = self.get_serializer_class().Meta.model
 
         try:
-            organisation = model_class.objects.with_deleted().get(pk=pk)
+            organisation = model_class.objects.with_deleted().filter(user=request.user).get(pk=pk)
 
             if organisation.deleted_at is None:
                 return Response(
@@ -475,7 +480,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             if not website:
                 return False
             normalized_domain = normalize_domain(website)
-            if model_class.objects.filter(website_url__icontains=normalized_domain).exists():
+            if model_class.objects.filter(
+                website_url__icontains=normalized_domain, user=request.user
+            ).exists():
                 logger.info(
                     f"Row {index}: {model_class._meta.object_name} with domain '{normalized_domain}' already exists"
                 )
@@ -522,7 +529,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                     date_str = get_cell(row_dict, "date")
                     comments = get_cell(row_dict, "comments")
 
-                    if model_class.objects.filter(name__iexact=name).exists():
+                    if model_class.objects.filter(name__iexact=name, user=request.user).exists():
                         logger.info(f"Row {index}: {resolved_type} '{name}' already exists")
                         stats[f"{stats_key}_skipped"] += 1
                         continue
@@ -536,6 +543,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                         "country": country,
                         "website_url": website,
                         "comments": comments,
+                        "user": request.user,
                     }
                     if model_class != Venue:
                         fields["approximate_date"] = date_str
@@ -547,6 +555,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                         config["contact_model"].objects.create(
                             name=contact_person,
                             email=contact_email,
+                            user=request.user,
                             **{config["contact_fk"]: org},
                         )
 
