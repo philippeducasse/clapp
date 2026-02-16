@@ -472,7 +472,7 @@ def get_or_create_application(
 
     organisation_content_type = ContentType.objects.get_for_model(organisation.__class__)
     applications = Application.objects.filter(
-        content_type=organisation_content_type, object_id=organisation.pk
+        content_type=organisation_content_type, object_id=organisation.pk, profile=profile
     )
 
     application = next(
