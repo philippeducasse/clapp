@@ -1,23 +1,57 @@
 import logging
+import secrets
 
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils import timezone
 
-from profiles.models import Reminder
+from profiles.models import Profile, Reminder
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_registration_confirmation_email(email: str):
-    logger.info(f"Sending confirmation email to {email}")
+def send_registration_confirmation_email(user: Profile):
+    token = secrets.token_urlsafe(32)
+    user.confirmation_token = token
+    user.save()
+    confirmation_url = f"{settings.APP_URL}/api/profiles/confirm-email?token={token}/"
+
+    email_body = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #8B4789;">Welcome to Clapp! 🎪</h2>
+                
+                <p>Hello {user.email or "there"},</p>
+                
+                <p>We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.</p>
+                
+                <p style="margin: 30px 0; text-align: center;">
+                    <a href="{confirmation_url}" style="background-color: #8B4789; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                        Confirm Your Email
+                    </a>
+                </p>
+                
+                <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 12px; color: #666;">
+                    Let the show begin! 🎭<br>
+                    The Clapp Team
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+
+    logger.info(f"Created confirmation token for {user.email} : {token}")
+
+    logger.info(f"Sending confirmation email to {user.email}")
+
     send_mail(
-        "Welcome! Please confirm your email",
-        "CONFIRMATION URL GOES HERE",
-        "info@philippeducasse.com",
-        [email],
+        "Welcome to Clapp! Please confirm your email",
+        email_body,
+        settings.APP_EMAIL,
+        [user.email],
         fail_silently=False,
     )
 
