@@ -6,6 +6,9 @@ from .base import *  # noqa
 DEBUG = False
 ENVIRONMENT = "prod"
 
+APP_URL = os.getenv("APP_URL", "https://clapp.ovh")
+APP_EMAIL = os.getenv("APP_EMAIL", "info@philippeducasse.com")
+
 # Production database configuration - all from environment variables
 DATABASES = {
     "default": {
