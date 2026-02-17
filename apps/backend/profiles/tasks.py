@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_registration_confirmation_email(user: Profile):
+def send_registration_confirmation_email(user_id: int):
+    user = Profile.objects.get(id=user_id)
     token = secrets.token_urlsafe(32)
     user.confirmation_token = token
     user.save()
