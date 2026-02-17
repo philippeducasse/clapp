@@ -36,3 +36,8 @@ CELERY_BROKER_URL = "memory://"
 CELERY_RESULT_BACKEND = "cache+memory://"
 ENVIRONMENT = "test"
 SECRET_KEY = "test-secret-key-for-ci"
+
+# Email and URL settings for testing
+APP_URL = "http://localhost:8000"
+FRONTEND_URL = "http://localhost:3020"
+APP_EMAIL = "info@test.example.com"
