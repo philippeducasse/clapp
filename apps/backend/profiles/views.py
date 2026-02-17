@@ -8,7 +8,7 @@ from django.db.models import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -16,6 +16,28 @@ from profiles.models import Profile, Reminder
 from profiles.serializers import ProfileSerializer, RegisterSerializer, ReminderSerializer
 
 logger = logging.getLogger(__name__)
+
+
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def confirm_email(request: Request) -> HttpResponseRedirect:
+    """
+    Confirm user email via token in query parameter.
+    Redirects to FRONTEND_URL with status and optional error message.
+    """
+    token = request.GET.get("token")
+    if not token:
+        return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
+
+    try:
+        user = Profile.objects.get(confirmation_token=token)
+        user.confirmed_account = True
+        user.confirmation_token = ""
+        user.save()
+        logger.info(f"User {user.email} successfully confirmed")
+        return redirect(f"{settings.APP_URL}/email-confirmation?status=success")
+    except Profile.DoesNotExist:
+        return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -87,26 +109,6 @@ class ProfileViewSet(viewsets.ModelViewSet):
         django_logout(request)
         logger.info(f"User {user_id} logged out")
         return Response({"message": "Logged out successfully"})
-
-    @action(detail=False, methods=["get"], permission_classes=[permissions.AllowAny])
-    def confirm_email(self, request: Request) -> HttpResponseRedirect:
-        token = request.query_params.get("token")
-        if not token:
-            return redirect(
-                f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token"
-            )
-
-        try:
-            user = Profile.objects.get(confirmation_token=token)
-            user.confirmed_account = True
-            user.confirmation_token = None
-            user.save()
-            logger.info(f"User {user.email} successfully confirmed")
-            return redirect(f"{settings.APP_URL}/email-confirmation?status=success")
-        except Profile.DoesNotExist:
-            return redirect(
-                f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token"
-            )
 
 
 class ReminderViewSet(viewsets.ModelViewSet):
