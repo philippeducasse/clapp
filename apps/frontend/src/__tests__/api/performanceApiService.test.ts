@@ -416,7 +416,7 @@ describe("performanceApiService", () => {
 
       const performanceWithProfileObject: Performance = {
         id: 2,
-        profile: { id: 42, email: "user@example.com", performances: [] },
+        profile: { id: 42, email: "user@example.com", confirmedAccount: true, performances: [] },
         performanceTitle: "Performance with Profile Object",
       };
 

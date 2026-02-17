@@ -22,6 +22,7 @@ describe('profileApiService', () => {
         firstName: 'John',
         lastName: 'Doe',
         companyName: 'Acme Corp',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -47,6 +48,7 @@ describe('profileApiService', () => {
         instagramProfile: '@janesmith',
         facebookProfile: 'janesmith',
         youtubeProfile: 'JaneSmithChannel',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -72,6 +74,7 @@ describe('profileApiService', () => {
         email: 'newuser@example.com',
         firstName: 'Alice',
         lastName: 'Johnson',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -97,6 +100,7 @@ describe('profileApiService', () => {
       const mockResponse: Profile = {
         id: 3,
         email: 'minimal@example.com',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -123,6 +127,7 @@ describe('profileApiService', () => {
         firstName: 'John',
         lastName: 'Smith',
         location: 'London, UK',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -156,6 +161,7 @@ describe('profileApiService', () => {
         facebookProfile: 'newfacebook',
         tiktokProfile: '@newtiktok',
         youtubeProfile: 'NewYouTubeChannel',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -206,6 +212,7 @@ describe('profileApiService', () => {
         email: 'user@example.com',
         firstName: 'John',
         lastName: 'Doe',
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -232,6 +239,7 @@ describe('profileApiService', () => {
       mockSendRequest.mockResolvedValue({
         id: 2,
         email: 'jane@example.com',
+        confirmedAccount: true,
         performances: [],
       } as Profile);
 

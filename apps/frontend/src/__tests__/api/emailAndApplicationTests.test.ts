@@ -24,6 +24,7 @@ describe("Email and Application Functionality", () => {
         firstName: "John",
         lastName: "Doe",
         companyName: "Circus Act Inc",
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -60,6 +61,7 @@ describe("Email and Application Functionality", () => {
         email: "artist@example.com",
         firstName: "Jane",
         lastName: "Smith",
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -89,6 +91,7 @@ describe("Email and Application Functionality", () => {
       const mockProfile: Profile = {
         id: 1,
         email: "performer@example.com",
+        confirmedAccount: true,
         performances: [],
       };
 
@@ -575,6 +578,7 @@ describe("Email and Application Functionality", () => {
         spokenLanguages: ["English", "German", "French"],
         instagramProfile: "@alicejohnson",
         facebookProfile: "alicejohnson",
+        confirmedAccount: true,
         performances: [
           {
             id: 1,
@@ -612,6 +616,7 @@ describe("Email and Application Functionality", () => {
       const minimalProfile: Profile = {
         id: 99,
         email: "minimal@example.com",
+        confirmedAccount: true,
         performances: [],
       };
 
