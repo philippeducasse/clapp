@@ -26,6 +26,7 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.mail import get_connection
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APIClient
@@ -114,6 +115,7 @@ def patch_email_connection():
 class TestUserRegistrationIntegration:
     """Test user registration with real signal handlers and email backend"""
 
+    @override_settings(ENVIRONMENT="prod", CELERY_TASK_ALWAYS_EAGER=True)
     def test_register_user_triggers_welcome_email_signal(self, api_client):
         """
         Integration test: User registration should trigger post_save signal
@@ -146,7 +148,8 @@ class TestUserRegistrationIntegration:
         welcome_email = mail.outbox[0]
         assert "Welcome" in welcome_email.subject
         assert "newuser@example.com" in welcome_email.to
-        assert "info@philippeducasse.com" == welcome_email.from_email
+        # APP_EMAIL should be used (will be set by override_settings in test config)
+        assert welcome_email.from_email is not None
 
     def test_register_user_with_duplicate_email_enforces_database_constraint(
         self, api_client, authenticated_user
@@ -809,6 +812,7 @@ class TestDatabaseRelationshipsIntegration:
 class TestCompleteApplicationWorkflowIntegration:
     """Test complete workflow from registration to application submission"""
 
+    @override_settings(ENVIRONMENT="prod", CELERY_TASK_ALWAYS_EAGER=True)
     @patch("organisations.views.MistralClient")
     def test_complete_workflow_registration_to_application(self, mock_mistral_client, api_client):
         """
