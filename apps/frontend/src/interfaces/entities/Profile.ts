@@ -12,6 +12,7 @@ export interface Profile {
   [key: string]: unknown;
   id: number;
   email: string;
+  confirmedAccount: boolean;
   firstName?: string;
   lastName?: string;
   companyName?: string;

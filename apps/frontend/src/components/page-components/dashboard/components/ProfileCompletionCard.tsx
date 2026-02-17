@@ -7,6 +7,7 @@ const ProfileCompletionCard = ({ profile }: { profile: Profile }) => {
     if (!profile) return { percentage: 0, completed: 0, total: 0, missingFields: [] };
 
     const fields = [
+      { name: "Account confirmed", value: profile.confirmedAccount },
       { name: "First Name", value: profile.firstName },
       { name: "Last Name", value: profile.lastName },
       { name: "Company Name", value: profile.companyName },
