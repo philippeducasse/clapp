@@ -53,6 +53,10 @@ class ProfileManager(BaseUserManager["Profile"]):
 class Profile(AbstractUser):
     username = None  # remove username field
     email = models.EmailField(unique=True)
+    confirmed_account = models.BooleanField(default=False)
+    confirmation_token = models.CharField(max_length=64, blank=True)
+
+    # company / artist information
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     company_name = models.CharField(max_length=255, blank=True)
@@ -64,13 +68,17 @@ class Profile(AbstractUser):
     tiktok_profile = models.URLField(blank=True)
     youtube_profile = models.URLField(blank=True)
     phone = PhoneNumberField(blank=True, null=True)
-    spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
+
+    # email settings
     email_host = models.CharField(max_length=255, blank=True)
     other_email_host = models.CharField(max_length=255, blank=True)
     email_port = models.IntegerField(default=587)
     email_use_tls = models.BooleanField(default=True)
     email_host_password = models.CharField(max_length=255, blank=True)
     email_host_user = models.CharField(max_length=255, blank=True)
+
+    # user preferences / settings
+    spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
     date_format = models.CharField(max_length=50, blank=True, null=True)
     table_size = models.IntegerField(blank=True, null=True)
 
