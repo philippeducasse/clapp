@@ -111,7 +111,7 @@ Clapp Team
     send_mail(
         subject=subject,
         message=message,
-        from_email=settings.EMAIL_HOST_USER,
+        from_email=settings.APP_EMAIL,
         recipient_list=[reminder.profile.email],
         fail_silently=False,
     )

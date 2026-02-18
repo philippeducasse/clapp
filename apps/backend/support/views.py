@@ -9,19 +9,15 @@ from .serializers import BugReportSerializer
 
 class SubmitBugReportView(APIView):
     def post(self, request):
-        print("RECEIVED REQUEST: ", request)
         serializer = BugReportSerializer(data=request.data)
         if serializer.is_valid():
-            print("REQUEST IS VALID")
-
             bug_report = serializer.save(profile=request.user)
-            print("BUG REPORT: ", bug_report)
             # Send email
             email = EmailMultiAlternatives(
                 subject=f"Bug Report from {request.user}",
                 body=bug_report.message,
-                from_email=settings.EMAIL_HOST_USER,
-                to=[settings.EMAIL_HOST_USER],
+                from_email=settings.APP_EMAIL,
+                to=[settings.APP_EMAIL],
             )
             # Attach files
             for attachment in bug_report.attachments.all():

@@ -424,7 +424,7 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -487,7 +487,7 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -536,7 +536,7 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -619,7 +619,7 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -671,7 +671,7 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -711,7 +711,7 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -751,7 +751,7 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 
@@ -902,7 +902,7 @@ class TestCompleteApplicationWorkflowIntegration:
         user.email_host = "OTHER"
         user.other_email_host = "ssl0.ovh.net"
 
-        user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        user.email_host_user = os.environ["APP_EMAIL"]
         user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         user.save()
 
@@ -951,7 +951,7 @@ class TestApplicationSoftDeleteIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["EMAIL_HOST_USER"]
+        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
         authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
         authenticated_user.save()
 

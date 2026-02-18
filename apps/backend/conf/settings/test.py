@@ -7,11 +7,7 @@ from .base import *  # noqa
 os.environ["SECRET_KEY"] = "test-secret-key-for-ci"
 os.environ["ENVIRONMENT"] = "test"
 os.environ["EMAIL_BACKEND"] = "django.core.mail.backends.locmem.EmailBackend"
-os.environ["EMAIL_HOST"] = "GMAIL"
-os.environ["EMAIL_PORT"] = "587"
-os.environ["EMAIL_USE_TLS"] = "True"
-os.environ["EMAIL_HOST_USER"] = "test@test.com"
-os.environ["EMAIL_HOST_PASSWORD"] = "TestPassword123!"
+os.environ["APP_EMAIL"] = "test@test.com"
 os.environ["MISTRAL_API_KEY"] = "dummy_key_for_testing"
 
 
