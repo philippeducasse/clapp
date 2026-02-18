@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import logging
+# import logging
 import os
 from pathlib import Path
 
@@ -147,9 +147,9 @@ REST_FRAMEWORK = {
 }
 
 
-class HealthcheckFilter(logging.Filter):
-    def filter(self, record):
-        return "/health/" not in record.getMessage()
+# class HealthcheckFilter(logging.Filter):
+#     def filter(self, record):
+#         return "/health/" not in record.getMessage()
 
 
 LOGGING = {
@@ -161,11 +161,11 @@ LOGGING = {
             "style": "{",
         },
     },
-    "filters": {
-        "healthcheck": {
-            "()": HealthcheckFilter,
-        },
-    },
+    # "filters": {
+    #     "healthcheck": {
+    #         "()": HealthcheckFilter,
+    #     },
+    # },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
