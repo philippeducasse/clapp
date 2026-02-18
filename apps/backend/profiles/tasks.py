@@ -12,8 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_registration_confirmation_email(user_id: int):
-    user = Profile.objects.get(id=user_id)
+def send_registration_confirmation_email(new_user_email: str):
+    try:
+        user = Profile.objects.get(email=new_user_email)
+    except Profile.DoesNotExist:
+        logger.error(f"User with email {new_user_email} not found for confirmation email task")
+        return
+
     token = secrets.token_urlsafe(32)
     user.confirmation_token = token
     user.save()

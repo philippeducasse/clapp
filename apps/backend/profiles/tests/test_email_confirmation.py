@@ -60,7 +60,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """
         assert not profile.confirmation_token  # starts empty
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         profile.refresh_from_db()
         assert profile.confirmation_token
@@ -72,7 +72,7 @@ class TestSendRegistrationConfirmationEmailTask:
         The generated token must contain only URL-safe characters so it
         can be embedded in a query parameter without percent-encoding.
         """
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         profile.refresh_from_db()
         token = profile.confirmation_token
@@ -87,11 +87,11 @@ class TestSendRegistrationConfirmationEmailTask:
         Two consecutive calls must produce different tokens so that old
         confirmation links cannot be reused unintentionally.
         """
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
         profile.refresh_from_db()
         first_token = profile.confirmation_token
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
         profile.refresh_from_db()
         second_token = profile.confirmation_token
 
@@ -106,7 +106,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """Task must send exactly one email per invocation."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert len(mail.outbox) == 1
 
@@ -115,7 +115,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """The confirmation email must be addressed to the profile's email."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert mail.outbox[0].to == [profile.email]
 
@@ -124,7 +124,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """The email subject must match the expected string."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert mail.outbox[0].subject == "Welcome to Clapp! Please confirm your email"
 
@@ -133,7 +133,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """The from address must be the APP_EMAIL setting, not a hardcoded value."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert mail.outbox[0].from_email == CONFIRMATION_SETTINGS["APP_EMAIL"]
 
@@ -146,7 +146,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """The greeting in the email body must contain the user's email address."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert profile.email in mail.outbox[0].body
 
@@ -158,7 +158,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         profile.refresh_from_db()
         expected_url_prefix = (
@@ -175,7 +175,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert CONFIRMATION_SETTINGS["APP_URL"] in mail.outbox[0].body
 
@@ -184,7 +184,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """Brand elements (welcome text and team signature) must appear in the body."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         body = mail.outbox[0].body
         assert "Welcome to Clapp" in body
@@ -195,7 +195,7 @@ class TestSendRegistrationConfirmationEmailTask:
         """The call-to-action anchor text must be present in the HTML body."""
         mail.outbox.clear()
 
-        send_registration_confirmation_email(profile.id)
+        send_registration_confirmation_email(profile.email)
 
         assert "Confirm Your Email" in mail.outbox[0].body
 
