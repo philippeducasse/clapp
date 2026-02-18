@@ -46,7 +46,7 @@ def send_registration_confirmation_email(user_id: int):
 
     logger.info(f"Created confirmation token for {user.email} : {token}")
 
-    logger.info(f"Sending confirmation email to {user.email}")
+    logger.info(f"Sending confirmation email from {settings.APP_EMAIL} to {user.email}")
 
     send_mail(
         "Welcome to Clapp! Please confirm your email",
