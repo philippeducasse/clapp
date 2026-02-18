@@ -6,7 +6,7 @@ from django.test import override_settings
 from profiles.models import Profile
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestSendConfirmationEmailSignal:
     """
     Tests for the send_confirmation_email signal.

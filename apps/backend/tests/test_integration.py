@@ -111,7 +111,7 @@ def patch_email_connection():
         yield
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestUserRegistrationIntegration:
     """Test user registration with real signal handlers and email backend"""
 
@@ -808,7 +808,7 @@ class TestDatabaseRelationshipsIntegration:
         assert applied_applications.count() == 2
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestCompleteApplicationWorkflowIntegration:
     """Test complete workflow from registration to application submission"""
 
