@@ -43,7 +43,7 @@ CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "UTC")
 
 # Production security settings
 # SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True").lower() == "true"
+# On VPS apache is handling the redirects
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True").lower() == "true"
 CSRF_COOKIE_SECURE = os.getenv("CSRF_COOKIE_SECURE", "True").lower() == "true"
-SECURE_PROXY_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
