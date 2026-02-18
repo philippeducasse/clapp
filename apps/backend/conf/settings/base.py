@@ -170,7 +170,7 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
-            "filters": ["healthcheck"],
+            # "filters": ["healthcheck"],
         },
     },
     "root": {
