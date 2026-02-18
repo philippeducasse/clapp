@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -27,7 +28,8 @@ def send_confirmation_email(sender, instance, created, raw, **kwargs):
         logger.info(
             f"Initiating celery send_confirmaton_email task for user email: {instance.email}"
         )
-        send_registration_confirmation_email.delay(instance.email)
+        # Waits for database transaction to be complete before running this function
+        transaction.on_commit(lambda: send_registration_confirmation_email.delay(instance.email))
 
 
 @receiver(post_save, sender=Profile, dispatch_uid="seed_user_organisations")
