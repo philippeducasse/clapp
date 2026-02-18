@@ -25,7 +25,7 @@ class TestSendConfirmationEmailSignal:
             )
 
             # Verify the Celery task was called with the profile ID
-            mock_task.assert_called_once_with(profile.id)
+            mock_task.assert_called_once_with(profile.email)
 
     @override_settings(ENVIRONMENT="prod", CELERY_TASK_ALWAYS_EAGER=True)
     def test_send_mail_not_called_on_update(self):
@@ -92,7 +92,7 @@ class TestSendConfirmationEmailSignal:
             )
 
             # Verify signal was called with the correct profile ID
-            mock_task.assert_called_once_with(created_profile.id)
+            mock_task.assert_called_once_with(created_profile.email)
 
     @override_settings(ENVIRONMENT="prod", CELERY_TASK_ALWAYS_EAGER=True)
     def test_multiple_profile_creation_triggers_multiple_signals(self):
