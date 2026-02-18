@@ -18,7 +18,6 @@ Test coverage:
 6. Complex queries across related models
 """
 
-import os
 from datetime import date, datetime
 from unittest.mock import Mock, patch
 
@@ -424,8 +423,8 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         data = {
@@ -487,8 +486,8 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create another performance
@@ -536,8 +535,8 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create first application
@@ -619,8 +618,8 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         data = {
@@ -671,8 +670,8 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create an application
@@ -711,8 +710,8 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create an application
@@ -751,8 +750,8 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create applications for different years
@@ -902,8 +901,8 @@ class TestCompleteApplicationWorkflowIntegration:
         user.email_host = "OTHER"
         user.other_email_host = "ssl0.ovh.net"
 
-        user.email_host_user = os.environ["APP_EMAIL"]
-        user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        user.email_host_user = "test@test.com"
+        user.email_host_password = "TestPassword123!"
         user.save()
 
         apply_data = {
@@ -951,8 +950,8 @@ class TestApplicationSoftDeleteIntegration:
         authenticated_user.email_host = "OTHER"
         authenticated_user.other_email_host = "ssl0.ovh.net"
 
-        authenticated_user.email_host_user = os.environ["APP_EMAIL"]
-        authenticated_user.email_host_password = os.environ["EMAIL_HOST_PASSWORD"]
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
         # Create an application
