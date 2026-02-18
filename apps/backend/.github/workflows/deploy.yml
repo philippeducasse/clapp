@@ -71,3 +71,4 @@ jobs:
             cd ~/clapp
             docker compose pull django
             docker compose up -d django
+            docker image prune -f
