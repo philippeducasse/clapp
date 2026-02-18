@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
 
@@ -145,6 +146,12 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 25,
 }
 
+
+class HealthcheckFilter(logging.Filter):
+    def filter(self, record):
+        return "/health/" not in record.getMessage()
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -154,10 +161,16 @@ LOGGING = {
             "style": "{",
         },
     },
+    "filters": {
+        "healthcheck": {
+            "()": HealthcheckFilter,
+        },
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+            "filters": ["healthcheck"],
         },
     },
     "root": {
