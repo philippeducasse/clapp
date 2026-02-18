@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from django.core import mail
 from django.test import override_settings
 
 from profiles.models import Profile
@@ -52,18 +53,17 @@ class TestSendConfirmationEmailSignal:
     )
     def test_email_sent_to_correct_recipient(self):
         """Test that confirmation emails are sent to the correct recipients."""
-        with patch("profiles.tasks.send_mail") as mock_send_mail:
-            Profile.objects.create_user(email="user1@example.com", password="testpassword123")
-            Profile.objects.create_user(email="user2@example.com", password="testpassword123")
+        mail.outbox.clear()
 
-            # In eager mode, the task runs synchronously and calls send_mail
-            assert mock_send_mail.call_count == 2
+        Profile.objects.create_user(email="user1@example.com", password="testpassword123")
+        Profile.objects.create_user(email="user2@example.com", password="testpassword123")
 
-            # Verify recipients (4th positional argument)
-            first_call_recipients = mock_send_mail.call_args_list[0][0][3]
-            second_call_recipients = mock_send_mail.call_args_list[1][0][3]
-            assert first_call_recipients == ["user1@example.com"]
-            assert second_call_recipients == ["user2@example.com"]
+        # In eager mode, the task runs synchronously and sends emails
+        assert len(mail.outbox) == 2
+
+        # Verify recipients
+        assert mail.outbox[0].to == ["user1@example.com"]
+        assert mail.outbox[1].to == ["user2@example.com"]
 
     @override_settings(ENVIRONMENT="prod", CELERY_TASK_ALWAYS_EAGER=True)
     def test_signal_only_on_creation(self):
