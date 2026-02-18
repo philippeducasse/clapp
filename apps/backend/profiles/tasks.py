@@ -3,7 +3,7 @@ import secrets
 
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, send_mail
 from django.utils import timezone
 
 from profiles.models import Profile, Reminder
@@ -28,14 +28,14 @@ def send_registration_confirmation_email(new_user_email: str):
     <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #8B4789;">Welcome to Clapp! 🎪</h2>
+                <h2 style="color: #06965C;">Welcome to Clapp! 🎪</h2>
                 
                 <p>Hello {user.email or "there"},</p>
                 
                 <p>We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.</p>
                 
                 <p style="margin: 30px 0; text-align: center;">
-                    <a href="{confirmation_url}" style="background-color: #8B4789; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                    <a href="{confirmation_url}" style="background-color: #06965C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
                         Confirm Your Email
                     </a>
                 </p>
@@ -53,13 +53,14 @@ def send_registration_confirmation_email(new_user_email: str):
 
     logger.info(f"Sending confirmation email from {settings.APP_EMAIL} to {user.email}")
 
-    send_mail(
-        "Welcome to Clapp! Please confirm your email",
-        email_body,
-        settings.APP_EMAIL,
-        [user.email],
-        fail_silently=False,
+    email_message = EmailMessage(
+        subject="Welcome to Clapp! Please confirm your email",
+        body=email_body,
+        from_email=settings.APP_EMAIL,
+        to=[user.email],
     )
+    email_message.content_subtype = "html"
+    email_message.send(fail_silently=False)
 
 
 @shared_task
