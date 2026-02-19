@@ -70,7 +70,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "docker/.env"
-          target: "~/clapp/.env"
+          target: "~/clapp/"
 
       - name: Add sensitive variables to server
         uses: appleboy/ssh-action@v1.0.0
