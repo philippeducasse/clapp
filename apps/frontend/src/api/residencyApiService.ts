@@ -12,7 +12,7 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { GetAllParams, EntityApiService } from "@/interfaces/api/ApiService";
 
-const endpoint = "/api/residencies/";
+const endpoint = "/api/residencies";
 
 const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Residency>> => {
   const queryString = buildQueryParams(params);
@@ -21,7 +21,7 @@ const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Residency>> =>
 };
 
 const get = (id: number): Promise<Residency> => {
-  return fetchRequest(`${endpoint}${id}/`);
+  return fetchRequest(`${endpoint}/${id}`);
 };
 
 const create = (residency: Residency): Promise<Residency> => {
@@ -29,19 +29,19 @@ const create = (residency: Residency): Promise<Residency> => {
 };
 
 const remove = (residencyId: number): Promise<void> => {
-  return deleteRequest(`${endpoint}${residencyId}`, "Residency successfully deleted");
+  return deleteRequest(`${endpoint}/${residencyId}`, "Residency successfully deleted");
 };
 
 const tag = (residencyId: number, action: TagAction): Promise<Residency> => {
   return patchRequest<Residency>(
-    `${endpoint}${residencyId}/tag/${action}/`,
+    `${endpoint}/${residencyId}/tag/${action}`,
     "Residency successfully tagged"
   );
 };
 
 const update = (residency: Residency): Promise<Residency> => {
   return sendRequest(
-    `${endpoint}${residency.id}/`,
+    `${endpoint}/${residency.id}`,
     residency,
     "PUT",
     "Residency successfully updated"
@@ -49,7 +49,7 @@ const update = (residency: Residency): Promise<Residency> => {
 };
 
 const enrich = (id: number): Promise<Residency> => {
-  return fetchRequest(`${endpoint}${id}/enrich/`);
+  return fetchRequest(`${endpoint}/${id}/enrich`);
 };
 
 const apply = (
@@ -59,7 +59,7 @@ const apply = (
   fileFieldName: string
 ): Promise<{ message: string; applicationId: number }> => {
   return sendFormDataRequest<ApplicationCreate, { message: string; applicationId: number }>(
-    `${endpoint}${residencyId}/apply/`,
+    `${endpoint}/${residencyId}/apply`,
     application,
     files,
     fileFieldName,
@@ -70,7 +70,7 @@ const apply = (
 
 const generateEmail = (residencyId: number) => {
   return sendRequest<{ message: string }, { message: string }>(
-    `${endpoint}${residencyId}/generate_email/`,
+    `${endpoint}/${residencyId}/generate_email`,
     { message: "" },
     "POST",
     "Email successfully generated"

@@ -4,7 +4,7 @@ import { Application, ApplicationStatus } from "@/interfaces/entities/Applicatio
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { GetAllParams } from "@/interfaces/api/ApiService";
 
-const endpoint = "/api/applications/";
+const endpoint = "/api/applications";
 
 const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Application>> => {
   const queryString = buildQueryParams(params);
@@ -13,7 +13,7 @@ const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Application>> 
 };
 
 const get = (applicationId: number): Promise<Application> => {
-  return fetchRequest<Application>(`${endpoint}${applicationId}/`);
+  return fetchRequest<Application>(`${endpoint}/${applicationId}`);
 };
 
 const create = (application: Application): Promise<Application> => {
@@ -26,12 +26,12 @@ const create = (application: Application): Promise<Application> => {
 };
 
 const remove = (applicationId: number) => {
-  return deleteRequest(`${endpoint}${applicationId}`, "Application successfully deleted");
+  return deleteRequest(`${endpoint}/${applicationId}`, "Application successfully deleted");
 };
 
 const update = (application: Application): Promise<Application> => {
   return sendRequest<Application, Application>(
-    `${endpoint}${application.id}/`,
+    `${endpoint}/${application.id}`,
     application,
     "PUT",
     "Application successfully updated",
@@ -40,7 +40,7 @@ const update = (application: Application): Promise<Application> => {
 
 const changeStatus = (entityId: number, action: ApplicationStatus): Promise<Application> => {
   return patchRequest<Application>(
-    `${endpoint}${entityId}/status/${action}/`,
+    `${endpoint}/${entityId}/status/${action}`,
     "Festival status successfully updated",
   );
 };

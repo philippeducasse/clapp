@@ -1,14 +1,14 @@
 import { Performance } from "@/interfaces/entities/Performance";
 import { fetchRequest, sendRequest, deleteRequest, sendFormDataRequest } from "./fetchHelper";
 
-const endpoint = "/api/performances/";
+const endpoint = "/api/performances";
 
 const getAll = (userId: number): Promise<Performance[]> => {
-  return fetchRequest<Performance[]>(`${endpoint}${userId}/`);
+  return fetchRequest<Performance[]>(`${endpoint}/${userId}`);
 };
 
 const get = (performanceId: number): Promise<Performance> => {
-  return fetchRequest<Performance>(`${endpoint}${performanceId}/`);
+  return fetchRequest<Performance>(`${endpoint}/${performanceId}`);
 };
 
 const create = (performance: Performance): Promise<Performance> => {
@@ -35,7 +35,7 @@ const create = (performance: Performance): Promise<Performance> => {
 };
 
 const remove = (performanceId: number) => {
-  return deleteRequest(`${endpoint}${performanceId}`, "Performance successfully deleted", true);
+  return deleteRequest(`${endpoint}/${performanceId}`, "Performance successfully deleted", true);
 };
 
 const update = (performance: Performance): Promise<Performance> => {
@@ -56,7 +56,7 @@ const update = (performance: Performance): Promise<Performance> => {
 
     if (newFiles.length > 0) {
       return sendFormDataRequest<Performance, Performance>(
-        `${endpoint}${performance.id}/`,
+        `${endpoint}/${performance.id}`,
         dataWithDossierIds,
         newFiles,
         "dossier_files",
@@ -67,7 +67,7 @@ const update = (performance: Performance): Promise<Performance> => {
 
     // No new files, but send dossier_ids to keep existing ones
     return sendRequest<Performance, Performance>(
-      `${endpoint}${performance.id}/`,
+      `${endpoint}/${performance.id}`,
       dataWithDossierIds,
       "PUT",
       "Performance successfully updated",
@@ -77,7 +77,7 @@ const update = (performance: Performance): Promise<Performance> => {
 
   // No dossiers at all, send empty dossier_ids to delete all
   return sendRequest<Performance, Performance>(
-    `${endpoint}${performance.id}/`,
+    `${endpoint}/${performance.id}`,
     { ...performanceData, dossierIds: [] },
     "PUT",
     "Performance successfully updated",

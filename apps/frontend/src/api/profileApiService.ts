@@ -5,12 +5,12 @@ import { Credentials } from "@/interfaces/api/ApiService";
 const endpoint = "/api/profiles";
 
 const get = async (): Promise<Profile> => {
-  return await fetchRequest(`${endpoint}/me/`);
+  return await fetchRequest(`${endpoint}/me`);
 };
 
 const register = async (profile: Partial<Profile>): Promise<Profile> => {
   return await sendRequest(
-    `${endpoint}/register/`,
+    `${endpoint}/register`,
     profile,
     "POST",
     "Profile successfully created!",
@@ -18,12 +18,12 @@ const register = async (profile: Partial<Profile>): Promise<Profile> => {
 };
 
 const remove = (profileId: number) => {
-  return deleteRequest(`${endpoint}/${profileId}/`, "Profile successfully deleted", true);
+  return deleteRequest(`${endpoint}/${profileId}`, "Profile successfully deleted", true);
 };
 
 const update = async (profile: Partial<Profile>): Promise<Profile> => {
   return await sendRequest(
-    `${endpoint}/${profile.id}/`,
+    `${endpoint}/${profile.id}`,
     profile,
     "PUT",
     "Profile successfully updated",
@@ -33,7 +33,7 @@ const update = async (profile: Partial<Profile>): Promise<Profile> => {
 
 const login = async (credentials: Credentials): Promise<Profile> => {
   return await sendRequest<Credentials, Profile>(
-    `${endpoint}/login/`,
+    `${endpoint}/login`,
     credentials,
     "POST",
     `Welcome ${credentials.email}, you have successfully logged in`,
@@ -41,7 +41,7 @@ const login = async (credentials: Credentials): Promise<Profile> => {
   );
 };
 const logout = async () => {
-  return await sendRequest(`${endpoint}/logout/`, {}, "POST", `Successfully logged out`, true);
+  return await sendRequest(`${endpoint}/logout`, {}, "POST", `Successfully logged out`, true);
 };
 
 export const profileApiService = {

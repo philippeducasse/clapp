@@ -12,7 +12,7 @@ const reportBug = async (bugReport: BugReport): Promise<{ id: number }> => {
 
   if (attachments && attachments.length > 0) {
     return await sendFormDataRequest(
-      `${endpoint}/bugs/`,
+      `${endpoint}/bugs`,
       reportData,
       attachments,
       "attachments",
@@ -22,7 +22,7 @@ const reportBug = async (bugReport: BugReport): Promise<{ id: number }> => {
   }
 
   return await sendFormDataRequest(
-    `${endpoint}/bugs/`,
+    `${endpoint}/bugs`,
     reportData,
     undefined,
     undefined,

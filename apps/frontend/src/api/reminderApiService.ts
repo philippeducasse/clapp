@@ -2,7 +2,7 @@ import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
 import { OrganisationType } from "@/interfaces/Enums";
 import { sendRequest, deleteRequest, fetchRequest } from "./fetchHelper";
 
-export const reminderEndpoint = "/api/profiles/me/reminders/";
+export const reminderEndpoint = "/api/profiles/me/reminders";
 
 const setReminder = (reminder: ReminderCreate): Promise<Reminder> => {
   return sendRequest<ReminderCreate, Reminder>(
@@ -15,7 +15,7 @@ const setReminder = (reminder: ReminderCreate): Promise<Reminder> => {
 };
 
 const deleteReminder = (reminderId: number): Promise<void> => {
-  return deleteRequest(`${reminderEndpoint}${reminderId}/`, "Reminder successfully deleted");
+  return deleteRequest(`${reminderEndpoint}/${reminderId}`, "Reminder successfully deleted");
 };
 
 const getReminders = (): Promise<Reminder[]> => {

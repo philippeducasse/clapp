@@ -13,7 +13,7 @@ import { TagAction } from "@/interfaces/Enums";
 import { GetAllParams } from "@/interfaces/api/ApiService";
 import { buildQueryParams } from "./helpers/buildQueryParams";
 
-const endpoint = "/api/festivals/";
+const endpoint = "/api/festivals";
 
 const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Festival>> => {
   const queryString = buildQueryParams(params);
@@ -22,7 +22,7 @@ const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Festival>> => 
 };
 
 const get = (festivalId: number): Promise<Festival> => {
-  return fetchRequest<Festival>(`${endpoint}${festivalId}/`);
+  return fetchRequest<Festival>(`${endpoint}/${festivalId}`);
 };
 
 const create = (festival: Festival): Promise<Festival> => {
@@ -37,22 +37,22 @@ const create = (festival: Festival): Promise<Festival> => {
 
 const tag = (festivalId: number, action: TagAction): Promise<Festival> => {
   return patchRequest<Festival>(
-    `${endpoint}${festivalId}/tag/${action}/`,
+    `${endpoint}/${festivalId}/tag/${action}`,
     "Festival successfully tagged",
   );
 };
 
 const remove = (festivalId: number): Promise<void> => {
-  return deleteRequest(`${endpoint}${festivalId}/`, "Festival successfully deleted", true);
+  return deleteRequest(`${endpoint}/${festivalId}`, "Festival successfully deleted", true);
 };
 
 const enrich = (festivalId: number): Promise<Festival> => {
-  return fetchRequest<Festival>(`${endpoint}${festivalId}/enrich/`);
+  return fetchRequest<Festival>(`${endpoint}/${festivalId}/enrich`);
 };
 
 const update = (festival: Festival): Promise<Festival> => {
   return sendRequest<Festival, Festival>(
-    `${endpoint}${festival.id}/`,
+    `${endpoint}/${festival.id}`,
     festival,
     "PUT",
     "Festival successfully updated",
@@ -65,7 +65,7 @@ const generateEmail = (
   data: { profile: Profile; selectedPerformanceIds?: number[] },
 ): Promise<{ message: string }> => {
   return sendRequest<{ profile: Profile; selectedPerformanceIds?: number[] }, { message: string }>(
-    `${endpoint}${festivalId}/generate_email/`,
+    `${endpoint}/${festivalId}/generate_email`,
     data,
     "POST",
     "Email successfully generated",
@@ -80,7 +80,7 @@ const apply = (
   fileFieldName: string,
 ): Promise<{ message: string; applicationId: number }> => {
   return sendFormDataRequest<ApplicationCreate, { message: string; applicationId: number }>(
-    `${endpoint}${festivalId}/apply/`,
+    `${endpoint}/${festivalId}/apply`,
     application,
     files,
     fileFieldName,

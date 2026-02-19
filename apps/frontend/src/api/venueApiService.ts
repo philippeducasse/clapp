@@ -12,7 +12,7 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
 import { GetAllParams, EntityApiService } from "@/interfaces/api/ApiService";
 
-const endpoint = "/api/venues/";
+const endpoint = "/api/venues";
 
 const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Venue>> => {
   const queryString = buildQueryParams(params);
@@ -21,7 +21,7 @@ const getAll = (params?: GetAllParams): Promise<PaginatedResponse<Venue>> => {
 };
 
 const get = (venueId: number): Promise<Venue> => {
-  return fetchRequest<Venue>(`${endpoint}${venueId}/`);
+  return fetchRequest<Venue>(`${endpoint}/${venueId}`);
 };
 
 const create = (venue: Venue): Promise<Venue> => {
@@ -29,20 +29,20 @@ const create = (venue: Venue): Promise<Venue> => {
 };
 
 const remove = (venueId: number): Promise<void> => {
-  return deleteRequest(`${endpoint}${venueId}`, "Venue successfully deleted");
+  return deleteRequest(`${endpoint}/${venueId}`, "Venue successfully deleted");
 };
 
 const tag = (venueId: number, action: TagAction): Promise<Venue> => {
-  return patchRequest<Venue>(`${endpoint}${venueId}/tag/${action}/`, "Venue successfully tagged");
+  return patchRequest<Venue>(`${endpoint}/${venueId}/tag/${action}`, "Venue successfully tagged");
 };
 
 const enrich = (id: number): Promise<Venue> => {
-  return fetchRequest<Venue>(`${endpoint}${id}/enrich/`);
+  return fetchRequest<Venue>(`${endpoint}/${id}/enrich`);
 };
 
 const update = (venue: Venue): Promise<Venue> => {
   return sendRequest<Venue, Venue>(
-    `${endpoint}${venue.id}/`,
+    `${endpoint}/${venue.id}`,
     venue,
     "PUT",
     "Venue successfully updated"
@@ -51,7 +51,7 @@ const update = (venue: Venue): Promise<Venue> => {
 
 const generateEmail = (venueId: number): Promise<{ message: string }> => {
   return sendRequest<{ message: string }, { message: string }>(
-    `${endpoint}${venueId}/generate_email/`,
+    `${endpoint}/${venueId}/generate_email`,
     { message: "" },
     "POST",
     "Email successfully generated"
@@ -65,7 +65,7 @@ const apply = (
   fileFieldName: string
 ): Promise<ApplicationCreate> => {
   return sendFormDataRequest<ApplicationCreate, ApplicationCreate>(
-    `${endpoint}${venueId}/apply/`,
+    `${endpoint}/${venueId}/apply`,
     application,
     files,
     fileFieldName,

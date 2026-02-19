@@ -19,10 +19,10 @@ const search = async (
     return [];
   }
   const typeParam = type ? `&type=${type.toLowerCase()}` : "";
-  return await fetchRequest(`${endpoint}/search/?q=${searchQuery}${typeParam}`);
+  return await fetchRequest(`${endpoint}/search?q=${searchQuery}${typeParam}`);
 };
 const upload = async (excelFile: File[]): Promise<UploadStats> => {
-  return await sendFormDataRequest(`${endpoint}/upload/`, undefined, excelFile, "excel", "POST");
+  return await sendFormDataRequest(`${endpoint}/upload`, undefined, excelFile, "excel", "POST");
 };
 
 export const organisationApiService = {
