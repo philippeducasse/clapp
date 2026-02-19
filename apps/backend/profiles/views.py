@@ -27,6 +27,7 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
     """
     token = request.GET.get("token")
     if not token:
+        logger.warning(f"No valid confirmation token found! for {request}")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
     try:
@@ -37,6 +38,7 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
         logger.info(f"User {user.email} successfully confirmed")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=success")
     except Profile.DoesNotExist:
+        logger.warning(f"No user found found for token {token}")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
 
