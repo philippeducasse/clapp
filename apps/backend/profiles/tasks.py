@@ -4,6 +4,7 @@ import secrets
 from celery import shared_task
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives, send_mail
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from profiles.models import Profile, Reminder
@@ -24,34 +25,13 @@ def send_registration_confirmation_email(new_user_email: str):
     user.save()
     confirmation_url = f"{settings.APP_URL}/api/profiles/confirm-email?token={token}/"
 
-    email_body = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #06965C;">Welcome to Clapp! 🎪</h2>
-                
-                <p>Hello {user.email or "there"},</p>
-                
-                <p>We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.</p>
-                
-                <p style="margin: 30px 0; text-align: center;">
-                    <a href="{confirmation_url}" style="background-color: #06965C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                        Confirm Your Email
-                    </a>
-                </p>
-                
-                <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 12px; color: #666;">
-                    Let the show begin! 🎭<br>
-                    The Clapp Team
-                </p>
-            </div>
-        </body>
-    </html>
-    """
-
     logger.info(f"Created confirmation token for {user.email} : {token}")
-
     logger.info(f"Sending confirmation email from {settings.APP_EMAIL} to {user.email}")
+
+    context = {
+        "email": user.email,
+        "confirmation_url": confirmation_url,
+    }
 
     text_content = f"""Welcome to Clapp!
 
@@ -65,13 +45,15 @@ Let the show begin!
 The Clapp Team
     """.strip()
 
+    html_content = render_to_string("profiles/emails/confirmation_email.html", context)
+
     email_message = EmailMultiAlternatives(
         subject="Welcome to Clapp! Please confirm your email",
         body=text_content,
         from_email=settings.APP_EMAIL,
         to=[user.email],
     )
-    email_message.attach_alternative(email_body, mimetype="text/html")
+    email_message.attach_alternative(html_content, "text/html")
     email_message.send(fail_silently=False)
 
 
