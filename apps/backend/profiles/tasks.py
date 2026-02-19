@@ -35,15 +35,15 @@ def send_registration_confirmation_email(new_user_email: str):
 
     text_content = f"""Welcome to Clapp!
 
-Hello {user.email or "there"},
+        Hello {user.email or "there"},
 
-We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.
+        We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.
 
-Confirm Your Email: {confirmation_url}
+        Confirm Your Email: {confirmation_url}
 
-Let the show begin!
-The Clapp Team
-    """.strip()
+        Let the show begin!
+        The Clapp Team
+            """.strip()
 
     html_content = render_to_string("profiles/emails/confirmation_email.html", context)
 
