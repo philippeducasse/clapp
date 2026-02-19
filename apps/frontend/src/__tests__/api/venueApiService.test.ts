@@ -107,7 +107,7 @@ describe('venueApiService', () => {
 
       const result = await venueApiService.get(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith('/api/venues/1/');
+      expect(mockFetchRequest).toHaveBeenCalledWith('/api/venues/1');
       expect(result.name).toBe('National Theatre');
     });
 
@@ -134,7 +134,7 @@ describe('venueApiService', () => {
       const result = await venueApiService.create(newVenue);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/venues/',
+        '/api/venues',
         newVenue,
         'POST',
         'Venue successfully created'
@@ -197,7 +197,7 @@ describe('venueApiService', () => {
       const result = await venueApiService.update(updatedVenue);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/venues/1/',
+        '/api/venues/1',
         updatedVenue,
         'PUT',
         'Venue successfully updated'
@@ -267,7 +267,7 @@ describe('venueApiService', () => {
       const result = await venueApiService.tag(1, TagAction.STAR);
 
       expect(mockPatchRequest).toHaveBeenCalledWith(
-        '/api/venues/1/tag/STAR/',
+        '/api/venues/1/tag/STAR',
         'Venue successfully tagged'
       );
       expect(result.tag).toBe('STAR');
@@ -317,7 +317,7 @@ describe('venueApiService', () => {
 
       const result = await venueApiService.enrich(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith('/api/venues/1/enrich/');
+      expect(mockFetchRequest).toHaveBeenCalledWith('/api/venues/1/enrich');
       expect(result.description).toBeDefined();
     });
   });

@@ -40,7 +40,7 @@ let csrfToken = "";
 export const waitForBackend = async (maxAttempts = 30, delayMs = 1000) => {
   for (let i = 0; i < maxAttempts; i++) {
     try {
-      const response = await fetch(`${BACKEND_URL}/api/profiles/me/`, {
+      const response = await fetch(`${BACKEND_URL}/api/profiles/me`, {
         method: "GET",
         headers: {
           Cookie: globalCookies.join("; "),
@@ -104,7 +104,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
 
   // First, make a GET request to establish CSRF cookie (Django requirement)
   console.log("  → Requesting CSRF token...");
-  const getResponse = await fetch(`${API_BASE}/profiles/me/`, {
+  const getResponse = await fetch(`${API_BASE}/profiles/me`, {
     method: "GET",
     headers: {
       Cookie: globalCookies.join("; "),
@@ -117,7 +117,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
   console.log(`  → Cookies: [${globalCookies.join(", ")}]`);
 
   // Now login with the CSRF cookie
-  const response = await fetch(`${API_BASE}/profiles/login/`, {
+  const response = await fetch(`${API_BASE}/profiles/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
 
 // Helper to logout
 export const logoutTestUser = async () => {
-  await fetch(`${API_BASE}/profiles/logout/`, {
+  await fetch(`${API_BASE}/profiles/logout`, {
     method: "POST",
     headers: {
       Cookie: globalCookies.join("; "),
@@ -260,7 +260,7 @@ export const trackEntity = (type: string, id: number) => {
 // Delete single entity
 const deleteEntity = async (endpoint: string, id: number): Promise<boolean> => {
   try {
-    const response = await fetchWithAuth(`${API_BASE}${endpoint}${id}/`, {
+    const response = await fetchWithAuth(`${API_BASE}${endpoint}/${id}`, {
       method: "DELETE",
     });
     return response.ok;
@@ -284,13 +284,13 @@ export const cleanupTestData = async () => {
     let endpoint = "";
     switch (type) {
       case "application":
-        endpoint = "/applications/";
+        endpoint = "/applications";
         break;
       case "performance":
-        endpoint = "/performances/";
+        endpoint = "/performances";
         break;
       case "festival":
-        endpoint = "/festivals/";
+        endpoint = "/festivals";
         break;
       default:
         continue;

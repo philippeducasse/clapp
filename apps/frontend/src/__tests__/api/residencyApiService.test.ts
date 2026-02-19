@@ -107,7 +107,7 @@ describe('residencyApiService', () => {
 
       const result = await residencyApiService.get(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith('/api/residencies/1/');
+      expect(mockFetchRequest).toHaveBeenCalledWith('/api/residencies/1');
       expect(result.name).toBe('Berlin Residency');
     });
 
@@ -134,7 +134,7 @@ describe('residencyApiService', () => {
       const result = await residencyApiService.create(newResidency);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/residencies/',
+        '/api/residencies',
         newResidency,
         'POST',
         'Residency successfully created'
@@ -217,7 +217,7 @@ describe('residencyApiService', () => {
       const result = await residencyApiService.update(updatedResidency);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/residencies/1/',
+        '/api/residencies/1',
         updatedResidency,
         'PUT',
         'Residency successfully updated'
@@ -313,7 +313,7 @@ describe('residencyApiService', () => {
       const result = await residencyApiService.tag(1, TagAction.STAR);
 
       expect(mockPatchRequest).toHaveBeenCalledWith(
-        '/api/residencies/1/tag/STAR/',
+        '/api/residencies/1/tag/STAR',
         'Residency successfully tagged'
       );
       expect(result.tag).toBe('STAR');
@@ -362,7 +362,7 @@ describe('residencyApiService', () => {
 
       const result = await residencyApiService.enrich(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith('/api/residencies/1/enrich/');
+      expect(mockFetchRequest).toHaveBeenCalledWith('/api/residencies/1/enrich');
       expect(result.description).toBeDefined();
     });
   });

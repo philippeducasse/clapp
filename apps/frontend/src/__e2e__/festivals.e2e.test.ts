@@ -21,7 +21,7 @@ describe("E2E: Festivals and Applications", () => {
   });
 
   it("should fetch all festivals", async () => {
-    const response = await fetchWithAuth(`${API_BASE}/festivals/`, {
+    const response = await fetchWithAuth(`${API_BASE}/festivals`, {
       method: "GET",
     });
 
@@ -45,7 +45,7 @@ describe("E2E: Festivals and Applications", () => {
 
   it("should fetch a single festival by ID", async () => {
     // First get a festival ID
-    const listResponse = await fetchWithAuth(`${API_BASE}/festivals/`, {
+    const listResponse = await fetchWithAuth(`${API_BASE}/festivals`, {
       method: "GET",
     });
     const listData = await listResponse.json();
@@ -58,7 +58,7 @@ describe("E2E: Festivals and Applications", () => {
     const festivalId = listData.results[0].id;
 
     // Get single festival
-    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/`, {
+    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}`, {
       method: "GET",
     });
 
@@ -103,13 +103,13 @@ describe("E2E: Festivals and Applications", () => {
     const festivalId = listData.results[0].id;
 
     // Get current user profile
-    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
       method: "GET",
     });
     const profile = await profileResponse.json();
 
     // Generate email
-    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/generate_email/`, {
+    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/generate_email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -140,13 +140,13 @@ describe("E2E: Festivals and Applications", () => {
     const festivalId = listData.results[0].id;
 
     // Get current user
-    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
       method: "GET",
     });
     const profile = await profileResponse.json();
 
     // Create application using JSON format
-    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/apply/`, {
+    const response = await fetchWithAuth(`${API_BASE}/festivals/${festivalId}/apply`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,7 +174,7 @@ describe("E2E: Festivals and Applications", () => {
   });
 
   it("should fetch all applications for user", async () => {
-    const response = await fetchWithAuth(`${API_BASE}/applications/`, {
+    const response = await fetchWithAuth(`${API_BASE}/applications`, {
       method: "GET",
     });
 
@@ -186,7 +186,7 @@ describe("E2E: Festivals and Applications", () => {
 
   it("should get single application", async () => {
     // Get applications list
-    const listResponse = await fetchWithAuth(`${API_BASE}/applications/`, {
+    const listResponse = await fetchWithAuth(`${API_BASE}/applications`, {
       method: "GET",
     });
     const listData = await listResponse.json();
@@ -199,7 +199,7 @@ describe("E2E: Festivals and Applications", () => {
     const applicationId = listData.results[0].id;
 
     // Get single application
-    const response = await fetchWithAuth(`${API_BASE}/applications/${applicationId}/`, {
+    const response = await fetchWithAuth(`${API_BASE}/applications/${applicationId}`, {
       method: "GET",
     });
 
@@ -210,7 +210,7 @@ describe("E2E: Festivals and Applications", () => {
 
   it("should update application status", async () => {
     // Get applications
-    const listResponse = await fetchWithAuth(`${API_BASE}/applications/`, {
+    const listResponse = await fetchWithAuth(`${API_BASE}/applications`, {
       method: "GET",
     });
     const listData = await listResponse.json();
@@ -224,7 +224,7 @@ describe("E2E: Festivals and Applications", () => {
 
     // Update status to IN_DISCUSSION
     const response = await fetchWithAuth(
-      `${API_BASE}/applications/${applicationId}/status/IN_DISCUSSION/`,
+      `${API_BASE}/applications/${applicationId}/status/IN_DISCUSSION`,
       {
         method: "PATCH",
       },

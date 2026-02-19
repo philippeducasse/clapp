@@ -22,7 +22,7 @@ describe("E2E: Profiles and Performances", () => {
 
   describe("Profile Management", () => {
     it("should get current profile", async () => {
-      const response = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+      const response = await fetchWithAuth(`${API_BASE}/profiles/me`, {
         method: "GET",
       });
 
@@ -34,13 +34,13 @@ describe("E2E: Profiles and Performances", () => {
 
     it("should update profile information", async () => {
       // Get current profile
-      const getResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+      const getResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
         method: "GET",
       });
       const profile = await getResponse.json();
 
       // Update profile
-      const updateResponse = await fetchWithAuth(`${API_BASE}/profiles/${profile.id}/`, {
+      const updateResponse = await fetchWithAuth(`${API_BASE}/profiles/${profile.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -63,13 +63,13 @@ describe("E2E: Profiles and Performances", () => {
 
     it("should update profile with social media", async () => {
       // Get current profile
-      const getResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+      const getResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
         method: "GET",
       });
       const profile = await getResponse.json();
 
       // Update with social media
-      const updateResponse = await fetchWithAuth(`${API_BASE}/profiles/${profile.id}/`, {
+      const updateResponse = await fetchWithAuth(`${API_BASE}/profiles/${profile.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -100,7 +100,7 @@ describe("E2E: Profiles and Performances", () => {
 
     beforeAll(async () => {
       // Get current user ID
-      const response = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+      const response = await fetchWithAuth(`${API_BASE}/profiles/me`, {
         method: "GET",
       });
       const profile = await response.json();
@@ -108,7 +108,7 @@ describe("E2E: Profiles and Performances", () => {
     });
 
     it("should fetch all performances for user", async () => {
-      const response = await fetchWithAuth(`${API_BASE}/performances/${userId}/`, {
+      const response = await fetchWithAuth(`${API_BASE}/performances/${userId}`, {
         method: "GET",
       });
 
@@ -127,7 +127,7 @@ describe("E2E: Profiles and Performances", () => {
         genres: ["CIRCUS"],
       };
 
-      const response = await fetchWithAuth(`${API_BASE}/performances/`, {
+      const response = await fetchWithAuth(`${API_BASE}/performances`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -156,7 +156,7 @@ describe("E2E: Profiles and Performances", () => {
       const testFile = new File(["PDF content"], "dossier.pdf", { type: "application/pdf" });
       formData.append("dossierFiles", testFile);
 
-      const response = await fetchWithAuth(`${API_BASE}/performances/`, {
+      const response = await fetchWithAuth(`${API_BASE}/performances`, {
         method: "POST",
         body: formData,
       });
@@ -173,7 +173,7 @@ describe("E2E: Profiles and Performances", () => {
 
     it("should fetch specific performance", async () => {
       // Get all performances
-      const listResponse = await fetchWithAuth(`${API_BASE}/performances/${userId}/`, {
+      const listResponse = await fetchWithAuth(`${API_BASE}/performances/${userId}`, {
         method: "GET",
       });
 
@@ -191,7 +191,7 @@ describe("E2E: Profiles and Performances", () => {
       const performanceId = performances[0].id;
 
       // Fetch specific performance
-      const response = await fetchWithAuth(`${API_BASE}/performances/${performanceId}/`, {
+      const response = await fetchWithAuth(`${API_BASE}/performances/${performanceId}`, {
         method: "GET",
       });
 
@@ -202,7 +202,7 @@ describe("E2E: Profiles and Performances", () => {
 
     it("should update performance", async () => {
       // Create a performance first
-      const createResponse = await fetchWithAuth(`${API_BASE}/performances/`, {
+      const createResponse = await fetchWithAuth(`${API_BASE}/performances`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -223,7 +223,7 @@ describe("E2E: Profiles and Performances", () => {
       trackEntity("performance", performanceId);
 
       // Update it
-      const updateResponse = await fetchWithAuth(`${API_BASE}/performances/${performanceId}/`, {
+      const updateResponse = await fetchWithAuth(`${API_BASE}/performances/${performanceId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

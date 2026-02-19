@@ -30,7 +30,7 @@ describe('profileApiService', () => {
 
       const result = await profileApiService.get();
 
-      expect(mockFetchRequest).toHaveBeenCalledWith('/api/profiles/me/');
+      expect(mockFetchRequest).toHaveBeenCalledWith('/api/profiles/me');
       expect(result.id).toBe(1);
       expect(result.email).toBe('user@example.com');
     });
@@ -83,7 +83,7 @@ describe('profileApiService', () => {
       const result = await profileApiService.register(newProfile);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/profiles/register/',
+        '/api/profiles/register',
         newProfile,
         'POST',
         'Profile successfully created!',
@@ -136,7 +136,7 @@ describe('profileApiService', () => {
       const result = await profileApiService.update(updatedProfile);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/profiles/1/',
+        '/api/profiles/1',
         updatedProfile,
         'PUT',
         'Profile successfully updated',
@@ -181,7 +181,7 @@ describe('profileApiService', () => {
       await profileApiService.remove(1);
 
       expect(mockDeleteRequest).toHaveBeenCalledWith(
-        '/api/profiles/1/',
+        '/api/profiles/1',
         'Profile successfully deleted',
         true,
       );
@@ -193,7 +193,7 @@ describe('profileApiService', () => {
       await profileApiService.remove(42);
 
       expect(mockDeleteRequest).toHaveBeenCalledWith(
-        '/api/profiles/42/',
+        '/api/profiles/42',
         'Profile successfully deleted',
         true,
       );
@@ -221,7 +221,7 @@ describe('profileApiService', () => {
       const result = await profileApiService.login(credentials);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/profiles/login/',
+        '/api/profiles/login',
         credentials,
         'POST',
         'Welcome user@example.com, you have successfully logged in',
@@ -246,7 +246,7 @@ describe('profileApiService', () => {
       await profileApiService.login(credentials);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/profiles/login/',
+        '/api/profiles/login',
         credentials,
         'POST',
         'Welcome jane@example.com, you have successfully logged in',
@@ -262,7 +262,7 @@ describe('profileApiService', () => {
       await profileApiService.logout();
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        '/api/profiles/logout/',
+        '/api/profiles/logout',
         {},
         'POST',
         'Successfully logged out',

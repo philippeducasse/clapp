@@ -8,7 +8,7 @@ describe("E2E: Authentication", () => {
   });
 
   it("should login with valid credentials", async () => {
-    const response = await fetch(`${API_BASE}/profiles/login/`, {
+    const response = await fetch(`${API_BASE}/profiles/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,7 +30,7 @@ describe("E2E: Authentication", () => {
   });
 
   it("should fail login with invalid credentials", async () => {
-    const response = await fetch(`${API_BASE}/profiles/login/`, {
+    const response = await fetch(`${API_BASE}/profiles/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +50,7 @@ describe("E2E: Authentication", () => {
     expect(loginResponse.email).toBe(TEST_USER.email);
 
     // Get current profile
-    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+    const profileResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
       method: "GET",
     });
 
@@ -64,14 +64,14 @@ describe("E2E: Authentication", () => {
     await loginTestUser();
 
     // Logout
-    const response = await fetchWithAuth(`${API_BASE}/profiles/logout/`, {
+    const response = await fetchWithAuth(`${API_BASE}/profiles/logout`, {
       method: "POST",
     });
 
     expect(response.ok).toBe(true);
 
     // Verify session is invalidated
-    const meResponse = await fetchWithAuth(`${API_BASE}/profiles/me/`, {
+    const meResponse = await fetchWithAuth(`${API_BASE}/profiles/me`, {
       method: "GET",
     });
 

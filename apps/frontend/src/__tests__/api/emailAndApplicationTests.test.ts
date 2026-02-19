@@ -42,7 +42,7 @@ describe("Email and Application Functionality", () => {
       });
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/generate_email/",
+        "/api/festivals/1/generate_email",
         {
           profile: mockProfile,
           selectedPerformanceIds,
@@ -76,7 +76,7 @@ describe("Email and Application Functionality", () => {
       });
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/festivals/5/generate_email/",
+        "/api/festivals/5/generate_email",
         {
           profile: mockProfile,
         },
@@ -122,7 +122,7 @@ describe("Email and Application Functionality", () => {
       const result = await residencyApiService.generateEmail(1);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/residencies/1/generate_email/",
+        "/api/residencies/1/generate_email",
         { message: "" },
         "POST",
         "Email successfully generated",
@@ -136,7 +136,7 @@ describe("Email and Application Functionality", () => {
       await residencyApiService.generateEmail(42);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/residencies/42/generate_email/",
+        "/api/residencies/42/generate_email",
         { message: "" },
         "POST",
         "Email successfully generated",
@@ -155,7 +155,7 @@ describe("Email and Application Functionality", () => {
       const result = await venueApiService.generateEmail(1);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/venues/1/generate_email/",
+        "/api/venues/1/generate_email",
         { message: "" },
         "POST",
         "Email successfully generated",
@@ -169,7 +169,7 @@ describe("Email and Application Functionality", () => {
       await venueApiService.generateEmail(99);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/venues/99/generate_email/",
+        "/api/venues/99/generate_email",
         { message: "" },
         "POST",
         "Email successfully generated",
@@ -205,7 +205,7 @@ describe("Email and Application Functionality", () => {
       const result = await festivalApiService.apply(1, application, [mockFile], "dossier");
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/apply/",
+        "/api/festivals/1/apply",
         expect.objectContaining({
           profileId: 1,
           emailSubject: "Application to Jazz Festival",
@@ -248,7 +248,7 @@ describe("Email and Application Functionality", () => {
       );
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/apply/",
+        "/api/festivals/1/apply",
         expect.any(Object),
         [file1, file2, file3],
         "attachments",
@@ -279,7 +279,7 @@ describe("Email and Application Functionality", () => {
       const result = await festivalApiService.apply(2, application, [], "attachments");
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/festivals/2/apply/",
+        "/api/festivals/2/apply",
         expect.any(Object),
         [],
         "attachments",
@@ -338,7 +338,7 @@ describe("Email and Application Functionality", () => {
       const result = await residencyApiService.apply(1, application, [mockFile], "documents");
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/residencies/1/apply/",
+        "/api/residencies/1/apply",
         expect.any(Object),
         [mockFile],
         "documents",
@@ -368,7 +368,7 @@ describe("Email and Application Functionality", () => {
       await residencyApiService.apply(2, application, [], "attachments");
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/residencies/2/apply/",
+        "/api/residencies/2/apply",
         expect.any(Object),
         [],
         "attachments",
@@ -404,7 +404,7 @@ describe("Email and Application Functionality", () => {
       const result = await venueApiService.apply(1, application, [mockFile], "proposal");
 
       expect(mockSendFormDataRequest).toHaveBeenCalledWith(
-        "/api/venues/1/apply/",
+        "/api/venues/1/apply",
         expect.any(Object),
         [mockFile],
         "proposal",
@@ -600,7 +600,7 @@ describe("Email and Application Functionality", () => {
       });
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/generate_email/",
+        "/api/festivals/1/generate_email",
         expect.objectContaining({
           profile: comprehensiveProfile,
           selectedPerformanceIds: [1],

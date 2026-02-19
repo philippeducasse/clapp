@@ -108,7 +108,7 @@ describe("festivalApiService", () => {
 
       const result = await festivalApiService.get(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith("/api/festivals/1/");
+      expect(mockFetchRequest).toHaveBeenCalledWith("/api/festivals/1");
       expect(result).toEqual(mockFestival);
     });
 
@@ -135,7 +135,7 @@ describe("festivalApiService", () => {
       const result = await festivalApiService.create(newFestival);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/festivals/",
+        "/api/festivals",
         newFestival,
         "POST",
         "Festival successfully created",
@@ -192,7 +192,7 @@ describe("festivalApiService", () => {
       const result = await festivalApiService.update(updatedFestival);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/",
+        "/api/festivals/1",
         updatedFestival,
         "PUT",
         "Festival successfully updated",
@@ -232,7 +232,7 @@ describe("festivalApiService", () => {
       await festivalApiService.remove(1);
 
       expect(mockDeleteRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/",
+        "/api/festivals/1",
         "Festival successfully deleted",
         true,
       );
@@ -269,7 +269,7 @@ describe("festivalApiService", () => {
       const result = await festivalApiService.tag(1, TagAction.STAR);
 
       expect(mockPatchRequest).toHaveBeenCalledWith(
-        "/api/festivals/1/tag/STAR/",
+        "/api/festivals/1/tag/STAR",
         "Festival successfully tagged",
       );
       expect(result.tag).toBe("STAR");
@@ -305,7 +305,7 @@ describe("festivalApiService", () => {
 
       const result = await festivalApiService.enrich(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith("/api/festivals/1/enrich/");
+      expect(mockFetchRequest).toHaveBeenCalledWith("/api/festivals/1/enrich");
       expect(result.description).toBeDefined();
     });
   });

@@ -44,7 +44,7 @@ describe("performanceApiService", () => {
 
       const result = await performanceApiService.getAll(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/1/");
+      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/1");
       expect(result).toHaveLength(2);
       expect(result[0].performanceTitle).toBe("Juggling Act");
     });
@@ -62,7 +62,7 @@ describe("performanceApiService", () => {
 
       await performanceApiService.getAll(42);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/42/");
+      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/42");
     });
   });
 
@@ -83,7 +83,7 @@ describe("performanceApiService", () => {
 
       const result = await performanceApiService.get(1);
 
-      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/1/");
+      expect(mockFetchRequest).toHaveBeenCalledWith("/api/performances/1");
       expect(result.performanceTitle).toBe("Juggling Act");
       expect(result.performanceType).toBe(PerformanceType.STREET);
     });
@@ -153,7 +153,7 @@ describe("performanceApiService", () => {
       const result = await performanceApiService.create(newPerformance);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/performances/",
+        "/api/performances",
         expect.objectContaining({
           profile: 1,
           performanceTitle: "New Performance",
@@ -236,7 +236,7 @@ describe("performanceApiService", () => {
       const result = await performanceApiService.update(updatedPerformance);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/performances/1/",
+        "/api/performances/1",
         expect.objectContaining({
           performanceTitle: "Updated Performance",
           dossierIds: [],
@@ -301,7 +301,7 @@ describe("performanceApiService", () => {
       await performanceApiService.update(updatedPerformance);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
-        "/api/performances/1/",
+        "/api/performances/1",
         expect.objectContaining({
           dossierIds: [1],
         }),
