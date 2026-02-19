@@ -1,6 +1,5 @@
 import logging
 
-from django.conf import settings
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -20,9 +19,9 @@ def send_confirmation_email(sender, instance, created, raw, **kwargs):
     if raw:
         return
 
-    if settings.ENVIRONMENT != "prod":
-        logger.info(f"Skipping confirmation email for {instance.email}")
-        return
+    # if settings.ENVIRONMENT != "prod":
+    #     logger.info(f"Skipping confirmation email for {instance.email}")
+    #     return
 
     if created:
         logger.info(

@@ -147,7 +147,7 @@ class TestUserRegistrationIntegration:
         welcome_email = mail.outbox[0]
         assert "Welcome" in welcome_email.subject
         assert "newuser@example.com" in welcome_email.to
-        # APP_EMAIL should be used (will be set by override_settings in test config)
+        # EMAIL_HOST_USER should be used (will be set by override_settings in test config)
         assert welcome_email.from_email is not None
 
     def test_register_user_with_duplicate_email_enforces_database_constraint(
@@ -923,9 +923,9 @@ class TestCompleteApplicationWorkflowIntegration:
 
         # Verify application email was sent (total 1 email: the application email)
         assert len(mail.outbox) == 1
-        app_email = mail.outbox[0]
-        assert app_email.subject == "Application to Workflow Festival"
-        assert "workflow@festival.com" in app_email.to
+        EMAIL_HOST_USER = mail.outbox[0]
+        assert EMAIL_HOST_USER.subject == "Application to Workflow Festival"
+        assert "workflow@festival.com" in EMAIL_HOST_USER.to
 
         # Verify database relationships
         assert user.applications.count() == 1

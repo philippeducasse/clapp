@@ -49,7 +49,7 @@ class TestSendConfirmationEmailSignal:
         ENVIRONMENT="prod",
         CELERY_TASK_ALWAYS_EAGER=True,
         APP_URL="http://test.example.com",
-        APP_EMAIL="noreply@test.example.com",
+        EMAIL_HOST_USER="noreply@test.example.com",
     )
     def test_email_sent_to_correct_recipient(self):
         """Test that confirmation emails are sent to the correct recipients."""

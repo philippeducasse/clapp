@@ -7,6 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEBUG = True
 ENVIRONMENT = "local"
+APP_URL = "http://localhost:8000"
 
 # Disable secure cookie requirements for local HTTP development
 CSRF_COOKIE_SECURE = False

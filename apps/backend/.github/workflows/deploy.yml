@@ -72,7 +72,11 @@ jobs:
           script: |
             mkdir -p ~/clapp
             cat > ~/clapp/.env << 'EOF'
-            APP_EMAIL=${{ secrets.APP_EMAIL }}
+            EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+            EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
+            EMAIL_HOST=${{ secrets.EMAIL_HOST }}
+            EMAIL_HOST_PORT=${{ secrets.EMAIL_HOST_PORT }}
+            EMAIL_USE_TLS=${{ secrets.EMAIUSE_TLS}}
             DB_ENGINE=${{ secrets.DB_ENGINE }}
             DB_HOST=${{ secrets.DB_HOST }}
             DB_NAME=${{ secrets.DB_NAME }}

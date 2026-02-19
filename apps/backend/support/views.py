@@ -16,8 +16,8 @@ class SubmitBugReportView(APIView):
             email = EmailMultiAlternatives(
                 subject=f"Bug Report from {request.user}",
                 body=bug_report.message,
-                from_email=settings.APP_EMAIL,
-                to=[settings.APP_EMAIL],
+                from_email=settings.EMAIL_HOST_USER,
+                to=[settings.EMAIL_HOST_USER],
             )
             # Attach files
             for attachment in bug_report.attachments.all():

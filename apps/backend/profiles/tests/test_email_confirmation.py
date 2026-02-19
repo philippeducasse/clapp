@@ -4,7 +4,7 @@ Tests for the email confirmation flow:
   - confirm_email view action (profiles/views.py)
 
 Key design decisions:
-  - APP_URL and APP_EMAIL are only defined in prod settings, so every test
+  - APP_URL and EMAIL_HOST_USER are only defined in prod settings, so every test
     that exercises those code paths uses @override_settings to inject them.
   - The signal skips task dispatch in non-prod environments (ENVIRONMENT != "prod"),
     so task tests call the task function directly rather than relying on the signal.
@@ -27,7 +27,7 @@ from profiles.tasks import send_registration_confirmation_email
 # ---------------------------------------------------------------------------
 CONFIRMATION_SETTINGS = {
     "APP_URL": "https://test.clapp.example.com",
-    "APP_EMAIL": "noreply@test.clapp.example.com",
+    "EMAIL_HOST_USER": "noreply@test.clapp.example.com",
 }
 
 
@@ -129,13 +129,13 @@ class TestSendRegistrationConfirmationEmailTask:
         assert mail.outbox[0].subject == "Welcome to Clapp! Please confirm your email"
 
     @override_settings(**CONFIRMATION_SETTINGS)
-    def test_email_from_address_uses_app_email_setting(self, profile):
-        """The from address must be the APP_EMAIL setting, not a hardcoded value."""
+    def test_email_from_address_uses_EMAIL_HOST_USER_setting(self, profile):
+        """The from address must be the EMAIL_HOST_USER setting, not a hardcoded value."""
         mail.outbox.clear()
 
         send_registration_confirmation_email(profile.email)
 
-        assert mail.outbox[0].from_email == CONFIRMATION_SETTINGS["APP_EMAIL"]
+        assert mail.outbox[0].from_email == CONFIRMATION_SETTINGS["EMAIL_HOST_USER"]
 
     # ------------------------------------------------------------------
     # Email body content

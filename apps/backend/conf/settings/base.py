@@ -125,7 +125,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Email configuration
 
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
-APP_EMAIL = os.getenv("APP_EMAIL", "support@clapp.ovh")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
 
 # overides default django user model
 AUTH_USER_MODEL = "profiles.Profile"

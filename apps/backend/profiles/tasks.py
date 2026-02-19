@@ -26,7 +26,7 @@ def send_registration_confirmation_email(new_user_email: str):
     confirmation_url = f"{settings.APP_URL}/api/profiles/confirm-email?token={token}/"
 
     logger.info(f"Created confirmation token for {user.email} : {token}")
-    logger.info(f"Sending confirmation email from {settings.APP_EMAIL} to {user.email}")
+    logger.info(f"Sending confirmation email from {settings.EMAIL_HOST_USER} to {user.email}")
 
     context = {
         "email": user.email,
@@ -50,7 +50,7 @@ The Clapp Team
     email_message = EmailMultiAlternatives(
         subject="Welcome to Clapp! Please confirm your email",
         body=text_content,
-        from_email=settings.APP_EMAIL,
+        from_email=settings.EMAIL_HOST_USER,
         to=[user.email],
     )
     email_message.attach_alternative(html_content, "text/html")
@@ -105,7 +105,7 @@ Clapp Team
     send_mail(
         subject=subject,
         message=message,
-        from_email=settings.APP_EMAIL,
+        from_email=settings.EMAIL_HOST_USER,
         recipient_list=[reminder.profile.email],
         fail_silently=False,
     )

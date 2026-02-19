@@ -7,7 +7,7 @@ DEBUG = False
 ENVIRONMENT = "prod"
 
 APP_URL = os.getenv("APP_URL", "https://clapp.ovh")
-APP_EMAIL = os.getenv("APP_EMAIL", "support@clapp.ovh")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
 
 # Production database configuration - all from environment variables
 DATABASES = {
