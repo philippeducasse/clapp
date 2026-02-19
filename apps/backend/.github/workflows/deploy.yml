@@ -63,29 +63,34 @@ jobs:
           source: "docker/docker-compose.yml,docker/nginx.conf"
           target: "~/clapp/"
 
-      - name: Copy environment variables to server
+      - name: Copy environment file to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker/.env.prod"
+          target: "~/clapp/.env"
+
+      - name: Add sensitive variables to server
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            mkdir -p ~/clapp
-            cat > ~/clapp/.env << 'EOF'
+            cat >> ~/clapp/.env << 'EOF'
             REGISTRY_URL=${{ secrets.REGISTRY_URL }}
-            EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
-            EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
-            EMAIL_HOST=${{ secrets.EMAIL_HOST }}
-            EMAIL_HOST_PORT=${{ secrets.EMAIL_HOST_PORT }}
-            EMAIL_USE_TLS=${{ secrets.EMAIUSE_TLS}}
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
             DB_ENGINE=${{ secrets.DB_ENGINE }}
             DB_HOST=${{ secrets.DB_HOST }}
             DB_NAME=${{ secrets.DB_NAME }}
+            DB_USER=${{ secrets.DB_USER }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             DB_PORT=${{ secrets.DB_PORT }}
-            DB_USER=${{ secrets.DB_USER }}
+            EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
+            EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
             MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}
-            SECRET_KEY=${{ secrets.SECRET_KEY }}
             EOF
 
       - name: Deploy to server
