@@ -536,8 +536,6 @@ def prepare_application_email(
         application.email_subject,
         text_content,
         from_email=formatted_from_email,
-        # "info@philippeducasse.com",
-        # ["info@philippeducasse.com"],
         to=recipient_emails,
         connection=connection,
     )

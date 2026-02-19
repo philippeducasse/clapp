@@ -3,7 +3,7 @@ import secrets
 
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.utils import timezone
 
 from profiles.models import Profile, Reminder
@@ -53,13 +53,25 @@ def send_registration_confirmation_email(new_user_email: str):
 
     logger.info(f"Sending confirmation email from {settings.APP_EMAIL} to {user.email}")
 
-    email_message = EmailMessage(
+    text_content = f"""Welcome to Clapp!
+
+Hello {user.email or "there"},
+
+We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.
+
+Confirm Your Email: {confirmation_url}
+
+Let the show begin!
+The Clapp Team
+    """.strip()
+
+    email_message = EmailMultiAlternatives(
         subject="Welcome to Clapp! Please confirm your email",
-        body=email_body,
+        body=text_content,
         from_email=settings.APP_EMAIL,
         to=[user.email],
     )
-    email_message.content_subtype = "html"
+    email_message.attach_alternative(email_body, "text/html")
     email_message.send(fail_silently=False)
 
 
