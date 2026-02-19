@@ -69,7 +69,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker/.env.prod"
+          source: "docker/.env"
           target: "~/clapp/.env"
 
       - name: Add sensitive variables to server
