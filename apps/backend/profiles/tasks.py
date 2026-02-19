@@ -3,7 +3,7 @@ import secrets
 
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import EmailMessage, send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.utils import timezone
 
 from profiles.models import Profile, Reminder
@@ -65,13 +65,13 @@ Let the show begin!
 The Clapp Team
     """.strip()
 
-    email_message = EmailMessage(
+    email_message = EmailMultiAlternatives(
         subject="Welcome to Clapp! Please confirm your email",
         body=text_content,
         from_email=settings.APP_EMAIL,
         to=[user.email],
-        html_message=email_body,
     )
+    email_message.attach_alternative(email_body, mimetype="text/html")
     email_message.send(fail_silently=False)
 
 

@@ -63,6 +63,26 @@ jobs:
           source: "docker/docker-compose.yml,docker/nginx.conf"
           target: "~/clapp/"
 
+      - name: Copy environment variables to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ~/clapp
+            cat > ~/clapp/.env << 'EOF'
+            APP_EMAIL=${{ secrets.APP_EMAIL }}
+            DB_ENGINE=${{ secrets.DB_ENGINE }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_NAME=${{ secrets.DB_NAME }}
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_USER=${{ secrets.DB_USER }}
+            MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            EOF
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
         with:
