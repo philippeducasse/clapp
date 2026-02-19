@@ -72,6 +72,7 @@ jobs:
           script: |
             mkdir -p ~/clapp
             cat > ~/clapp/.env << 'EOF'
+            REGISTRY_URL=${{ secrets.REGISTRY_URL }}
             EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}
             EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}
             EMAIL_HOST=${{ secrets.EMAIL_HOST }}
