@@ -117,7 +117,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
   console.log(`  → Cookies: [${globalCookies.join(", ")}]`);
 
   // Now login with the CSRF cookie
-  const response = await fetch(`${API_BASE}/profiles/login`, {
+  const response = await fetch(`${API_BASE}/profiles/login/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -149,7 +149,7 @@ export const loginTestUser = async (credentials = TEST_USER) => {
 
 // Helper to logout
 export const logoutTestUser = async () => {
-  await fetch(`${API_BASE}/profiles/logout`, {
+  await fetch(`${API_BASE}/profiles/logout/`, {
     method: "POST",
     headers: {
       Cookie: globalCookies.join("; "),
