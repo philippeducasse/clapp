@@ -23,10 +23,14 @@ def send_registration_confirmation_email(new_user_email: str):
     token = secrets.token_urlsafe(32)
     user.confirmation_token = token
     user.save()
-    confirmation_url = f"{settings.APP_URL}/api/profiles/confirm-email?token={token}/"
+    confirmation_url = f"{settings.APP_URL}/api/profiles/confirm-email?token={token}"
 
     logger.info(f"Created confirmation token for {user.email} : {token}")
     logger.info(f"Sending confirmation email from {settings.EMAIL_HOST_USER} to {user.email}")
+
+    logger.info(
+        f"DEBUG: USER: {settings.EMAIL_HOST_USER} \n PW: {settings.EMAIL_HOST_PASSWORD} \n PORT:{settings.EMAIL_PORT} \nEMAIL_USE_TLS: {settings.EMAIL_USE_TLS} HOST:\n{settings.EMAIL_HOST}"
+    )
 
     context = {
         "email": user.email,

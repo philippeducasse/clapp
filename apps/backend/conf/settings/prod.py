@@ -8,10 +8,10 @@ ENVIRONMENT = "prod"
 
 APP_URL = os.getenv("APP_URL", "https://clapp.ovh")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
-EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS")
-EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "ssl0.ovh.net")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True")
 
 # Production database configuration - all from environment variables
 DATABASES = {

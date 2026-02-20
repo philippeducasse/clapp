@@ -1,22 +1,44 @@
 <html>
-    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2 style="color: #06965C;">Welcome to Clapp! 🎪</h2>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333">
+    <div style="max-width: 600px; padding: 20px">
+      <h2 style="color: #06965c">Welcome to Clapp! 🎪</h2>
 
-            <p>Hello {{ email|default:"there" }},</p>
+      <p>Hello {{ email|default:"there" }},</p>
 
-            <p>We're thrilled to have you join our performance arts community! Whether you're a juggler, singer-songwriter, or visual artist, Clapp will help you manage your freelance artist application process.</p>
+      <p>
+        We're thrilled to have you join our performance arts community! Whether you're a juggler,
+        singer-songwriter, or visual artist, Clapp will help you manage your freelance artist
+        application process.
+      </p>
 
-            <p style="margin: 30px 0; text-align: center;">
-                <a href="{{ confirmation_url }}" style="background-color: #06965C; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                    Confirm Your Email
-                </a>
-            </p>
+      <p style="margin: 30px 0; text-align: center">
+        <a
+          href="{{ confirmation_url }}"
+          style="
+            background-color: #06965c;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+          "
+        >
+          Confirm Your Email
+        </a>
+      </p>
 
-            <p style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; font-size: 12px; color: #666;">
-                Let the show begin! 🎭<br>
-                The Clapp Team
-            </p>
-        </div>
-    </body>
+      <p
+        style="
+          margin-top: 40px;
+          border-top: 1px solid #ddd;
+          padding-top: 20px;
+          font-size: 12px;
+          color: #666;
+        "
+      >
+        Let the show begin! 🎭<br />
+        The Clapp Team
+      </p>
+    </div>
+  </body>
 </html>

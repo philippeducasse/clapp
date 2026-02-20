@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from applications.views import ApplicationViewSet
 from typing import List
 
-router: DefaultRouter = DefaultRouter()
+router: DefaultRouter = DefaultRouter(trailing_slash=False)
 router.register(r"", ApplicationViewSet, basename="application")
 urlpatterns: List[URLPattern] = [
     path("", include(router.urls)),

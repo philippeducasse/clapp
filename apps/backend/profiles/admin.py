@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
     inlines = [EmailTemplateInline]
     list_filter = ("is_staff", "is_active")
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        (None, {"fields": ("email", "password", "confirmed_account", "confirmation_token")}),
         (
             "Personal info",
             {

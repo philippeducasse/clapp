@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEBUG = True
 ENVIRONMENT = "local"
-APP_URL = "http://localhost:8000"
+APP_URL = "http://localhost:3020"
 
 # Disable secure cookie requirements for local HTTP development
 CSRF_COOKIE_SECURE = False
@@ -63,3 +63,9 @@ if CACHE_BACKEND == "django_redis.cache.RedisCache":
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = "memory://"
 CELERY_RESULT_BACKEND = "cache+memory://"
+
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "ssl0.ovh.net")
+EMAIL_PORT = os.getenv("EMAIL_PORT", "587")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True")

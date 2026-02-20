@@ -27,6 +27,7 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
     """
     token = request.GET.get("token")
     if not token:
+        logger.warning(f"No valid confirmation token found! for {request}")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
     try:
@@ -37,6 +38,7 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
         logger.info(f"User {user.email} successfully confirmed")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=success")
     except Profile.DoesNotExist:
+        logger.warning(f"No user found found for token {token}")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
 
@@ -57,9 +59,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def me(self, request: Request) -> Response:
         """Get the authenticated user's profile"""
-        profile = request.user
-        serializer = self.get_serializer(profile)
-        return Response(serializer.data)
+        try:
+            profile = request.user
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data)
+        except Exception as e:
+            logger.error(f"Error fetching profile for user {request.user.pk}: {e}")
+            return Response({"detail": "Unable to retrieve profile."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=["post"])
     def change_password(self, request: Request) -> Response:
