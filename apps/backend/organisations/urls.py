@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import OrganisationViewSet, search
 
-router = DefaultRouter(trailing_slash=False)
+router = DefaultRouter()
 router.register(r"", OrganisationViewSet, basename="organisation")
 
 urlpatterns: List[URLPattern] = [

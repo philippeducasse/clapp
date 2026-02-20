@@ -17,12 +17,18 @@ class Command(BaseCommand):
                 "password": "TestPassword123!",
                 "first_name": "Test",
                 "last_name": "User",
+                "email_host": "GMAIL",
+                "email_host_user": "test@test.com",
+                "email_host_password": "TestPassword123!",
             },
             {
                 "email": "test2@test.com",
                 "password": "TestPassword123!",
                 "first_name": "Test",
                 "last_name": "User2",
+                "email_host": "GMAIL",
+                "email_host_user": "test@test.com",
+                "email_host_password": "TestPassword123!",
             },
         ]
 
