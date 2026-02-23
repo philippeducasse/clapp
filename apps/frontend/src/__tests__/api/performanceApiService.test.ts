@@ -218,12 +218,13 @@ describe("performanceApiService", () => {
 
   describe("update", () => {
     it("should update performance without dossiers", async () => {
-      const updatedPerformance: Performance = {
+      const updatedPerformance: Performance & { dossierIds?: number[] } = {
         id: 1,
         profile: 1,
         performanceTitle: "Updated Performance",
         shortDescription: "Updated description",
         performanceType: PerformanceType.INDOOR_STAGE,
+        dossierIds: [],
       };
 
       const mockResponse: Performance = {
@@ -233,7 +234,7 @@ describe("performanceApiService", () => {
 
       mockSendRequest.mockResolvedValue(mockResponse);
 
-      const result = await performanceApiService.update(updatedPerformance);
+      const result = await performanceApiService.update(updatedPerformance as Performance);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/performances/1",
@@ -281,24 +282,30 @@ describe("performanceApiService", () => {
     });
 
     it("should update performance keeping existing dossiers", async () => {
-      const existingDossier = {
-        id: 1,
-        file: "https://example.com/old.pdf",
-        uploadedAt: "2024-01-01",
-      };
-
       const updatedPerformance: Performance & {
-        dossierFiles?: (File | { id: number; file: string; uploadedAt: Date | string })[];
+        dossierIds?: number[];
       } = {
         id: 1,
         profile: 1,
         performanceTitle: "Keep Dossiers",
-        dossierFiles: [existingDossier],
+        dossierIds: [1],
       };
 
-      mockSendRequest.mockResolvedValue(updatedPerformance);
+      const mockResponse: Performance = {
+        ...updatedPerformance,
+        dossiers: [
+          {
+            id: 1,
+            file: "https://example.com/old.pdf",
+            uploadedAt: new Date("2024-01-01"),
+            name: "old.pdf",
+          },
+        ],
+      };
 
-      await performanceApiService.update(updatedPerformance);
+      mockSendRequest.mockResolvedValue(mockResponse);
+
+      await performanceApiService.update(updatedPerformance as Performance);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/performances/1",

@@ -72,12 +72,7 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
         const newDossiers: File[] = dossierFiles.filter(
           (dossier): dossier is File => dossier instanceof File,
         );
-        console.log("PERF", {
-          ...cleanedData,
-          id: performanceId,
-          dossierFiles: newDossiers,
-          dossierIds,
-        });
+
         const updatedPerformance = await performanceApiService.update({
           ...cleanedData,
           id: performanceId,
