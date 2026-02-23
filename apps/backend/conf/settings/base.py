@@ -10,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-import logging
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from .logging_filters import HealthcheckFilter
 
 load_dotenv(".env")
 
@@ -141,11 +141,6 @@ REST_FRAMEWORK = {
 }
 
 
-class HealthcheckFilter(logging.Filter):
-    def filter(self, record):
-        return "/health/" not in record.getMessage()
-
-
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -176,6 +171,12 @@ LOGGING = {
             "handlers": ["console"],
             "level": "DEBUG",
             "propagate": False,
+        },
+        "gunicorn.access": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+            "filters": ["healthcheck"],
         },
     },
 }
