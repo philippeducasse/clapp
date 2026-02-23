@@ -39,46 +39,28 @@ const remove = (performanceId: number) => {
 };
 
 const update = (performance: Performance): Promise<Performance> => {
-  const { dossierFiles, ...performanceData } = performance as Performance & {
-    dossierFiles?: Array<File | { id: number; file: string; uploadedAt: Date | string }>
+  const { dossierFiles, dossierIds, ...performanceData } = performance as Performance & {
+    dossierFiles?: File[];
+    dossierIds?: number[];
   };
 
   if (dossierFiles && dossierFiles.length > 0) {
-    const existingDossiers = dossierFiles.filter((item): item is { id: number; file: string; uploadedAt: Date | string } =>
-      !(item instanceof File)
-    );
-    const newFiles = dossierFiles.filter((item): item is File => item instanceof File);
-
-    const dataWithDossierIds = {
-      ...performanceData,
-      dossierIds: existingDossiers.map(d => d.id),
-    };
-
-    if (newFiles.length > 0) {
-      return sendFormDataRequest<Performance, Performance>(
-        `${endpoint}/${performance.id}`,
-        dataWithDossierIds,
-        newFiles,
-        "dossier_files",
-        "PUT",
-        "Performance successfully updated"
-      );
-    }
-
-    // No new files, but send dossier_ids to keep existing ones
-    return sendRequest<Performance, Performance>(
+    // When uploading files, use FormData but exclude dossierIds (arrays don't serialize well in FormData)
+    // Backend will not delete dossiers if dossier_ids is not provided
+    return sendFormDataRequest<Performance, Performance>(
       `${endpoint}/${performance.id}`,
-      dataWithDossierIds,
+      performanceData,
+      dossierFiles,
+      "dossier_files",
       "PUT",
-      "Performance successfully updated",
-      true
+      "Performance successfully updated"
     );
   }
 
-  // No dossiers at all, send empty dossier_ids to delete all
+  // When not uploading files, use JSON request to include dossierIds for proper array handling
   return sendRequest<Performance, Performance>(
     `${endpoint}/${performance.id}`,
-    { ...performanceData, dossierIds: [] },
+    { ...performanceData, dossierIds },
     "PUT",
     "Performance successfully updated",
     true

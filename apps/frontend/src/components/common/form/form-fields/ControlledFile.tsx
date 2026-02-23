@@ -16,8 +16,9 @@ const ControlledFile = ({ field }: BaseControlledProps) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newFiles = e.target.files ? Array.from(e.target.files) : [];
-    setFiles(newFiles);
-    field.onChange(newFiles);
+    const updatedFiles = [...files, ...newFiles];
+    setFiles(updatedFiles);
+    field.onChange(updatedFiles);
   };
 
   const handleRemoveFile = (index: number) => {

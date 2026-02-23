@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { Performance } from "@/interfaces/entities/Performance";
+import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import {
   createZodFormSchema,
   sanitizeFormData,
@@ -54,12 +54,36 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      const cleanedData = prepareFormDataForSubmission(values, formFields);
+      const cleanedData = prepareFormDataForSubmission(values, formFields) as Record<
+        string,
+        unknown
+      >;
+
       if (action === Action.EDIT && performanceId) {
+        // Separate dossier files from existing dossier IDs
+        const dossierFiles = (cleanedData.dossierFiles || []) as Array<File | { id: number }>;
+        const dossierIds: number[] = dossierFiles
+          .filter(
+            (dossier): dossier is { id: number } =>
+              typeof dossier === "object" && !!(dossier as Dossier).id,
+          )
+          .map((dossier) => dossier.id);
+
+        const newDossiers: File[] = dossierFiles.filter(
+          (dossier): dossier is File => dossier instanceof File,
+        );
+        console.log("PERF", {
+          ...cleanedData,
+          id: performanceId,
+          dossierFiles: newDossiers,
+          dossierIds,
+        });
         const updatedPerformance = await performanceApiService.update({
           ...cleanedData,
           id: performanceId,
-        } as Performance);
+          dossierFiles: newDossiers,
+          dossierIds,
+        } as unknown as Performance);
         dispatch(updatePerformance(updatedPerformance));
         router.push(`/profile#performances`);
       } else if (action === Action.CREATE && profile) {
@@ -82,7 +106,6 @@ const PerformanceForm = ({ action }: PerformanceFormProps) => {
   }
 
   const onCancelHref = `/profile#performances`;
-
   return (
     <>
       <FormHeader action={action} entityName={EntityName.PERFORMANCE} />
