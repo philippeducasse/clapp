@@ -27,7 +27,11 @@ class PerformanceSerializer(serializers.ModelSerializer):
     )
     trailer = NormalizedURLField(required=False, allow_blank=True, max_length=100)
     dossier_ids = serializers.ListField(
-        child=serializers.IntegerField(), write_only=True, required=False, allow_empty=True
+        child=serializers.IntegerField(allow_null=True),
+        write_only=True,
+        required=False,
+        allow_empty=True,
+        allow_null=True,
     )
 
     class Meta:
@@ -48,15 +52,20 @@ class PerformanceSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         dossier_files = validated_data.pop("dossier_files", [])
         dossier_ids = validated_data.pop("dossier_ids", None)
+        if dossier_ids == [""]:
+            dossier_ids = []
+        print("DOSSIERS:", dossier_ids, dossier_files)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # If dossier_ids is provided, delete dossiers not in the list
+        # Delete dossiers not in the provided list
         if dossier_ids is not None:
             instance.dossiers.exclude(id__in=dossier_ids).delete()
 
+        # Add new dossier files
         for dossier_file in dossier_files:
             Dossier.objects.create(performance=instance, file=dossier_file)
+            logger.info("Dossier added successfully")
 
         return instance
