@@ -14,7 +14,9 @@ python manage.py migrate --noinput
 
 echo "Starting Gunicorn..."
 exec gunicorn \
-    --config conf/gunicorn.conf.py \
+    --bind 0.0.0.0:8000 \
     --workers ${GUNICORN_WORKERS:-3} \
     --worker-class ${GUNICORN_WORKER_CLASS:-sync} \
+    --access-logfile - \
+    --error-logfile - \
     clapp_backend.wsgi:application
