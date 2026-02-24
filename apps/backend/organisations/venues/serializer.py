@@ -25,6 +25,7 @@ class VenueSerializer(WritableNestedModelSerializer):
             "country",
             "town",
             "website_url",
+            "venue_type",
             "tag",
             "comments",
             "contacts",

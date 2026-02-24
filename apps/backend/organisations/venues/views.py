@@ -2,7 +2,7 @@ from typing import Optional
 
 from django.db.models import Q, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 from organisations.venues.models import Venue
 from organisations.venues.serializer import VenueSerializer
@@ -13,7 +13,7 @@ from organisations.models import Organisation
 
 class VenueViewSet(OrganisationViewSet):
     serializer_class = VenueSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "venue_type"]
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name"]

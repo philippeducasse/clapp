@@ -4,7 +4,7 @@ from typing import Optional
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Exists, OuterRef, Prefetch, Q, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 from applications.models import Application
 from organisations.festivals.models import Festival
@@ -18,7 +18,7 @@ class FestivalViewSet(OrganisationViewSet):
     serializer_class = FestivalSerializer
 
     # DRF automatically reads the column and search filter with these paramters.
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "festival_type"]
     search_fields = ["name", "country", "website_url", "festival_type"]
     ordering_fields = ["name", "start_date", "application_date_start"]

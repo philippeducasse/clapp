@@ -2,7 +2,7 @@ from typing import Optional
 
 from django.db.models import Q, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 from organisations.residencies.models import Residency
 from organisations.residencies.serializer import ResidencySerializer
@@ -13,7 +13,7 @@ from organisations.models import Organisation
 
 class ResidencyViewSet(OrganisationViewSet):
     serializer_class = ResidencySerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "application_type"]
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name", "start_date", "application_date_start"]
