@@ -7,6 +7,7 @@ import {
   cleanupTestData,
   trackEntity,
 } from "./setup";
+import { Festival } from "@/interfaces/entities/Festival";
 
 describe("E2E: Festivals and Applications", () => {
   beforeAll(async () => {
@@ -79,7 +80,7 @@ describe("E2E: Festivals and Applications", () => {
   });
 
   it("should filter festivals by type", async () => {
-    const response = await fetchWithAuth(`${API_BASE}/festivals/?festival_type=CIRCUS`, {
+    const response = await fetchWithAuth(`${API_BASE}/festivals/?festivalType=CIRCUS`, {
       method: "GET",
     });
 
@@ -232,5 +233,298 @@ describe("E2E: Festivals and Applications", () => {
 
     // Note: May return 200 or 404 depending on permissions
     expect([200, 403, 404]).toContain(response.status);
+  });
+});
+
+describe("E2E: Search Bar and Column Filters", () => {
+  beforeAll(async () => {
+    await waitForBackend();
+    // Login and get session
+    const profile = await loginTestUser();
+    expect(profile.id).toBeDefined();
+  });
+
+  afterAll(async () => {
+    await cleanupTestData();
+  });
+
+  describe("Search Bar Tests", () => {
+    it("should search festivals with a specific term", async () => {
+      const searchTerm = "festival";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data).toHaveProperty("count");
+    });
+
+    it("should handle empty search results", async () => {
+      const searchTerm = "xyznonexistentfestivalname123";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.count).toBe(0);
+    });
+
+    it("should search with pagination parameters", async () => {
+      const searchTerm = "festival";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.results.length).toBeLessThanOrEqual(5);
+    });
+
+    it("should handle special characters in search", async () => {
+      const searchTerm = "test@";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+    });
+  });
+
+  describe("Column Filter Tests", () => {
+    it("should filter festivals by type", async () => {
+      const response = await fetchWithAuth(`${API_BASE}/festivals/?festival_type=STREET`, {
+        method: "GET",
+      });
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      // All results should be of type STREET
+      if (data.results.length > 0) {
+        data.results.forEach((festival: Festival) => {
+          expect(festival.festival_type || festival.festivalType).toBe("STREET");
+        });
+      }
+    });
+
+    it("should filter festivals by multiple filter parameters", async () => {
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=10`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.results.length).toBeLessThanOrEqual(10);
+    });
+
+    it("should handle filters with pagination", async () => {
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.results.length).toBeLessThanOrEqual(5);
+    });
+  });
+
+  describe("Combined Search and Filter Tests", () => {
+    it("should search and filter simultaneously", async () => {
+      const searchTerm = "festival";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}&festival_type=STREET`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      // All results should match both search and filter criteria
+      if (data.results.length > 0) {
+        data.results.forEach((festival: Festival) => {
+          expect(festival.festival_type || festival.festivalType).toBe("STREET");
+        });
+      }
+    });
+
+    it("should apply search with filters and pagination", async () => {
+      const searchTerm = "festival";
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}&festival_type=STREET&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.results.length).toBeLessThanOrEqual(5);
+    });
+
+    it("should return results even when both search and filter return nothing", async () => {
+      const response = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=xyznonexistent&festival_type=STREET`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response.ok).toBe(true);
+      const data = await response.json();
+      expect(Array.isArray(data.results)).toBe(true);
+      expect(data.count).toBe(0);
+    });
+  });
+
+  describe("Pagination with Filters and Search", () => {
+    it("should paginate through filtered results", async () => {
+      // Get first page of filtered results
+      const firstPageResponse = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(firstPageResponse.ok).toBe(true);
+      const firstPageData = await firstPageResponse.json();
+
+      // Get second page of same filter
+      const secondPageResponse = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=5&offset=5`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(secondPageResponse.ok).toBe(true);
+      const secondPageData = await secondPageResponse.json();
+
+      expect(Array.isArray(firstPageData.results)).toBe(true);
+      expect(Array.isArray(secondPageData.results)).toBe(true);
+
+      // Both pages should have the same properties but different data
+      if (firstPageData.results.length > 0 && secondPageData.results.length > 0) {
+        // IDs should be different between pages
+        const firstPageIds = firstPageData.results.map((f: Festival) => f.id);
+        const secondPageIds = secondPageData.results.map((f: Festival) => f.id);
+        const intersection = firstPageIds.filter((id: number) => secondPageIds.includes(id));
+        expect(intersection.length).toBe(0);
+      }
+    });
+
+    it("should paginate through search results", async () => {
+      const searchTerm = "festival";
+
+      // Get first page of search results
+      const firstPageResponse = await fetchWithAuth(
+        `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(firstPageResponse.ok).toBe(true);
+      const firstPageData = await firstPageResponse.json();
+
+      if (firstPageData.count > 5) {
+        // Get second page
+        const secondPageResponse = await fetchWithAuth(
+          `${API_BASE}/festivals/?search=${encodeURIComponent(searchTerm)}&limit=5&offset=5`,
+          {
+            method: "GET",
+          },
+        );
+
+        expect(secondPageResponse.ok).toBe(true);
+        const secondPageData = await secondPageResponse.json();
+
+        if (firstPageData.results.length > 0 && secondPageData.results.length > 0) {
+          const firstPageIds = firstPageData.results.map((f: Festival) => f.id);
+          const secondPageIds = secondPageData.results.map((f: Festival) => f.id);
+          const intersection = firstPageIds.filter((id: number) => secondPageIds.includes(id));
+          expect(intersection.length).toBe(0);
+        }
+      }
+    });
+  });
+
+  describe("Filter State Management Tests", () => {
+    it("should properly handle clearing filters by omitting filter parameters", async () => {
+      // First get filtered results
+      const filteredResponse = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=5`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(filteredResponse.ok).toBe(true);
+      const filteredData = await filteredResponse.json();
+
+      // Then get unfiltered results
+      const unfilteredResponse = await fetchWithAuth(`${API_BASE}/festivals/?limit=100`, {
+        method: "GET",
+      });
+
+      expect(unfilteredResponse.ok).toBe(true);
+      const unfilteredData = await unfilteredResponse.json();
+
+      // Unfiltered count should be >= filtered count
+      expect(unfilteredData.count).toBeGreaterThanOrEqual(filteredData.count);
+    });
+
+    it("should handle offset reset when applying new filters", async () => {
+      const response1 = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=STREET&limit=5&offset=10`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response1.ok).toBe(true);
+
+      // Applying different filter should still work with offset
+      const response2 = await fetchWithAuth(
+        `${API_BASE}/festivals/?festival_type=THEATRE&limit=5&offset=0`,
+        {
+          method: "GET",
+        },
+      );
+
+      expect(response2.ok).toBe(true);
+      const data2 = await response2.json();
+      expect(Array.isArray(data2.results)).toBe(true);
+    });
   });
 });

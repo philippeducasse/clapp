@@ -1,4 +1,5 @@
 import { GetAllParams } from "@/interfaces/api/ApiService";
+import { snakeCase } from "lodash";
 
 export const buildQueryParams = (params?: GetAllParams): string => {
   const queryParams = new URLSearchParams();
@@ -15,7 +16,8 @@ export const buildQueryParams = (params?: GetAllParams): string => {
   if (params?.filters) {
     Object.entries(params.filters).forEach(([key, value]) => {
       if (value !== null && value !== undefined) {
-        queryParams.append(`filter_${key}`, String(value));
+        const snakeKey = snakeCase(key);
+        queryParams.append(snakeKey, String(value));
       }
     });
   }
