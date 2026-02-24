@@ -113,28 +113,8 @@ export function DataTable<TData, TValue>({
   });
   // Reset to page 0 when filters or search changes
   useEffect(() => {
-    if (columnFilters.length > 0) {
-      console.log("calling 1");
-
-      setPagination(() => ({ pageIndex: 0, pageSize: totalCount ?? 500 }));
-      console.log({ pagination });
-    } else {
-      console.log("resetting page length");
-      table.setPageSize(25);
-    }
-  }, [columnFilters]);
-
-  useEffect(() => {
-    if (searchBarFilter.length > 0) {
-      console.log("calling 2");
-      setPagination(() => ({ pageIndex: 0, pageSize: totalCount ?? 500 }));
-      console.log({ pagination });
-    } else {
-      console.log("resetting page length");
-      setPagination(() => ({ pageIndex: 0, pageSize: 25 }));
-      table.setPageSize(25);
-    }
-  }, [searchBarFilter]);
+    setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
+  }, [columnFilters, searchBarFilter]);
 
   return (
     <>
