@@ -69,6 +69,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".env,docker/docker-compose.yml,docker/nginx.conf"
           target: "~/clapp/"
+          strip_components: true
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
