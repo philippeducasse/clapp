@@ -79,7 +79,7 @@ jobs:
           target: "~/clapp/"
 
       - name: Copy docker config files to server
-        # if: steps.changed-files-docker.outputs.any_changed == 'true'
+        if: steps.changed-files-docker.outputs.any_changed == 'true'
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
