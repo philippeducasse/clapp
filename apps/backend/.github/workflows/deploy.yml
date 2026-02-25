@@ -78,6 +78,7 @@ jobs:
           echo "EMAIL_HOST_USER=${{ secrets.EMAIL_HOST_USER }}" >> .env
           echo "EMAIL_HOST_PASSWORD=${{ secrets.EMAIL_HOST_PASSWORD }}" >> .env
           echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env
+          echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
 
       - name: Copy .env and docker files to server
         uses: appleboy/scp-action@v0.1.7
