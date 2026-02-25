@@ -1,5 +1,6 @@
 services:
   db:
+    restart: unless-stopped
     image: postgres:16-alpine
     env_file:
       - .env
@@ -18,6 +19,7 @@ services:
       retries: 5
 
   django:
+    restart: unless-stopped
     image: ${REGISTRY_URL}/clapp_backend:latest
     env_file:
       - .env
@@ -38,6 +40,12 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
   next:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
     image: ${REGISTRY_URL}/clapp_frontend:latest
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://django:8000
@@ -48,6 +56,7 @@ services:
       - clapp-network
 
   nginx:
+    restart: unless-stopped
     image: nginx:alpine
     ports:
         - "127.0.0.1:8085:80"  # Only accessible from localhost
@@ -56,12 +65,15 @@ services:
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
     depends_on:
-      - django
-      - next
+      django:
+        condition: service_healthy
+      next:
+        condition: service_healthy
     networks:
       - clapp-network
 
   redis:
+    restart: unless-stopped
     image: redis:alpine
     networks:
       - clapp-network
@@ -72,6 +84,7 @@ services:
       retries: 5
 
   celery_worker:
+    restart: unless-stopped
     image: ${REGISTRY_URL}/clapp_backend:latest
     entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A clapp_backend worker --loglevel=info
@@ -91,6 +104,7 @@ services:
       - media_volume:/app/media
 
   celery_beat:
+    restart: unless-stopped
     image: ${REGISTRY_URL}/clapp_backend:latest
     entrypoint: ["/app/entrypoint-celery.sh"]
     command: celery -A clapp_backend beat --loglevel=info
