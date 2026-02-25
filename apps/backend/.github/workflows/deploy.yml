@@ -61,15 +61,33 @@ jobs:
           echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env
           echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
 
-      - name: Copy .env and docker files to server
+      - name: Get changed files in docker folder
+        id: changed-files-docker
+        uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a # v47.0.4
+        with:
+          files: |
+            docker/docker-compose.yml
+            docker/nginx.conf
+
+      - name: Copy .env file to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".env,docker/docker-compose.yml,docker/nginx.conf"
+          source: ".env"
           target: "~/clapp/"
-          strip_components: true
+
+      - name: Copy docker config files to server
+        # if: steps.changed-files-docker.outputs.any_changed == 'true'
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker/docker-compose.yml,docker/nginx.conf"
+          target: "~/clapp/"
+          strip_components: 1
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
