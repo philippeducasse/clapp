@@ -44,25 +44,6 @@ jobs:
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest
 
-      - name: Check if config files changed
-        id: config_changed
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'docker/(docker-compose\.yml|nginx\.conf)'; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Copy docker-compose file
-        if: steps.config_changed.outputs.changed == 'true'
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker/docker-compose.yml,docker/nginx.conf"
-          target: "~/clapp/"
-
       - name: Prepare .env file
         run: |
           cat docker/.env.basic > .env

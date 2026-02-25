@@ -39,6 +39,7 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      
   next:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000"]
