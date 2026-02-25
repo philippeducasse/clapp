@@ -14,6 +14,7 @@ dependencies = [
     "charset-normalizer==3.4.3",
     "django==4.2.23",
     "django-cors-headers==4.7.0",
+    "django-encrypted-model-fields>=0.6.5",
     "django-filter>=25.1",
     "django-multiselectfield>=1.0.1",
     "django-phonenumber-field[phonenumbers]>=8.2.0",

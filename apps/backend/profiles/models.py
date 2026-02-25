@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from encrypted_model_fields.fields import EncryptedCharField
 from multiselectfield import MultiSelectField
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -74,7 +75,7 @@ class Profile(AbstractUser):
     other_email_host = models.CharField(max_length=255, blank=True)
     email_port = models.IntegerField(default=587)
     email_use_tls = models.BooleanField(default=True)
-    email_host_password = models.CharField(max_length=255, blank=True)
+    email_host_password = EncryptedCharField(max_length=255, blank=True)
     email_host_user = models.CharField(max_length=255, blank=True)
 
     # user preferences / settings

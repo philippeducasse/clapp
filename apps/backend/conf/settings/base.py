@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import logging
 import os
 from pathlib import Path
-import logging
 
 from dotenv import load_dotenv
 
@@ -186,3 +186,6 @@ CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False").lower() ==
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3020").split(",")
+
+# FERNET_KEY for reverse encryption of email_host_password
+FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY")
