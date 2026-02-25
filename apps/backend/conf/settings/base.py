@@ -188,4 +188,4 @@ CORS_ALLOW_CREDENTIALS = os.getenv("CORS_ALLOW_CREDENTIALS", "False").lower() ==
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3020").split(",")
 
 # FERNET_KEY for reverse encryption of email_host_password
-FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY")
+FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY", "REDACTED")
