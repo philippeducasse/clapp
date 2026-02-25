@@ -92,3 +92,135 @@ class TestProfileModel:
         """Test that ProfileManager requires an email"""
         with pytest.raises(ValueError, match="Users must provide an email address"):
             Profile.objects.create_user(email="", password="testpass123")
+
+    def test_email_host_password_encryption(self):
+        """Test that email_host_password field encrypts data"""
+        plaintext_password = "MySecurePassword123!"
+        profile = Profile.objects.create_user(
+            email="encrypted@example.com",
+            password="testpass123",
+            email_host_password=plaintext_password,
+        )
+
+        # Retrieve the profile and verify the password is decrypted correctly
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == plaintext_password
+
+    def test_email_host_password_is_stored_encrypted(self):
+        """Test that email_host_password is actually encrypted in the database"""
+        plaintext_password = "MySecurePassword123!"
+        profile = Profile.objects.create_user(
+            email="encrypted2@example.com",
+            password="testpass123",
+            email_host_password=plaintext_password,
+        )
+
+        # Get the raw database value to verify it's encrypted
+        from django.db import connection
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT email_host_password FROM profiles_profile WHERE id = %s",
+                [profile.id],
+            )
+            row = cursor.fetchone()
+            stored_value = row[0]
+
+        # The stored value should not be the plaintext password
+        assert stored_value != plaintext_password
+        # But when retrieved through Django, it should be decrypted
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == plaintext_password
+
+    def test_email_host_password_blank_value(self):
+        """Test that email_host_password can be blank"""
+        profile = Profile.objects.create_user(
+            email="nopwd@example.com",
+            password="testpass123",
+            email_host_password="",
+        )
+
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == ""
+
+    def test_email_host_password_special_characters(self):
+        """Test that email_host_password handles special characters"""
+        special_password = "P@ssw0rd!#$%^&*()_+-=[]{}|;:',.<>?/~`"
+        profile = Profile.objects.create_user(
+            email="special@example.com",
+            password="testpass123",
+            email_host_password=special_password,
+        )
+
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == special_password
+
+    def test_email_host_password_unicode_characters(self):
+        """Test that email_host_password handles unicode characters"""
+        unicode_password = "Pässwörd™🔐日本語"
+        profile = Profile.objects.create_user(
+            email="unicode@example.com",
+            password="testpass123",
+            email_host_password=unicode_password,
+        )
+
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == unicode_password
+
+    def test_email_host_password_max_length(self):
+        """Test that email_host_password respects max_length"""
+        # Create a password at the max length (255 characters)
+        long_password = "a" * 255
+        profile = Profile.objects.create_user(
+            email="longpwd@example.com",
+            password="testpass123",
+            email_host_password=long_password,
+        )
+
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == long_password
+        assert len(retrieved_profile.email_host_password) == 255
+
+    def test_email_host_password_multiple_profiles_isolated(self):
+        """Test that encrypted passwords are isolated between profiles"""
+        pwd1 = "FirstProfilePassword123"
+        pwd2 = "SecondProfilePassword456"
+
+        profile1 = Profile.objects.create_user(
+            email="profile1@example.com",
+            password="testpass123",
+            email_host_password=pwd1,
+        )
+        profile2 = Profile.objects.create_user(
+            email="profile2@example.com",
+            password="testpass123",
+            email_host_password=pwd2,
+        )
+
+        # Verify each profile has its own password
+        retrieved1 = Profile.objects.get(id=profile1.id)
+        retrieved2 = Profile.objects.get(id=profile2.id)
+
+        assert retrieved1.email_host_password == pwd1
+        assert retrieved2.email_host_password == pwd2
+        assert retrieved1.email_host_password != retrieved2.email_host_password
+
+    def test_email_host_password_update(self):
+        """Test that email_host_password can be updated"""
+        initial_password = "InitialPassword123"
+        updated_password = "UpdatedPassword456"
+
+        profile = Profile.objects.create_user(
+            email="update@example.com",
+            password="testpass123",
+            email_host_password=initial_password,
+        )
+
+        # Update the password
+        profile.email_host_password = updated_password
+        profile.save()
+
+        # Verify the update
+        retrieved_profile = Profile.objects.get(id=profile.id)
+        assert retrieved_profile.email_host_password == updated_password
+        assert retrieved_profile.email_host_password != initial_password
