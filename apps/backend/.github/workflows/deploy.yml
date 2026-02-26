@@ -97,6 +97,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/clapp
-            docker compose pull django
-            docker compose up -d --wait django django
+            docker compose pull 
+            docker compose up -d --pull always
             docker image prune -f
