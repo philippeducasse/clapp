@@ -35,6 +35,8 @@ RUN apt-get update && apt-get install -y \
 RUN addgroup --system --gid 999 django && \
     adduser --system --uid 999 --gid 999 django
 
+RUN chown django:django /app
+
 # Copy venv and strip unnecessary files
 COPY --from=deps /app/.venv /app/.venv
 RUN find /app/.venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
