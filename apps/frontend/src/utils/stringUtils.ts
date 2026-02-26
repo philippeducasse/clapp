@@ -33,3 +33,14 @@ export function formatDate(date: string | Date): string {
     })
   );
 }
+
+export function formatErrorMessage(message: string) {
+  let errorMessage = message;
+
+  try {
+    const errorJson = JSON.parse(errorMessage);
+    errorMessage = errorJson.error;
+  } catch {}
+
+  return errorMessage;
+}

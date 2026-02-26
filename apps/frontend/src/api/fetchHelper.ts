@@ -1,4 +1,5 @@
 import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
+import { formatErrorMessage } from "@/utils/stringUtils";
 import { toast } from "sonner";
 
 const getFullUrl = (url: string): string => {
@@ -64,11 +65,13 @@ const handleResponse = async <T>(
 ): Promise<T> => {
   if (!res.ok) {
     const error = await res.text();
-    toast.error(error, {
+
+    const formattedError = formatErrorMessage(error);
+
+    toast.error(formattedError, {
       closeButton: true,
       className: "border border-red-600",
       duration: 10000,
-      position: "bottom-right",
     });
     throw new Error(`Request failed for ${url}: ${res.status} - ${error}`);
   }
