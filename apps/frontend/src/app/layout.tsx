@@ -21,7 +21,7 @@ const pacifico = Pacifico({
 });
 
 export const metadata: Metadata = {
-  title: "caf",
+  title: "Clapp",
   description: "Your personal assistant for your career in the performance arts",
 };
 
