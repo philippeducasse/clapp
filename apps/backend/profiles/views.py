@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from profiles.models import Profile, Reminder
 from profiles.serializers import ProfileSerializer, RegisterSerializer, ReminderSerializer
 
+from .tasks import send_forgot_password_email
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +44,56 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
 
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def forgot_password(request: Request) -> HttpResponseRedirect:
+    """
+    Confirm user email via token in query parameter.
+    Redirects to FRONTEND_URL with status and optional error message.
+    """
+    email = request.data.get("email")
+    if not email:
+        logger.warning(f"No email found! for {email}")
+        return Response({"error": "email required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    send_forgot_password_email.delay(email)
+    return Response(status.HTTP_202_ACCEPTED)
+
+
+@api_view(["POST"])
+@permission_classes([permissions.AllowAny])
+def reset_password(request: Request) -> HttpResponseRedirect:
+    """
+    Confirm user email via token in query parameter.
+    Redirects to FRONTEND_URL with status and optional error message.
+    """
+    token = request.data.get("token")
+    new_password = request.data.get("new_password")
+
+    if not token or not new_password:
+        logger.warning(f"No valid token found! for {request}")
+        return Response(
+            {"error": "token and new_password required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        user = Profile.objects.get(reset_token=token)
+        user.reset_token = ""
+        user.set_password(new_password)
+        user.save()
+        logger.info(f"User {user.email} password successfully changed")
+        return Response({"message": "Password reset successfully"}, status=status.HTTP_200_OK)
+
+    except Profile.DoesNotExist:
+        logger.warning(f"No user found for token {token}")
+        return Response(
+            {
+                "error": "User not found",
+            },
+            status.HTTP_404_NOT_FOUND,
+        )
+
+
 class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
 
@@ -65,7 +117,10 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Exception as e:
             logger.error(f"Error fetching profile for user {request.user.pk}: {e}")
-            return Response({"detail": "Unable to retrieve profile."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"detail": "Unable to retrieve profile."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=False, methods=["post"])
     def change_password(self, request: Request) -> Response:
@@ -79,7 +134,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         user.set_password(new_password)
         user.save()
         logger.info(f"User {user.id} changed their password")
-        return Response({"status": "password changed successfully"})
+        return Response({"message": "password changed successfully"})
 
     @action(detail=False, methods=["post"], permission_classes=[permissions.AllowAny])
     def register(self, request: Request) -> Response:

@@ -58,6 +58,51 @@ def send_registration_confirmation_email(new_user_email: str):
 
 
 @shared_task
+def send_forgot_password_email(email: str):
+    try:
+        user = Profile.objects.get(email=email)
+        token = secrets.token_urlsafe(32)
+        user.reset_token = token
+        user.save()
+        reset_url = f"{settings.APP_URL}/reset-password?token={token}"
+
+        logger.info(f"Created confirmation token for {user.email} : {token}")
+        logger.info(f"Sending reset password email from {settings.EMAIL_HOST_USER} to {user.email}")
+
+        context = {
+            "name": user.first_name,
+            "reset_url": reset_url,
+        }
+
+        text_content = f"""Reset your password
+
+            Hello {user.first_name or user.email},
+
+            We have received a request to reset your password. If this was not you, please let us know. You can reset your password 
+            by clicking the link below.
+
+            Reset your password: {reset_url}
+
+            Let the show begin!
+            The Clapp Team
+                """.strip()
+
+        html_content = render_to_string("profiles/emails/reset_password_email.html", context)
+
+        email_message = EmailMultiAlternatives(
+            subject="Reset your password",
+            body=text_content,
+            from_email=settings.EMAIL_HOST_USER,
+            to=[user.email],
+        )
+        email_message.attach_alternative(html_content, "text/html")
+        email_message.send(fail_silently=False)
+
+    except Profile.DoesNotExist:
+        logger.warning(f"No user found found for email {email}")
+
+
+@shared_task
 def check_and_set_reminders() -> int:
     """
     Check for due reminders and send notifications.

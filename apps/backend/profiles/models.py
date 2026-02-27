@@ -55,7 +55,10 @@ class Profile(AbstractUser):
     username = None  # remove username field
     email = models.EmailField(unique=True)
     confirmed_account = models.BooleanField(default=False)
+
+    # temporary tokens
     confirmation_token = models.CharField(max_length=64, blank=True)
+    reset_token = models.CharField(max_length=255, blank=True)
 
     # company / artist information
     first_name = models.CharField(max_length=255, blank=True)
