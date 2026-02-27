@@ -40,8 +40,31 @@ const login = async (credentials: Credentials): Promise<Profile> => {
     true,
   );
 };
+
 const logout = async () => {
   return await sendRequest(`${endpoint}/logout`, {}, "POST", `Successfully logged out`, true);
+};
+
+const changePassword = async (newPassword: Record<string, unknown>, isReset: boolean) => {
+  const passwordEndPoint = isReset ? "reset-password" : "change_password";
+
+  return await sendRequest(
+    `${endpoint}/${passwordEndPoint}`,
+    newPassword,
+    "POST",
+    `Password successfully changed`,
+    true,
+  );
+};
+
+const forgotPassword = async (email: Record<string, unknown>) => {
+  return await sendRequest(
+    `${endpoint}/forgot-password`,
+    email,
+    "POST",
+    `Your request has been sent, please check your email ${email.email}`,
+    true,
+  );
 };
 
 export const profileApiService = {
@@ -51,4 +74,6 @@ export const profileApiService = {
   remove,
   login,
   logout,
+  changePassword,
+  forgotPassword,
 };
