@@ -50,7 +50,7 @@ const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) 
         <div className="flex items-center">
           {getActionIcon(action)}
           <div className="ml-4">
-            <h3 className="text-xl font-semibold">{capitalizeFirst(action)}</h3>
+            <h3 className="text-xl">{capitalizeFirst(action)}</h3>
             <p className="text-gray-400">{getSubtitle(action)}</p>
           </div>
         </div>

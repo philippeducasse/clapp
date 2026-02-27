@@ -40,7 +40,7 @@ const RegistrationForm = () => {
   };
   return (
     <div className="flex flex-col text-center">
-      <h3 className="text-xl font-semibold">Register</h3>
+      <h3 className="text-xl">Register</h3>
       <BasicForm
         form={form}
         formFields={formFields}
