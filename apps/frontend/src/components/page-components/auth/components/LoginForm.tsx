@@ -15,6 +15,8 @@ import { getAuthFormFields } from "../helpers/getAuthFormFields";
 import { useRouter } from "next/navigation";
 import { Action } from "@/interfaces/Enums";
 import { Credentials } from "@/interfaces/api/ApiService";
+import Link from "next/link";
+
 const LoginForm = () => {
   const router = useRouter();
 
@@ -42,7 +44,7 @@ const LoginForm = () => {
 
   return (
     <div className="flex flex-col text-center">
-      <h3 className="text-xl font-semibold">Login</h3>
+      <h3 className="text-xl">Login</h3>
       <BasicForm
         form={form}
         formFields={formFields}
@@ -52,6 +54,9 @@ const LoginForm = () => {
         action={Action.LOGIN}
         submitButtonLabel="Login"
       />
+      <Link className="text-sm text-right mt-2" href="/forgot-password">
+        Forgot your password?
+      </Link>
     </div>
   );
 };
