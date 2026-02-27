@@ -28,6 +28,8 @@ import { getPreferencesInfo } from "../helpers/getPreferencesInfo";
 import { useHashTab } from "@/hooks/useHashTab";
 import Link from "next/link";
 import ProfileRemindersCard from "./ProfileRemindersCard";
+import DeleteButton from "@/components/common/buttons/DeleteButton";
+import { Button } from "@/components/ui/button";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -91,13 +93,7 @@ const ProfileView = () => {
           <>
             {activeTab === "basic-information" && <EditButton href={`/profile/edit`} />}
             {activeTab === "email-settings" && <EditButton href={`/profile/edit/email-settings`} />}
-            {activeTab === "preferences" && <EditButton href={`/profile/edit/preferences`} />}
-            {/* <DeleteButton
-              label="Delete account"
-              variant={"outline"}
-              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
-              onDelete={() => handleDelete("profile", profile.id)}
-            /> */}
+            {activeTab === "account" && <EditButton href={`/profile/edit/preferences`} />}
           </>
         }
       />
@@ -160,12 +156,26 @@ const ProfileView = () => {
           />
         </Tab>
 
-        <Tab name="Preferences">
+        <Tab name="Account">
           <DetailsViewSection
             title="Preferences"
             icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
             data={getPreferencesInfo(profile)}
           />
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/profile/edit/change-password")}
+              variant={"tertiary"}
+            >
+              Change Password
+            </Button>
+            <DeleteButton
+              label="Delete account"
+              variant={"outline"}
+              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
+              onDelete={() => handleDelete("profile", profile.id)}
+            />
+          </div>
         </Tab>
 
         <Tab name="Reminders">
