@@ -14,7 +14,9 @@ export const middleware = (request: NextRequest) => {
     pathname !== "/" &&
     !pathname.startsWith("/login") &&
     !pathname.startsWith("/register") &&
-    !pathname.startsWith("/email-confirmation")
+    !pathname.startsWith("/email-confirmation") &&
+    !pathname.startsWith("/forgot-password") &&
+    !pathname.startsWith("/reset-password")
   ) {
     return NextResponse.redirect(new URL("/", request.url));
   }
