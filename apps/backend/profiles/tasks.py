@@ -66,7 +66,7 @@ def send_forgot_password_email(email: str):
         user.save()
         reset_url = f"{settings.APP_URL}/reset-password?token={token}"
 
-        logger.info(f"Created confirmation token for {user.email} : {token}")
+        logger.info(f"Created reset token for {user.email} : {token}")
         logger.info(f"Sending reset password email from {settings.EMAIL_HOST_USER} to {user.email}")
 
         context = {

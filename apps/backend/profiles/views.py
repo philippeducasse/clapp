@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, update_session_auth_hash
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.db.models import QuerySet
@@ -133,6 +133,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
         user.set_password(new_password)
         user.save()
+        update_session_auth_hash(request, user)
         logger.info(f"User {user.id} changed their password")
         return Response({"message": "password changed successfully"})
 
