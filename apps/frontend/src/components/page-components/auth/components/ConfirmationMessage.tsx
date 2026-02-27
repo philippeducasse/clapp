@@ -1,18 +1,16 @@
-import React from 'react'
+import React from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-
 const ConfirmationMessage = () => {
-      const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const message = searchParams.get("message");
 
   const isSuccess = status === "success";
 
   return (
-          <div className="text-center space-y-6">
-
+    <div className="text-center space-y-6">
       {isSuccess ? (
         <>
           <div className="text-emerald-600">
@@ -69,6 +67,6 @@ const ConfirmationMessage = () => {
       </Link>
     </div>
   );
-}
+};
 
-export default ConfirmationMessage
+export default ConfirmationMessage;

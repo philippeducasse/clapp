@@ -13,6 +13,7 @@ import { getPasswordFormFields } from "../helpers/getPasswordFormFields";
 import { useSearchParams } from "next/navigation";
 import FormHeader from "@/components/common/form/FormHeader";
 import { EntityName } from "@/interfaces/Enums";
+
 const PasswordForm = ({ isReset = false }: { isReset?: boolean }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
