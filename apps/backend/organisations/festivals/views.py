@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Exists, OuterRef, Prefetch, Q, QuerySet
+from django.db.models import Exists, OuterRef, Prefetch, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
@@ -25,22 +25,7 @@ class FestivalViewSet(OrganisationViewSet):
     ordering = ["name"]
 
     def get_queryset(self) -> QuerySet[Festival]:
-        include_deleted = (
-            self.request.query_params.get("include_deleted", "false").lower() == "true"
-        )
-
-        if self.request.user.is_staff:
-            visibility_filter = (
-                Q(user__isnull=True) | Q(is_seed_clone=False) | Q(user=self.request.user)
-            )
-        else:
-            visibility_filter = Q(user=self.request.user)
-
-        base_queryset = (
-            Festival.objects.with_deleted().filter(visibility_filter).distinct()
-            if include_deleted
-            else Festival.objects.filter(visibility_filter).distinct()
-        )
+        base_queryset = super().get_queryset()
 
         festival_content_type = ContentType.objects.get_for_model(Festival)
         year_start = date(2026 - 1, 9, 1)
