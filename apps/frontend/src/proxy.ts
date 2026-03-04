@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 
-export const middleware = (request: NextRequest) => {
+export const proxy = (request: NextRequest) => {
   const sessionid = request.cookies.get("sessionid");
   const { pathname } = request.nextUrl;
   if (
