@@ -3,7 +3,7 @@ from typing import Any, Type
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 from organisations.venues.models import Venue, VenueContact
-from organisations.serializers import BaseContactSerializer, handle_nested_contacts
+from organisations.serializers import BaseContactSerializer, OrganisationSerializerMixin, handle_nested_contacts
 from clapp_backend.utils import NormalizedURLField
 
 
@@ -12,7 +12,7 @@ class VenueContactSerializer(BaseContactSerializer):
         model = VenueContact
 
 
-class VenueSerializer(WritableNestedModelSerializer):
+class VenueSerializer(OrganisationSerializerMixin, WritableNestedModelSerializer):
     contacts = VenueContactSerializer(many=True, required=False)
     website_url = NormalizedURLField(required=False, allow_blank=True)
 
@@ -30,6 +30,9 @@ class VenueSerializer(WritableNestedModelSerializer):
             "comments",
             "contacts",
             "deleted_at",
+            # User-created flag (for admin differentiation)
+            "is_user_created",
+            "added_by",
         ]
         read_only_fields = ("id", "deleted_at")
 

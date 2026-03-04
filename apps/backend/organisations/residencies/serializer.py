@@ -8,6 +8,7 @@ from organisations.residencies.models import Residency, ResidencyContact
 from organisations.serializers import (
     BaseContactSerializer,
     BlankToNullDateField,
+    OrganisationSerializerMixin,
     handle_nested_contacts,
 )
 
@@ -17,7 +18,7 @@ class ResidencyContactSerializer(BaseContactSerializer):
         model = ResidencyContact
 
 
-class ResidencySerializer(WritableNestedModelSerializer):
+class ResidencySerializer(OrganisationSerializerMixin, WritableNestedModelSerializer):
     contacts = ResidencyContactSerializer(many=True, required=False)
     website_url = NormalizedURLField(required=False, allow_blank=True)
 
@@ -58,6 +59,9 @@ class ResidencySerializer(WritableNestedModelSerializer):
             "latest_application_date",
             # Nested applications
             "current_year_application",
+            # User-created flag (for admin differentiation)
+            "is_user_created",
+            "added_by",
         ]
         read_only_fields = ("id", "deleted_at")
 

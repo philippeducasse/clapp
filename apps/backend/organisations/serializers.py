@@ -3,6 +3,47 @@ from typing import Any
 from rest_framework import serializers
 
 
+class OrganisationSerializerMixin(serializers.Serializer):
+    """Mixin that adds user-created metadata fields to any organisation serializer.
+
+    This inherits from serializers.Serializer (rather than being a plain Python
+    class) because DRF uses a custom metaclass (SerializerMetaclass) that builds
+    a _declared_fields dict at class-creation time. It does this by scanning the
+    class body and then merging in _declared_fields from each base class. A plain
+    Python class has no _declared_fields, so DRF silently skips it — the fields
+    declared here would never make it into the serializer, causing
+    ImproperlyConfigured at runtime.
+
+    By inheriting from serializers.Serializer, DRF's metaclass processes this
+    class and sets _declared_fields = {'is_user_created': ..., 'added_by': ...}.
+    Subclasses then pick those up automatically during their own class creation.
+
+    Both this mixin and WritableNestedModelSerializer ultimately inherit from
+    Serializer (diamond inheritance), which Python's C3 MRO handles cleanly.
+
+    Usage:
+        class FestivalSerializer(OrganisationSerializerMixin, WritableNestedModelSerializer):
+            class Meta:
+                fields = [..., "is_user_created", "added_by"]
+
+    The mixin is placed left of WritableNestedModelSerializer by convention:
+    in Python's MRO (Method Resolution Order), leftmost wins when two bases define the same name.
+    """
+
+    # SerializerMethodField delegates serialization to get_<field_name>() below.
+    # read_only is implied by SerializerMethodField — no write path needed.
+    is_user_created = serializers.SerializerMethodField()
+    added_by = serializers.SerializerMethodField()
+
+    def get_is_user_created(self, obj: Any) -> bool:
+        return obj.user_id is not None and not obj.is_seed_clone
+
+    def get_added_by(self, obj: Any) -> str | None:
+        if obj.user_id is not None and not obj.is_seed_clone:
+            return obj.user.email
+        return None
+
+
 class BlankToNullDateField(serializers.DateField):
     """Convert blank strings to None for date fields."""
 

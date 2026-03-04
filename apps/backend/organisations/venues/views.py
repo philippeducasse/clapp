@@ -1,6 +1,5 @@
 from typing import Optional
 
-from django.db.models import Q, QuerySet
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
@@ -19,22 +18,6 @@ class VenueViewSet(OrganisationViewSet):
     ordering_fields = ["name"]
     ordering = ["name"]
 
-    def get_queryset(self) -> QuerySet[Venue]:
-        include_deleted = (
-            self.request.query_params.get("include_deleted", "false").lower() == "true"
-        )
-
-        if self.request.user.is_staff:
-            visibility_filter = (
-                Q(user__isnull=True) | Q(is_seed_clone=False) | Q(user=self.request.user)
-            )
-        else:
-            visibility_filter = Q(user=self.request.user)
-
-        if include_deleted:
-            return Venue.objects.with_deleted().filter(visibility_filter).distinct()
-        else:
-            return Venue.objects.filter(visibility_filter).distinct()
 
     def get_organisation_type_name(self) -> str:
         return "venue"

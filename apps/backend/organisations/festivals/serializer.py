@@ -7,6 +7,7 @@ from organisations.festivals.models import Festival, FestivalContact
 from organisations.serializers import (
     BlankToNullDateField,
     BaseContactSerializer,
+    OrganisationSerializerMixin,
     handle_nested_contacts,
 )
 from clapp_backend.utils import NormalizedURLField
@@ -17,7 +18,7 @@ class FestivalContactSerializer(BaseContactSerializer):
         model = FestivalContact
 
 
-class FestivalSerializer(WritableNestedModelSerializer):
+class FestivalSerializer(OrganisationSerializerMixin, WritableNestedModelSerializer):
     contacts = FestivalContactSerializer(many=True, required=False)
     website_url = NormalizedURLField(required=False, allow_blank=True)
 
@@ -60,6 +61,9 @@ class FestivalSerializer(WritableNestedModelSerializer):
             "latest_application_date",
             # Nested applications
             "current_year_application",
+            # User-created flag (for admin differentiation)
+            "is_user_created",
+            "added_by",
         ]
 
     def update(self, instance: Festival, validated_data: Festival) -> dict[str, Any]:

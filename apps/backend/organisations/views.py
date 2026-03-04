@@ -134,6 +134,33 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         """
         return generate_enrich_prompt(organisation, search_results)
 
+    def get_queryset(self):
+        """Return the base queryset for any organisation type.
+
+        Subclasses that need extra annotations (e.g. has_application_this_year)
+        should call super().get_queryset() and chain their own .annotate() /
+        .prefetch_related() calls on the result rather than duplicating this logic.
+
+        select_related("user") is applied here so that OrganisationSerializerMixin
+        can access obj.user.email in get_added_by() without triggering an extra
+        query per row (N+1).
+        """
+        model_class = self.get_serializer_class().Meta.model
+
+        include_deleted = (
+            self.request.query_params.get("include_deleted", "false").lower() == "true"
+        )
+
+        if self.request.user.is_staff:
+            visibility_filter = (
+                Q(user__isnull=True) | Q(is_seed_clone=False) | Q(user=self.request.user)
+            )
+        else:
+            visibility_filter = Q(user=self.request.user)
+
+        manager = model_class.objects.with_deleted() if include_deleted else model_class.objects
+        return manager.filter(visibility_filter).distinct().select_related("user")
+
     def perform_create(self, serializer):
         instance = serializer.save(user=self.request.user, is_seed_clone=False)
         instance.full_clean()
