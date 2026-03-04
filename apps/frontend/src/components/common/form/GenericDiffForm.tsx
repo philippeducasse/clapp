@@ -40,6 +40,7 @@ const GenericDiffForm = <T extends Record<string, unknown>>({
     defaultValues: sanitizeFormData(updated) as z.infer<typeof formSchema>,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchedValues = form.watch();
 
   useEffect(() => {

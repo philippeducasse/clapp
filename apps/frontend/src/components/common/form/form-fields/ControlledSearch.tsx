@@ -58,6 +58,7 @@ const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) =>
       field.onChange("");
       setSearchResults([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organisationType]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

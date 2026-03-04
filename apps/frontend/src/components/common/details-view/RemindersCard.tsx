@@ -33,6 +33,7 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
 
   useEffect(() => {
     fetchReminders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [organisationType, entityId]);
 
   const handleDelete = async (reminderId: number) => {

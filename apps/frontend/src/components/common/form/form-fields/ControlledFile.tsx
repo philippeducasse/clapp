@@ -10,6 +10,7 @@ const ControlledFile = ({ field }: BaseControlledProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (Array.isArray(field.value) && field.value.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFiles(field.value);
     }
   }, [field]);

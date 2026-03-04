@@ -14,6 +14,7 @@ const ControlledSingleFile = ({ field, accept }: ControlledSingleFileProps) => {
 
   useEffect(() => {
     if (field.value instanceof File) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFile(field.value);
     }
   }, [field]);

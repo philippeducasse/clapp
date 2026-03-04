@@ -1,5 +1,5 @@
 import { camelCase, snakeCase } from "lodash";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 export const transformKeysToCamelCase = (obj: any): any => {
   if (Array.isArray(obj)) {
