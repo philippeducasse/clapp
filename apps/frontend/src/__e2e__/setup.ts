@@ -260,7 +260,7 @@ export const trackEntity = (type: string, id: number) => {
 // Delete single entity
 const deleteEntity = async (endpoint: string, id: number): Promise<boolean> => {
   try {
-    const response = await fetchWithAuth(`${API_BASE}${endpoint}/${id}`, {
+    const response = await fetchWithAuth(`${API_BASE}${endpoint}/${id}/`, {
       method: "DELETE",
     });
     return response.ok;
