@@ -2,7 +2,7 @@
 
 - Rotate some tags / status
 - add color coding to orgs added by other users
-- add confirmation mail logic
+- add season start/end logic
 - add user deletion logic
 - add invoices
 
