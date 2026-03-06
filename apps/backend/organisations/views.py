@@ -22,6 +22,7 @@ from .models import Organisation
 from .services import (
     create_form_application,
     extract_search_results,
+    format_email,
     generate_application_mail_prompt,
     generate_enrich_prompt,
     get_or_create_application,
@@ -408,9 +409,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             prompt = generate_application_mail_prompt(
                 organisation, profile, performance_objects, language, email_length
             )
-            # TODO: after postgres migration, change to tenant_schema
-            message = self.mistral_client.chat(prompt, request.user.id)
-
+            logger.info(f"Email generation prompt: {prompt}")
+            message = format_email(self.mistral_client.chat(prompt, request.user.id))
+            logger.info(f"Generated email {message}")
             return Response({"message": message}, status=status.HTTP_200_OK)
 
         except ValueError as e:

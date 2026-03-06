@@ -314,7 +314,15 @@ def generate_application_mail_prompt(
         signature += f"<br>{social_line}"
 
     prompt = f"""
-        ⚠️ CRITICAL LENGTH REQUIREMENT - READ THIS FIRST ⚠️
+        ⚠️ CRITICAL OUTPUT FORMAT - READ THIS FIRST ⚠️
+        Return ONLY the email HTML content - NO explanations, NO preamble.
+        REQUIRED: Use ONLY <br><br> tags for ALL paragraph breaks.
+        REQUIRED: Use ONLY <a> tags for links. Example: <a href="url">text</a>
+        FORBIDDEN: Do NOT use \\n, newline characters, or line breaks of any kind.
+        FORBIDDEN: Do NOT use asterisks (* or **) for emphasis.
+        Start immediately with the salutation. No preamble.
+
+        ⚠️ CRITICAL LENGTH REQUIREMENT - READ THIS SECOND ⚠️
         MAXIMUM WORDS: {max_words}
         TARGET LENGTH: {length_config["description"]} ({length_config["paragraphs"]})
         INSTRUCTION: {length_config["detail"]}
@@ -354,14 +362,6 @@ def generate_application_mail_prompt(
         - Closing: {trailer_instruction} {dossier_instruction}
         Express enthusiasm in awaiting the response and openness to answer any questions or provide more information. Provide contact information using this format: {signature}
 
-        Response Format Instructions:
-        Return ONLY the email HTML content.
-        CRITICAL: Use <br><br> tags for paragraph breaks (empty lines between sections).
-        Use <a> tags for links.
-        Do NOT use newlines, \\n characters, or any other line break methods.
-        Do NOT use asterisks (* or **) for emphasis (*like this* or **like this**).
-        Do not add any preamble message, notes, or formatting indicators.
-        The response should begin immediately with the salutation.
 
         Email Structure (separate each section with <br><br>):
         1. Salutation (e.g., "Dear [Name],")
@@ -376,13 +376,16 @@ def generate_application_mail_prompt(
         COUNT YOUR WORDS AS YOU WRITE. STOP IMMEDIATELY WHEN YOU REACH {max_words} WORDS.
         Be selective with details. Prioritize impact over completeness.
         {length_config["detail"]}
-        Do NOT use asterisks (* or **) for emphasis (*like this* or **like this**).
 
         EXAMPLE OUTPUT FORMAT:
 
-        {performances[0].email_prompt if len(performances) == 1 else chr(10).join([f"For {p.performance_title}:" + chr(10) + p.email_prompt for p in performances if hasattr(p, "email_prompt") and p.email_prompt])}
+        {performances[0].email_prompt if len(performances) == 1 else "<br><br>".join([f"For {p.performance_title}:<br><br>" + p.email_prompt for p in performances if hasattr(p, "email_prompt") and p.email_prompt])}
         """
     return prompt.strip()
+
+
+def format_email(message: str):
+    return message.replace("\n", "<br>").replace("*", "")
 
 
 def extract_search_results(search_results: ConversationResponse):
