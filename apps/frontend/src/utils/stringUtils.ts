@@ -35,7 +35,7 @@ export function formatDate(date: string | Date): string {
 }
 
 export function formatErrorMessage(message: string) {
-  let errorMessage = message;
+  let errorMessage = message ?? "Error!";
 
   try {
     const errorJson = JSON.parse(errorMessage);
