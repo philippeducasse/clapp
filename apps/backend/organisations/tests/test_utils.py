@@ -1,5 +1,6 @@
 import pytest
 from organisations.festivals.models import Festival
+from organisations.services import format_email
 from organisations.utils import clean_organisation_data, extract_fields_from_llm
 
 
@@ -220,3 +221,102 @@ class TestCleanOrganisationData:
         assert festival.description == "Test description."
         # Comments should be lowercased
         assert festival.comments == "test comment"
+
+
+class TestFormatEmail:
+    """Tests for format_email function."""
+
+    def test_convert_single_newline_to_br(self):
+        """Test that single newlines are converted to <br> tags."""
+        message = "Hello\nWorld"
+        result = format_email(message)
+        assert result == "Hello<br>World"
+
+    def test_convert_double_newline_to_double_br(self):
+        """Test that double newlines are converted to double <br> tags."""
+        message = "Paragraph 1\n\nParagraph 2"
+        result = format_email(message)
+        assert result == "Paragraph 1<br><br>Paragraph 2"
+
+    def test_remove_single_asterisk(self):
+        """Test that single asterisks are removed."""
+        message = "This is *emphasized*"
+        result = format_email(message)
+        assert result == "This is emphasized"
+
+    def test_remove_double_asterisk(self):
+        """Test that double asterisks are removed."""
+        message = "This is **bold**"
+        result = format_email(message)
+        assert result == "This is bold"
+
+    def test_remove_multiple_asterisks(self):
+        """Test that multiple asterisks throughout text are removed."""
+        message = "*Hello* and **world** and *test*"
+        result = format_email(message)
+        assert result == "Hello and world and test"
+
+    def test_convert_newlines_and_remove_asterisks(self):
+        """Test converting newlines and removing asterisks together."""
+        message = "*Title*\n\nThis is *important* content\n\nBest regards,\n**Name**"
+        result = format_email(message)
+        assert result == "Title<br><br>This is important content<br><br>Best regards,<br>Name"
+
+    def test_preserve_html_tags(self):
+        """Test that HTML tags are preserved."""
+        message = 'Contact: <a href="mailto:test@example.com">email</a>\n\nWebsite: <a href="https://example.com">link</a>'
+        result = format_email(message)
+        assert (
+            result
+            == 'Contact: <a href="mailto:test@example.com">email</a><br><br>Website: <a href="https://example.com">link</a>'
+        )
+
+    def test_empty_string(self):
+        """Test that empty string is handled correctly."""
+        result = format_email("")
+        assert result == ""
+
+    def test_string_without_newlines_or_asterisks(self):
+        """Test that plain text without special characters is unchanged."""
+        message = "Hello World"
+        result = format_email(message)
+        assert result == "Hello World"
+
+    def test_only_newlines(self):
+        """Test string with only newlines."""
+        result = format_email("\n\n\n")
+        assert result == "<br><br><br>"
+
+    def test_only_asterisks(self):
+        """Test string with only asterisks."""
+        result = format_email("***")
+        assert result == ""
+
+    def test_mixed_asterisks_and_newlines(self):
+        """Test complex message with both asterisks and newlines."""
+        message = "Dear *Contact*,\n\nI have an *exciting* proposal.\n\n*Thanks*\n**Philippe**"
+        result = format_email(message)
+        assert (
+            result == "Dear Contact,<br><br>I have an exciting proposal.<br><br>Thanks<br>Philippe"
+        )
+
+    def test_real_email_example(self):
+        """Test with a realistic email output."""
+        message = "Dear Team,\n\nI'm a performer seeking collaboration.\n\nMy show is *unique* and **engaging**.\n\nBest regards,\nPhilippe\n+1234567890"
+        result = format_email(message)
+        assert (
+            result
+            == "Dear Team,<br><br>I'm a performer seeking collaboration.<br><br>My show is unique and engaging.<br><br>Best regards,<br>Philippe<br>+1234567890"
+        )
+
+    def test_preserve_whitespace_other_than_newlines(self):
+        """Test that spaces and tabs are preserved."""
+        message = "Text  with  spaces\n\nTab\there"
+        result = format_email(message)
+        assert result == "Text  with  spaces<br><br>Tab\there"
+
+    def test_asterisk_in_url_is_removed(self):
+        """Test that asterisks are removed even if they appear in URLs (which shouldn't happen but test edge case)."""
+        message = '<a href="https://example.com/*param">link</a>'
+        result = format_email(message)
+        assert result == '<a href="https://example.com/param">link</a>'
