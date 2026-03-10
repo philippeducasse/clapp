@@ -33,6 +33,8 @@ def send_confirmation_email(sender, instance, created, raw, **kwargs):
 
 
 @receiver(post_save, sender=Profile, dispatch_uid="seed_user_organisations")
+# Consider overlay model? if user edits overlay, overwrite base for that field
+# create copy only when user changes data -> works like git forks
 def seed_user_organisations(sender, instance, created, raw, **kwargs):
     """
     When a new user registers, clone all seed organisations and contacts for them.

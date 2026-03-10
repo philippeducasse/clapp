@@ -1,5 +1,6 @@
 services:
   db:
+    #TODO: backups with pgDump?
     restart: unless-stopped
     image: postgres:16-alpine
     env_file:
