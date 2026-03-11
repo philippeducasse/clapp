@@ -83,7 +83,7 @@ const Sidebar = () => {
             <SidebarMenu className="flex h-full">
               {items.map((item, index) => (
                 <SidebarMenuItem key={item.title} className={index == 5 ? `mt-auto` : ""}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild size={"lg"}>
                     <a href={item.url}>
                       <item.icon className="text-emerald-600 h-6! w-6! dark:text-emerald-400" />
                       <span className="text-lg ml-4">{item.title}</span>
