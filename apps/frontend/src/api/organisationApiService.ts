@@ -11,6 +11,15 @@ export interface OrganisationSearchResponse {
   type: string;
 }
 
+interface TaskResponse {
+  taskId: string;
+}
+
+interface TaskStatus {
+  status: "PENDING" | "STARTED" | "SUCCESS" | "FAILURE";
+  stats: UploadStats | null;
+}
+
 const search = async (
   searchQuery: string,
   type?: string,
@@ -21,11 +30,51 @@ const search = async (
   const typeParam = type ? `&type=${type.toLowerCase()}` : "";
   return await fetchRequest(`${endpoint}/search?q=${searchQuery}${typeParam}`);
 };
-const upload = async (excelFile: File[]): Promise<UploadStats> => {
-  return await sendFormDataRequest(`${endpoint}/upload`, undefined, excelFile, "excel", "POST");
+
+const upload = async (excelFile: File[]): Promise<string> => {
+  const response = await sendFormDataRequest<TaskResponse>(
+    `${endpoint}/upload`,
+    undefined,
+    excelFile,
+    "excel",
+    "POST",
+  );
+  return response.taskId;
+};
+
+const pollTask = async (taskId: string): Promise<UploadStats> => {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      try {
+        const { status, stats } = await fetchRequest<TaskStatus>(
+          `${endpoint}/upload-status/${taskId}`,
+        );
+
+        if (status === "SUCCESS") {
+          clearInterval(interval);
+          resolve(stats!);
+        } else if (status === "FAILURE") {
+          clearInterval(interval);
+          reject(new Error("Upload task failed"));
+        }
+      } catch (error) {
+        clearInterval(interval);
+        reject(error);
+      }
+    }, 2000);
+
+    setTimeout(
+      () => {
+        clearInterval(interval);
+        reject(new Error("Upload task timeout"));
+      },
+      5 * 60 * 1000, // 5 minutes
+    );
+  });
 };
 
 export const organisationApiService = {
   search,
   upload,
+  pollTask,
 };

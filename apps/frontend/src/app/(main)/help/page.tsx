@@ -35,13 +35,13 @@ export default function GettingStartedPage() {
             <div className="space-y-2">
               <Link
                 href="/help/email-settings"
-                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm font-medium text-gray-900 hover:text-emerald-700"
+                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm text-gray-900 hover:text-emerald-700"
               >
                 Email Settings Guide
               </Link>
               <Link
                 href="/help/importing-organizations"
-                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm font-medium text-gray-900 hover:text-emerald-700"
+                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm text-gray-900 hover:text-emerald-700"
               >
                 Importing Organizations
               </Link>

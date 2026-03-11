@@ -17,7 +17,7 @@ export default function ImportingOrganizationsHelpPage({
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
+        <h1 className="text-2xl text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
         <p className="text-gray-600 text-lg">
           Bulk import festivals, venues, and residencies from an Excel file
         </p>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createZodFormSchema } from "@/helpers/formHelper";
 import BasicForm from "@/components/common/form/BasicForm";
 import { z } from "zod";
@@ -29,16 +29,25 @@ const UploadForm = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [uploadStats, setUploadStats] = useState<UploadStats | null>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onSubmit",
   });
 
+  useEffect(() => {
+    if (uploadStats && summaryRef.current) {
+      summaryRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [uploadStats]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
       const excelFile = values.excel as File;
-      const stats: UploadStats = await organisationApiService.upload([excelFile]);
+      const taskId = await organisationApiService.upload([excelFile]);
+      const stats = await organisationApiService.pollTask(taskId);
+
       setUploadStats(stats);
     } catch (error) {
       console.error(error);
@@ -59,7 +68,11 @@ const UploadForm = () => {
           action={Action.UPLOAD}
         />
       </div>
-      {uploadStats && <UploadSummarySection uploadStats={uploadStats} />}
+      {uploadStats && (
+        <div ref={summaryRef}>
+          <UploadSummarySection uploadStats={uploadStats} />
+        </div>
+      )}
     </>
   );
 };
