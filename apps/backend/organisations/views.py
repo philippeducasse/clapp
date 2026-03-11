@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List
 
+from celery.result import AsyncResult
 from django.apps import apps
 from django.db.models import Q
 from django.http import HttpRequest
@@ -10,14 +11,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
-from django.db import transaction
 
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
 from performances.models import Performance
 from services.mistral_service import ConversationResponse, MistralClient
-from .tasks import upload_user_data
+
 from .models import Organisation
 from .services import (
     create_form_application,
@@ -30,6 +30,7 @@ from .services import (
     send_application_email,
     validate_application_recipients,
 )
+from .tasks import upload_user_data
 from .utils import clean_organisation_data, extract_fields_from_llm
 
 logger = logging.getLogger(__name__)
@@ -459,5 +460,15 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         file_bytes = excel_file.read()
         user_id = request.user.id
         logger.info("Initiating user data upload")
-        transaction.on_commit(lambda: upload_user_data.delay(file_bytes, user_id))
-        return Response({"message": "Upload scheduled"}, status=status.HTTP_202_ACCEPTED)
+        task = upload_user_data.delay(file_bytes, user_id)
+        return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+
+    @action(detail=False, methods=["get"], url_path="upload-status/(?P<task_id>[^/.]+)")
+    def upload_status(self, request: HttpRequest, task_id: int) -> Response:
+        result = AsyncResult(task_id)
+
+        logger.info(f"Polling task {task_id}: {result.status}")
+
+        return Response(
+            {"status": result.status, "stats": result.result if result.ready() else None}
+        )
