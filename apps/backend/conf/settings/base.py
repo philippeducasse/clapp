@@ -189,3 +189,18 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3020"
 
 # FERNET_KEY for reverse encryption of email_host_password
 FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY", "REDACTED")
+
+# Google OAuth
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv(
+    "GOOGLE_OAUTH_REDIRECT_URI", "http://localhost:8000/api/profiles/oauth/gmail/callback/"
+)
+
+# Microsoft OAuth
+MICROSOFT_OAUTH_CLIENT_ID = os.getenv("MICROSOFT_OAUTH_CLIENT_ID", "")
+MICROSOFT_OAUTH_CLIENT_SECRET = os.getenv("MICROSOFT_OAUTH_CLIENT_SECRET", "")
+MICROSOFT_OAUTH_TENANT_ID = os.getenv("MICROSOFT_OAUTH_TENANT_ID", "common")
+MICROSOFT_OAUTH_REDIRECT_URI = os.getenv(
+    "MICROSOFT_OAUTH_REDIRECT_URI", "http://localhost:8000/api/profiles/oauth/outlook/callback/"
+)

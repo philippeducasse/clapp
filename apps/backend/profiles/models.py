@@ -81,6 +81,14 @@ class Profile(AbstractUser):
     email_host_password = EncryptedCharField(max_length=255, blank=True)
     email_host_user = models.CharField(max_length=255, blank=True)
 
+    # OAuth email integrations
+    google_oauth_refresh_token = EncryptedCharField(max_length=2048, blank=True)
+    google_oauth_access_token = EncryptedCharField(max_length=2048, blank=True)
+    google_oauth_token_expiry = models.DateTimeField(null=True, blank=True)
+    outlook_oauth_refresh_token = EncryptedCharField(max_length=2048, blank=True)
+    outlook_oauth_access_token = EncryptedCharField(max_length=2048, blank=True)
+    outlook_oauth_token_expiry = models.DateTimeField(null=True, blank=True)
+
     # user preferences / settings
     spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
     date_format = models.CharField(max_length=50, blank=True, null=True)
