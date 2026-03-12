@@ -34,4 +34,6 @@ export interface Profile {
   emailHostPassword?: string;
   dateFormat?: string;
   tableSize?: string;
+  oauthProvider?: "GMAIL" | "OUTLOOK" | null;
+  oauthTokenExpiry?: string | null;
 }

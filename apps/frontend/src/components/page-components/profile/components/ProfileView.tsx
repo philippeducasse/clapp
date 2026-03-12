@@ -20,10 +20,10 @@ import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import PerformanceViewSection from "./PerformanceViewSection";
 import EmailTemplatesSection from "./EmailTemplatesSection";
+import OAuthEmailSection from "./OAuthEmailSection";
 import { Profile } from "@/interfaces/entities/Profile";
 import { Performance } from "@/interfaces/entities/Performance";
 import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
-import { getEmailSettings } from "../helpers/getEmailSettings";
 import { getPreferencesInfo } from "../helpers/getPreferencesInfo";
 import { useHashTab } from "@/hooks/useHashTab";
 import Link from "next/link";
@@ -137,23 +137,17 @@ const ProfileView = () => {
         </Tab>
 
         <Tab name="Email Settings">
-          <DetailsViewSection
-            title="Email Settings"
-            icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
-            data={getEmailSettings(profile)}
-            subtitle={
-              <>
-                These values are used when contacting organisations.{" "}
-                <Link
-                  href="/help/email-settings"
-                  target="_blank"
+          <OAuthEmailSection profile={profile} />
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md text-sm text-blue-700 dark:text-blue-300">
+            These values are used when contacting organisations.{" "}
+            <Link
+              href="/help/email-settings"
+              target="_blank"
                   className="text-blue-600 hover:text-blue-800 underline"
-                >
-                  View setup guide
-                </Link>
-              </>
-            }
-          />
+            >
+              View setup guide
+            </Link>
+          </div>
         </Tab>
 
         <Tab name="Account">
