@@ -34,13 +34,42 @@ export function formatDate(date: string | Date): string {
   );
 }
 
-export function formatErrorMessage(message: string) {
-  let errorMessage = message ?? "Error!";
+export const transformKeysToCamelCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => transformKeysToCamelCase(v));
+  } else if (obj != null && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const camelKey = _.camelCase(key);
+      result[camelKey] = transformKeysToCamelCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+};
 
+export const transformKeysToSnakeCase = (obj: any): any => {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => transformKeysToSnakeCase(v));
+  } else if (obj && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const snakeKey = _.snakeCase(key);
+      result[snakeKey] = transformKeysToSnakeCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+};
+
+export function formatErrorMessage(message: string, maxLength = 100) {
+  let errorMessage = message ?? "Error!";
   try {
     const errorJson = JSON.parse(errorMessage);
-    errorMessage = errorJson.error;
+    errorMessage =
+      typeof errorJson.error === "string" ? errorJson.error : JSON.stringify(errorJson.error);
   } catch {}
 
+  if (errorMessage.length > maxLength) {
+    return errorMessage.slice(0, maxLength) + "…";
+  }
   return errorMessage;
 }

@@ -10,7 +10,7 @@
  * 3. Environment variables are set correctly
  */
 
-import { transformKeysToCamelCase, transformKeysToSnakeCase } from "../helpers/serializer";
+import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/utils/stringUtils";
 
 export const BACKEND_URL = "http://localhost:8000";
 export const API_BASE = `${BACKEND_URL}/api`;
