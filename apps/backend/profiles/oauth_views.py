@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 
 import msal
@@ -11,13 +12,11 @@ from profiles.models import Profile
 
 GMAIL_SCOPES = ["https://mail.google.com/"]
 OUTLOOK_SCOPES = ["https://outlook.office.com/SMTP.Send", "offline_access"]
+logger = logging.getLogger(__name__)
 
 
 def gmail_connect(request: HttpRequest) -> HttpResponse:
-    """Redirect user to Google's OAuth consent screen."""
-    if not request.user.is_authenticated:
-        return redirect(f"{settings.APP_URL}/login?next=/settings/email")
-
+    logger.info(f"Attempting to connect user {request.user.email} to Gmail")
     flow = Flow.from_client_config(
         {
             "web": {
@@ -30,6 +29,7 @@ def gmail_connect(request: HttpRequest) -> HttpResponse:
         scopes=GMAIL_SCOPES,
         redirect_uri=settings.GOOGLE_OAUTH_REDIRECT_URI,
     )
+    # builds a signed state token containing the user's ID (so you can recover who they are after the redirect)
     state = signing.dumps({"uid": request.user.pk})
     auth_url, _ = flow.authorization_url(state=state, access_type="offline", prompt="consent")
     return redirect(auth_url)
@@ -71,8 +71,6 @@ def gmail_callback(request: HttpRequest) -> HttpResponse:
 
 def outlook_connect(request: HttpRequest) -> HttpResponse:
     """Redirect user to Microsoft's OAuth consent screen."""
-    if not request.user.is_authenticated:
-        return redirect(f"{settings.APP_URL}/login?next=/settings/email")
 
     app = msal.ConfidentialClientApplication(
         settings.MICROSOFT_OAUTH_CLIENT_ID,
