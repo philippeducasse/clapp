@@ -15,6 +15,21 @@ interface OAuthEmailSectionProps {
   profile: Profile;
 }
 
+const GmailIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
+    <path
+      d="M20.4 4H3.6C2.16 4 1.2 4.96 1.2 6.4v11.2c0 1.44.96 2.4 2.4 2.4h16.8c1.44 0 2.4-.96 2.4-2.4V6.4c0-1.44-.96-2.4-2.4-2.4zm0 3.6l-8.4 5.28L3.6 7.6v-1.2l8.4 5.28 8.4-5.28v1.2z"
+      fill="#EA4335"
+    />
+  </svg>
+);
+
+const OutlookIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="mr-2">
+    <path d="M2 4h7v7H2V4zm0 9h7v7H2v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z" fill="#0078D4" />
+  </svg>
+);
+
 const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
@@ -46,74 +61,44 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
     }
   };
 
-  const isOAuthActive = profile.oauthProvider !== null;
+  const isOAuthActive = profile.oauthProvider != null;
 
   return (
     <Card className="mb-6">
       <CardContent>
         <div className="flex items-center gap-2 mb-6">
           <Mail className="text-emerald-600 dark:text-emerald-400" size={20} />
-          <CardTitle className="text-lg font-semibold">
-            Email Configuration
-          </CardTitle>
+          <CardTitle className="text-lg font-semibold">Click to connect</CardTitle>
         </div>
+        <p className="font-light text-gray-600 dark:text-foreground mb-4">
+          Connect your Gmail or Outlook mailbox with just a few clicks using the buttons below.{" "}
+          <br></br> If you use an other provider, you will need to manually setup up the connection.
+        </p>
 
-        <div className="space-y-4">
-          <div className="flex gap-3 pb-4 border-b">
-            <Button
-              onClick={() => handleConnect("gmail")}
-              disabled={isLoading}
-              variant={profile.oauthProvider === "GMAIL" ? "default" : "outline"}
-              size="sm"
-            >
-              {profile.oauthProvider === "GMAIL" ? "✓ Gmail Connected" : "Connect Gmail"}
+        <div className="flex gap-4">
+          <Button
+            onClick={() => handleConnect("gmail")}
+            disabled={isLoading}
+            variant={profile.oauthProvider === "GMAIL" ? "default" : "outline"}
+            size="sm"
+          >
+            <GmailIcon />
+            {profile.oauthProvider === "GMAIL" ? "✓ Gmail Connected" : "Connect Gmail"}
+          </Button>
+          <Button
+            onClick={() => handleConnect("outlook")}
+            disabled={isLoading}
+            variant={profile.oauthProvider === "OUTLOOK" ? "default" : "outline"}
+            size="sm"
+          >
+            <OutlookIcon />
+            {profile.oauthProvider === "OUTLOOK" ? "✓ Outlook Connected" : "Connect Outlook"}
+          </Button>
+          {isOAuthActive && (
+            <Button onClick={handleDisconnect} disabled={isLoading} variant="destructive" size="sm">
+              Disconnect
             </Button>
-            <Button
-              onClick={() => handleConnect("outlook")}
-              disabled={isLoading}
-              variant={profile.oauthProvider === "OUTLOOK" ? "default" : "outline"}
-              size="sm"
-            >
-              {profile.oauthProvider === "OUTLOOK" ? "✓ Outlook Connected" : "Connect Outlook"}
-            </Button>
-            {isOAuthActive && (
-              <Button
-                onClick={handleDisconnect}
-                disabled={isLoading}
-                variant="destructive"
-                size="sm"
-              >
-                Disconnect
-              </Button>
-            )}
-          </div>
-
-          <div className={isOAuthActive ? "opacity-50" : ""}>
-            <div className="flex items-center gap-2 mb-3">
-              <Lock size={16} className="text-gray-400" />
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                Manual Configuration
-              </p>
-            </div>
-            <div className="space-y-2 ml-6">
-              {getEmailSettings(profile).map((setting, idx) => {
-                let displayValue = "—";
-                if (typeof setting.value === "boolean") {
-                  displayValue = setting.value ? "Yes" : "No";
-                } else if (setting.value instanceof Date) {
-                  displayValue = setting.value.toString();
-                } else if (setting.value) {
-                  displayValue = String(setting.value);
-                }
-                return (
-                  <div key={idx} className="text-sm">
-                    <span className="font-medium">{setting.title}:</span>{" "}
-                    <span className="text-gray-600 dark:text-gray-400">{displayValue}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>

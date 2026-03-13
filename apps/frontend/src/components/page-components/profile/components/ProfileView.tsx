@@ -30,6 +30,7 @@ import Link from "next/link";
 import ProfileRemindersCard from "./ProfileRemindersCard";
 import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { Button } from "@/components/ui/button";
+import { getEmailSettings } from "../helpers/getEmailSettings";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -89,13 +90,6 @@ const ProfileView = () => {
         subtitle={`${profile?.firstName} ${profile.lastName}`}
         icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
         entityId={profile.id}
-        actionElements={
-          <>
-            {activeTab === "basic-information" && <EditButton href={`/profile/edit`} />}
-            {activeTab === "email-settings" && <EditButton href={`/profile/edit/email-settings`} />}
-            {activeTab === "account" && <EditButton href={`/profile/edit/preferences`} />}
-          </>
-        }
       />
 
       <DetailsTabs defaultTab={activeTab} onTabChange={handleTabChange}>
@@ -104,11 +98,13 @@ const ProfileView = () => {
             title="Basic information"
             icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
             data={getBasicProfileInfo(profile)}
+            action={<EditButton href={`/profile/edit`} />}
           />
           <DetailsViewSection
             title="Contact details"
             icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
             data={getProfileContactInfo(profile)}
+            action={<EditButton href={`/profile/edit`} />}
           />
         </Tab>
 
@@ -137,16 +133,25 @@ const ProfileView = () => {
         </Tab>
 
         <Tab name="Email Settings">
-          <OAuthEmailSection profile={profile} />
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md text-sm text-blue-700 dark:text-blue-300">
-            These values are used when contacting organisations.{" "}
-            <Link
-              href="/help/email-settings"
-              target="_blank"
-                  className="text-blue-600 hover:text-blue-800 underline"
-            >
-              View setup guide
-            </Link>
+          <div className="mb-6">
+            <OAuthEmailSection profile={profile} />
+            <DetailsViewSection
+              title="Connect manually"
+              icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
+              data={getEmailSettings(profile)}
+              subtitle={
+                <>
+                  These values are used when contacting organisations.{" "}
+                  <Link
+                    href="/help/email-settings"
+                    target="_blank"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View setup guide
+                  </Link>
+                </>
+              }
+            />
           </div>
         </Tab>
 
@@ -155,6 +160,7 @@ const ProfileView = () => {
             title="Preferences"
             icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
             data={getPreferencesInfo(profile)}
+            action={<EditButton href={`/profile/edit/preferences`} />}
           />
           <div className="flex gap-4">
             <Button

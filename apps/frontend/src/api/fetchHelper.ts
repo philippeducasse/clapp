@@ -1,4 +1,4 @@
-import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/helpers/serializer";
+import { transformKeysToCamelCase, transformKeysToSnakeCase } from "@/utils/stringUtils";
 import { formatErrorMessage } from "@/utils/stringUtils";
 import { toast } from "sonner";
 
