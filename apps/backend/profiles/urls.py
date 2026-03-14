@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 from profiles.oauth_views import (
     gmail_callback,
     gmail_connect,
+    oauth_disconnect,
     outlook_callback,
     outlook_connect,
 )
@@ -28,5 +29,6 @@ urlpatterns: List[Union[URLPattern, URLResolver]] = [
     path("oauth/gmail/callback/", gmail_callback, name="gmail-callback"),
     path("oauth/outlook/connect/", outlook_connect, name="outlook-connect"),
     path("oauth/outlook/callback/", outlook_callback, name="outlook-callback"),
+    path("oauth/disconnect/", oauth_disconnect, name="oauth-disconnect"),
     path("", include(router.urls)),
 ]

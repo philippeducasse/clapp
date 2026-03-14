@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+
+from django.utils import timezone
 
 import msal
 from django.conf import settings
@@ -77,7 +79,7 @@ def _outlook_oauth_connection(user: Profile):
     # Refresh if expired
     if (
         user.outlook_oauth_token_expiry
-        and user.outlook_oauth_token_expiry <= datetime.now()
+        and user.outlook_oauth_token_expiry <= timezone.now()
         and user.outlook_oauth_refresh_token
     ):
         result = app.acquire_token_by_refresh_token(
@@ -85,7 +87,7 @@ def _outlook_oauth_connection(user: Profile):
         )
         if "access_token" in result:
             user.outlook_oauth_access_token = result["access_token"]
-            user.outlook_oauth_token_expiry = datetime.now() + timedelta(
+            user.outlook_oauth_token_expiry = timezone.now() + timedelta(
                 seconds=result.get("expires_in", 3600)
             )
             user.save(update_fields=["outlook_oauth_access_token", "outlook_oauth_token_expiry"])

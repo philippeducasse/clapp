@@ -15,7 +15,7 @@ class CustomUserAdmin(UserAdmin):
     inlines = [EmailTemplateInline]
     list_filter = ("is_staff", "is_active")
     fieldsets = (
-        (None, {"fields": ("email", "password", "confirmed_account", "confirmation_token")}),
+        (None, {"fields": ("email", "password", "confirmed_account", "confirmation_token", "reset_token")}),
         (
             "Personal info",
             {
@@ -29,6 +29,7 @@ class CustomUserAdmin(UserAdmin):
                     "instagram_profile",
                     "facebook_profile",
                     "tiktok_profile",
+                    "youtube_profile",
                     "phone",
                 )
             },
@@ -53,6 +54,29 @@ class CustomUserAdmin(UserAdmin):
                     "email_port",
                     "email_host_password",
                     "email_use_tls",
+                )
+            },
+        ),
+        (
+            "OAuth integrations",
+            {
+                "fields": (
+                    "google_oauth_refresh_token",
+                    "google_oauth_access_token",
+                    "google_oauth_token_expiry",
+                    "outlook_oauth_refresh_token",
+                    "outlook_oauth_access_token",
+                    "outlook_oauth_token_expiry",
+                )
+            },
+        ),
+        (
+            "Preferences",
+            {
+                "fields": (
+                    "spoken_languages",
+                    "date_format",
+                    "table_size",
                 )
             },
         ),

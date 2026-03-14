@@ -62,10 +62,36 @@ class ProfileSerializer(serializers.ModelSerializer):
     facebook_profile = NormalizedURLField(required=False, allow_blank=True)
     tiktok_profile = NormalizedURLField(required=False, allow_blank=True)
     youtube_profile = NormalizedURLField(required=False, allow_blank=True)
+    oauth_provider = serializers.SerializerMethodField()
+    oauth_token_expiry = serializers.SerializerMethodField()
+
+    def get_oauth_provider(self, obj: Profile) -> str | None:
+        if obj.google_oauth_refresh_token:
+            return "GMAIL"
+        if obj.outlook_oauth_refresh_token:
+            return "OUTLOOK"
+        return None
+
+    def get_oauth_token_expiry(self, obj: Profile) -> str | None:
+        if obj.google_oauth_refresh_token and obj.google_oauth_token_expiry:
+            return obj.google_oauth_token_expiry.isoformat()
+        if obj.outlook_oauth_refresh_token and obj.outlook_oauth_token_expiry:
+            return obj.outlook_oauth_token_expiry.isoformat()
+        return None
 
     class Meta:
         model: Type[Profile] = Profile
-        exclude = ("password", "groups", "user_permissions")
+        exclude = (
+            "password",
+            "groups",
+            "user_permissions",
+            "google_oauth_refresh_token",
+            "google_oauth_access_token",
+            "google_oauth_token_expiry",
+            "outlook_oauth_refresh_token",
+            "outlook_oauth_access_token",
+            "outlook_oauth_token_expiry",
+        )
         read_only_fields = ("id",)
 
     def update(self, instance, validated_data):
