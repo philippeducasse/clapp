@@ -137,6 +137,14 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   }, [entityId, entity, entityName, dispatch]);
 
   useEffect(() => {
+    if (!entity?.contacts?.length) return;
+    const emails = entity.contacts.map((c) => c.email).filter(Boolean);
+    if (emails.length > 0) {
+      form.setValue("recipients", emails);
+    }
+  }, [entity, form]);
+
+  useEffect(() => {
     if (!selectedTemplateId || applicationMethod !== ApplicationMethod.EMAIL) return;
 
     const template = profile?.emailTemplates?.find((t) => t.id === Number(selectedTemplateId));
@@ -214,7 +222,16 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
         {isLoading ? "Generating..." : "Generate email"}
       </Button>
     );
-  }, [profile, selectedPerformanceIds, language, messageLength, isLoading, form, entityId, entityName]);
+  }, [
+    profile,
+    selectedPerformanceIds,
+    language,
+    messageLength,
+    isLoading,
+    form,
+    entityId,
+    entityName,
+  ]);
 
   return (
     <>

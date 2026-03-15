@@ -10,7 +10,7 @@ export const getApplicationBasicInfo = (application: Application): SectionCellPr
       title: "Organisation Name",
       value: application.organisation.name,
       type: SectionCellType.Link,
-      linkTo: `/${application.organisationType.toLowerCase()}s/${application.organisation.id}`,
+      linkTo: `/${application.organisationType.toLowerCase() === "residency" ? "residencies" : `${application.organisationType.toLowerCase()}s`}/${application.organisation.id}`,
       target: "_self",
     },
     {
