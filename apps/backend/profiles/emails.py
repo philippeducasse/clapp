@@ -53,7 +53,7 @@ def _gmail_oauth_connection(user: Profile):
     )
 
     # Refresh if expired
-    if creds.expired and creds.refresh_token:
+    if not creds.valid:
         creds.refresh(Request())
         user.google_oauth_access_token = creds.token
         user.google_oauth_token_expiry = creds.expiry
@@ -72,7 +72,7 @@ def _outlook_oauth_connection(user: Profile):
     """Create SMTP connection using Outlook OAuth tokens, refreshing if needed."""
     app = msal.ConfidentialClientApplication(
         settings.MICROSOFT_OAUTH_CLIENT_ID,
-        authority=f"https://login.microsoftonline.com/{settings.MICROSOFT_OAUTH_TENANT_ID}",
+        authority="https://login.microsoftonline.com/common",
         client_credential=settings.MICROSOFT_OAUTH_CLIENT_SECRET,
     )
 

@@ -50,9 +50,12 @@ class SoftDeleteManager(models.Manager.from_queryset(SoftDeleteQuerySet)):
 
     def with_deleted(self) -> SoftDeleteQuerySet:
         """Return all objects including deleted, bypassing default alive filter"""
-        # Use super().get_queryset() to get base queryset without alive filter
-        # This preserves RelatedManager filters while including deleted objects
-        return super().get_queryset()
+        # super().get_queryset() bypasses alive() but also loses the FK filter
+        # applied by Django's RelatedManager. Re-apply core_filters if present.
+        qs = super().get_queryset()
+        if hasattr(self, "core_filters"):
+            return qs.filter(**self.core_filters)
+        return qs
 
     def deleted(self) -> SoftDeleteQuerySet:
         """Return only deleted objects, bypassing default alive filter"""
