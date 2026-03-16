@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { profileApiService } from "@/api/profileApiService";
 import { updateProfile } from "@/redux/slices/authSlice";
 import { getEmailSettings } from "../helpers/getEmailSettings";
+import { capitalizeFirst } from "@/utils/stringUtils";
 
 interface OAuthEmailSectionProps {
   profile: Profile;
@@ -60,8 +61,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
       setIsLoading(false);
     }
   };
-
-  const isOAuthActive = profile.oauthProvider != null;
+  console.log("porifle", profile);
 
   return (
     <Card className="mb-6">
@@ -70,7 +70,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
           <Mail className="text-emerald-600 dark:text-emerald-400" size={20} />
           <CardTitle className="text-lg font-semibold">Click to connect</CardTitle>
         </div>
-        <p className="font-light text-gray-600 dark:text-foreground mb-4">
+        <p className="font-light text-gray-600 dark:text-foreground mb-8">
           Connect your Gmail or Outlook mailbox with just a few clicks using the buttons below.{" "}
           <br></br> If you use an other provider, you will need to manually setup up the connection.
         </p>
@@ -79,8 +79,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
           <Button
             onClick={() => handleConnect("gmail")}
             disabled={isLoading}
-            variant={profile.oauthProvider === "GMAIL" ? "default" : "outline"}
-            size="sm"
+            variant={profile.oauthProvider === "GMAIL" ? "tertiary" : "outline"}
           >
             <GmailIcon />
             {profile.oauthProvider === "GMAIL" ? "✓ Gmail Connected" : "Connect Gmail"}
@@ -88,15 +87,14 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
           <Button
             onClick={() => handleConnect("outlook")}
             disabled={isLoading}
-            variant={profile.oauthProvider === "OUTLOOK" ? "default" : "outline"}
-            size="sm"
+            variant={profile.oauthProvider === "OUTLOOK" ? "tertiary" : "outline"}
           >
             <OutlookIcon />
             {profile.oauthProvider === "OUTLOOK" ? "✓ Outlook Connected" : "Connect Outlook"}
           </Button>
-          {isOAuthActive && (
-            <Button onClick={handleDisconnect} disabled={isLoading} variant="destructive" size="sm">
-              Disconnect
+          {profile.oauthProvider && (
+            <Button onClick={handleDisconnect} disabled={isLoading} variant="destructive">
+              {`Disconnect ${capitalizeFirst(profile.oauthProvider)}`}
             </Button>
           )}
         </div>

@@ -25,7 +25,7 @@ const DeleteButton = ({
       variant={variant}
       onClick={onDelete}
       type="button"
-      className={className}
+      className={`${className} dark:border-red-500`}
       disabled={loading}
     >
       {icon && <Trash2 />}

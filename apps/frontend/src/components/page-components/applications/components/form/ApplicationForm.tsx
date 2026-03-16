@@ -4,8 +4,12 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/reducers";
 import { selectFestival } from "@/redux/slices/festivalSlice";
+import { selectResidency } from "@/redux/slices/residencySlice";
+import { selectVenue } from "@/redux/slices/venueSlice";
 import { useParams } from "next/navigation";
 import { refreshFestival } from "@/components/page-components/festivals/helpers/refreshFestival";
+import { refreshResidency } from "@/components/page-components/residencies/helpers/refreshResidency";
+import { refreshVenue } from "@/components/page-components/venues/helpers/refreshVenue";
 import FormHeader from "@/components/common/form/FormHeader";
 import { Action, EntityName } from "@/interfaces/Enums";
 import BasicForm from "@/components/common/form/BasicForm";
@@ -17,17 +21,39 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Bot } from "lucide-react";
 import { festivalApiService } from "@/api/festivalApiService";
+import { residencyApiService } from "@/api/residencyApiService";
+import { venueApiService } from "@/api/venueApiService";
 import { ApplicationCreate, ApplicationMethod } from "@/interfaces/entities/Application";
 import { selectProfile } from "@/redux/slices/authSlice";
-import { Festival } from "@/interfaces/entities/Festival";
 import { Profile } from "@/interfaces/entities/Profile";
 import { useRouter } from "next/navigation";
 import { Dossier } from "@/interfaces/entities/Performance";
 
-const ApplicationForm = () => {
+interface ApplicationFormProps {
+  entityName: EntityName.FESTIVAL | EntityName.RESIDENCY | EntityName.VENUE;
+}
+
+const ENTITY_CONFIG = {
+  [EntityName.FESTIVAL]: { objectType: "Festival", basePath: "festivals" },
+  [EntityName.RESIDENCY]: { objectType: "Residency", basePath: "residencies" },
+  [EntityName.VENUE]: { objectType: "Venue", basePath: "venues" },
+};
+
+const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const params = useParams();
-  const festivalId = Number(params.id);
-  const festival = useSelector((state: RootState) => selectFestival(state, festivalId));
+  const entityId = Number(params.id);
+
+  const festival = useSelector((state: RootState) => selectFestival(state, entityId));
+  const residency = useSelector((state: RootState) => selectResidency(state, entityId));
+  const venue = useSelector((state: RootState) => selectVenue(state, entityId));
+
+  const entity =
+    entityName === EntityName.FESTIVAL
+      ? festival
+      : entityName === EntityName.RESIDENCY
+        ? residency
+        : venue;
+
   const profile = useSelector((state: RootState) => selectProfile(state));
   const router = useRouter();
   const dispatch = useDispatch();
@@ -39,18 +65,20 @@ const ApplicationForm = () => {
   >(ApplicationMethod.EMAIL);
   const dossiersSetRef = useRef(false);
 
+  const config = ENTITY_CONFIG[entityName];
+
   const formFields = useMemo(() => {
     const performances = profile?.performances ?? [];
     const emailTemplates = profile?.emailTemplates ?? [];
     return getApplicationFormFields(
-      festival as Festival,
+      entity,
       performances,
       applicationMethod,
       profile as Profile,
       dossiers,
-      emailTemplates
+      emailTemplates,
     );
-  }, [festival, applicationMethod, profile, dossiers]);
+  }, [entity, applicationMethod, profile, dossiers]);
 
   const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
 
@@ -70,7 +98,7 @@ const ApplicationForm = () => {
 
   useEffect(() => {
     setApplicationMethod(
-      applicationMethodWatch as ApplicationMethod.EMAIL | ApplicationMethod.FORM
+      applicationMethodWatch as ApplicationMethod.EMAIL | ApplicationMethod.FORM,
     );
   }, [applicationMethodWatch]);
 
@@ -82,7 +110,7 @@ const ApplicationForm = () => {
     if (applicationMethod !== ApplicationMethod.EMAIL) return;
 
     const selectedPerformances = profile?.performances.filter((p) =>
-      selectedPerformanceIds.includes(p.id)
+      selectedPerformanceIds.includes(p.id),
     );
 
     const allDossierFiles =
@@ -101,12 +129,21 @@ const ApplicationForm = () => {
   }, [dossiers, form]);
 
   useEffect(() => {
-    if (!festival) {
-      refreshFestival(festivalId, dispatch);
+    if (!entity) {
+      if (entityName === EntityName.FESTIVAL) refreshFestival(entityId, dispatch);
+      else if (entityName === EntityName.RESIDENCY) refreshResidency(entityId, dispatch);
+      else refreshVenue(entityId, dispatch);
     }
-  }, [festivalId, festival, dispatch]);
+  }, [entityId, entity, entityName, dispatch]);
 
-  // Populate message when email template is selected
+  useEffect(() => {
+    if (!entity?.contacts?.length) return;
+    const emails = entity.contacts.map((c) => c.email).filter(Boolean);
+    if (emails.length > 0) {
+      form.setValue("recipients", emails);
+    }
+  }, [entity, form]);
+
   useEffect(() => {
     if (!selectedTemplateId || applicationMethod !== ApplicationMethod.EMAIL) return;
 
@@ -124,16 +161,25 @@ const ApplicationForm = () => {
         const applicationData = {
           ...vals,
           profileId: profile.id,
-          objectType: "Festival",
-          objectId: festivalId,
+          objectType: config.objectType,
+          objectId: entityId,
         };
-        const response = await festivalApiService.apply(
-          festivalId,
+
+        const apiService =
+          entityName === EntityName.FESTIVAL
+            ? festivalApiService
+            : entityName === EntityName.RESIDENCY
+              ? residencyApiService
+              : venueApiService;
+
+        const response = (await apiService.apply(
+          entityId,
           applicationData as ApplicationCreate,
           attachmentsSent as File[],
-          "attachments_sent"
-        );
-        if ("applicationId" in response) {
+          "attachments_sent",
+        )) as unknown as { applicationId?: number };
+
+        if (response && "applicationId" in response) {
           router.push(`/applications/${response.applicationId}`);
         }
       } catch (error) {
@@ -150,7 +196,17 @@ const ApplicationForm = () => {
       if (profile) {
         const data = { profile, selectedPerformanceIds, language, messageLength };
         try {
-          const { message } = await festivalApiService.generateEmail(festivalId, data);
+          let message: string;
+          if (entityName === EntityName.FESTIVAL) {
+            const result = await festivalApiService.generateEmail(entityId, data);
+            message = result.message;
+          } else if (entityName === EntityName.RESIDENCY) {
+            const result = await residencyApiService.generateEmail(entityId);
+            message = result.message;
+          } else {
+            const result = await venueApiService.generateEmail(entityId);
+            message = result.message;
+          }
           form.setValue("message", message);
         } catch (error) {
           console.error(`Failed to generate message: ${error}`);
@@ -166,7 +222,16 @@ const ApplicationForm = () => {
         {isLoading ? "Generating..." : "Generate email"}
       </Button>
     );
-  }, [profile, selectedPerformanceIds, language, messageLength, isLoading, form, festivalId]);
+  }, [
+    profile,
+    selectedPerformanceIds,
+    language,
+    messageLength,
+    isLoading,
+    form,
+    entityId,
+    entityName,
+  ]);
 
   return (
     <>
@@ -176,9 +241,9 @@ const ApplicationForm = () => {
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
-        onCancelHref={`/festivals/${festival?.id}`}
+        onCancelHref={`/${config.basePath}/${entity?.id}`}
         isLoading={isLoading}
-        entity={festival}
+        entity={entity}
         additionalActions={applicationMethod == ApplicationMethod.EMAIL ? generateEmail() : null}
         action={applicationMethod == ApplicationMethod.EMAIL ? Action.APPLY : Action.CREATE}
       />

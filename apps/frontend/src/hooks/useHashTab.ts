@@ -10,7 +10,7 @@ export const useHashTab = (defaultTab: string) => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const hash = window.location.hash.replace("#", "");
+      const hash = window.location.hash.replace("#", "").split("?")[0];
       if (hash) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveTab(hash);

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CircleUser, Cog } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
@@ -31,6 +31,7 @@ import ProfileRemindersCard from "./ProfileRemindersCard";
 import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { getEmailSettings } from "../helpers/getEmailSettings";
+import { toast } from "sonner";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -43,6 +44,27 @@ const ProfileView = () => {
   );
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
   const { activeTab, handleTabChange } = useHashTab("basic-information");
+
+  useEffect(() => {
+    const hash = window.location.hash; // e.g. "#email-settings?oauth=outlook&status=success"
+    const queryString = hash.includes("?") ? hash.slice(hash.indexOf("?") + 1) : "";
+    if (!queryString) return;
+
+    const params = new URLSearchParams(queryString);
+    const oauth = params.get("oauth");
+    const status = params.get("status");
+
+    if (oauth && status) {
+      const provider = oauth.charAt(0).toUpperCase() + oauth.slice(1);
+      setTimeout(() => {
+        if (status === "success") {
+          toast.success(`${provider} connected successfully`);
+        } else {
+          toast.error(`Failed to connect ${provider}`);
+        }
+      }, 100);
+    }
+  }, []);
 
   const handleDelete = (entity: "profile" | "performance" | "email template", index?: number) => {
     setIdToDelete(index);
@@ -151,6 +173,7 @@ const ProfileView = () => {
                   </Link>
                 </>
               }
+              action={<EditButton href={`/profile/edit/email-settings`} />}
             />
           </div>
         </Tab>

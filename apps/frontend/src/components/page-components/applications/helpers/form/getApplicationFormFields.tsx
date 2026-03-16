@@ -1,11 +1,18 @@
 import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Dossier, Performance } from "@/interfaces/entities/Performance";
-import { Festival } from "@/interfaces/entities/Festival";
+import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { Profile, EmailTemplate } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { LANGUAGES } from "@/constants/languages";
 import { getOptions } from "@/helpers/formHelper";
+
+export interface ApplicableEntity {
+  id?: number;
+  name?: string;
+  contacts?: OrganisationContact[];
+  applicationType?: string;
+}
 
 export const getEmailTemplateOptions = (emailTemplates: EmailTemplate[]): SelectOptions[] => {
   return [
@@ -32,7 +39,7 @@ export const getDossierOptions = (dossiers: Dossier[]): SelectOptions[] | undefi
 };
 
 export const getApplicationFormFields = (
-  festival: Festival,
+  entity: ApplicableEntity | null | undefined,
   performances: Performance[],
   applicationMethod: ApplicationMethod,
   profile: Profile,
@@ -50,13 +57,13 @@ export const getApplicationFormFields = (
       fieldName: "emailSubject",
       type: ControlledFormElementType.TEXT,
       defaultValue:
-        festival?.name && `${profile?.firstName} ${profile?.lastName} at ${festival?.name} 2026`,
+        entity?.name && `${profile?.firstName} ${profile?.lastName} at ${entity?.name} 2026`,
     },
     {
       label: "Recipients",
       fieldName: "recipients",
       type: ControlledFormElementType.MULTI_EMAIL,
-      defaultValue: festival?.contacts?.map((c) => c.email) ?? [],
+      defaultValue: entity?.contacts?.map((c) => c.email) ?? [],
       helpText: "Enter recipients, hit enter or ',' to separate them",
     },
     {
@@ -118,7 +125,7 @@ export const getApplicationFormFields = (
       fieldName: "applicationMethod",
       type: ControlledFormElementType.SELECT,
       options: getOptions(ApplicationMethod),
-      defaultValue: festival?.applicationType || "EMAIL",
+      defaultValue: entity?.applicationType || "EMAIL",
       helpText:
         applicationMethod === ApplicationMethod.FORM
           ? "Selecting 'Form' implies that you have filled out and sent an organisation online form yourself."
@@ -131,7 +138,7 @@ export const getApplicationFormFields = (
       fieldName: "performances",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
-      helpText: "Select with which performances you want to apply to this festival",
+      helpText: "Select with which performances you want to apply to this organisation",
     },
   ];
 
