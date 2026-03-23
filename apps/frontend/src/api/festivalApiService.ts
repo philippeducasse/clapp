@@ -55,7 +55,6 @@ const update = (festival: Festival): Promise<Festival> => {
     festival,
     "PUT",
     "Festival successfully updated",
-    true,
   );
 };
 
@@ -68,7 +67,6 @@ const generateEmail = (
     data,
     "POST",
     "Email successfully generated",
-    true,
   );
 };
 

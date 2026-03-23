@@ -160,7 +160,6 @@ describe("performanceApiService", () => {
         }),
         "POST",
         "Performance successfully created",
-        true,
       );
       expect(result.id).toBe(3);
     });
@@ -244,7 +243,6 @@ describe("performanceApiService", () => {
         }),
         "PUT",
         "Performance successfully updated",
-        true,
       );
       expect(result.performanceTitle).toBe("Updated Performance");
     });
@@ -314,7 +312,6 @@ describe("performanceApiService", () => {
         }),
         "PUT",
         "Performance successfully updated",
-        true,
       );
     });
 
@@ -358,7 +355,6 @@ describe("performanceApiService", () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(
         "/api/performances/1",
         "Performance successfully deleted",
-        true,
       );
     });
 
@@ -370,7 +366,6 @@ describe("performanceApiService", () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(
         "/api/performances/99",
         "Performance successfully deleted",
-        true,
       );
     });
   });

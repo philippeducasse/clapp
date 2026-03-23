@@ -49,7 +49,6 @@ describe("Email and Application Functionality", () => {
         },
         "POST",
         "Email successfully generated",
-        true,
       );
       expect(result.message).toBeDefined();
       expect(result.message).toContain("Dear");
@@ -82,7 +81,6 @@ describe("Email and Application Functionality", () => {
         },
         "POST",
         "Email successfully generated",
-        true,
       );
       expect(result.message).toBeDefined();
     });
@@ -607,7 +605,6 @@ describe("Email and Application Functionality", () => {
         }),
         "POST",
         "Email successfully generated",
-        true,
       );
       expect(result.message).toBeDefined();
     });

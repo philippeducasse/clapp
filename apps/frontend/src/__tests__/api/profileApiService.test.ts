@@ -140,7 +140,6 @@ describe('profileApiService', () => {
         updatedProfile,
         'PUT',
         'Profile successfully updated',
-        true,
       );
       expect(result.location).toBe('London, UK');
     });
@@ -183,7 +182,6 @@ describe('profileApiService', () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(
         '/api/profiles/1',
         'Profile successfully deleted',
-        true,
       );
     });
 
@@ -195,7 +193,6 @@ describe('profileApiService', () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(
         '/api/profiles/42',
         'Profile successfully deleted',
-        true,
       );
     });
   });
@@ -225,7 +222,6 @@ describe('profileApiService', () => {
         credentials,
         'POST',
         'Welcome user@example.com, you have successfully logged in',
-        true,
       );
       expect(result.id).toBe(1);
     });
@@ -250,7 +246,6 @@ describe('profileApiService', () => {
         credentials,
         'POST',
         'Welcome jane@example.com, you have successfully logged in',
-        true,
       );
     });
   });
@@ -266,7 +261,6 @@ describe('profileApiService', () => {
         {},
         'POST',
         'Successfully logged out',
-        true,
       );
     });
   });

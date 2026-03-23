@@ -139,7 +139,6 @@ describe("festivalApiService", () => {
         newFestival,
         "POST",
         "Festival successfully created",
-        true,
       );
       expect(result).toEqual(newFestival);
     });
@@ -196,7 +195,6 @@ describe("festivalApiService", () => {
         updatedFestival,
         "PUT",
         "Festival successfully updated",
-        true,
       );
       expect(result.name).toBe("Updated Jazz Festival");
     });
@@ -234,7 +232,6 @@ describe("festivalApiService", () => {
       expect(mockDeleteRequest).toHaveBeenCalledWith(
         "/api/festivals/1",
         "Festival successfully deleted",
-        true,
       );
     });
 

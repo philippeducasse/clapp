@@ -61,8 +61,7 @@ const update = (performance: Performance): Promise<Performance> => {
     `${endpoint}/${performance.id}`,
     { ...performanceData, dossierIds },
     "PUT",
-    "Performance successfully updated",
-    true
+    "Performance successfully updated"
   );
 };
 
