@@ -29,13 +29,12 @@ const create = (performance: Performance): Promise<Performance> => {
     `${endpoint}`,
     performanceData,
     "POST",
-    "Performance successfully created",
-    true
+    "Performance successfully created"
   );
 };
 
 const remove = (performanceId: number) => {
-  return deleteRequest(`${endpoint}/${performanceId}`, "Performance successfully deleted", true);
+  return deleteRequest(`${endpoint}/${performanceId}`, "Performance successfully deleted");
 };
 
 const update = (performance: Performance): Promise<Performance> => {

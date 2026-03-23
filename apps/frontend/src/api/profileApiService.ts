@@ -18,7 +18,7 @@ const register = async (profile: Partial<Profile>): Promise<Profile> => {
 };
 
 const remove = (profileId: number) => {
-  return deleteRequest(`${endpoint}/${profileId}`, "Profile successfully deleted", true);
+  return deleteRequest(`${endpoint}/${profileId}`, "Profile successfully deleted");
 };
 
 const update = async (profile: Partial<Profile>): Promise<Profile> => {
@@ -27,7 +27,6 @@ const update = async (profile: Partial<Profile>): Promise<Profile> => {
     profile,
     "PUT",
     "Profile successfully updated",
-    true,
   );
 };
 
@@ -37,12 +36,11 @@ const login = async (credentials: Credentials): Promise<Profile> => {
     credentials,
     "POST",
     `Welcome ${credentials.email}, you have successfully logged in`,
-    true,
   );
 };
 
 const logout = async () => {
-  return await sendRequest(`${endpoint}/logout`, {}, "POST", `Successfully logged out`, true);
+  return await sendRequest(`${endpoint}/logout`, {}, "POST", `Successfully logged out`);
 };
 
 const changePassword = async (newPassword: Record<string, unknown>, isReset: boolean) => {
@@ -53,7 +51,6 @@ const changePassword = async (newPassword: Record<string, unknown>, isReset: boo
     newPassword,
     "POST",
     `Password successfully changed`,
-    true,
   );
 };
 
@@ -63,7 +60,6 @@ const forgotPassword = async (email: Record<string, unknown>) => {
     email,
     "POST",
     `Your request has been sent, please check your email ${email.email}`,
-    true,
   );
 };
 

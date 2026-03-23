@@ -31,7 +31,6 @@ const create = (festival: Festival): Promise<Festival> => {
     festival,
     "POST",
     "Festival successfully created",
-    true,
   );
 };
 
@@ -43,7 +42,7 @@ const tag = (festivalId: number, action: TagAction): Promise<Festival> => {
 };
 
 const remove = (festivalId: number): Promise<void> => {
-  return deleteRequest(`${endpoint}/${festivalId}`, "Festival successfully deleted", true);
+  return deleteRequest(`${endpoint}/${festivalId}`, "Festival successfully deleted");
 };
 
 const enrich = (festivalId: number): Promise<Festival> => {

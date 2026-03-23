@@ -108,7 +108,6 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
   formFields?.forEach((field) => {
     fieldConfigMap.set(field.fieldName, { type: field.type, required: field.required ?? false });
   });
-  console.log("preparing data:", preparedData);
   for (const key in preparedData) {
     if (Object.prototype.hasOwnProperty.call(preparedData, key)) {
       const value = preparedData[key];
