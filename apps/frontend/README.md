@@ -5,7 +5,11 @@
 - add season start/end logic
 - add user deletion logic
 - add invoices
--
+- all emailing tasks on celery? -> io heavy
+- check requests tab
+  - dashboard queries entire data, but only count is needed
+  - profiles/me is hit on every page load
+  - optimise all of this
 
 # building the image
 
