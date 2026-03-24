@@ -27,5 +27,12 @@ export const getPreferencesFormFields = (): ControlledFormElement[] => {
       ],
       helpText: "Choose how many rows to display in tables by default",
     },
+    {
+      label: "Current Application Year",
+      fieldName: "currentApplicationYear",
+      type: ControlledFormElementType.NUMBER,
+      required: false,
+      helpText: 'The year/season you are currently sending applications for. Defaults to current year. <a href="/help/application-year" target="_blank" class="text-blue-600 hover:text-blue-800 underline">more info</a>',
+    },
   ];
 };

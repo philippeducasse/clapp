@@ -150,7 +150,7 @@ export const createZodFormSchema = (
     switch (type) {
       case ControlledFormElementType.NUMBER:
       case ControlledFormElementType.SLIDER:
-        zodType = z.number().optional();
+        zodType = z.coerce.number().optional();
         break;
       case ControlledFormElementType.MULTI_SELECT:
         zodType = z.array(z.string());

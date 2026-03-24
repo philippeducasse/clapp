@@ -36,4 +36,5 @@ export interface Profile {
   tableSize?: string;
   oauthProvider?: "GMAIL" | "OUTLOOK" | null;
   oauthTokenExpiry?: string | null;
+  currentApplicationYear?: number;
 }
