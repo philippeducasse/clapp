@@ -377,7 +377,7 @@ class TestFestivalApplyAction:
     def test_apply_calculates_correct_application_year(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
-        """Test that application year is calculated correctly"""
+        """Test that application year uses profile.current_application_year or defaults to current year"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
         mock_email_instance.send.return_value = 1
@@ -390,11 +390,160 @@ class TestFestivalApplyAction:
         }
 
         with patch("django.utils.timezone.now") as mock_now:
-            # Test for October (should increment year)
+            # When current_application_year is None, defaults to current year
             mock_now.return_value = timezone.make_aware(datetime(2025, 10, 1))
+            profile.current_application_year = None
+            profile.save()
 
             response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
 
             assert response.status_code == status.HTTP_200_OK
             application = Application.objects.first()
-            assert application.application_year == 2026
+            # Should use current year from timezone.now() = 2025
+            assert application.application_year == 2025
+
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_uses_profile_current_application_year(
+        self, mock_email, mock_connection, api_client, profile
+    ):
+        """Test that application year from profile.current_application_year is used for deduplication"""
+        mock_connection.return_value = Mock()
+        mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
+        mock_email.return_value = mock_email_instance
+
+        # Create a non-test festival to ensure duplicate check isn't bypassed
+        festival = Festival.objects.create(
+            name="Real Festival",
+            description="Not a test",
+            country="France",
+            town="Paris",
+            festival_type="STREET",
+            website_url="https://festival.com",
+            start_date=date(2025, 7, 15),
+            end_date=date(2025, 7, 20),
+            application_type="EMAIL",
+            user=profile,
+        )
+
+        # Set current_application_year on profile to 2027
+        profile.current_application_year = 2027
+        profile.save()
+
+        data = {
+            "message": "<p>Test message</p>",
+            "email_subject": "Test Subject",
+            "recipients": "festival@example.com",
+        }
+
+        # First application should succeed
+        response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
+        assert response.status_code == status.HTTP_200_OK
+        assert Application.objects.count() == 1
+
+        # Second application in same year should fail (duplicate)
+        response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "already exists" in str(response.data)
+
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_defaults_to_current_year_when_not_set(
+        self, mock_email, mock_connection, api_client, profile
+    ):
+        """Test that application year defaults to current calendar year when profile.current_application_year is None"""
+        mock_connection.return_value = Mock()
+        mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
+        mock_email.return_value = mock_email_instance
+
+        # Create a non-test festival
+        festival = Festival.objects.create(
+            name="Summer Music Festival",
+            description="A real festival",
+            country="France",
+            town="Paris",
+            festival_type="STREET",
+            website_url="https://festival.com",
+            start_date=date(2025, 7, 15),
+            end_date=date(2025, 7, 20),
+            application_type="EMAIL",
+            user=profile,
+        )
+
+        # Ensure current_application_year is None
+        profile.current_application_year = None
+        profile.save()
+
+        data = {
+            "message": "<p>Test message</p>",
+            "email_subject": "Test Subject",
+            "recipients": "festival@example.com",
+        }
+
+        with patch("django.utils.timezone.now") as mock_now:
+            # May 15, 2025 -> application_year should be 2025 (before Sept)
+            mock_now.return_value = timezone.make_aware(datetime(2025, 5, 15))
+
+            response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
+
+            assert response.status_code == status.HTTP_200_OK
+            # Two applications can exist if they have different application years
+            # Application created on May 15, 2025 will have application_year of 2025
+            application = Application.objects.first()
+            assert application.application_year == 2025
+
+    @patch("profiles.emails.get_user_email_connection")
+    @patch("organisations.services.EmailMultiAlternatives")
+    def test_apply_with_different_application_years(
+        self, mock_email, mock_connection, api_client, profile
+    ):
+        """Test that multiple applications in different years can both exist"""
+        mock_connection.return_value = Mock()
+        mock_email_instance = Mock()
+        mock_email_instance.send.return_value = 1
+        mock_email.return_value = mock_email_instance
+
+        # Create a non-test festival
+        festival = Festival.objects.create(
+            name="Annual Music Festival",
+            description="A real festival",
+            country="France",
+            town="Paris",
+            festival_type="STREET",
+            website_url="https://festival.com",
+            start_date=date(2025, 7, 15),
+            end_date=date(2025, 7, 20),
+            application_type="EMAIL",
+            user=profile,
+        )
+
+        data = {
+            "message": "<p>Test message</p>",
+            "email_subject": "Test Subject",
+            "recipients": "festival@example.com",
+        }
+
+        # First application in year 2025
+        profile.current_application_year = 2025
+        profile.save()
+
+        with patch("django.utils.timezone.now") as mock_now:
+            mock_now.return_value = timezone.make_aware(datetime(2025, 5, 15))
+            response1 = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
+            assert response1.status_code == status.HTTP_200_OK
+
+        # Second application in year 2026
+        profile.current_application_year = 2026
+        profile.save()
+
+        with patch("django.utils.timezone.now") as mock_now:
+            mock_now.return_value = timezone.make_aware(datetime(2026, 5, 15))
+            response2 = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
+            assert response2.status_code == status.HTTP_200_OK
+
+        assert Application.objects.count() == 2
+        apps = list(Application.objects.all().order_by("application_year_value"))
+        assert apps[0].application_year == 2025
+        assert apps[1].application_year == 2026

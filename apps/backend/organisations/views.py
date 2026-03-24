@@ -313,10 +313,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        current_date = timezone.now().date()
-        application_year = current_date.year
-        if current_date.month >= 9:
-            application_year += 1
+        application_year = profile.current_application_year or timezone.now().year
 
         logger.debug(f"Creating/updating application for year {application_year}")
         try:

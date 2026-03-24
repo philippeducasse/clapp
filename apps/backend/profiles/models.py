@@ -93,6 +93,7 @@ class Profile(AbstractUser):
     spoken_languages = MultiSelectField(choices=LANGUAGES, blank=True, max_length=200)
     date_format = models.CharField(max_length=50, blank=True, null=True)
     table_size = models.IntegerField(blank=True, null=True)
+    current_application_year = models.IntegerField(blank=True, null=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS: list[str] = []

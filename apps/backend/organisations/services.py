@@ -497,6 +497,7 @@ def get_or_create_application(
         application = Application.objects.create(
             organisation=organisation,
             application_date=timezone.now().date(),
+            application_year_value=application_year,
             status="DRAFT",
             message=message,
             email_subject=subject,
