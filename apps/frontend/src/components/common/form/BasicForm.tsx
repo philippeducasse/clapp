@@ -19,7 +19,7 @@ import { Action } from "@/interfaces/Enums";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useFormPersist } from "@/hooks/useFormPersist";
-import { Upload, Loader2 } from "lucide-react";
+import { Upload, Loader2, Send } from "lucide-react";
 
 interface BasicFormProps {
   form: UseFormReturn;
@@ -137,7 +137,9 @@ const BasicForm = ({
             <div className="flex gap-4 w-full justify-end">
               {additionalActions}
               {action === Action.APPLY ? (
-                <Button disabled={isLoading}>Send application</Button>
+                <Button disabled={isLoading}>
+                  <Send /> Send application
+                </Button>
               ) : action === Action.UPLOAD ? (
                 <Button disabled={isLoading}>
                   {isLoading ? <Loader2 className="animate-spin" /> : <Upload />}
