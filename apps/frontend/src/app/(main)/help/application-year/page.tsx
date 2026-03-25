@@ -8,7 +8,7 @@ export default function ApplicationYearHelpPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-emerald-700 mb-2">Application Year</h1>
+        <h1 className="text-2xl font-bold text-primary mb-2">Application Year</h1>
         <p className="text-gray-600">Specify which year or season you're focusing your applications on</p>
       </div>
 
@@ -16,7 +16,7 @@ export default function ApplicationYearHelpPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-600" />
+              <Calendar className="h-5 w-5 text-primary" />
               What does this do?
             </CardTitle>
           </CardHeader>

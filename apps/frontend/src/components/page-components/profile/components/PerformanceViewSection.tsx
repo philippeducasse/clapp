@@ -16,7 +16,7 @@ const PerformanceViewSection = ({ performances, onDelete }: PerformanceViewSecti
         <AuxilliarySection
           key={`${performance.id}_${index}`}
           title={performance.performanceTitle}
-          icon={<PartyPopper className="text-emerald-600 dark:text-emerald-400" />}
+          icon={<PartyPopper className="text-primary" />}
           item={performance}
           index={performance.id}
           entityId={"profile"}

@@ -13,7 +13,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       position="top-center"
       icons={{
-        success: <CheckCircle2 className="size-5 text-emerald-600" />,
+        success: <CheckCircle2 className="size-5 text-primary" />,
         error: <XCircle className="size-5 text-red-500" />,
       }}
       style={

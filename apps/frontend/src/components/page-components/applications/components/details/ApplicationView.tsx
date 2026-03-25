@@ -52,7 +52,7 @@ const ApplicationView = () => {
       />
       <DetailsViewHeader
         title={application.emailSubject ?? ""}
-        icon={<Clipboard className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={<Clipboard className="text-primary" size={32} />}
         entityId={application.id}
         statusApiMethod={applicationApiService.changeStatus}
         updateSlice={updateApplication}
@@ -69,7 +69,7 @@ const ApplicationView = () => {
       />
       <DetailsViewSection
         title="Application information"
-        icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+        icon={<Info className="text-primary" />}
         data={getApplicationBasicInfo(application)}
         ribbonValue={application.status}
         ribbonType="status"

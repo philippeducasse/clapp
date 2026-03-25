@@ -67,7 +67,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
     <Card className="mb-6">
       <CardContent>
         <div className="flex items-center gap-2 mb-6">
-          <Mail className="text-emerald-600 dark:text-emerald-400" size={20} />
+          <Mail className="text-primary" size={20} />
           <CardTitle className="text-lg font-semibold">Click to connect</CardTitle>
         </div>
         <p className="font-light text-gray-600 dark:text-foreground mb-8">

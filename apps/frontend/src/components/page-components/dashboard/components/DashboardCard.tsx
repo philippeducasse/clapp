@@ -14,7 +14,7 @@ const DashboardCard = ({ title, value, subtitle, loading }: DashboardCardProps) 
     <Card>
       <CardHeader className="pb-2">
         <CardDescription className="text-2xl"> {title}</CardDescription>
-        <CardTitle className="text-3xl text-emerald-600 dark:text-emerald-400">
+        <CardTitle className="text-3xl text-primary">
           {loading ? <Skeleton className="h-6 mt-2 w-full" /> : value}
         </CardTitle>
       </CardHeader>

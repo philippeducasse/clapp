@@ -63,7 +63,7 @@ const GenericDiffForm = <T extends Record<string, unknown>>({
             <TableRow
               key={formField.fieldName}
               className={
-                isChanged ? "bg-emerald-50 dark:bg-emerald-950" : undefined
+                isChanged ? "bg-primary/5" : undefined
               }
             >
               <TableCell className="align-top w-full">

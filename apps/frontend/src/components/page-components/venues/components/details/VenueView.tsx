@@ -91,7 +91,7 @@ const VenueView = () => {
       <DetailsViewHeader
         title={venue.name}
         subtitle={`${venue.town && `${venue.town}`}, ${venue.country}`}
-        icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={<Flag className="text-primary" size={32} />}
         entityId={venue.id}
         tagApiMethod={venueApiService.tag}
         updateSlice={updateVenue}
@@ -114,7 +114,7 @@ const VenueView = () => {
         <div className="flex-1">
           <DetailsViewSection
             title="Basic information"
-            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<Info className="text-primary" />}
             data={getVenueBasicInfo(venue)}
             ribbonType="tag"
             ribbonValue={venue.tag}
@@ -134,7 +134,7 @@ const VenueView = () => {
       </div>
       <DetailsViewSection
         title="Venue details"
-        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+        icon={<NotebookTabs className="text-primary" />}
         data={getVenueDetails(venue)}
       />
       {venue.contacts && venue.contacts.length > 0 && (

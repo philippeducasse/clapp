@@ -82,7 +82,7 @@ export const ReminderModal = ({
       >
         <DialogHeader className={` py-2 pt-6 -mb-12`}>
           <div className="flex items-center justify-center gap-3 mb-2">
-            <AlarmClock className={`w-8 h-8 text-emerald-600`} strokeWidth={2.5} />
+            <AlarmClock className={`w-8 h-8 text-primary`} strokeWidth={2.5} />
             <DialogTitle className={` text-xl `}>Set reminder</DialogTitle>
           </div>
         </DialogHeader>

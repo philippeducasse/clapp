@@ -110,7 +110,7 @@ const ProfileView = () => {
       <DetailsViewHeader
         title={profile?.companyName || "Profile"}
         subtitle={`${profile?.firstName} ${profile.lastName}`}
-        icon={<CircleUser className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={<CircleUser className="text-primary" size={32} />}
         entityId={profile.id}
       />
 
@@ -118,13 +118,13 @@ const ProfileView = () => {
         <Tab name="Basic Information">
           <DetailsViewSection
             title="Basic information"
-            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<Info className="text-primary" />}
             data={getBasicProfileInfo(profile)}
             action={<EditButton href={`/profile/edit`} />}
           />
           <DetailsViewSection
             title="Contact details"
-            icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<NotebookTabs className="text-primary" />}
             data={getProfileContactInfo(profile)}
             action={<EditButton href={`/profile/edit`} />}
           />
@@ -159,7 +159,7 @@ const ProfileView = () => {
             <OAuthEmailSection profile={profile} />
             <DetailsViewSection
               title="Connect manually"
-              icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
+              icon={<Cog className="text-primary" />}
               data={getEmailSettings(profile)}
               subtitle={
                 <>
@@ -181,7 +181,7 @@ const ProfileView = () => {
         <Tab name="Account">
           <DetailsViewSection
             title="Preferences"
-            icon={<Cog className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<Cog className="text-primary" />}
             data={getPreferencesInfo(profile)}
             action={<EditButton href={`/profile/edit/preferences`} />}
           />

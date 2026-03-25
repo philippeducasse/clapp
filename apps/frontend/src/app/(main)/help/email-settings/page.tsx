@@ -19,7 +19,7 @@ export default function EmailSettingsHelpPage() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-emerald-700 mb-2 mt-4">
+        <h1 className="text-2xl font-bold text-primary mb-2 mt-4">
           Email Settings Configuration Guide
         </h1>
         <p className="text-gray-600 text-lg">
@@ -47,14 +47,14 @@ export default function EmailSettingsHelpPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-emerald-600" />
+              <Settings className="h-5 w-5 text-primary" />
               What You'll Need
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Email Address</p>
                   <p className="text-sm text-gray-600">
@@ -63,7 +63,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Password</p>
                   <p className="text-sm text-gray-600">
@@ -73,7 +73,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">SMTP Port</p>
                   <p className="text-sm text-gray-600">
@@ -83,7 +83,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Email Provider</p>
                   <p className="text-sm text-gray-600">
@@ -100,7 +100,7 @@ export default function EmailSettingsHelpPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-emerald-600" />
+              <Lock className="h-5 w-5 text-primary" />
               Understanding App Passwords
             </CardTitle>
             <CardDescription>
@@ -131,10 +131,10 @@ export default function EmailSettingsHelpPage() {
             </Card>
 
             <div className="grid md:grid-cols-3 gap-4">
-              <Card className="border-emerald-200 bg-emerald-50">
+              <Card className="border-primary/30 bg-primary/5">
                 <CardContent className="">
-                  <h4 className="font-semibold text-emerald-900 text-sm mb-2">Always Required</h4>
-                  <p className="text-xs text-emerald-800 mb-2">
+                  <h4 className="font-semibold text-primary text-sm mb-2">Always Required</h4>
+                  <p className="text-xs text-primary/80 mb-2">
                     These providers always require app passwords for security:
                   </p>
                   <div className="flex flex-wrap gap-1">
@@ -210,7 +210,7 @@ export default function EmailSettingsHelpPage() {
           <CardContent className="space-y-6">
             <div className="space-y-4">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                   1
                 </div>
                 <div className="flex-1">
@@ -225,7 +225,7 @@ export default function EmailSettingsHelpPage() {
               <Separator />
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                   2
                 </div>
                 <div className="flex-1">
@@ -254,7 +254,7 @@ export default function EmailSettingsHelpPage() {
               <Separator />
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                   3
                 </div>
                 <div className="flex-1">
@@ -262,26 +262,26 @@ export default function EmailSettingsHelpPage() {
                   <p className="text-gray-600 mb-3">Fill in the form fields:</p>
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2">
-                      <span className="text-emerald-600">•</span>
+                      <span className="text-primary">•</span>
                       <span className="text-gray-700">
                         <strong>Email:</strong> Your full email address
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-emerald-600">•</span>
+                      <span className="text-primary">•</span>
                       <span className="text-gray-700">
                         <strong>Password:</strong> Paste the app password you generated (not your
                         regular password)
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-emerald-600">•</span>
+                      <span className="text-primary">•</span>
                       <span className="text-gray-700">
                         <strong>Port:</strong> Pre-filled based on your provider (usually 587)
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-emerald-600">•</span>
+                      <span className="text-primary">•</span>
                       <span className="text-gray-700">
                         <strong>TLS:</strong> Pre-configured based on your provider's requirements
                       </span>
@@ -293,7 +293,7 @@ export default function EmailSettingsHelpPage() {
               <Separator />
 
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                   4
                 </div>
                 <div className="flex-1">
@@ -309,7 +309,7 @@ export default function EmailSettingsHelpPage() {
         </Card>
 
         <div>
-          <h2 className="text-2xl font-bold text-emerald-700 mb-4">Provider-Specific Notes</h2>
+          <h2 className="text-2xl font-bold text-primary mb-4">Provider-Specific Notes</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <Card>
               <CardHeader>
@@ -519,21 +519,21 @@ export default function EmailSettingsHelpPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-emerald-600" />
+              <Shield className="h-5 w-5 text-primary" />
               Security Best Practices
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <strong>Never share your app passwords</strong>
                   <p className="text-sm text-gray-600">Treat them like regular passwords</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <strong>Revoke unused passwords</strong>
                   <p className="text-sm text-gray-600">
@@ -543,7 +543,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <strong>Use unique passwords</strong>
                   <p className="text-sm text-gray-600">
@@ -552,7 +552,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <strong>Monitor account activity</strong>
                   <p className="text-sm text-gray-600">
@@ -561,7 +561,7 @@ export default function EmailSettingsHelpPage() {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle2 className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
                   <strong>Keep 2FA enabled</strong>
                   <p className="text-sm text-gray-600">
@@ -573,10 +573,10 @@ export default function EmailSettingsHelpPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
+        <Card className="border-l-4 border-l-primary bg-primary/5">
           <CardHeader>
             <CardTitle>Need More Help?</CardTitle>
-            <CardDescription className="text-emerald-800">
+            <CardDescription className="text-primary/80">
               If you're still having trouble configuring your email settings, each provider has
               detailed documentation available through the "Detailed instructions" links in the
               form.

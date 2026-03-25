@@ -17,7 +17,7 @@ const ControlledSlider = ({ field, sliderOptions }: ControlledSliderProps) => {
   return (
     <div className="max-w-[200px]">
       <Slider
-        className="my-4 [&_[role=slider]]:bg-emerald-800 [&_[role=slider]]:border-emerald-600"
+        className="my-4 [&_[role=slider]]:bg-primary [&_[role=slider]]:border-primary"
         value={[currentValue]}
         onValueChange={(value) => field.onChange(value[0])}
         min={min}

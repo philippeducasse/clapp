@@ -54,7 +54,7 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <AlarmClock className="text-emerald-600 dark:text-emerald-400" size={20} />
+            <AlarmClock className="text-primary" size={20} />
             <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
               Reminders
             </CardTitle>
@@ -62,7 +62,7 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-gray-400 hover:text-emerald-600"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-primary"
             onClick={() => setOpenReminderModal(true)}
           >
             <Plus size={16} />

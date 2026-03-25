@@ -19,7 +19,7 @@ export default function GettingStartedPage() {
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-12 flex justify-between items-start gap-6">
         <div>
-          <h1 className="text-4xl font-bold text-emerald-700 mb-3">Getting Started Guide</h1>
+          <h1 className="text-4xl font-bold text-primary mb-3">Getting Started Guide</h1>
           <p className="text-lg text-gray-600">
             Welcome to Clapp! This guide will walk you through the key features and help you get the
             most out of the platform.
@@ -35,13 +35,13 @@ export default function GettingStartedPage() {
             <div className="space-y-2">
               <Link
                 href="/help/email-settings"
-                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm text-gray-900 hover:text-emerald-700"
+                className="block p-3 rounded-lg border border-gray-200 hover:border-primary/30 hover:bg-primary/5 transition text-sm text-gray-900 hover:text-primary"
               >
                 Email Settings Guide
               </Link>
               <Link
                 href="/help/importing-organizations"
-                className="block p-3 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition text-sm text-gray-900 hover:text-emerald-700"
+                className="block p-3 rounded-lg border border-gray-200 hover:border-primary/30 hover:bg-primary/5 transition text-sm text-gray-900 hover:text-primary"
               >
                 Importing Organizations
               </Link>
@@ -51,10 +51,10 @@ export default function GettingStartedPage() {
       </div>
 
       {/* Quick Overview */}
-      <Card className="mb-8 border-l-4 border-l-emerald-500 bg-emerald-50">
+      <Card className="mb-8 border-l-4 border-l-primary bg-primary/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-emerald-600" />
+            <Zap className="h-5 w-5 text-primary" />
             What is Clapp?
           </CardTitle>
         </CardHeader>
@@ -65,19 +65,19 @@ export default function GettingStartedPage() {
           </p>
           <ul className="space-y-2 ml-4">
             <li className="flex items-start gap-3">
-              <span className="text-emerald-600 font-bold">•</span>
+              <span className="text-primary font-bold">•</span>
               <span>Find and organize festivals, venues, and residency opportunities</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-emerald-600 font-bold">•</span>
+              <span className="text-primary font-bold">•</span>
               <span>Submit applications directly from the platform</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-emerald-600 font-bold">•</span>
+              <span className="text-primary font-bold">•</span>
               <span>Track your applications and deadlines in one place</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-emerald-600 font-bold">•</span>
+              <span className="text-primary font-bold">•</span>
               <span>Manage your professional profile and applications</span>
             </li>
           </ul>
@@ -86,7 +86,7 @@ export default function GettingStartedPage() {
 
       {/* Core Features */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-emerald-700 mb-6">Core Features</h2>
+        <h2 className="text-2xl font-bold text-primary mb-6">Core Features</h2>
         <div className="space-y-6">
           {/* Feature 1: Storing Organizations */}
           <Card>
@@ -351,7 +351,7 @@ export default function GettingStartedPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-emerald-600" />
+            <BookOpen className="h-5 w-5 text-primary" />
             Quick Start Flow
           </CardTitle>
           <CardDescription>Get your first application sent in 5 steps</CardDescription>
@@ -359,7 +359,7 @@ export default function GettingStartedPage() {
         <CardContent>
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
                 1
               </div>
               <div className="flex-1">
@@ -370,7 +370,7 @@ export default function GettingStartedPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
                 2
               </div>
               <div className="flex-1">
@@ -381,7 +381,7 @@ export default function GettingStartedPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
                 3
               </div>
               <div className="flex-1">
@@ -392,7 +392,7 @@ export default function GettingStartedPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
                 4
               </div>
               <div className="flex-1">
@@ -403,7 +403,7 @@ export default function GettingStartedPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
                 5
               </div>
               <div className="flex-1">
@@ -424,11 +424,11 @@ export default function GettingStartedPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <Link href="/help/email-settings" className="group">
-              <div className="p-4 rounded-lg border border-gray-200 hover:border-emerald-400 hover:bg-emerald-50 transition">
+              <div className="p-4 rounded-lg border border-gray-200 hover:border-primary/30 hover:bg-primary/5 transition">
                 <div className="flex items-start gap-3">
-                  <Mail className="h-5 w-5 text-emerald-600 mt-1 flex-shrink-0" />
+                  <Mail className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-emerald-700">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-primary">
                       Email Settings Configuration
                     </h4>
                     <p className="text-sm text-gray-600 mt-1">
@@ -478,7 +478,7 @@ export default function GettingStartedPage() {
       </Card>
 
       {/* CTA */}
-      <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
+      <Card className="border-l-4 border-l-primary bg-primary/5">
         <CardHeader>
           <CardTitle>Ready to Get Started?</CardTitle>
         </CardHeader>
@@ -488,7 +488,7 @@ export default function GettingStartedPage() {
             submitting applications in no time!
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+            <Button asChild className="bg-primary hover:bg-primary/90">
               <Link href="/profile/edit">Complete Your Profile</Link>
             </Button>
             <Button asChild variant="outline">

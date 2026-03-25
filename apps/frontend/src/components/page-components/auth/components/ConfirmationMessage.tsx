@@ -13,7 +13,7 @@ const ConfirmationMessage = () => {
     <div className="text-center space-y-6">
       {isSuccess ? (
         <>
-          <div className="text-emerald-600">
+          <div className="text-primary">
             <svg
               className="w-16 h-16 mx-auto"
               fill="none"
@@ -61,7 +61,7 @@ const ConfirmationMessage = () => {
 
       <Link
         href={isSuccess ? "/login" : "/register"}
-        className="inline-block mt-8 px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+        className="inline-block mt-8 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
       >
         {isSuccess ? "Go to Login" : "Back to Registration"}
       </Link>

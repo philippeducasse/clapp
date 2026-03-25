@@ -53,21 +53,21 @@ const ReportBugPage = () => {
       <div className="container mx-auto p-6 max-w-2xl">
         <Link
           href="/help"
-          className="text-emerald-600 hover:text-emerald-800 text-sm mb-4 inline-flex items-center gap-2"
+          className="text-primary hover:text-primary/80 text-sm mb-4 inline-flex items-center gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Help
         </Link>
 
-        <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
+        <Card className="border-l-4 border-l-primary bg-primary/5">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+              <CheckCircle2 className="h-12 w-12 text-primary" />
             </div>
-            <CardTitle className="text-2xl text-emerald-700">
+            <CardTitle className="text-2xl text-primary">
               Thank you for your feedback!
             </CardTitle>
-            <CardDescription className="text-base text-emerald-800">
+            <CardDescription className="text-base text-primary/90">
               Your bug report has been successfully submitted.
             </CardDescription>
           </CardHeader>
@@ -81,7 +81,7 @@ const ReportBugPage = () => {
               to submit another report or visit our help page.
             </p>
             <div className="flex gap-3 pt-4">
-              <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
+              <Button asChild className="bg-primary hover:bg-primary/90">
                 <Link href="/help">Back to Help</Link>
               </Button>
               <Button

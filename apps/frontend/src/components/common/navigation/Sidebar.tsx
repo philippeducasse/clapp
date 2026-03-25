@@ -75,7 +75,7 @@ const Sidebar = () => {
     <ShadcnSidebar>
       <SidebarContent>
         <SidebarGroup className="h-full">
-          <SidebarGroupLabel className="text-emerald-600 mb-8 mt-5 dark:text-emerald-400 gap-1">
+          <SidebarGroupLabel className="text-primary mb-8 mt-5 gap-1">
             <h1 className="font-clapp text-4xl">Clapp</h1>
             <Image src={"/logo.png"} width="60" height="60" alt="Clapping hands" />
           </SidebarGroupLabel>
@@ -85,7 +85,7 @@ const Sidebar = () => {
                 <SidebarMenuItem key={item.title} className={index == 5 ? `mt-auto` : ""}>
                   <SidebarMenuButton asChild size={"lg"}>
                     <a href={item.url}>
-                      <item.icon className="text-emerald-600 h-6! w-6! dark:text-emerald-400" />
+                      <item.icon className="text-primary h-6! w-6!" />
                       <span className="text-lg ml-4">{item.title}</span>
                     </a>
                   </SidebarMenuButton>

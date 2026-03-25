@@ -18,7 +18,7 @@ const EmailTemplatesSection = ({ emailTemplates, onDelete }: EmailTemplatesSecti
         <AuxilliarySection
           key={`${template.id}_${index}`}
           title={template.name}
-          icon={<Mail className="text-emerald-600 dark:text-emerald-400" />}
+          icon={<Mail className="text-primary" />}
           item={template}
           index={template.id}
           entityId={"profile"}

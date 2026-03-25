@@ -63,7 +63,7 @@ const BasicForm = ({
       <div className="flex">
         {formTitle && (
           <div className="flex flex-col max-w-[200px]  m-8">
-            <h3 className="text-xl text-bold text-emerald-600">{formTitle}</h3>
+            <h3 className="text-xl text-bold text-primary">{formTitle}</h3>
             {formSubtitle && (
               <p className="text-base mt-2">
                 {typeof formSubtitle === "string" && formSubtitle.includes("<a ") ? (
@@ -90,7 +90,7 @@ const BasicForm = ({
                   key={formField.fieldName}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-emerald-700 dark:text-emerald-400">
+                      <FormLabel className="text-primary">
                         {formField.label}
                         {formField.required &&
                           action !== Action.LOGIN &&
@@ -99,7 +99,7 @@ const BasicForm = ({
                               className={`-ml-1 ${
                                 form.formState.errors[formField.fieldName]
                                   ? "text-red-600"
-                                  : "text-emerald-700"
+                                  : "text-primary"
                               }`}
                             >
                               *

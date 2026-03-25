@@ -91,7 +91,7 @@ const ResidencyView = () => {
       <DetailsViewHeader
         title={residency.name}
         subtitle={`${residency.town && `${residency.town}`}, ${residency.country}`}
-        icon={<University className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={<University className="text-primary" size={32} />}
         entityId={residency.id}
         tagApiMethod={residencyApiService.tag}
         updateSlice={updateResidency}
@@ -114,7 +114,7 @@ const ResidencyView = () => {
         <div className="flex-1">
           <DetailsViewSection
             title="Basic information"
-            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<Info className="text-primary" />}
             data={getResidencyBasicInfo(residency)}
             ribbonType="tag"
             ribbonValue={residency.tag}
@@ -134,7 +134,7 @@ const ResidencyView = () => {
       </div>
       <DetailsViewSection
         title="Residency details"
-        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+        icon={<NotebookTabs className="text-primary" />}
         data={getResidencyDetails(residency)}
       />
       {residency.contacts && residency.contacts.length > 0 && (

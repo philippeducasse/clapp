@@ -84,7 +84,7 @@ const handleResponse = async <T>(
   }
 
   if (successMessage) {
-    toast.success(successMessage, { className: "border border-emerald-400" });
+    toast.success(successMessage, { className: "border border-primary" });
   }
   return transformKeysToCamelCase(json);
 };

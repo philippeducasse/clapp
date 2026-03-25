@@ -34,7 +34,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
         cell: ({ row }) => {
           const festival = row.original;
           return (
-            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-primary hover:text-primary/80">
               <Link href={`/festivals/${festival.id}`}>{festival.name}</Link>
             </div>
           );
@@ -120,7 +120,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="size-8 text-primary hover:text-primary/80"
                 onClick={() => onEdit(String(festival.id))}
               >
                 <Pencil />
@@ -128,7 +128,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="size-8 text-primary hover:text-primary/80"
                 onClick={onApply}
               >
                 <Send />

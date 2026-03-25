@@ -184,7 +184,7 @@ export function ImportStepsGuide() {
           {steps.map((step, index) => (
             <div key={index} className={index > 0 ? "border-t border-gray-200 pt-4" : ""}>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-semibold">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                   {index + 1}
                 </div>
                 <div className="flex-1">
@@ -273,7 +273,7 @@ export function ImportHelpCard() {
     <Card className="mt-6">
       <CardContent className="pt-4">
         <div className="flex gap-3">
-          <HelpCircle className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <HelpCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <p className="font-semiboldtext-sm mb-2">Need help formatting your file?</p>
             <p className="text-sm mb-3">
@@ -292,7 +292,7 @@ export function ImportHelpCard() {
 export function UploadSummarySection({ uploadStats }: { uploadStats: UploadStats }) {
   return (
     <Card className="mt-8 max-w-xl mx-auto">
-      <CardTitle className="text-emerald-600 text-xl p-4 border-b text-center">
+      <CardTitle className="text-primary text-xl p-4 border-b text-center">
         Upload Summary
       </CardTitle>
       <CardContent className="p-6">

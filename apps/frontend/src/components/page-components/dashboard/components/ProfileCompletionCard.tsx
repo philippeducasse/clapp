@@ -39,14 +39,14 @@ const ProfileCompletionCard = ({ profile }: { profile: Profile }) => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+        <span className="text-2xl font-bold text-primary">
           {profileCompletion.percentage}%
         </span>
         <span className="text-sm text-muted-foreground">
           {profileCompletion.completed} of {profileCompletion.total} fields completed
         </span>
       </div>
-      <Progress value={profileCompletion.percentage} className="h-2" color="emerald-600" />
+      <Progress value={profileCompletion.percentage} className="h-2" color="primary" />
       {profileCompletion.missingFields.length > 0 && (
         <div className="space-y-2">
           <p className="text-sm font-medium">Missing fields:</p>

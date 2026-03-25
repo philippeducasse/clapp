@@ -48,7 +48,7 @@ const ProfileRemindersCard = () => {
       <CardContent>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <AlarmClock className="text-emerald-600 dark:text-emerald-400" size={20} />
+            <AlarmClock className="text-primary" size={20} />
             <CardTitle className="text-lg font-semibold text-black dark:text-foreground">
               Reminders
             </CardTitle>
@@ -56,7 +56,7 @@ const ProfileRemindersCard = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0 text-gray-400 hover:text-emerald-600"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-primary"
             onClick={() => setOpenReminderModal(true)}
           >
             <Plus size={16} />
@@ -82,7 +82,7 @@ const ProfileRemindersCard = () => {
               <div key={reminder.id} className="p-3 rounded-lg border">
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-emerald-600 mb-1">
+                    <p className="text-primary mb-1">
                       {reminder.organisationName || reminder.organisationType}
                     </p>
                     <p className="text-forground break-words">{reminder.message}</p>
@@ -91,7 +91,7 @@ const ProfileRemindersCard = () => {
                   {reminder.isSent ? (
                     <div className="flex gap-2">
                       <p className="">Sent</p>
-                      <CheckCheck size={25} className="text-emerald-600" />
+                      <CheckCheck size={25} className="text-primary" />
                     </div>
                   ) : (
                     <Button

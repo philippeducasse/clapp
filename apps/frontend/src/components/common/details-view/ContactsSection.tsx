@@ -23,7 +23,7 @@ const ContactsViewSection = ({
         <AuxilliarySection
           key={`${contact.email}_${index}`}
           title={title}
-          icon={<Contact2 className="text-emerald-600 dark:text-emerald-400" />}
+          icon={<Contact2 className="text-primary" />}
           item={contact}
           index={index}
           entityId={entityId}

@@ -39,7 +39,7 @@ const useApplicationColumns = ({
         cell: ({ row }) => {
           const application = row.original;
           return (
-            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-primary hover:text-primary/80">
               <Link href={`/applications/${application.id}`}>
                 {capitalizeFirst(application.organisation.name)}
               </Link>
@@ -93,7 +93,7 @@ const useApplicationColumns = ({
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="size-8 text-primary hover:text-primary/80"
                 onClick={() => onEdit(String(application.id))}
               >
                 <Pencil />

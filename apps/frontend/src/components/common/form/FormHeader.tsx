@@ -13,7 +13,7 @@ const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) 
   const getActionIcon = (action: Action) => {
     const iconProps = {
       className:
-        "text-emerald-600 bg-emerald-100 p-2 rounded-md dark:bg-emerald-900 dark:text-emerald-400",
+        "text-primary-foreground bg-primary p-2 rounded-md",
       size: 48 as const,
     };
 

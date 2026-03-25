@@ -35,7 +35,7 @@ const ControlledMultiEmail = ({ field }: BaseControlledProps) => {
       {values.map((value, index) => (
         <span
           key={index}
-          className="flex items-center gap-1 border border-emerald-700 dark:bg-emerald-900 px-2 py-1 rounded"
+          className="flex items-center gap-1 border border-primary bg-primary/5 px-2 py-1 rounded"
         >
           {value}
           <X size={14} className="cursor-pointer" onClick={() => removeValue(index)} />

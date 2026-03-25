@@ -17,7 +17,7 @@ export default function ImportingOrganizationsHelpPage({
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl text-emerald-700 mb-2 mt-4">Importing Organizations</h1>
+        <h1 className="text-2xl text-primary mb-2 mt-4">Importing Organizations</h1>
         <p className="text-gray-600 text-lg">
           Bulk import festivals, venues, and residencies from an Excel file
         </p>
@@ -51,7 +51,7 @@ export default function ImportingOrganizationsHelpPage({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <CheckCircle2 className="h-5 w-5 text-primary" />
               Data Requirements
             </CardTitle>
           </CardHeader>
@@ -100,7 +100,7 @@ export default function ImportingOrganizationsHelpPage({
         </Card>
         <ExampleExcelTable />
         {showGoToUploadPage && (
-          <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
+          <Card className="border-l-4 border-l-primary bg-primary/5">
             <CardHeader>
               <CardTitle>Ready to Import?</CardTitle>
             </CardHeader>

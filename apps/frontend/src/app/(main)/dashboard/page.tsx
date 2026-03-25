@@ -70,7 +70,7 @@ const Page = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold text-emerald-600 dark:text-emerald-400">
+          <h1 className="text-3xl font-semibold text-primary">
             Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -96,7 +96,7 @@ const Page = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl text-emerald-600 dark:text-emerald-400">
+              <CardTitle className="text-3xl text-primary">
                 Application Breakdown
               </CardTitle>
               <CardDescription className="text-xl">
@@ -120,7 +120,7 @@ const Page = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl text-emerald-600 dark:text-emerald-400">
+              <CardTitle className="text-3xl text-primary">
                 Profile Completion
               </CardTitle>
               <CardDescription className="text-xl">
@@ -138,7 +138,7 @@ const Page = () => {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl text-emerald-600 dark:text-emerald-400">
+            <CardTitle className="text-3xl text-primary">
               Upcoming Deadlines
             </CardTitle>
             <CardDescription className="text-xl">

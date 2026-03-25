@@ -40,7 +40,7 @@ const Breadcrumbs = () => {
 
   const buildBreadcrumbs = (): BreadcrumbType[] => {
     const breadcrumbs: BreadcrumbType[] = [
-      { path: "/", label: <Home className="text-emerald-600 dark:text-emerald-400" /> },
+      { path: "/", label: <Home className="text-primary" /> },
     ];
 
     if (!entityType) return breadcrumbs;

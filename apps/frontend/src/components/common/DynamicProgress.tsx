@@ -52,7 +52,7 @@ const DynamicProgress = ({
       <CurrentIcon
         className={cn(
           "h-12 w-12 transition-all duration-500",
-          progressValue >= 100 ? "text-emerald-600 scale-110" : "text-emerald-500 animate-pulse",
+          progressValue >= 100 ? "text-primary scale-110" : "text-primary/80 animate-pulse",
         )}
       />
       <Progress value={progressValue} className={cn(className, "")} {...props} />

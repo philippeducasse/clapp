@@ -55,7 +55,7 @@ export default function LandingPage() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <Image src="/logo.png" width={36} height={36} alt="Clapp logo" />
-            <span className="font-clapp text-2xl text-emerald-600">Clapp</span>
+            <span className="font-clapp text-2xl text-primary">Clapp</span>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" asChild>
@@ -70,15 +70,15 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-16">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl px-6 text-center">
           <div className="flex justify-center gap-8 mb-16">
-            <h1 className="font-clapp text-8xl text-emerald-600 self-center">Clapp</h1>
+            <h1 className="font-clapp text-8xl text-primary self-center">Clapp</h1>
             <Image src={"/logo.png"} width={150} height={150} alt="Clapp logo" />
           </div>
           <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
             Your freelance arts career,{" "}
-            <span className="text-emerald-600 dark:text-emerald-400">all in one place</span>
+            <span className="text-primary">all in one place</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
             Track festivals, residencies, venues, and applications. Clapp is your personal assistant
@@ -101,7 +101,7 @@ export default function LandingPage() {
       <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">
               Everything you need
             </p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -116,11 +116,11 @@ export default function LandingPage() {
             {features.map((feature) => (
               <Card
                 key={feature.title}
-                className="border-transparent bg-muted/40 transition-colors hover:border-emerald-600/30 hover:bg-muted/60"
+                className="border-transparent bg-muted/40 transition-colors hover:border-primary/30 hover:bg-muted/60"
               >
                 <CardContent className="pt-6">
-                  <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-emerald-600/10">
-                    <feature.icon className="size-6 text-emerald-600 dark:text-emerald-400" />
+                  <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-primary/10">
+                    <feature.icon className="size-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold">{feature.title}</h3>
                   <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
@@ -136,7 +136,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto grid max-w-5xl items-center gap-12 lg:grid-cols-2">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+              <p className="text-sm font-semibold uppercase tracking-widest text-primary">
                 Welcome back
               </p>
               <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
@@ -151,7 +151,7 @@ export default function LandingPage() {
                 Don&apos;t have an account yet?{" "}
                 <Link
                   href="/register"
-                  className="font-medium text-emerald-600 underline-offset-4 hover:underline dark:text-emerald-400"
+                  className="font-medium text-primary underline-offset-4 hover:underline"
                 >
                   Create one for free
                 </Link>
@@ -169,7 +169,7 @@ export default function LandingPage() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
           <div className="flex items-center gap-2">
             <Image src="/logo.png" width={24} height={24} alt="Clapp logo" />
-            <span className="font-clapp text-lg text-emerald-600">Clapp</span>
+            <span className="font-clapp text-lg text-primary">Clapp</span>
           </div>
           <p className="text-sm text-muted-foreground">Built for artists, by artists.</p>
         </div>

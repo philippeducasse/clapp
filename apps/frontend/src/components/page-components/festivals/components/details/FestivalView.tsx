@@ -92,7 +92,7 @@ const FestivalView = () => {
       <DetailsViewHeader
         title={festival.name}
         subtitle={`${festival.town && `${festival.town}`}, ${festival.country}`}
-        icon={<Flag className="text-emerald-600 dark:text-emerald-400" size={32} />}
+        icon={<Flag className="text-primary" size={32} />}
         entityId={festival.id}
         tagApiMethod={festivalApiService.tag}
         updateSlice={updateFestival}
@@ -115,7 +115,7 @@ const FestivalView = () => {
         <div className="flex-1">
           <DetailsViewSection
             title="Basic information"
-            icon={<Info className="text-emerald-600 dark:text-emerald-400" />}
+            icon={<Info className="text-primary" />}
             data={getFestivalBasicInfo(festival)}
             ribbonType="tag"
             ribbonValue={festival.tag}
@@ -135,7 +135,7 @@ const FestivalView = () => {
       </div>
       <DetailsViewSection
         title="Festival details"
-        icon={<NotebookTabs className="text-emerald-600 dark:text-emerald-400" />}
+        icon={<NotebookTabs className="text-primary" />}
         data={getFestivalDetails(festival)}
       />
       {festival.contacts && festival.contacts.length > 0 && (

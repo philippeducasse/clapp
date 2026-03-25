@@ -250,7 +250,7 @@ Extensive use of enums for type safety:
 - **TailwindCSS 4** - Utility-first CSS
 - **shadcn/ui** - Component library (Radix UI primitives)
 - **next-themes** - Dark mode support
-- **Primary color:** Emerald (emerald-600, emerald-400)
+- **Primary color:** Defined in globals.css as CSS variables (primary, primary-foreground)
 
 ## Important Notes
 

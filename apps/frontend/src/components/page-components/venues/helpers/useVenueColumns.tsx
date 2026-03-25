@@ -34,7 +34,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
         cell: ({ row }) => {
           const venue = row.original;
           return (
-            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-emerald-700 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300">
+            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-primary hover:text-primary/80">
               <Link href={`/venues/${venue.id}`}>{venue.name}</Link>
             </div>
           );
@@ -108,7 +108,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="size-8 text-primary hover:text-primary/80"
                 onClick={() => onEdit(String(venue.id))}
               >
                 <Pencil />
@@ -116,7 +116,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
               <Button
                 variant="outline"
                 size="icon"
-                className="size-8 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300"
+                className="size-8 text-primary hover:text-primary/80"
                 onClick={onApply}
               >
                 <Send />

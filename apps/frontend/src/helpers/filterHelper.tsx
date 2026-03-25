@@ -97,7 +97,7 @@ export const getFilterInput = <TData,>(
 
   return (
     <div className="grid gap-2 w-full">
-      <Label className="text-emerald-700 dark:text-emerald-400">{filterConfig.label}</Label>
+      <Label className="text-primary">{filterConfig.label}</Label>
       {input}
     </div>
   );

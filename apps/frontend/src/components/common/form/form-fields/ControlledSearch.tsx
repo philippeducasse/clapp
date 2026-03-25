@@ -89,7 +89,7 @@ const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) =>
         value={searchQuery}
         onChange={handleChange}
         placeholder="Search organisations..."
-        className={isSelected ? "font-bold text-emerald-600" : ""}
+        className={isSelected ? "font-bold text-primary" : ""}
       />
       {searchQuery.length >= 2 && searchResults.length === 0 && showDropdown && !isLoading && (
         <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">

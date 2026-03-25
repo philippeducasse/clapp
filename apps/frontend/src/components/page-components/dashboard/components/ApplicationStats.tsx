@@ -17,7 +17,7 @@ const ApplicationStats = ({ applications }: { applications: Application[] }) => 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="space-y-1">
-        <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+        <p className="text-2xl font-bold text-primary">
           {applicationStats.accepted}
         </p>
         <p className="text-sm text-muted-foreground">Accepted</p>

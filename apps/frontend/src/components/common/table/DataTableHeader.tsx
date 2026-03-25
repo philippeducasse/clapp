@@ -107,7 +107,7 @@ const DataTableHeader = <TData,>({
       <div className="flex items-center justify-between">
         <div className="flex gap-6">
           <div className="flex max-w-sm h-10 items-center rounded-md border border-input bg-white pl-3 text-sm ring-offset-background focus-within:ring-1 focus-within:ring-ring focus-within:ring-offset-2 dark:bg-background dark:border-gray-700">
-            <Search className="h-[16px] w-[16px] text-emerald-600" />
+            <Search className="h-[16px] w-[16px] text-primary" />
             <input
               placeholder="Search"
               value={searchBarFilter}
@@ -129,7 +129,7 @@ const DataTableHeader = <TData,>({
                       onClick={() => handleRemoveFilter(filter?.column as string, filter?.value)}
                     >
                       <span>{capitalizeFirst(String(filter?.value))}</span>
-                      <X className="h-3 w-3 ml-1 text-emerald-600" />
+                      <X className="h-3 w-3 ml-1 text-primary" />
                     </Button>
                   );
                 })}
