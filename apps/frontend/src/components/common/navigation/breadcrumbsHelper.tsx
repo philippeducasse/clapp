@@ -5,6 +5,8 @@ import { selectVenue } from "@/redux/slices/venueSlice";
 import { selectResidency } from "@/redux/slices/residencySlice";
 import { selectApplication } from "@/redux/slices/applicationSlice";
 import { selectProfile } from "@/redux/slices/authSlice";
+import { capitalizeFirst } from "@/utils/stringUtils";
+import { Action } from "@/interfaces/Enums";
 
 export interface Breadcrumb {
   path: string;
@@ -28,19 +30,6 @@ export type EntityType =
   | "upload"
   | "preferences"
   | "dashboard";
-
-const ENTITY_LABELS: Record<EntityType, string> = {
-  festivals: "Festivals",
-  venues: "Venues",
-  residencies: "Residencies",
-  applications: "Applications",
-  profile: "Profile",
-  help: "Help",
-  "report-bug": "Report Bug",
-  upload: "Upload",
-  preferences: "Preferences",
-  dashboard: "Dashboard",
-};
 
 export const extractEntityId = (pathname: string, entityType: EntityType): number | undefined => {
   if (!pathname.includes(`/${entityType}/`)) return undefined;
@@ -104,12 +93,46 @@ export const getEntityDisplayName = (entityData: EntityData | null): string => {
   return entityData.organisationName ?? entityData.name ?? "";
 };
 
-export const extractAction = (pathname: string): "create" | "edit" | "apply" | null => {
+export const extractAction = (pathname: string): Action | null => {
   const pathSegments = pathname.split("/").filter(Boolean);
-  if (pathSegments.includes("create")) return "create";
-  if (pathSegments.includes("edit")) return "edit";
-  if (pathSegments.includes("apply")) return "apply";
+  if (pathSegments.includes("create")) return Action.CREATE;
+  if (pathSegments.includes("edit")) return Action.EDIT;
+  if (pathSegments.includes("apply")) return Action.APPLY;
   return null;
+};
+
+const SPECIAL_PAGES_CONFIG: Partial<
+  Record<EntityType, { breadcrumbs?: Breadcrumb[]; subPages?: Record<string, string> }>
+> = {
+  help: {
+    breadcrumbs: [{ path: "/help", label: "Help" }],
+    subPages: { "/importing-organizations": "Importing Organizations" },
+  },
+  "report-bug": {
+    breadcrumbs: [{ path: null as any, label: "Report Bug" }],
+  },
+  upload: {
+    breadcrumbs: [{ path: null as any, label: "Upload" }],
+  },
+  preferences: {
+    breadcrumbs: [
+      { path: "/profile/edit", label: "Edit Profile" },
+      { path: null as any, label: "Preferences" },
+    ],
+  },
+};
+
+const addActionBreadcrumb = (breadcrumbs: Breadcrumb[], action: Action | null, pathname: string): void => {
+  if (!action) return;
+
+  if (action === Action.CREATE) {
+    breadcrumbs.push({ path: pathname, label: "Create" });
+  } else {
+    breadcrumbs.push({
+      path: pathname,
+      label: capitalizeFirst(action),
+    });
+  }
 };
 
 export const buildStandardEntityBreadcrumbs = (
@@ -117,64 +140,43 @@ export const buildStandardEntityBreadcrumbs = (
   entityType: EntityType,
   entityData: EntityData | null,
   pathname: string,
-  action: "create" | "edit" | "apply" | null,
+  action: Action | null,
 ): Breadcrumb[] => {
   const result = [...breadcrumbs];
 
   try {
     // Handle special pages
-    if (entityType === "help") {
-      result.push({
-        path: "/help",
-        label: <span>{ENTITY_LABELS.help}</span>,
-      });
-      if (pathname.includes("/importing-organizations")) {
+    const config = SPECIAL_PAGES_CONFIG[entityType];
+    if (config?.breadcrumbs) {
+      config.breadcrumbs.forEach(({ path, label }) => {
         result.push({
-          path: pathname,
-          label: <span>Importing Organizations</span>,
+          path: path || pathname,
+          label: typeof label === "string" ? label : capitalizeFirst(entityType),
+        });
+      });
+
+      // Check for sub-pages
+      if (config.subPages) {
+        Object.entries(config.subPages).forEach(([pathSegment, label]) => {
+          if (pathname.includes(pathSegment)) {
+            result.push({ path: pathname, label });
+          }
         });
       }
-      return result;
-    }
 
-    if (entityType === "report-bug") {
-      result.push({
-        path: pathname,
-        label: <span>{ENTITY_LABELS["report-bug"]}</span>,
-      });
-      return result;
-    }
-
-    if (entityType === "upload") {
-      result.push({
-        path: pathname,
-        label: <span>{ENTITY_LABELS.upload}</span>,
-      });
-      return result;
-    }
-
-    if (entityType === "preferences") {
-      result.push({
-        path: "/profile/edit",
-        label: <span>Edit Profile</span>,
-      });
-      result.push({
-        path: pathname,
-        label: <span>{ENTITY_LABELS.preferences}</span>,
-      });
       return result;
     }
 
     // Handle standard entity pages
     result.push({
       path: `/${entityType}`,
-      label: <span>{ENTITY_LABELS[entityType]}</span>,
+      label: capitalizeFirst(entityType),
     });
 
-    if (entityType == "profile" && action) {
+    if (entityType === "profile" && action) {
       result.push({
         path: pathname,
-        label: <span>Edit</span>,
+        label: "Edit",
       });
     }
 
@@ -182,19 +184,13 @@ export const buildStandardEntityBreadcrumbs = (
       const entityPath = getEntityPath(entityType, entityData?.id);
       result.push({
         path: entityPath,
-        label: <span>{getEntityDisplayName(entityData)}</span>,
+        label: getEntityDisplayName(entityData),
       });
-
-      if (action && action !== "create") {
-        result.push({
-          path: pathname,
-          label: <span>{action.charAt(0).toUpperCase() + action.slice(1)}</span>,
-        });
-      }
-    } else if (action === "create") {
+      addActionBreadcrumb(result, action, pathname);
+    } else if (action === Action.CREATE) {
       result.push({
         path: pathname,
-        label: <span>Create</span>,
+        label: "Create",
       });
     }
   } catch (error) {
@@ -208,32 +204,26 @@ export const buildApplicationBreadcrumbs = (
   breadcrumbs: Breadcrumb[],
   entityData: EntityData | null,
   pathname: string,
-  action: "create" | "edit" | "apply" | null,
+  action: Action | null,
 ): Breadcrumb[] => {
   const result = [...breadcrumbs];
 
   result.push({
     path: "/applications",
-    label: <span>{ENTITY_LABELS.applications}</span>,
+    label: capitalizeFirst(entityData?.name),
   });
 
   if (entityData?.id) {
     const entityPath = getEntityPath("applications", entityData.id);
     result.push({
       path: entityPath,
-      label: <span>{getEntityDisplayName(entityData)}</span>,
+      label: getEntityDisplayName(entityData),
     });
-
-    if (action === "edit") {
-      result.push({
-        path: pathname,
-        label: <span>Edit</span>,
-      });
-    }
-  } else if (action === "create") {
+    addActionBreadcrumb(result, action, pathname);
+  } else if (action === Action.CREATE) {
     result.push({
       path: pathname,
-      label: <span>Create</span>,
+      label: "Create",
     });
   }
 

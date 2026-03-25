@@ -29,7 +29,7 @@ const Breadcrumbs = () => {
     if (!entityType) return null;
 
     const entityIdMatch = pathname.match(
-      /\/(festivals|venues|residencies|applications|profile)\/(\d+)/
+      /\/(festivals|venues|residencies|applications|profile)\/(\d+)/,
     );
     const entityId = entityIdMatch ? Number(entityIdMatch[2]) : undefined;
 
