@@ -138,6 +138,12 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
   return preparedData;
 };
 
+const ACCEPTED_EXCEL_MIME_TYPES = [
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+  "application/vnd.ms-excel", // .xls
+];
+const ACCEPTED_EXCEL_EXTENSIONS = [".xlsx", ".xls"];
+
 export const createZodFormSchema = (
   formFields: ControlledFormElement[],
 ): ZodObject<Record<string, ZodType>> => {
@@ -162,12 +168,6 @@ export const createZodFormSchema = (
         zodType = z.array(z.instanceof(File));
         break;
       case ControlledFormElementType.EXCEL:
-        const ACCEPTED_EXCEL_MIME_TYPES = [
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-          "application/vnd.ms-excel", // .xls
-        ];
-
-        const ACCEPTED_EXCEL_EXTENSIONS = [".xlsx", ".xls"];
         zodType = z.instanceof(File).refine(
           (data) => {
             if (!(data instanceof File)) return false;
