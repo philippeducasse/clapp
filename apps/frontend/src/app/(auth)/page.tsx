@@ -77,8 +77,7 @@ export default function LandingPage() {
             <Image src={"/logo.png"} width={150} height={150} alt="Clapp logo" />
           </div>
           <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            Your freelance arts career,{" "}
-            <span className="text-primary">all in one place</span>
+            Your freelance arts career, <span className="text-primary">all in one place</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
             Track festivals, residencies, venues, and applications. Clapp is your personal assistant
@@ -90,7 +89,7 @@ export default function LandingPage() {
                 Start for free <ArrowRight className="ml-1 size-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="tertiary" className="text-base px-8" asChild>
+            <Button size="lg" variant="secondary" className="text-base px-8" asChild>
               <a href="#login">Log in to your account</a>
             </Button>
           </div>

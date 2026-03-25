@@ -27,7 +27,7 @@ export const TagsButton = <T,>({ entityId, tag, updateSlice }: TagsButtonProps<T
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="tertiary">
+        <Button variant="secondary">
           <Bookmark />
         </Button>
       </DropdownMenuTrigger>

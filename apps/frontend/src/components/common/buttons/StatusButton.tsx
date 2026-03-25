@@ -28,11 +28,7 @@ interface StatusButtonProps<T> {
   updateSlice: (entity: T) => PayloadAction<T>;
 }
 
-export const StatusButton = <T,>({
-  entityId,
-  updateStatus,
-  updateSlice,
-}: StatusButtonProps<T>) => {
+export const StatusButton = <T,>({ entityId, updateStatus, updateSlice }: StatusButtonProps<T>) => {
   const dispatch = useDispatch();
   const changeStatus = async (status: ApplicationStatus) => {
     const updatedEntity = await updateStatus(entityId, status);
@@ -42,7 +38,7 @@ export const StatusButton = <T,>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="tertiary">
+        <Button variant="secondary">
           <Flag />
         </Button>
       </DropdownMenuTrigger>

@@ -140,8 +140,8 @@ const DataTableHeader = <TData,>({
 
         <div className="flex gap-4">
           {filters && (
-            <Button variant={"tertiary"} onClick={() => setOpenFilterDialog(true)}>
-              <SlidersHorizontal />
+            <Button variant={"secondary"} onClick={() => setOpenFilterDialog(true)}>
+              <SlidersHorizontal className="text-primary" />
               Filters
             </Button>
           )}

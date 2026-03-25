@@ -188,7 +188,7 @@ const ProfileView = () => {
           <div className="flex gap-4">
             <Button
               onClick={() => router.push("/profile/edit/change-password")}
-              variant={"tertiary"}
+              variant={"secondary"}
             >
               Change Password
             </Button>

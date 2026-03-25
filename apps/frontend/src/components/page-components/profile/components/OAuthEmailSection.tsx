@@ -79,7 +79,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
           <Button
             onClick={() => handleConnect("gmail")}
             disabled={isLoading}
-            variant={profile.oauthProvider === "GMAIL" ? "tertiary" : "outline"}
+            variant={profile.oauthProvider === "GMAIL" ? "secondary" : "outline"}
           >
             <GmailIcon />
             {profile.oauthProvider === "GMAIL" ? "✓ Gmail Connected" : "Connect Gmail"}
@@ -87,7 +87,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
           <Button
             onClick={() => handleConnect("outlook")}
             disabled={isLoading}
-            variant={profile.oauthProvider === "OUTLOOK" ? "tertiary" : "outline"}
+            variant={profile.oauthProvider === "OUTLOOK" ? "secondary" : "outline"}
           >
             <OutlookIcon />
             {profile.oauthProvider === "OUTLOOK" ? "✓ Outlook Connected" : "Connect Outlook"}
