@@ -462,54 +462,6 @@ def parse_performance_ids(performance_ids: Any) -> List[Performance]:
     return list(Performance.objects.filter(id__in=ids))
 
 
-def get_or_create_application(
-    organisation: Organisation,
-    profile: Profile,
-    performances: List[Performance],
-    application_year: int,
-    message: str,
-    subject: str,
-    recipient_emails: List[str],
-) -> Application:
-    from django.contrib.contenttypes.models import ContentType
-
-    organisation_content_type = ContentType.objects.get_for_model(organisation.__class__)
-    applications = Application.objects.filter(
-        content_type=organisation_content_type, object_id=organisation.pk, profile=profile
-    )
-
-    application = next(
-        (a for a in applications if a.application_year == application_year),
-        None,
-    )
-
-    # Check if recipient emails are test emails (e.g., test@example.com, not contact@testfestival.com)
-    is_test_app = any(email.lower().split("@")[0].startswith("test") for email in recipient_emails)
-
-    if application and "test" not in organisation.name.lower() and not is_test_app:
-        if application.status != "DRAFT":
-            raise ValueError("Application already exists for this organisation and year")
-        else:
-            application.message = message
-            application.email_subject = subject
-            application.save()
-    else:
-        application = Application.objects.create(
-            organisation=organisation,
-            application_date=timezone.now().date(),
-            application_year_value=application_year,
-            status="DRAFT",
-            message=message,
-            email_subject=subject,
-            profile=profile,
-            email_recipients=recipient_emails,
-        )
-    if performances and len(performances) > 0:
-        application.performances.set(performances)
-
-    return application
-
-
 def prepare_application_email(
     application: Application,
     recipient_emails: List[str],
