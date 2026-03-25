@@ -28,6 +28,8 @@ import { selectProfile } from "@/redux/slices/authSlice";
 import { Profile } from "@/interfaces/entities/Profile";
 import { useRouter } from "next/navigation";
 import { Dossier } from "@/interfaces/entities/Performance";
+import { selectAllApplications } from "@/redux/slices/applicationSlice";
+import { AlertModal } from "@/components/common/modals/AlertModal";
 
 interface ApplicationFormProps {
   entityName: EntityName.FESTIVAL | EntityName.RESIDENCY | EntityName.VENUE;
@@ -57,12 +59,15 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const profile = useSelector((state: RootState) => selectProfile(state));
   const router = useRouter();
   const dispatch = useDispatch();
+  const allApplications = useSelector((state: RootState) => selectAllApplications(state));
   const [isLoading, setIsLoading] = useState(false);
   const [dossiers, setDossiers] = useState<Dossier[]>([]);
   const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<number[]>([]);
   const [applicationMethod, setApplicationMethod] = useState<
     ApplicationMethod.EMAIL | ApplicationMethod.FORM
   >(ApplicationMethod.EMAIL);
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
+  const [bypassDuplicateWarning, setBypassDuplicateWarning] = useState(false);
   const dossiersSetRef = useRef(false);
 
   const config = ENTITY_CONFIG[entityName];
@@ -135,6 +140,24 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
       else refreshVenue(entityId, dispatch);
     }
   }, [entityId, entity, entityName, dispatch]);
+
+  useEffect(() => {
+    if (!entity || !profile) return;
+
+    const currentYear = new Date().getFullYear();
+    const duplicateApplication = allApplications.find((app) => {
+      const applicationYear = new Date(app.applicationDate).getFullYear();
+      const sameEntity =
+        app.organisation?.id === entity.id && app.organisationType === config.objectType;
+      return sameEntity && applicationYear === currentYear && !bypassDuplicateWarning;
+    });
+
+    if (duplicateApplication && !bypassDuplicateWarning) {
+      setShowDuplicateWarning(true);
+    } else {
+      setShowDuplicateWarning(false);
+    }
+  }, [entity, profile, allApplications, bypassDuplicateWarning, config.objectType]);
 
   useEffect(() => {
     if (!entity?.contacts?.length) return;
@@ -246,6 +269,17 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
         entity={entity}
         additionalActions={applicationMethod == ApplicationMethod.EMAIL ? generateEmail() : null}
         action={applicationMethod == ApplicationMethod.EMAIL ? Action.APPLY : Action.CREATE}
+      />
+      <AlertModal
+        open={showDuplicateWarning}
+        onOpenChange={setShowDuplicateWarning}
+        variant="warning"
+        title="Application Already Submitted"
+        description={`You have already submitted an application to ${entity?.name} this year. Are you sure you want to submit another one?`}
+        confirmText="Continue anyway"
+        cancelText="Cancel"
+        showCancel={true}
+        onConfirm={() => setBypassDuplicateWarning(true)}
       />
     </>
   );
