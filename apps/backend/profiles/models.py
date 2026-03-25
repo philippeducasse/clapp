@@ -80,7 +80,7 @@ class Profile(AbstractUser):
     email_use_tls = models.BooleanField(default=True)
     email_host_password = EncryptedCharField(max_length=255, blank=True)
     email_host_user = models.CharField(max_length=255, blank=True)
-
+    default_email_subject = models.CharField(max_length=500, blank=True)
     # OAuth email integrations
     google_oauth_refresh_token = EncryptedCharField(max_length=2048, blank=True)
     google_oauth_access_token = EncryptedCharField(max_length=2048, blank=True)
@@ -120,6 +120,7 @@ class Profile(AbstractUser):
 
 class EmailTemplate(models.Model):
     name = models.CharField(max_length=255, blank=True)
+    subject = models.CharField(max_length=500, blank=True)
     content = models.TextField(max_length=10000, blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="email_templates")
 
