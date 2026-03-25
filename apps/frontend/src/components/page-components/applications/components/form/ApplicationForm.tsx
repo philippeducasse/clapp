@@ -144,12 +144,14 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   useEffect(() => {
     if (!entity || !profile) return;
 
-    const currentYear = new Date().getFullYear();
+    const now = new Date();
+    const twelveMonthsAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+
     const duplicateApplication = allApplications.find((app) => {
-      const applicationYear = new Date(app.applicationDate).getFullYear();
+      const appDate = new Date(app.applicationDate);
       const sameEntity =
         app.organisation?.id === entity.id && app.organisationType === config.objectType;
-      return sameEntity && applicationYear === currentYear && !bypassDuplicateWarning;
+      return sameEntity && appDate >= twelveMonthsAgo && appDate <= now && !bypassDuplicateWarning;
     });
 
     if (duplicateApplication && !bypassDuplicateWarning) {
