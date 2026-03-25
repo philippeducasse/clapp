@@ -17,6 +17,13 @@ export const getEmailTemplateFormFields = (): ControlledFormElement[] => {
       helpText: "A name to identify this template (e.g., 'Festival Introduction', 'Short Pitch')",
     },
     {
+      label: "Email Subject Template",
+      fieldName: "subjectTemplate",
+      type: ControlledFormElementType.TEXT,
+      helpText:
+        "Set the email subject for this template. Use {{firstName}}, {{lastName}}, {{entityName}}, and {{currentYear}} as placeholders that will be replaced automatically.",
+    },
+    {
       label: "Content",
       fieldName: "content",
       type: ControlledFormElementType.TEXT_EDITOR,

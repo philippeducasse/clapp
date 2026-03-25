@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { Dossier } from "@/interfaces/entities/Performance";
 import { selectAllApplications } from "@/redux/slices/applicationSlice";
 import { AlertModal } from "@/components/common/modals/AlertModal";
+import { interpolateEmailTemplate } from "@/helpers/emailTemplateHelper";
 
 interface ApplicationFormProps {
   entityName: EntityName.FESTIVAL | EntityName.RESIDENCY | EntityName.VENUE;
@@ -176,7 +177,17 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     if (!template) return;
 
     form.setValue("message", template.content);
-  }, [selectedTemplateId, applicationMethod, profile, form]);
+
+    if (template.subjectTemplate) {
+      const interpolatedSubject = interpolateEmailTemplate(template.subjectTemplate, {
+        firstName: profile?.firstName,
+        lastName: profile?.lastName,
+        entityName: entity?.name,
+        currentYear: new Date().getFullYear(),
+      });
+      form.setValue("emailSubject", interpolatedSubject);
+    }
+  }, [selectedTemplateId, applicationMethod, profile, form, entity]);
 
   const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);

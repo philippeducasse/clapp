@@ -4,8 +4,10 @@ import { EmailHost } from "../Enums";
 export interface EmailTemplate {
   [key: string]: unknown;
   id: number;
+  subject: string;
   name: string;
   content: string;
+  subjectTemplate?: string;
 }
 
 export interface Profile {
@@ -26,6 +28,7 @@ export interface Profile {
   youtubeProfile?: string;
   performances: Performance[];
   emailTemplates?: EmailTemplate[];
+  emailSubjectDefultText?: string;
   emailHost?: EmailHost;
   otherEmailHost?: string;
   emailPort?: number;

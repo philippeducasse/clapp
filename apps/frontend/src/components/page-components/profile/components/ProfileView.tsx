@@ -32,6 +32,7 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { Button } from "@/components/ui/button";
 import { getEmailSettings } from "../helpers/getEmailSettings";
 import { toast } from "sonner";
+import { getDefaultEmailSubject } from "../helpers/getEmailTemplateInfo";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -143,6 +144,12 @@ const ProfileView = () => {
         </Tab>
 
         <Tab name="Email Templates">
+          <DetailsViewSection
+            title="Default subject"
+            icon={<Info className="text-primary" />}
+            data={getDefaultEmailSubject(profile)}
+            action={<EditButton href={`/profile/edit/default-subject`} />}
+          />
           {profile.emailTemplates && profile.emailTemplates.length > 0 ? (
             <EmailTemplatesSection
               emailTemplates={profile.emailTemplates}

@@ -86,6 +86,13 @@ export const getEmailSettingsFormFields = (
       type: ControlledFormElementType.BOOLEAN,
       helpText: getEmailTlsHelpText(selectedEmailHost),
     },
+    {
+      label: "Default Email Subject Template",
+      fieldName: "emailSubjectDefultText",
+      type: ControlledFormElementType.TEXT,
+      helpText:
+        "Set a default template for email subjects. Use {{firstName}}, {{lastName}}, {{entityName}}, and {{currentYear}} as placeholders.",
+    },
   ];
 
   return fields;

@@ -6,6 +6,7 @@ import { Profile, EmailTemplate } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { LANGUAGES } from "@/constants/languages";
 import { getOptions } from "@/helpers/formHelper";
+import { interpolateEmailTemplate } from "@/helpers/emailTemplateHelper";
 
 export interface ApplicableEntity {
   id?: number;
@@ -51,13 +52,20 @@ export const getApplicationFormFields = (
   const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
   const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
+
+  const defaultEmailSubject = interpolateEmailTemplate(profile?.emailSubjectDefultText, {
+    firstName: profile?.firstName,
+    lastName: profile?.lastName,
+    entityName: entity?.name,
+    currentYear: new Date().getFullYear(),
+  });
+
   const emailApplicationFields: ControlledFormElement[] = [
     {
       label: "Email subject",
       fieldName: "emailSubject",
       type: ControlledFormElementType.TEXT,
-      defaultValue:
-        entity?.name && `${profile?.firstName} ${profile?.lastName} at ${entity?.name} 2026`,
+      defaultValue: defaultEmailSubject,
     },
     {
       label: "Recipients",
