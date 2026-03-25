@@ -12,8 +12,7 @@ interface FormHeaderProps {
 const FormHeader = ({ action, entityName, additionalActions }: FormHeaderProps) => {
   const getActionIcon = (action: Action) => {
     const iconProps = {
-      className:
-        "text-primary-foreground bg-primary p-2 rounded-md",
+      className: "text-primary bg-primary/20 p-2 rounded-md",
       size: 48 as const,
     };
 
