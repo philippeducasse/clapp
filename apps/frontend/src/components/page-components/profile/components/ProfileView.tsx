@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { CircleUser, Cog } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CircleUser, Cog, PenTool } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -145,8 +145,8 @@ const ProfileView = () => {
 
         <Tab name="Email Templates">
           <DetailsViewSection
-            title="Default subject"
-            icon={<Info className="text-primary" />}
+            title="Default email subject"
+            icon={<PenTool className="text-primary" />}
             data={getDefaultEmailSubject(profile)}
             action={<EditButton href={`/profile/edit/default-subject`} />}
           />

@@ -1,6 +1,6 @@
 "use client";
 
-import { EmailTemplate, Profile } from "@/interfaces/entities/Profile";
+import { EmailTemplate } from "@/interfaces/entities/Profile";
 import { getEmailTemplateInfo } from "../helpers/getEmailTemplateInfo";
 import { Mail } from "lucide-react";
 import AuxilliarySection from "@/components/common/details-view/AuxilliarySection";

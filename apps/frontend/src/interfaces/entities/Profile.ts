@@ -7,7 +7,6 @@ export interface EmailTemplate {
   subject: string;
   name: string;
   content: string;
-  subjectTemplate?: string;
 }
 
 export interface Profile {
@@ -28,7 +27,7 @@ export interface Profile {
   youtubeProfile?: string;
   performances: Performance[];
   emailTemplates?: EmailTemplate[];
-  emailSubjectDefultText?: string;
+  defaultEmailSubject?: string;
   emailHost?: EmailHost;
   otherEmailHost?: string;
   emailPort?: number;

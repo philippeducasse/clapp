@@ -22,13 +22,19 @@ import BasicForm from "@/components/common/form/BasicForm";
 import { Action, EmailHost } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
 import { getEmailSettingsFormFields } from "../../helpers/form/getEmailSettingsFormFields";
+import { getDefaultEmailSubjectFormField } from "../../helpers/form/getDefaultEmailSubjectFormField";
 
 interface ProfileFormProps {
   action: Action;
-  isEmailConfig: boolean;
+  isEmailConfig?: boolean;
+  isDefaultSubject?: boolean;
 }
 
-const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
+const ProfileForm = ({
+  action,
+  isEmailConfig = false,
+  isDefaultSubject = false,
+}: ProfileFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const profile = useSelector((state: RootState) => selectProfile(state));
@@ -36,16 +42,15 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
   const [isOtherEmailHost, setIsOtherEmailHost] = useState(profile?.emailHost === "OTHER");
   const [selectedEmailHost, setSelectedEmailHost] = useState<EmailHost | null | undefined>(
-    profile?.emailHost
+    profile?.emailHost,
   );
 
-  const formFields = useMemo(
-    () =>
-      isEmailConfig
-        ? getEmailSettingsFormFields(isOtherEmailHost, selectedEmailHost)
-        : getProfileFormFields(),
-    [isEmailConfig, isOtherEmailHost, selectedEmailHost]
-  );
+  const formFields = useMemo(() => {
+    if (isDefaultSubject) return getDefaultEmailSubjectFormField();
+    return isEmailConfig
+      ? getEmailSettingsFormFields(isOtherEmailHost, selectedEmailHost)
+      : getProfileFormFields();
+  }, [isDefaultSubject, isEmailConfig, isOtherEmailHost, selectedEmailHost]);
 
   const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
 
@@ -102,8 +107,9 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
     try {
       if (profile) {
         let updatedProfile;
-        if (isEmailConfig) {
+        if (isEmailConfig || isDefaultSubject) {
           updatedProfile = { ...profile, ...values } as Profile;
+          console.log({ values, updatedProfile });
         } else {
           updatedProfile = { ...values, id: profile.id } as Profile;
         }
@@ -111,7 +117,11 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
 
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));
-        const tabHash = isEmailConfig ? "#email-settings" : "#basic-information";
+        const tabHash = isDefaultSubject
+          ? "#email-templates"
+          : isEmailConfig
+            ? "#email-settings"
+            : "#basic-information";
         router.push(`/profile${tabHash}`);
       }
     } catch (error) {
@@ -132,16 +142,30 @@ const ProfileForm = ({ action, isEmailConfig = false }: ProfileFormProps) => {
         form={form}
         formFields={formFields}
         onSubmit={onSubmit}
-        onCancelHref={isEmailConfig ? "/profile#email-settings" : "/profile#basic-information"}
+        onCancelHref={
+          isDefaultSubject
+            ? "/profile#email-templates"
+            : isEmailConfig
+              ? "/profile#email-settings"
+              : "/profile#basic-information"
+        }
         isLoading={isLoading}
         entity={profile}
         action={action}
-        formTitle={isEmailConfig ? "Email Settings" : "Profile Information"}
+        formTitle={
+          isDefaultSubject
+            ? "Default Email Subject"
+            : isEmailConfig
+              ? "Email Settings"
+              : "Profile Information"
+        }
         submitButtonLabel="Save"
         formSubtitle={
-          isEmailConfig
-            ? 'Configure the app to connect with your email account. Please fill these fields out carefully! <a href="/help/email-settings" target="_blank" class="text-blue-600 hover:text-blue-800 underline">View guide</a>'
-            : "Update your profile information and contact details"
+          isDefaultSubject
+            ? "Set a default subject template applied when sending applications by email."
+            : isEmailConfig
+              ? 'Configure the app to connect with your email account. Please fill these fields out carefully! <a href="/help/email-settings" target="_blank" class="text-blue-600 hover:text-blue-800 underline">View guide</a>'
+              : "Update your profile information and contact details"
         }
       />
     </>

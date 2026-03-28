@@ -1,7 +1,8 @@
 interface EmailTemplateVariables {
   firstName?: string;
   lastName?: string;
-  entityName?: string;
+  organisation?: string;
+  companyName?: string;
   currentYear?: number;
 }
 
@@ -11,7 +12,7 @@ interface EmailTemplateVariables {
  */
 export const interpolateEmailTemplate = (
   template: string | undefined,
-  variables: EmailTemplateVariables
+  variables: EmailTemplateVariables,
 ): string => {
   if (!template) return "";
 
@@ -23,8 +24,11 @@ export const interpolateEmailTemplate = (
   if (variables.lastName) {
     result = result.replace(/{{lastName}}/g, variables.lastName);
   }
-  if (variables.entityName) {
-    result = result.replace(/{{entityName}}/g, variables.entityName);
+  if (variables.companyName) {
+    result = result.replace(/{{companyName}}/g, variables.companyName);
+  }
+  if (variables.organisation) {
+    result = result.replace(/{{organisation}}/g, variables.organisation);
   }
   if (variables.currentYear) {
     result = result.replace(/{{currentYear}}/g, String(variables.currentYear));

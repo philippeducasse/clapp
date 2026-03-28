@@ -3,6 +3,7 @@ import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElem
 import { EmailHost, EMAIL_HOST_CONFIG } from "@/interfaces/Enums";
 import { getOptions } from "@/helpers/formHelper";
 import { capitalizeFirst } from "@/utils/stringUtils";
+import { EMAIL_PLACEHOLDER_HELP_TEXT } from "@/constants/emailPlaceholders";
 export const getEmailPasswordHelpText = (emailHost: EmailHost | null | undefined): string => {
   if (!emailHost || emailHost === EmailHost.OTHER) {
     return EMAIL_HOST_CONFIG[EmailHost.OTHER].helpText;
@@ -32,16 +33,16 @@ export const getEmailTlsHelpText = (emailHost: EmailHost | null | undefined): st
   const config = EMAIL_HOST_CONFIG[emailHost];
   return config.useTls
     ? `${capitalizeFirst(
-        emailHost
+        emailHost,
       )} requires TLS/SSL encryption. This setting should be enabled for secure email transmission.`
     : `${capitalizeFirst(
-        emailHost
+        emailHost,
       )} does not require TLS encryption for this configuration. TLS can be disabled, but it is recommended you leave it .`;
 };
 
 export const getEmailSettingsFormFields = (
   isOtherEmailHost: boolean,
-  selectedEmailHost?: EmailHost | null
+  selectedEmailHost?: EmailHost | null,
 ): ControlledFormElement[] => {
   const fields: ControlledFormElement[] = [
     {
@@ -90,8 +91,7 @@ export const getEmailSettingsFormFields = (
       label: "Default Email Subject Template",
       fieldName: "emailSubjectDefultText",
       type: ControlledFormElementType.TEXT,
-      helpText:
-        "Set a default template for email subjects. Use {{firstName}}, {{lastName}}, {{entityName}}, and {{currentYear}} as placeholders.",
+      helpText: `Set a default template for email subjects. ${EMAIL_PLACEHOLDER_HELP_TEXT} For example: "{{companyName}} at {{organisation}} {{currentYear}}"`,
     },
   ];
 

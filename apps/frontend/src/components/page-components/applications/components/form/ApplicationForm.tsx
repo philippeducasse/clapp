@@ -177,14 +177,15 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     if (!template) return;
 
     form.setValue("message", template.content);
-
-    if (template.subjectTemplate) {
-      const interpolatedSubject = interpolateEmailTemplate(template.subjectTemplate, {
+    if (template.subject) {
+      const interpolatedSubject = interpolateEmailTemplate(template.subject, {
         firstName: profile?.firstName,
         lastName: profile?.lastName,
-        entityName: entity?.name,
+        organisation: entity?.name,
+        companyName: profile?.companyName,
         currentYear: new Date().getFullYear(),
       });
+
       form.setValue("emailSubject", interpolatedSubject);
     }
   }, [selectedTemplateId, applicationMethod, profile, form, entity]);

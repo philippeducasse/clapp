@@ -50,13 +50,14 @@ export const getApplicationFormFields = (
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
   const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
-  const userLanguageCodes = profile?.spokenLanguages ?? ["en"];
+  const userLanguageCodes = profile?.spokenLanguages?.length ? profile.spokenLanguages : ["en"];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
 
-  const defaultEmailSubject = interpolateEmailTemplate(profile?.emailSubjectDefultText, {
+  const defaultEmailSubject = interpolateEmailTemplate(profile?.defaultEmailSubject, {
     firstName: profile?.firstName,
     lastName: profile?.lastName,
-    entityName: entity?.name,
+    companyName: profile?.companyName,
+    organisation: entity?.name,
     currentYear: new Date().getFullYear(),
   });
 
@@ -73,14 +74,6 @@ export const getApplicationFormFields = (
       type: ControlledFormElementType.MULTI_EMAIL,
       defaultValue: entity?.contacts?.map((c) => c.email) ?? [],
       helpText: "Enter recipients, hit enter or ',' to separate them",
-    },
-    {
-      label: "Language",
-      fieldName: "language",
-      type: ControlledFormElementType.SELECT,
-      options: userLanguages.map((l) => ({ value: l.code, label: l.name })),
-      helpText: "Provide the language for the email generation",
-      defaultValue: userLanguages[0]?.code ?? "en",
     },
     {
       label: "Email Template",
@@ -107,6 +100,15 @@ export const getApplicationFormFields = (
       },
       defaultValue: 3 as unknown as string,
       helpText: "Set the length if generating email",
+    },
+    {
+      label: "Language",
+      fieldName: "language",
+      type: ControlledFormElementType.SELECT,
+      options: userLanguages.map((l) => ({ value: l.code, label: l.name })),
+      helpText:
+        "Provide the language for the email generation. You can add more languages under your profile <a class='underline text-blue-400' href='/profile'>settings</a>",
+      defaultValue: userLanguages[0]?.code ?? "en",
     },
   ];
 
