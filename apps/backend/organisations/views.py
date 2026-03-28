@@ -321,7 +321,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
             content_type = ContentType.objects.get_for_model(organisation.__class__)
             application = Application.objects.create(
-                organisation_id=organisation.id,
                 content_type=content_type,
                 object_id=organisation.id,
                 profile=profile,

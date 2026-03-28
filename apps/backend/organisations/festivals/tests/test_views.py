@@ -322,7 +322,7 @@ class TestFestivalApplyAction:
     def test_apply_duplicate_application_same_year(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
-        """Test that duplicate applications for the same year are rejected"""
+        """Test that multiple applications for the same festival are allowed"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
         mock_email_instance.send.return_value = 1
@@ -338,7 +338,7 @@ class TestFestivalApplyAction:
             profile=profile,
         )
 
-        # Try to create second application
+        # Second application should also succeed
         data = {
             "message": "<p>Second application</p>",
             "email_subject": "Second Subject",
@@ -347,8 +347,8 @@ class TestFestivalApplyAction:
 
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "already exists" in response.data
+        assert response.status_code == status.HTTP_200_OK
+        assert Application.objects.count() == 2
 
     @patch("profiles.emails.get_user_email_connection")
     @patch("organisations.services.EmailMultiAlternatives")
@@ -407,13 +407,12 @@ class TestFestivalApplyAction:
     def test_apply_uses_profile_current_application_year(
         self, mock_email, mock_connection, api_client, profile
     ):
-        """Test that application year from profile.current_application_year is used for deduplication"""
+        """Test that application year uses profile.current_application_year when set"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
-        # Create a non-test festival to ensure duplicate check isn't bypassed
         festival = Festival.objects.create(
             name="Real Festival",
             description="Not a test",
@@ -427,7 +426,6 @@ class TestFestivalApplyAction:
             user=profile,
         )
 
-        # Set current_application_year on profile to 2027
         profile.current_application_year = 2027
         profile.save()
 
@@ -437,15 +435,15 @@ class TestFestivalApplyAction:
             "recipients": "festival@example.com",
         }
 
-        # First application should succeed
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
         assert response.status_code == status.HTTP_200_OK
         assert Application.objects.count() == 1
+        assert Application.objects.first().application_year == 2027
 
-        # Second application in same year should fail (duplicate)
+        # Second application should also succeed
         response = api_client.post(f"/api/festivals/{festival.id}/apply/", data)
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "already exists" in str(response.data)
+        assert response.status_code == status.HTTP_200_OK
+        assert Application.objects.count() == 2
 
     @patch("profiles.emails.get_user_email_connection")
     @patch("organisations.services.EmailMultiAlternatives")
