@@ -68,7 +68,7 @@ export function formatErrorMessage(message: string, maxLength = 100) {
       typeof errorJson.error === "string" ? errorJson.error : JSON.stringify(errorJson.error);
   } catch {}
 
-  if (errorMessage.length > maxLength) {
+  if (errorMessage?.length > maxLength) {
     return errorMessage.slice(0, maxLength) + "…";
   }
   return errorMessage;
