@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { Bot } from "lucide-react";
+import { Bot, TriangleAlert } from "lucide-react";
 import { festivalApiService } from "@/api/festivalApiService";
 import { residencyApiService } from "@/api/residencyApiService";
 import { venueApiService } from "@/api/venueApiService";
@@ -269,9 +269,24 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     entityName,
   ]);
 
+  const hasEmailConfigured =
+    profile?.oauthProvider || (profile?.emailHostUser && profile?.emailHost);
+
   return (
     <>
       <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
+      {applicationMethod === ApplicationMethod.EMAIL && !hasEmailConfigured && (
+        <div className="flex items-start gap-3 rounded-md border border-red-300 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+          <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <p className="text-sm">
+            No email account connected. Please configure your email settings in your{" "}
+            <a href="/profile" className="font-medium underline underline-offset-2">
+              profile
+            </a>{" "}
+            before sending applications.
+          </p>
+        </div>
+      )}
       <BasicForm
         key={formKey}
         form={form}
