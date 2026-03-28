@@ -13,7 +13,6 @@ const connectGmail = async (): Promise<void> => {
 
 const connectOutlook = async (): Promise<void> => {
   const response = await fetchRequest<OAuthConnectResponse>(`${endpoint}/outlook/connect/`);
-  console.log({ response });
   window.location.href = response.authUrl;
 };
 

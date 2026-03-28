@@ -77,7 +77,6 @@ const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) =>
 
     const currentOrganisationType = getValues("organisationType");
     if (!currentOrganisationType && org.type) {
-      console.log("type: ", org.type.toUpperCase());
       setValue("organisationType", org.type.toUpperCase());
     }
   };

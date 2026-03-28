@@ -61,7 +61,6 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
       setIsLoading(false);
     }
   };
-  console.log("porifle", profile);
 
   return (
     <Card className="mb-6">

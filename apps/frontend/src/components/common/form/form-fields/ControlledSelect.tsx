@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Select,
   SelectContent,
@@ -22,7 +21,7 @@ const ControlledSelect = ({
       }}
     >
       <SelectTrigger>
-        <SelectValue placeholder="Select a type" />
+        <SelectValue placeholder="Select an option" />
       </SelectTrigger>
       <SelectContent>
         {options.map((o, i) => (
