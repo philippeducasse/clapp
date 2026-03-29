@@ -64,8 +64,12 @@ export function formatErrorMessage(message: string, maxLength = 100) {
   let errorMessage = message ?? "Error!";
   try {
     const errorJson = JSON.parse(errorMessage);
-    errorMessage =
-      typeof errorJson.error === "string" ? errorJson.error : JSON.stringify(errorJson.error);
+    if (typeof errorJson.error === "string") {
+      errorMessage = errorJson.error;
+    } else {
+      const messages = Object.values(errorJson).flat();
+      errorMessage = messages.join("; ");
+    }
   } catch {}
 
   if (errorMessage?.length > maxLength) {

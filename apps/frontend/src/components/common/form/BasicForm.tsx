@@ -33,6 +33,7 @@ interface BasicFormProps {
   additionalActions?: React.ReactNode;
   action?: Action;
   submitButtonLabel?: string;
+  disabled?: boolean;
 }
 
 const BasicForm = ({
@@ -46,6 +47,7 @@ const BasicForm = ({
   additionalActions,
   action,
   submitButtonLabel,
+  disabled = false,
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
   const showIcon = action === Action.EDIT || action === Action.APPLY || action === Action.UPLOAD;
@@ -137,7 +139,7 @@ const BasicForm = ({
             <div className="flex gap-4 w-full justify-end">
               {additionalActions}
               {action === Action.APPLY ? (
-                <Button disabled={isLoading}>
+                <Button disabled={disabled || isLoading}>
                   <Send /> Send application
                 </Button>
               ) : action === Action.UPLOAD ? (

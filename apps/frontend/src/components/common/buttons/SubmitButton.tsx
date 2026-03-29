@@ -27,7 +27,8 @@ const SubmitButton = ({
         </>
       ) : (
         <>
-          {showIcon && <Save className="text-primary dark:text-foreground" />} {label ?? "Submit"}
+          {showIcon && <Save className="text-primary-foreground dark:text-foreground" />}{" "}
+          {label ?? "Submit"}
         </>
       )}
     </Button>

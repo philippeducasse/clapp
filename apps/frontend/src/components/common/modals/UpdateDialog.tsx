@@ -76,7 +76,7 @@ export const UpdateDialog = <T,>({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="secondary" onClick={handleUpdate}>
-          <Bot />
+          <Bot className="text-primary" />
           Update
         </Button>
       </DialogTrigger>

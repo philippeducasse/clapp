@@ -122,7 +122,11 @@ const SPECIAL_PAGES_CONFIG: Partial<
   },
 };
 
-const addActionBreadcrumb = (breadcrumbs: Breadcrumb[], action: Action | null, pathname: string): void => {
+const addActionBreadcrumb = (
+  breadcrumbs: Breadcrumb[],
+  action: Action | null,
+  pathname: string,
+): void => {
   if (!action) return;
 
   if (action === Action.CREATE) {
@@ -210,7 +214,7 @@ export const buildApplicationBreadcrumbs = (
 
   result.push({
     path: "/applications",
-    label: capitalizeFirst(entityData?.name),
+    label: "Applications",
   });
 
   if (entityData?.id) {

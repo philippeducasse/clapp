@@ -1,3 +1,5 @@
+# Make activated account mandatory to login
+
 # Performance Improvements TODO
 
 Generated from codebase analysis on 2026-03-25
@@ -5,6 +7,7 @@ Generated from codebase analysis on 2026-03-25
 ## 🔴 Critical Issues
 
 ### 1. Remove Redux Store Console Logging
+
 - **File**: `src/redux/store.ts` (lines 9-11)
 - **Issue**: Store subscription logs entire state on every update
 - **Impact**: Console spam, memory overhead in dev and production
@@ -15,6 +18,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Verify Redux DevTools still works in dev
 
 ### 2. Debounce Form Persistence
+
 - **File**: `src/hooks/useFormPersist.ts`
 - **Issue**: `form.watch()` triggers localStorage write on every keystroke
 - **Impact**: Excessive localStorage writes, potential jank on large forms
@@ -28,6 +32,7 @@ Generated from codebase analysis on 2026-03-25
 ## 🟠 High Priority
 
 ### 3. Implement API Response Caching
+
 - **File**: `src/api/fetchHelper.ts`
 - **Issue**: No caching strategy - every navigation/filter triggers fresh API calls
 - **Impact**: Redundant network requests, slower navigation, poor UX
@@ -40,6 +45,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Consider cache expiration time (5-10 min recommended)
 
 ### 4. Debounce Table Search/Filter Input
+
 - **File**: `src/components/common/table/DataTable.tsx` (lines 74-92)
 - **Issue**: API calls fire on every keystroke in search/filter inputs
 - **Impact**: Excessive API calls, server load, poor performance
@@ -51,6 +57,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Ensure user can still clear search quickly
 
 ### 5. Memoize Zod Schema Generation
+
 - **File**: `src/helpers/formHelper.tsx` (line 147)
 - **Issue**: `createZodFormSchema()` called on every render without memoization
 - **Impact**: Repeated schema validation compilation, slower form renders
@@ -63,6 +70,7 @@ Generated from codebase analysis on 2026-03-25
 ## 🟡 Medium Priority
 
 ### 6. Implement Virtual Scrolling for Tables
+
 - **File**: `src/components/common/table/DataTable.tsx`
 - **Issue**: All rows rendered in DOM (currently 25/page, manageable but inefficient)
 - **Impact**: Will struggle with larger datasets or increased page sizes
@@ -75,6 +83,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Performance test with 500+ rows
 
 ### 7. Add Memoization to Components
+
 - **Files**: Multiple component files (only 13/100+ currently use memoization)
 - **Issue**: Missing React.memo, useMemo, useCallback in many components
 - **Impact**: Unnecessary re-renders throughout the app
@@ -90,6 +99,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Use useCallback for event handlers in forms
 
 ### 8. Replace Full Lodash Import
+
 - **File**: `src/utils/stringUtils.ts`
 - **Issue**: Imports entire lodash library (~24KB gzipped) for 4 functions
 - **Functions used**: camelCase, snakeCase, capitalize, lowerCase
@@ -105,6 +115,7 @@ Generated from codebase analysis on 2026-03-25
 ## 🔵 Low Priority
 
 ### 9. Sanitize dangerouslySetInnerHTML Usage
+
 - **Files**:
   - `src/components/common/form/BasicForm.tsx` (line 70)
   - `src/components/common/details-view/Row.tsx` (line 70)
@@ -118,6 +129,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Add security tests
 
 ### 10. Add Selector Memoization Library
+
 - **File**: Redux slices in `src/redux/slices/`
 - **Issue**: Redux selectors not using `reselect` for computed selectors
 - **Impact**: Minor performance impact, selectors recompute on every call
@@ -129,6 +141,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Test selector performance
 
 ### 11. Fix Missing Error Handling in Refresh Functions
+
 - **File**: `src/components/page-components/{entity}/helpers/refresh{Entity}.ts` (all entities)
 - **Issue**: No error handling for failed fetches
 - **Impact**: Silent failures, poor user experience
@@ -141,6 +154,7 @@ Generated from codebase analysis on 2026-03-25
 - [ ] Consider global error toast pattern
 
 ### 12. Reduce useEffect Hook Redundancy
+
 - **Files**: Detail view and form components
 - **Issue**: Many components independently call refresh functions in useEffect
 - **Impact**: Duplicate fetches, complex dependency arrays
@@ -155,24 +169,25 @@ Generated from codebase analysis on 2026-03-25
 
 ## Performance Wins Summary
 
-| Issue | Severity | Effort | Est. Impact |
-|-------|----------|--------|-------------|
-| Remove console logging | Critical | 1 min | High |
-| Debounce form persistence | Critical | 5 min | High |
-| API response caching | High | 30 min | Very High |
-| Debounce search input | High | 10 min | High |
-| Memoize Zod schema | High | 10 min | Medium |
-| Virtual scrolling | Medium | 45 min | Medium |
-| Add memoization | Medium | 60+ min | Medium |
-| Replace lodash | Medium | 15 min | Low (bundle) |
-| Sanitize HTML | Low | 20 min | Security |
-| Reselect memoization | Low | 20 min | Low |
-| Error handling | Low | 60 min | UX |
-| Reduce useEffect | Low | 90 min | High (refactor) |
+| Issue                     | Severity | Effort  | Est. Impact     |
+| ------------------------- | -------- | ------- | --------------- |
+| Remove console logging    | Critical | 1 min   | High            |
+| Debounce form persistence | Critical | 5 min   | High            |
+| API response caching      | High     | 30 min  | Very High       |
+| Debounce search input     | High     | 10 min  | High            |
+| Memoize Zod schema        | High     | 10 min  | Medium          |
+| Virtual scrolling         | Medium   | 45 min  | Medium          |
+| Add memoization           | Medium   | 60+ min | Medium          |
+| Replace lodash            | Medium   | 15 min  | Low (bundle)    |
+| Sanitize HTML             | Low      | 20 min  | Security        |
+| Reselect memoization      | Low      | 20 min  | Low             |
+| Error handling            | Low      | 60 min  | UX              |
+| Reduce useEffect          | Low      | 90 min  | High (refactor) |
 
 ---
 
 ## Quick Wins (Start Here)
+
 1. Remove Redux console logging (1 min)
 2. Debounce form persistence (5 min)
 3. Debounce table search (10 min)

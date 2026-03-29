@@ -28,7 +28,7 @@ export const TagsButton = <T,>({ entityId, tag, updateSlice }: TagsButtonProps<T
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="secondary">
-          <Bookmark />
+          <Bookmark className="text-primary" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-[100px] flex flex-col items-center">

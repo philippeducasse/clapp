@@ -3,7 +3,6 @@ import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElem
 import { EmailHost, EMAIL_HOST_CONFIG } from "@/interfaces/Enums";
 import { getOptions } from "@/helpers/formHelper";
 import { capitalizeFirst } from "@/utils/stringUtils";
-import { EMAIL_PLACEHOLDER_HELP_TEXT } from "@/constants/emailPlaceholders";
 export const getEmailPasswordHelpText = (emailHost: EmailHost | null | undefined): string => {
   if (!emailHost || emailHost === EmailHost.OTHER) {
     return EMAIL_HOST_CONFIG[EmailHost.OTHER].helpText;
@@ -86,12 +85,6 @@ export const getEmailSettingsFormFields = (
       fieldName: "emailUseTls",
       type: ControlledFormElementType.BOOLEAN,
       helpText: getEmailTlsHelpText(selectedEmailHost),
-    },
-    {
-      label: "Default Email Subject Template",
-      fieldName: "emailSubjectDefultText",
-      type: ControlledFormElementType.TEXT,
-      helpText: `Set a default template for email subjects. ${EMAIL_PLACEHOLDER_HELP_TEXT} For example: "{{companyName}} at {{organisation}} {{currentYear}}"`,
     },
   ];
 

@@ -281,7 +281,7 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
           <p className="text-sm">
             No email account connected. Please configure your email settings in your{" "}
-            <a href="/profile" className="font-medium underline underline-offset-2">
+            <a href="/profile#email-settings" className="font-medium underline underline-offset-2">
               profile
             </a>{" "}
             before sending applications.
@@ -298,6 +298,7 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
         entity={entity}
         additionalActions={applicationMethod == ApplicationMethod.EMAIL ? generateEmail() : null}
         action={applicationMethod == ApplicationMethod.EMAIL ? Action.APPLY : Action.CREATE}
+        disabled={!hasEmailConfigured}
       />
       <AlertModal
         open={showDuplicateWarning}

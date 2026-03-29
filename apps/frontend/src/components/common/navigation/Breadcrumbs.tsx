@@ -24,7 +24,7 @@ const Breadcrumbs = () => {
   const pathname = usePathname();
 
   const entityType = detectEntityType(pathname);
-
+  console.log({ entityType });
   const entityData = useSelector((state: RootState) => {
     if (!entityType) return null;
 
@@ -39,9 +39,7 @@ const Breadcrumbs = () => {
   const action = extractAction(pathname);
 
   const buildBreadcrumbs = (): BreadcrumbType[] => {
-    const breadcrumbs: BreadcrumbType[] = [
-      { path: "/", label: <Home className="text-primary" /> },
-    ];
+    const breadcrumbs: BreadcrumbType[] = [{ path: "/", label: <Home className="text-primary" /> }];
 
     if (!entityType) return breadcrumbs;
 
