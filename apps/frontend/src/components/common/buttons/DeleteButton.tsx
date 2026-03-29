@@ -28,7 +28,7 @@ const DeleteButton = ({
       className={`${className} dark:border-red-500`}
       disabled={loading}
     >
-      {icon && <Trash2 />}
+      {icon && <Trash2 className="text-destructive" />}
       {label ?? "Delete"}
     </Button>
   );

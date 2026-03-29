@@ -17,7 +17,7 @@ const EditButton = ({ label, href, className }: EditButtonProps) => {
 
   return (
     <Button className={className} variant="secondary" onClick={handleClick}>
-      <Pencil />
+      <Pencil className="text-primary" />
       {label ?? "Edit"}
     </Button>
   );

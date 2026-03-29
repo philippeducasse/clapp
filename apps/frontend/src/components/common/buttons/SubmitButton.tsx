@@ -22,12 +22,12 @@ const SubmitButton = ({
     <Button size="default" disabled={isLoading} onClick={onClick}>
       {isLoading ? (
         <>
-          <Loader2Icon className="animate-spin" />
+          <Loader2Icon className="animate-spin text-primary" />
           {submissionLabel ?? "Loading..."}
         </>
       ) : (
         <>
-          {showIcon && <Save />} {label ?? "Submit"}
+          {showIcon && <Save className="text-primary" />} {label ?? "Submit"}
         </>
       )}
     </Button>

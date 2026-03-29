@@ -18,7 +18,7 @@ const CreateButton = ({ label, href, className }: CreateButtonProps) => {
 
   return (
     <Button variant="default" onClick={handleClick} className={className}>
-      <Plus />
+      <Plus className="text-primary" />
       {label ?? "Create"}
     </Button>
   );
