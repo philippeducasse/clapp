@@ -48,7 +48,7 @@ class Performance(models.Model):
     short_description = models.TextField(max_length=1000, blank=True)
     email_prompt = models.TextField(max_length=10000, blank=True)
     trailer = models.URLField(max_length=100, blank=True)
-    length = models.DurationField(blank=True, null=True)
+    length = models.CharField(blank=True, null=True)
     long_description = models.TextField(max_length=10000, blank=True)
     creation_date = models.DateField(blank=True, null=True)
 
