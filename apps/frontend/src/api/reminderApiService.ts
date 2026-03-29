@@ -10,7 +10,6 @@ const setReminder = (reminder: ReminderCreate): Promise<Reminder> => {
     reminder,
     "POST",
     "Reminder successfully set",
-    true,
   );
 };
 
