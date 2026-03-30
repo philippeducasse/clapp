@@ -11,6 +11,7 @@ import { profileApiService } from "@/api/profileApiService";
 import { updateProfile } from "@/redux/slices/authSlice";
 import { getEmailSettings } from "../helpers/getEmailSettings";
 import { capitalizeFirst } from "@/utils/stringUtils";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
 
 interface OAuthEmailSectionProps {
   profile: Profile;
@@ -34,6 +35,7 @@ const OutlookIcon = () => (
 const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [openDisconnectDialog, setOpenDisconnectDialog] = useState(false);
 
   const handleConnect = async (provider: "gmail" | "outlook") => {
     try {
@@ -64,6 +66,13 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
 
   return (
     <Card className="mb-6">
+      <DeleteModal
+        open={openDisconnectDialog}
+        onOpenChange={setOpenDisconnectDialog}
+        onConfirm={handleDisconnect}
+        itemName={`${capitalizeFirst(profile.oauthProvider ?? "")} connection`}
+        description="This will disconnect your email provider. You can reconnect at any time."
+      />
       <CardContent>
         <div className="flex items-center gap-2 mb-6">
           <Mail className="text-primary" size={20} />
@@ -92,7 +101,7 @@ const OAuthEmailSection = ({ profile }: OAuthEmailSectionProps) => {
             {profile.oauthProvider === "OUTLOOK" ? "✓ Outlook Connected" : "Connect Outlook"}
           </Button>
           {profile.oauthProvider && (
-            <Button onClick={handleDisconnect} disabled={isLoading} variant="destructive">
+            <Button onClick={() => setOpenDisconnectDialog(true)} disabled={isLoading} variant="destructive">
               {`Disconnect ${capitalizeFirst(profile.oauthProvider)}`}
             </Button>
           )}
