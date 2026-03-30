@@ -31,7 +31,7 @@ const ControlledMultiEmail = ({ field }: BaseControlledProps) => {
   if (!values) return;
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 border rounded-md">
       {values.map((value, index) => (
         <span
           key={index}

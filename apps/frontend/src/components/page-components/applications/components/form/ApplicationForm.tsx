@@ -277,7 +277,7 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     <>
       <FormHeader action={Action.APPLY} entityName={EntityName.APPLICATION} />
       {applicationMethod === ApplicationMethod.EMAIL && !hasEmailConfigured && (
-        <div className="flex items-start gap-3 rounded-md border border-red-300 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
+        <div className="flex items-start gap-3 mt-4 rounded-md border border-red-300 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-400">
           <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
           <p className="text-sm">
             No email account connected. Please configure your email settings in your{" "}
