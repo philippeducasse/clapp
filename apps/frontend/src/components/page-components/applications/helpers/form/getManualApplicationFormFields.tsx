@@ -44,7 +44,7 @@ export const getManualApplicationFormFields = (
       fieldName: "performanceIds",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
-      helpText: "Select with which performances you want to apply to this festival",
+      helpText: "Select with which performances you want to apply to this festival. Dossiers will automatically be attached.",
     },
     {
       label: "Comments",
