@@ -201,8 +201,6 @@ const ProfileView = () => {
             </Button>
             <DeleteButton
               label="Delete account"
-              variant={"outline"}
-              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
               onDelete={() => handleDelete("profile", profile.id)}
             />
           </div>

@@ -104,8 +104,6 @@ const FestivalView = () => {
             <FestivalUpdateDialog />
             <EditButton href={`/festivals/${festival.id}/edit`} />
             <DeleteButton
-              variant={"outline"}
-              className="text-red-500 border border-red-500 hover:text-red-400 hover:bg-background"
               onDelete={() => handleDelete("festival", festivalId)}
             />
           </>

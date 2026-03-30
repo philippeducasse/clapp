@@ -42,7 +42,7 @@ const AuxilliarySection = <T,>({
             <DetailsView data={formatData(item)} />
             <div className="flex my-6 self-end mr-6 gap-2">
               <EditButton href={`${entityId}/edit/${editPath}/${index}`} className="" />
-              <DeleteButton variant="outline" onDelete={() => onDelete(index)} />
+              <DeleteButton onDelete={() => onDelete(index)} />
             </div>
           </div>
         </div>

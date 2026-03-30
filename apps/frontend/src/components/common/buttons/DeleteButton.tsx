@@ -1,12 +1,11 @@
 import { Button } from "../../ui/button";
-import React from "react";
 import { Trash2 } from "lucide-react";
 
 interface DeleteButtonProps {
   onDelete: () => void;
   label?: string;
   icon?: boolean;
-  variant?: "destructive" | "outline";
+  variant?: "destructive" | "outline" | "secondary";
   className?: string;
   loading?: boolean;
 }
@@ -15,7 +14,7 @@ const DeleteButton = ({
   label,
   onDelete,
   icon = true,
-  variant = "destructive",
+  variant = "secondary",
   className,
   loading,
 }: DeleteButtonProps) => {
@@ -25,10 +24,10 @@ const DeleteButton = ({
       variant={variant}
       onClick={onDelete}
       type="button"
-      className={`${className} dark:border-red-500`}
+      className={className}
       disabled={loading}
     >
-      {icon && <Trash2 className="text-destructive " />}
+      {icon && <Trash2 className="text-destructive" />}
       {label ?? "Delete"}
     </Button>
   );

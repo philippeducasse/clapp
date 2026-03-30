@@ -18,8 +18,8 @@ const BackButton = ({ label, href, icon = true, size = "default" }: BackButtonPr
   };
 
   return (
-    <Button size={size} variant="outline" onClick={handleClick} type="button">
-      {icon && <Undo2 className="text-primary dark:text-foreground" />}
+    <Button size={size} variant="secondary" onClick={handleClick} type="button">
+      {icon && <Undo2 className="text-primary" />}
       {label ?? "Go back"}
     </Button>
   );
