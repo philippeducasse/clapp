@@ -103,6 +103,7 @@ export const getFestivalFormFields = (
       label: "Applied",
       fieldName: "applied",
       type: ControlledFormElementType.BOOLEAN,
+      helpText: "Have you already applied to this festival in the past?"
     },
     {
       label: "Comments",
