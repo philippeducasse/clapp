@@ -526,8 +526,7 @@ class TestApplicationWorkflowIntegration:
         self, authenticated_client, festival, authenticated_user
     ):
         """
-        Integration test: Business rule preventing duplicate applications
-        for the same year should be enforced.
+        Integration test: Multiple applications to the same festival are allowed.
         """
         mail.outbox.clear()
 
@@ -539,23 +538,18 @@ class TestApplicationWorkflowIntegration:
         authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
-        # Create first application
-        current_date = timezone.now().date()
-        application_year = current_date.year + 1 if current_date.month >= 9 else current_date.year  # noqa
-
         content_type = ContentType.objects.get_for_model(Festival)
         Application.objects.create(
             content_type=content_type,
             object_id=festival.id,
             profile=authenticated_user,
-            application_date=current_date,
+            application_date=timezone.now().date(),
             status="APPLIED",
             message="First application",
             email_subject="First Subject",
             email_recipients=["contact@festival.com"],
         )
 
-        # Try to create second application for the same year
         data = {
             "message": "<p>Second application</p>",
             "email_subject": "Second Subject",
@@ -564,16 +558,12 @@ class TestApplicationWorkflowIntegration:
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
 
-        # Should fail due to business rule
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "already exists" in str(response.data).lower()
-
-        # Only one application should exist
+        assert response.status_code == status.HTTP_200_OK
         assert (
             Application.objects.filter(
                 content_type=content_type, object_id=festival.id, profile=authenticated_user
             ).count()
-            == 1
+            == 2
         )
 
     def test_apply_with_invalid_email_validates_through_entire_stack(
@@ -609,8 +599,8 @@ class TestApplicationWorkflowIntegration:
         self, authenticated_client, festival, authenticated_user
     ):
         """
-        Integration test: Application year should be calculated correctly
-        based on the September rule (applications after September are for next year).
+        Integration test: Application year uses profile.current_application_year when set,
+        otherwise defaults to the current calendar year regardless of month.
         """
         mail.outbox.clear()
 
@@ -628,7 +618,7 @@ class TestApplicationWorkflowIntegration:
             "recipients": "contact@festival.com",
         }
 
-        # Test applying in August (should use current year)
+        # Applying in August with no current_application_year → uses calendar year
         with patch("django.utils.timezone.now") as mock_now:
             mock_now.return_value = timezone.make_aware(datetime(2025, 8, 15))
 
@@ -638,11 +628,10 @@ class TestApplicationWorkflowIntegration:
             application = Application.objects.first()
             assert application.application_year == 2025
 
-        # Delete the application
         application.hard_delete()
         mail.outbox.clear()
 
-        # Test applying in October (should increment year)
+        # Applying in October with no current_application_year → still uses calendar year (2025)
         with patch("django.utils.timezone.now") as mock_now:
             mock_now.return_value = timezone.make_aware(datetime(2025, 10, 1))
 
@@ -650,7 +639,7 @@ class TestApplicationWorkflowIntegration:
 
             assert response.status_code == status.HTTP_200_OK
             application = Application.objects.first()
-            assert application.application_year == 2026
+            assert application.application_year == 2025
 
 
 @pytest.mark.django_db
@@ -780,7 +769,7 @@ class TestDatabaseRelationshipsIntegration:
 
         with patch("django.utils.timezone.now") as mock_now:
             # Application for 2026
-            mock_now.return_value = timezone.make_aware(datetime(2025, 10, 1))
+            mock_now.return_value = timezone.make_aware(datetime(2026, 3, 1))
 
             data = {
                 "message": "<p>2026 application</p>",

@@ -9,6 +9,6 @@ router = DefaultRouter()
 router.register(r"", OrganisationViewSet, basename="organisation")
 
 urlpatterns: List[URLPattern] = [
+    path("search/", search, name="organisations-search"),
     path("", include(router.urls)),
-    path("search", search, name="organisations-search"),
 ]

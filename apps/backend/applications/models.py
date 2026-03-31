@@ -47,6 +47,7 @@ class Application(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="applications")
     performances = models.ManyToManyField(Performance, related_name="applications", blank=True)
     application_date = models.DateField(blank=True, null=True)
+    application_year_value = models.IntegerField(blank=True, null=True)
     application_method = models.CharField(
         max_length=50,
         choices=APPLICATION_TYPE,
@@ -90,7 +91,13 @@ class Application(models.Model):
 
     @property
     def application_year(self) -> int | None:
-        """Derive the festival year based on the application date."""
+        """Get the application year.
+
+        Returns stored application_year_value if set, otherwise derives from application_date.
+        """
+        if self.application_year_value is not None:
+            return self.application_year_value
+
         if not self.application_date:
             return None
 

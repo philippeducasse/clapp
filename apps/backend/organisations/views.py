@@ -12,6 +12,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
@@ -25,7 +26,6 @@ from .services import (
     format_email,
     generate_application_mail_prompt,
     generate_enrich_prompt,
-    get_or_create_application,
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
@@ -313,24 +313,30 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        current_date = timezone.now().date()
-        application_year = current_date.year
-        if current_date.month >= 9:
-            application_year += 1
+        application_year = profile.current_application_year or timezone.now().year
 
-        logger.debug(f"Creating/updating application for year {application_year}")
+        logger.debug(f"Creating application for year {application_year}")
         try:
-            application = get_or_create_application(
-                organisation,
-                profile,
-                performances,
-                application_year,
-                message,
-                subject,
-                recipient_emails,
+            from django.contrib.contenttypes.models import ContentType
+
+            content_type = ContentType.objects.get_for_model(organisation.__class__)
+            application = Application.objects.create(
+                content_type=content_type,
+                object_id=organisation.id,
+                profile=profile,
+                application_date=timezone.now().date(),
+                application_year_value=application_year,
+                status="APPLIED",
+                message=message,
+                email_subject=subject,
+                email_recipients=recipient_emails,
             )
-            logger.debug(f"Application created/updated: {application.id}")
-        except ValueError as e:
+
+            if performances and len(performances) > 0:
+                application.performances.set(performances)
+
+            logger.debug(f"Application created: {application.id}")
+        except Exception as e:
             logger.error(f"Failed to create application: {str(e)}")
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
