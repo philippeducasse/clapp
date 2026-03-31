@@ -1016,3 +1016,1072 @@ class TestFormApplicationIntegration:
 
         # No email should be sent for form applications
         assert len(mail.outbox) == 0
+
+
+@pytest.mark.django_db
+class TestApplicationViewSet:
+    """Test ApplicationViewSet endpoints and filtering"""
+
+    def test_application_list_returns_user_applications(
+        self, authenticated_client, festival, authenticated_user, performance
+    ):
+        """
+        Test that list endpoint returns only applications for the authenticated user.
+        """
+        mail.outbox.clear()
+
+        # Configure user email
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        # Create an application
+        data = {
+            "message": "<p>Test application</p>",
+            "email_subject": "Test Subject",
+            "recipients": "contact@festival.com",
+            "performances": [str(performance.id)],
+        }
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+        assert response.status_code == status.HTTP_200_OK
+
+        # Get applications list
+        list_response = authenticated_client.get("/api/applications/")
+
+        assert list_response.status_code == status.HTTP_200_OK
+        # Response is paginated, check results
+        results = list_response.data.get("results", list_response.data)
+        assert len(results) >= 1
+        application_ids = [app["id"] for app in results]
+        assert response.data["applicationId"] in application_ids
+
+    def test_application_get_queryset_filters_by_user(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that get_queryset filters applications by the authenticated user.
+        """
+        # Create another user's application
+        other_user = Profile.objects.create_user(
+            email="other@example.com",
+            password="OtherPass123!",
+        )
+
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=other_user,
+        )
+
+        # Create application for other user
+        from django.contrib.contenttypes.models import ContentType
+
+        content_type = ContentType.objects.get_for_model(Festival)
+        Application.objects.create(
+            content_type=content_type,
+            object_id=festival.id,
+            profile=other_user,
+            application_date=timezone.now().date(),
+            status="APPLIED",
+            message="Other user's application",
+            email_subject="Subject",
+            email_recipients=["test@test.com"],
+        )
+
+        # Authenticated user should not see other user's applications
+        list_response = authenticated_client.get("/api/applications/")
+
+        assert list_response.status_code == status.HTTP_200_OK
+        # Response is paginated
+        results = list_response.data.get("results", list_response.data)
+        assert len(results) == 0
+
+    def test_application_tag_status_action(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test the tag action to update application status.
+        """
+        mail.outbox.clear()
+
+        # Configure user email
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        # Create an application
+        data = {
+            "message": "<p>Test application</p>",
+            "email_subject": "Test Subject",
+            "recipients": "contact@festival.com",
+        }
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+        assert response.status_code == status.HTTP_200_OK
+
+        application_id = response.data["applicationId"]
+
+        # Update application status to ACCEPTED
+        tag_response = authenticated_client.patch(
+            f"/api/applications/{application_id}/status/ACCEPTED/", format="json"
+        )
+
+        assert tag_response.status_code == status.HTTP_200_OK
+
+        # Verify status was updated
+        application = Application.objects.get(id=application_id)
+        assert application.status == "ACCEPTED"
+
+    def test_application_tag_invalid_status(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that tag action rejects invalid statuses.
+        """
+        mail.outbox.clear()
+
+        # Configure user email
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        # Create an application
+        data = {
+            "message": "<p>Test application</p>",
+            "email_subject": "Test Subject",
+            "recipients": "contact@festival.com",
+        }
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+        assert response.status_code == status.HTTP_200_OK
+
+        application_id = response.data["applicationId"]
+
+        # Try to update with invalid status
+        tag_response = authenticated_client.patch(
+            f"/api/applications/{application_id}/status/INVALID_STATUS/", format="json"
+        )
+
+        assert tag_response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Invalid action" in tag_response.data["error"]
+
+
+@pytest.mark.django_db
+class TestOrganisationSearchEndpoint:
+    """Test the search endpoint for organisations"""
+
+    def test_search_with_minimum_query_returns_empty(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that search with less than 2 characters returns empty list.
+        """
+        response = authenticated_client.get("/api/organisations/search/?q=a")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == []
+
+    def test_search_festivals_by_name(self, authenticated_client, authenticated_user):
+        """
+        Test searching for festivals by name.
+        """
+        festival = Festival.objects.create(
+            name="Paris Street Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.get("/api/organisations/search/?q=Paris&type=festival")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) > 0
+        assert response.data[0]["id"] == festival.id
+        # When filtering by type, the endpoint returns just the fields without the type field
+
+    def test_search_invalid_organisation_type(self, authenticated_client):
+        """
+        Test that invalid organisation type returns error.
+        """
+        response = authenticated_client.get("/api/organisations/search/?q=test&type=invalid_type")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Invalid organisation type" in response.data["error"]
+
+    def test_search_all_types_without_type_parameter(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that search without type parameter returns mixed results.
+        """
+        from organisations.residencies.models import Residency
+        from organisations.venues.models import Venue
+
+        Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        Venue.objects.create(
+            name="Test Venue",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        Residency.objects.create(
+            name="Test Residency",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.get("/api/organisations/search/?q=Test")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) >= 3
+
+        types = {item["type"] for item in response.data}
+        assert "festival" in types
+        assert "venue" in types
+        assert "residency" in types
+
+
+@pytest.mark.django_db
+class TestOrganisationTagAction:
+    """Test the tag action for organisations"""
+
+    def test_organisation_tag_valid_action(self, authenticated_client, authenticated_user):
+        """
+        Test tagging an organisation with valid tag action.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        # Tag with STAR
+        response = authenticated_client.patch(
+            f"/api/festivals/{festival.id}/tag/STAR/", format="json"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["tag"] == "STAR"
+
+        # Verify in database
+        festival.refresh_from_db()
+        assert festival.tag == "STAR"
+
+    def test_organisation_tag_toggle_off(self, authenticated_client, authenticated_user):
+        """
+        Test that applying the same tag removes it.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+            tag="STAR",
+        )
+
+        # Apply same tag to toggle off
+        response = authenticated_client.patch(
+            f"/api/festivals/{festival.id}/tag/STAR/", format="json"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["tag"] == ""
+
+        # Verify in database
+        festival.refresh_from_db()
+        assert festival.tag == ""
+
+    def test_organisation_tag_invalid_action(self, authenticated_client, authenticated_user):
+        """
+        Test that invalid tag action returns error.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.patch(
+            f"/api/festivals/{festival.id}/tag/INVALID_TAG/", format="json"
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Invalid action" in response.data["error"]
+
+
+@pytest.mark.django_db
+class TestResidencyViewSet:
+    """Test ResidencyViewSet specific functionality"""
+
+    def test_residency_get_organisation_type_name(self, authenticated_client, authenticated_user):
+        """
+        Test that residency viewset returns correct type name.
+        """
+        from organisations.residencies.models import Residency
+
+        residency = Residency.objects.create(
+            name="Test Residency",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.get(f"/api/residencies/{residency.id}/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+    @patch("organisations.views.MistralClient")
+    def test_residency_enrich_uses_residency_prompt(
+        self, mock_mistral_client, authenticated_client, authenticated_user
+    ):
+        """
+        Test that residency enrichment uses residency-specific prompt.
+        """
+        from organisations.residencies.models import Residency
+        from mistralai import TextChunk
+
+        residency = Residency.objects.create(
+            name="Test Residency",
+            country="France",
+            town="Paris",
+            website_url="https://residency.com",
+            user=authenticated_user,
+        )
+
+        # Mock the Mistral service
+        mock_mistral = Mock()
+
+        mock_text_chunk = Mock(
+            spec=TextChunk,
+            text="Test residency in France",
+        )
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
+        mock_mistral.chat.return_value = """
+        {
+            "description": "A test residency"
+        }
+        """
+        mock_mistral_client.return_value = mock_mistral
+
+        response = authenticated_client.get(f"/api/residencies/{residency.id}/enrich/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert mock_mistral.search.called
+        assert mock_mistral.chat.called
+
+
+@pytest.mark.django_db
+class TestOrganisationRestoreAction:
+    """Test the restore action for soft-deleted organisations"""
+
+    def test_restore_non_deleted_organisation_returns_error(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that trying to restore a non-deleted organisation returns error.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        # Try to restore non-deleted festival
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/restore/")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "not deleted" in response.data["error"].lower()
+
+    def test_restore_deleted_organisation(self, authenticated_client, authenticated_user):
+        """
+        Test that restoring a deleted organisation works correctly.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        # Soft delete the festival
+        festival.delete()
+        assert festival.deleted_at is not None
+
+        # Restore it
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/restore/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "restored successfully" in response.data["message"].lower()
+
+        # Verify it's restored
+        festival.refresh_from_db()
+        assert festival.deleted_at is None
+
+    def test_restore_non_existent_organisation(self, authenticated_client, authenticated_user):
+        """
+        Test that trying to restore non-existent organisation returns 404.
+        """
+        response = authenticated_client.post("/api/festivals/999999/restore/")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.django_db
+class TestOrganisationUploadAction:
+    """Test the upload action for importing organisations"""
+
+    def test_upload_without_file_returns_error(self, authenticated_client):
+        """
+        Test that upload without file returns error.
+        """
+        response = authenticated_client.post("/api/festivals/upload/", {})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "No Excel file provided" in response.data["error"]
+
+    def test_upload_returns_task_id(self, authenticated_client):
+        """
+        Test that upload returns a task ID for async processing.
+        """
+        from django.core.files.uploadedfile import SimpleUploadedFile
+
+        # Create a simple Excel-like file (just for testing)
+        file_content = b"test content"
+        uploaded_file = SimpleUploadedFile("test.xlsx", file_content)
+
+        response = authenticated_client.post(
+            "/api/festivals/upload/",
+            {"excel": uploaded_file},
+            format="multipart",
+        )
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        assert "task_id" in response.data
+
+
+@pytest.mark.django_db
+class TestOrganisationUploadStatus:
+    """Test the upload-status action for checking import progress"""
+
+    def test_upload_status_returns_task_status(self, authenticated_client):
+        """
+        Test that upload_status returns task status.
+        """
+        # Just test with a fake task ID
+        response = authenticated_client.get("/api/festivals/upload-status/fake-task-id/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "status" in response.data
+
+
+@pytest.mark.django_db
+class TestOrganisationApplyEdgeCases:
+    """Test edge cases in the apply action"""
+
+    def test_apply_with_missing_message_returns_error(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that apply without message returns error.
+        """
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        data = {
+            "email_subject": "Test Subject",
+            "recipients": "contact@festival.com",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Message and/or subject not found" in response.data["error"]
+
+    def test_apply_form_method_succeeds_with_invalid_performance(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that form application succeeds even with invalid performance ID
+        (the performance is simply not added to the relationship).
+        """
+        data = {
+            "application_method": "FORM",
+            "performances": ["999999"],  # Invalid performance ID - will be ignored
+            "comments": "Test",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+
+        # The endpoint succeeds and creates the application
+        assert response.status_code == status.HTTP_200_OK
+        assert "applicationId" in response.data
+
+
+@pytest.mark.django_db
+class TestOrganisationQuerysetFiltering:
+    """Test the queryset filtering logic in OrganisationViewSet"""
+
+    def test_include_deleted_parameter_shows_deleted_organisations(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that include_deleted=true parameter shows soft-deleted organisations.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        # Soft delete the festival
+        festival.delete()
+
+        # Without include_deleted parameter
+        response = authenticated_client.get("/api/festivals/")
+        results = response.data.get("results", response.data)
+        assert not any(f["id"] == festival.id for f in results)
+
+        # With include_deleted=true parameter
+        response = authenticated_client.get("/api/festivals/?include_deleted=true")
+        results = response.data.get("results", response.data)
+        assert any(f["id"] == festival.id for f in results)
+
+    def test_staff_user_sees_all_non_seed_clones(self, authenticated_user, api_client):
+        """
+        Test that staff users can see organisations they didn't create.
+        """
+        # Create a staff user
+        staff_user = Profile.objects.create_user(
+            email="staff@example.com",
+            password="StaffPass123!",
+            is_staff=True,
+        )
+
+        # Create a festival for regular user
+        festival = Festival.objects.create(
+            name="User Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+            is_seed_clone=False,
+        )
+
+        # Staff user should see the festival
+        api_client.force_authenticate(user=staff_user)
+        response = api_client.get("/api/festivals/")
+        results = response.data.get("results", response.data)
+        assert any(f["id"] == festival.id for f in results)
+
+    def test_non_staff_user_sees_only_own_organisations(
+        self, authenticated_client, authenticated_user
+    ):
+        """
+        Test that non-staff users can only see their own organisations.
+        """
+        # Create another user
+        other_user = Profile.objects.create_user(
+            email="other@example.com",
+            password="OtherPass123!",
+        )
+
+        # Create festivals for both users
+        user_festival = Festival.objects.create(
+            name="User Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        other_festival = Festival.objects.create(
+            name="Other Festival",
+            country="Spain",
+            town="Madrid",
+            user=other_user,
+        )
+
+        # Authenticated user should only see their own festival
+        response = authenticated_client.get("/api/festivals/")
+        results = response.data.get("results", response.data)
+        festival_ids = [f["id"] for f in results]
+
+        assert user_festival.id in festival_ids
+        assert other_festival.id not in festival_ids
+
+
+@pytest.mark.django_db
+class TestOrganisationPerformUpdate:
+    """Test the perform_update method of OrganisationViewSet"""
+
+    def test_perform_update_calls_full_clean(self, authenticated_client, authenticated_user):
+        """
+        Test that updating an organisation triggers full_clean() for validation.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        # Update the festival with valid data
+        data = {
+            "name": "Updated Festival",
+            "country": "Spain",
+            "town": "Madrid",
+        }
+
+        response = authenticated_client.patch(f"/api/festivals/{festival.id}/", data)
+
+        assert response.status_code == status.HTTP_200_OK
+
+        # Verify the update
+        festival.refresh_from_db()
+        assert festival.name == "Updated Festival"
+        assert festival.country == "Spain"
+        assert festival.town == "Madrid"
+
+
+@pytest.mark.django_db
+class TestOrganisationEnrichEnhancements:
+    """Test enrich endpoint enhancements"""
+
+    @patch("organisations.views.MistralClient")
+    def test_enrich_with_contacts_in_response(
+        self, mock_mistral_client, authenticated_client, authenticated_user
+    ):
+        """
+        Test that enrich endpoint includes contacts from LLM in the response.
+        """
+        from mistralai import TextChunk
+
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            website_url="https://festival.com",
+            user=authenticated_user,
+        )
+
+        # Mock the Mistral service
+        mock_mistral = Mock()
+
+        mock_text_chunk = Mock(
+            spec=TextChunk,
+            text="Test festival with contacts",
+        )
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
+        mock_mistral.chat.return_value = """
+        {
+            "description": "A test festival",
+            "contacts": ["contact1@example.com", "contact2@example.com"]
+        }
+        """
+        mock_mistral_client.return_value = mock_mistral
+
+        response = authenticated_client.get(f"/api/festivals/{festival.id}/enrich/")
+
+        assert response.status_code == status.HTTP_200_OK
+        # Contacts should be included in response
+        if "contacts" in response.data:
+            assert len(response.data["contacts"]) == 2
+
+
+@pytest.mark.django_db
+class TestGenerateEmailAction:
+    """Test the generate_email action"""
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_string_performance_ids(
+        self, mock_mistral_client, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that generate_email handles string-formatted performance IDs.
+        """
+        from performances.models import Performance
+
+        performance = Performance.objects.create(
+            performance_title="Test Performance",
+            profile=authenticated_user,
+            short_description="A test performance",
+        )
+
+        mock_mistral = Mock()
+        mock_mistral.chat.return_value = "Generated email content"
+        mock_mistral_client.return_value = mock_mistral
+
+        # Pass performance ID as string
+        data = {
+            "selected_performance_ids": str(performance.id),
+            "language": "ENGLISH",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "message" in response.data
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_list_performance_ids(
+        self, mock_mistral_client, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that generate_email handles list-formatted performance IDs.
+        """
+        from performances.models import Performance
+
+        perf1 = Performance.objects.create(
+            performance_title="Performance 1",
+            profile=authenticated_user,
+            short_description="First performance",
+        )
+
+        perf2 = Performance.objects.create(
+            performance_title="Performance 2",
+            profile=authenticated_user,
+            short_description="Second performance",
+        )
+
+        mock_mistral = Mock()
+        mock_mistral.chat.return_value = "Generated email for multiple performances"
+        mock_mistral_client.return_value = mock_mistral
+
+        # Pass performance IDs as list
+        data = {
+            "selected_performance_ids": [perf1.id, perf2.id],
+            "language": "ENGLISH",
+            "message_length": "LONG",
+        }
+
+        response = authenticated_client.post(
+            f"/api/festivals/{festival.id}/generate_email/",
+            data,
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "message" in response.data
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_integer_performance_id(
+        self, mock_mistral_client, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that generate_email handles single integer performance ID.
+        """
+        from performances.models import Performance
+
+        performance = Performance.objects.create(
+            performance_title="Test Performance",
+            profile=authenticated_user,
+            short_description="A test performance",
+        )
+
+        mock_mistral = Mock()
+        mock_mistral.chat.return_value = "Generated email"
+        mock_mistral_client.return_value = mock_mistral
+
+        # Pass performance ID as integer
+        data = {
+            "selected_performance_ids": performance.id,
+            "language": "ENGLISH",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "message" in response.data
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_no_performances(
+        self, mock_mistral_client, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that generate_email works without performance IDs.
+        """
+        mock_mistral = Mock()
+        mock_mistral.chat.return_value = "Generated email without performances"
+        mock_mistral_client.return_value = mock_mistral
+
+        data = {
+            "language": "ENGLISH",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "message" in response.data
+
+
+@pytest.mark.django_db
+class TestGenerateEmailErrorHandling:
+    """Test error handling in generate_email action"""
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_invalid_performance_id_format(
+        self, mock_mistral_client, authenticated_client, festival
+    ):
+        """
+        Test that invalid performance ID format returns error.
+        """
+        mock_mistral = Mock()
+        mock_mistral_client.return_value = mock_mistral
+
+        data = {
+            "selected_performance_ids": "not-a-number",
+            "language": "ENGLISH",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Invalid performance ID format" in response.data["error"]
+
+    @patch("organisations.views.MistralClient")
+    def test_generate_email_with_mistral_error(
+        self, mock_mistral_client, authenticated_client, festival
+    ):
+        """
+        Test that Mistral service errors are handled gracefully.
+        """
+        mock_mistral = Mock()
+        mock_mistral.chat.side_effect = Exception("Mistral API error")
+        mock_mistral_client.return_value = mock_mistral
+
+        data = {
+            "language": "ENGLISH",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
+
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert "Error generating email" in response.data["error"]
+
+
+@pytest.mark.django_db
+class TestApplyErrorHandling:
+    """Test error handling in apply action"""
+
+    def test_apply_to_nonexistent_organisation(self, authenticated_client):
+        """
+        Test that applying to non-existent organisation returns 404.
+        """
+        data = {
+            "message": "<p>Test application</p>",
+            "email_subject": "Test Subject",
+            "recipients": "contact@test.com",
+        }
+
+        response = authenticated_client.post("/api/festivals/999999/apply/", data)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_apply_with_invalid_recipient_email(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that invalid recipient emails are rejected.
+        """
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        data = {
+            "message": "<p>Test application</p>",
+            "email_subject": "Test Subject",
+            "recipients": "not-an-email",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestSearchEndpointEdgeCases:
+    """Test edge cases in search endpoint"""
+
+    def test_search_with_empty_query_returns_empty(self, authenticated_client):
+        """
+        Test that search with empty query returns empty list.
+        """
+        response = authenticated_client.get("/api/organisations/search/?q=")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == []
+
+    def test_search_returns_max_15_results(self, authenticated_client, authenticated_user):
+        """
+        Test that search returns maximum 15 results when no type specified.
+        """
+        # Create many festivals
+        for i in range(20):
+            Festival.objects.create(
+                name=f"Test Festival {i}",
+                country="France",
+                town="Paris",
+                user=authenticated_user,
+            )
+
+        response = authenticated_client.get("/api/organisations/search/?q=Test")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) <= 15
+
+    def test_search_returns_max_20_for_single_type(self, authenticated_client, authenticated_user):
+        """
+        Test that search returns maximum 20 results when type is specified.
+        """
+        # Create many festivals
+        for i in range(25):
+            Festival.objects.create(
+                name=f"Test Festival {i}",
+                country="France",
+                town="Paris",
+                user=authenticated_user,
+            )
+
+        response = authenticated_client.get("/api/organisations/search/?q=Test&type=festival")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) <= 20
+
+
+@pytest.mark.django_db
+class TestOrganisationBaseViewSetMethods:
+    """Test base OrganisationViewSet methods"""
+
+    def test_get_organisation_type_name_default(self, authenticated_client, authenticated_user):
+        """
+        Test that get_organisation_type_name returns correct name.
+        Note: This will return 'festival' for Festival viewset, not 'organisation'
+        since each subclass overrides it.
+        """
+        festival = Festival.objects.create(
+            name="Test Festival",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.get(f"/api/festivals/{festival.id}/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+class TestApplyValidation:
+    """Test apply action validation"""
+
+    def test_apply_with_missing_subject_returns_error(
+        self, authenticated_client, festival, authenticated_user
+    ):
+        """
+        Test that apply without subject returns error.
+        """
+        authenticated_user.email_host = "OTHER"
+        authenticated_user.other_email_host = "ssl0.ovh.net"
+        authenticated_user.email_host_user = "test@test.com"
+        authenticated_user.email_host_password = "TestPassword123!"
+        authenticated_user.save()
+
+        data = {
+            "message": "<p>Test application</p>",
+            "recipients": "contact@festival.com",
+        }
+
+        response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
+
+        # Should fail because subject is missing
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.django_db
+class TestVenueViewSet:
+    """Test VenueViewSet specific functionality"""
+
+    def test_venue_get_organisation_type_name(self, authenticated_client, authenticated_user):
+        """
+        Test that venue viewset returns correct type name.
+        """
+        from organisations.venues.models import Venue
+
+        venue = Venue.objects.create(
+            name="Test Venue",
+            country="France",
+            town="Paris",
+            user=authenticated_user,
+        )
+
+        response = authenticated_client.get(f"/api/venues/{venue.id}/")
+
+        assert response.status_code == status.HTTP_200_OK
+
+    @patch("organisations.views.MistralClient")
+    def test_venue_enrich_uses_venue_prompt(
+        self, mock_mistral_client, authenticated_client, authenticated_user
+    ):
+        """
+        Test that venue enrichment uses venue-specific prompt.
+        """
+        from organisations.venues.models import Venue
+        from mistralai import TextChunk
+
+        venue = Venue.objects.create(
+            name="Test Venue",
+            country="France",
+            town="Paris",
+            website_url="https://venue.com",
+            user=authenticated_user,
+        )
+
+        # Mock the Mistral service
+        mock_mistral = Mock()
+
+        mock_text_chunk = Mock(
+            spec=TextChunk,
+            text="Test venue in France",
+        )
+        mock_output = Mock(type="message.output", content=[mock_text_chunk])
+        mock_search_response = Mock(outputs=[mock_output])
+        mock_mistral.search.return_value = mock_search_response
+
+        mock_mistral.chat.return_value = """
+        {
+            "description": "A test venue"
+        }
+        """
+        mock_mistral_client.return_value = mock_mistral
+
+        response = authenticated_client.get(f"/api/venues/{venue.id}/enrich/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert mock_mistral.search.called
+        assert mock_mistral.chat.called

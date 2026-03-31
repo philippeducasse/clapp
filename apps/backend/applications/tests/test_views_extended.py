@@ -1,4 +1,5 @@
 """Extended tests for applications/views.py."""
+
 import pytest
 from rest_framework.test import APIClient
 
@@ -56,7 +57,10 @@ class TestApplicationTagAction:
         response = client.get("/api/applications/")
 
         assert response.status_code == 200
-        assert len(response.data) == 2
+        if isinstance(response.data, dict) and "results" in response.data:
+            assert response.data["count"] == 2
+        else:
+            assert len(response.data) == 2
 
     def test_other_user_cannot_see_applications(self):
         profile1 = Profile.objects.create_user(email="user1@example.com", password="pass")
@@ -68,13 +72,23 @@ class TestApplicationTagAction:
         response = client.get("/api/applications/")
 
         assert response.status_code == 200
-        assert len(response.data) == 0
+        if isinstance(response.data, dict) and "results" in response.data:
+            assert response.data["count"] == 0
+        else:
+            assert len(response.data) == 0
 
     def test_all_valid_statuses(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         valid_statuses = [
-            "DRAFT", "APPLIED", "IN_DISCUSSION", "REJECTED",
-            "IGNORED", "ACCEPTED", "POSTPONED", "CANCELLED", "OTHER"
+            "DRAFT",
+            "APPLIED",
+            "IN_DISCUSSION",
+            "REJECTED",
+            "IGNORED",
+            "ACCEPTED",
+            "POSTPONED",
+            "CANCELLED",
+            "OTHER",
         ]
 
         client = APIClient()

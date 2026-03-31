@@ -1,4 +1,5 @@
 """Extended tests for performances/views.py."""
+
 import pytest
 from rest_framework.test import APIClient
 
@@ -38,7 +39,11 @@ class TestPerformanceViewSetExtended:
         response = client.get("/api/performances/")
 
         assert response.status_code == 200
-        assert len(response.data) == 2
+        # Response is paginated with count, results, next, previous
+        if isinstance(response.data, dict) and "results" in response.data:
+            assert response.data["count"] == 2
+        else:
+            assert len(response.data) == 2
 
     def test_other_user_cannot_see_performances(self):
         profile1 = Profile.objects.create_user(email="p1@example.com", password="pass")
@@ -52,7 +57,11 @@ class TestPerformanceViewSetExtended:
         response = client.get("/api/performances/")
 
         assert response.status_code == 200
-        assert len(response.data) == 0
+        # Response is paginated with count, results, next, previous
+        if isinstance(response.data, dict) and "results" in response.data:
+            assert response.data["count"] == 0
+        else:
+            assert len(response.data) == 0
 
 
 @pytest.mark.django_db
@@ -64,6 +73,9 @@ class TestGetUserPerformancesView:
         )
 
         client = APIClient()
+        # Authenticate as any user to access the public endpoint
+        other_user = Profile.objects.create_user(email="other@example.com", password="pass")
+        client.force_authenticate(user=other_user)
         response = client.get(f"/api/performances/{profile.id}")
 
         assert response.status_code == 200
@@ -73,6 +85,9 @@ class TestGetUserPerformancesView:
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
 
         client = APIClient()
+        # Authenticate to access the endpoint
+        other_user = Profile.objects.create_user(email="other@example.com", password="pass")
+        client.force_authenticate(user=other_user)
         response = client.get(f"/api/performances/{profile.id}")
 
         assert response.status_code == 200
@@ -80,6 +95,9 @@ class TestGetUserPerformancesView:
 
     def test_get_nonexistent_user_performances(self):
         client = APIClient()
+        # Authenticate to access the endpoint
+        user = Profile.objects.create_user(email="user@example.com", password="pass")
+        client.force_authenticate(user=user)
         response = client.get("/api/performances/99999")
 
         assert response.status_code == 200

@@ -1,4 +1,5 @@
 """Extended tests for organisations/views.py to improve coverage."""
+
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -304,14 +305,14 @@ class TestApplyAction:
         client = APIClient()
         client.force_authenticate(user=profile)
 
-        mock_app = MagicMock()
-        mock_app.id = 99
-        mock_app.application_year = 2026
-
-        with patch("organisations.views.validate_application_recipients", return_value=["test@test.com"]), \
-             patch("organisations.views.get_or_create_application", return_value=mock_app), \
-             patch("organisations.views.prepare_application_email", return_value=MagicMock()), \
-             patch("organisations.views.send_application_email"):
+        with (
+            patch(
+                "organisations.views.validate_application_recipients",
+                return_value=["test@test.com"],
+            ),
+            patch("organisations.views.prepare_application_email", return_value=MagicMock()),
+            patch("organisations.views.send_application_email"),
+        ):
             response = client.post(
                 f"/api/festivals/{festival.id}/apply/",
                 {
@@ -324,7 +325,7 @@ class TestApplyAction:
             )
 
         assert response.status_code == 200
-        assert response.data["applicationId"] == 99
+        assert "applicationId" in response.data
 
     def test_apply_email_value_error_in_prepare(self):
         profile = Profile.objects.create_user(email="a@example.com", password="pass")
@@ -334,13 +335,15 @@ class TestApplyAction:
         client = APIClient()
         client.force_authenticate(user=profile)
 
-        mock_app = MagicMock()
-        mock_app.id = 1
-        mock_app.application_year = 2026
-
-        with patch("organisations.views.validate_application_recipients", return_value=["test@test.com"]), \
-             patch("organisations.views.get_or_create_application", return_value=mock_app), \
-             patch("organisations.views.prepare_application_email", side_effect=ValueError("Bad value")):
+        with (
+            patch(
+                "organisations.views.validate_application_recipients",
+                return_value=["test@test.com"],
+            ),
+            patch(
+                "organisations.views.prepare_application_email", side_effect=ValueError("Bad value")
+            ),
+        ):
             response = client.post(
                 f"/api/festivals/{festival.id}/apply/",
                 {
@@ -367,9 +370,11 @@ class TestGenerateEmailAction:
         client = APIClient()
         client.force_authenticate(user=profile)
 
-        with patch("organisations.views.generate_application_mail_prompt", return_value="prompt"), \
-             patch("organisations.views.format_email", return_value="<p>Email</p>"), \
-             patch("services.mistral_service.MistralClient.chat", return_value="Email content"):
+        with (
+            patch("organisations.views.generate_application_mail_prompt", return_value="prompt"),
+            patch("organisations.views.format_email", return_value="<p>Email</p>"),
+            patch("services.mistral_service.MistralClient.chat", return_value="Email content"),
+        ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
                 {"selected_performance_ids": "1,2,3", "language": "ENGLISH"},
@@ -385,9 +390,11 @@ class TestGenerateEmailAction:
         client = APIClient()
         client.force_authenticate(user=profile)
 
-        with patch("organisations.views.generate_application_mail_prompt", return_value="prompt"), \
-             patch("organisations.views.format_email", return_value="<p>Email</p>"), \
-             patch("services.mistral_service.MistralClient.chat", return_value="Email content"):
+        with (
+            patch("organisations.views.generate_application_mail_prompt", return_value="prompt"),
+            patch("organisations.views.format_email", return_value="<p>Email</p>"),
+            patch("services.mistral_service.MistralClient.chat", return_value="Email content"),
+        ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
                 {"selected_performance_ids": [1, 2], "language": "FRENCH"},
@@ -403,9 +410,11 @@ class TestGenerateEmailAction:
         client = APIClient()
         client.force_authenticate(user=profile)
 
-        with patch("organisations.views.generate_application_mail_prompt", return_value="prompt"), \
-             patch("organisations.views.format_email", return_value="<p>Email</p>"), \
-             patch("services.mistral_service.MistralClient.chat", return_value="Email content"):
+        with (
+            patch("organisations.views.generate_application_mail_prompt", return_value="prompt"),
+            patch("organisations.views.format_email", return_value="<p>Email</p>"),
+            patch("services.mistral_service.MistralClient.chat", return_value="Email content"),
+        ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
                 {"selected_performance_ids": 1, "language": "ENGLISH"},

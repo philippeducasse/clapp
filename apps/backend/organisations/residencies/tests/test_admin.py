@@ -1,4 +1,5 @@
 """Tests for organisations/residencies/admin.py."""
+
 from unittest.mock import MagicMock
 
 import pytest
@@ -20,11 +21,16 @@ class TestResidencySoftDeleteFilter:
 
     def test_queryset_active(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        r_active = Residency.objects.create(name="Active", town="Berlin", country="DE", user=profile)
-        r_deleted = Residency.objects.create(name="Deleted", town="Berlin", country="DE", user=profile)
+        r_active = Residency.objects.create(
+            name="Active", town="Berlin", country="DE", user=profile
+        )
+        r_deleted = Residency.objects.create(
+            name="Deleted", town="Berlin", country="DE", user=profile
+        )
         r_deleted.delete()
 
         request = MagicMock()
+        request.GET = {"deleted": "active"}
         filter_obj = SoftDeleteFilter(request, {"deleted": "active"}, Residency, MagicMock())
         qs = Residency.objects.with_deleted().filter(user=profile)
         result = filter_obj.queryset(request, qs)
@@ -34,10 +40,13 @@ class TestResidencySoftDeleteFilter:
     def test_queryset_deleted(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         Residency.objects.create(name="Active", town="Berlin", country="DE", user=profile)
-        r_deleted = Residency.objects.create(name="Deleted", town="Berlin", country="DE", user=profile)
+        r_deleted = Residency.objects.create(
+            name="Deleted", town="Berlin", country="DE", user=profile
+        )
         r_deleted.delete()
 
         request = MagicMock()
+        request.GET = {"deleted": "deleted"}
         filter_obj = SoftDeleteFilter(request, {"deleted": "deleted"}, Residency, MagicMock())
         qs = Residency.objects.with_deleted().filter(user=profile)
         result = filter_obj.queryset(request, qs)
@@ -63,7 +72,9 @@ class TestResidencyAdmin:
 
     def test_deleted_status_active(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        residency = Residency.objects.create(name="Active", town="Berlin", country="DE", user=profile)
+        residency = Residency.objects.create(
+            name="Active", town="Berlin", country="DE", user=profile
+        )
 
         admin = self._get_admin()
         html = admin.deleted_status(residency)
@@ -71,7 +82,9 @@ class TestResidencyAdmin:
 
     def test_deleted_status_deleted(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        residency = Residency.objects.create(name="Deleted", town="Berlin", country="DE", user=profile)
+        residency = Residency.objects.create(
+            name="Deleted", town="Berlin", country="DE", user=profile
+        )
         residency.delete()
         residency.refresh_from_db()
 
@@ -80,6 +93,8 @@ class TestResidencyAdmin:
         assert "Deleted" in str(html)
 
     def test_restore_residencies_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         r1 = Residency.objects.create(name="R1", town="Berlin", country="DE", user=profile)
         r1.delete()
@@ -87,20 +102,25 @@ class TestResidencyAdmin:
         admin = self._get_admin()
         request = MagicMock()
         queryset = Residency.objects.with_deleted().filter(user=profile)
-        admin.restore_residencies(request, queryset)
-        request.message_user.assert_called_once()
+
+        with patch.object(admin, "message_user") as mock_message:
+            admin.restore_residencies(request, queryset)
+            mock_message.assert_called_once()
 
     def test_hard_delete_residencies_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         Residency.objects.create(name="R1", town="Berlin", country="DE", user=profile)
 
         admin = self._get_admin()
         request = MagicMock()
         queryset = Residency.objects.with_deleted().filter(user=profile)
-        admin.hard_delete_residencies(request, queryset)
 
-        request.message_user.assert_called_once()
-        assert Residency.objects.with_deleted().filter(user=profile).count() == 0
+        with patch.object(admin, "message_user") as mock_message:
+            admin.hard_delete_residencies(request, queryset)
+            mock_message.assert_called_once()
+            assert Residency.objects.with_deleted().filter(user=profile).count() == 0
 
     def test_get_queryset_includes_deleted(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")

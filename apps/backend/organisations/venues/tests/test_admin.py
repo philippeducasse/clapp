@@ -1,4 +1,5 @@
 """Tests for organisations/venues/admin.py."""
+
 from unittest.mock import MagicMock
 
 import pytest
@@ -25,6 +26,7 @@ class TestVenueSoftDeleteFilter:
         v_deleted.delete()
 
         request = MagicMock()
+        request.GET = {"deleted": "active"}
         filter_obj = SoftDeleteFilter(request, {"deleted": "active"}, Venue, MagicMock())
         qs = Venue.objects.with_deleted().filter(user=profile)
         result = filter_obj.queryset(request, qs)
@@ -38,6 +40,7 @@ class TestVenueSoftDeleteFilter:
         v_deleted.delete()
 
         request = MagicMock()
+        request.GET = {"deleted": "deleted"}
         filter_obj = SoftDeleteFilter(request, {"deleted": "deleted"}, Venue, MagicMock())
         qs = Venue.objects.with_deleted().filter(user=profile)
         result = filter_obj.queryset(request, qs)
@@ -80,6 +83,8 @@ class TestVenueAdmin:
         assert "Deleted" in str(html)
 
     def test_restore_venues_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         v1 = Venue.objects.create(name="V1", town="London", country="UK", user=profile)
         v1.delete()
@@ -87,20 +92,25 @@ class TestVenueAdmin:
         admin = self._get_admin()
         request = MagicMock()
         queryset = Venue.objects.with_deleted().filter(user=profile)
-        admin.restore_venues(request, queryset)
-        request.message_user.assert_called_once()
+
+        with patch.object(admin, "message_user") as mock_message:
+            admin.restore_venues(request, queryset)
+            mock_message.assert_called_once()
 
     def test_hard_delete_venues_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         Venue.objects.create(name="V1", town="London", country="UK", user=profile)
 
         admin = self._get_admin()
         request = MagicMock()
         queryset = Venue.objects.with_deleted().filter(user=profile)
-        admin.hard_delete_venues(request, queryset)
 
-        request.message_user.assert_called_once()
-        assert Venue.objects.with_deleted().filter(user=profile).count() == 0
+        with patch.object(admin, "message_user") as mock_message:
+            admin.hard_delete_venues(request, queryset)
+            mock_message.assert_called_once()
+            assert Venue.objects.with_deleted().filter(user=profile).count() == 0
 
     def test_get_queryset_includes_deleted(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")

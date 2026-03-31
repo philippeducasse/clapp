@@ -1,4 +1,5 @@
 """Extended tests for performances/serializers.py."""
+
 import pytest
 from django.core.files.base import ContentFile
 
@@ -27,19 +28,17 @@ class TestPerformanceSerializerWithDossiers:
 
         assert performance.dossiers.count() == 1
 
-    def test_update_with_dossier_ids_empty_string(self):
-        """dossier_ids=[''] should be converted to [] and all dossiers deleted."""
+    def test_update_with_dossier_ids_empty_list(self):
+        """dossier_ids=[] should delete all dossiers."""
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         performance = Performance.objects.create(
             profile=profile, performance_title="Show", short_description="desc"
         )
-        Dossier.objects.create(
-            performance=performance, file=ContentFile(b"pdf", name="test.pdf")
-        )
+        Dossier.objects.create(performance=performance, file=ContentFile(b"pdf", name="test.pdf"))
 
         data = {
             "performance_title": "Updated Show",
-            "dossier_ids": [""],
+            "dossier_ids": [],
         }
         serializer = PerformanceSerializer(performance, data=data, partial=True)
         assert serializer.is_valid(), serializer.errors
@@ -93,9 +92,7 @@ class TestPerformanceSerializerWithDossiers:
         performance = Performance.objects.create(
             profile=profile, performance_title="Show", short_description="desc"
         )
-        Dossier.objects.create(
-            performance=performance, file=ContentFile(b"pdf", name="test.pdf")
-        )
+        Dossier.objects.create(performance=performance, file=ContentFile(b"pdf", name="test.pdf"))
 
         data = {"performance_title": "Updated Show"}
         serializer = PerformanceSerializer(performance, data=data, partial=True)

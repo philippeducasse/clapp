@@ -8,6 +8,14 @@ class SoftDeleteFilter(admin.SimpleListFilter):
     title = "Deletion Status"
     parameter_name = "deleted"
 
+    def __init__(self, request, params, model, model_admin):
+        super().__init__(request, params, model, model_admin)
+        # Ensure used_parameters is correctly set from request.GET or params
+        if hasattr(request, "GET") and self.parameter_name in request.GET:
+            self.used_parameters = {self.parameter_name: request.GET[self.parameter_name]}
+        else:
+            self.used_parameters = {k: v for k, v in params.items() if k == self.parameter_name}
+
     def lookups(self, request, model_admin):
         return (
             ("active", "Active only"),
@@ -48,8 +56,10 @@ class VenueAdmin(admin.ModelAdmin):
     def deleted_status(self, obj):
         """Display deletion status with visual indicator"""
         if obj.deleted_at:
-            return format_html('<span style="color: red; font-weight: bold;">🗑️ Deleted</span>')
-        return format_html('<span style="color: green;">✓ Active</span>')
+            return format_html(
+                '<span style="color: red; font-weight: bold;">🗑️ {}</span>', "Deleted"
+            )
+        return format_html('<span style="color: green;">✓ {}</span>', "Active")
 
     deleted_status.short_description = "Status"
 

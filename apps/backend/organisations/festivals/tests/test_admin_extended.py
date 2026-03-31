@@ -1,4 +1,5 @@
 """Tests for organisations/festivals/admin.py."""
+
 from unittest.mock import MagicMock
 
 import pytest
@@ -21,7 +22,9 @@ class TestSoftDeleteFilter:
     def test_queryset_active(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         f_active = Festival.objects.create(name="Active", town="Paris", country="FR", user=profile)
-        f_deleted = Festival.objects.create(name="Deleted", town="Paris", country="FR", user=profile)
+        f_deleted = Festival.objects.create(
+            name="Deleted", town="Paris", country="FR", user=profile
+        )
         f_deleted.delete()
 
         request = MagicMock()
@@ -35,10 +38,13 @@ class TestSoftDeleteFilter:
     def test_queryset_deleted(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         Festival.objects.create(name="Active", town="Paris", country="FR", user=profile)
-        f_deleted = Festival.objects.create(name="Deleted", town="Paris", country="FR", user=profile)
+        f_deleted = Festival.objects.create(
+            name="Deleted", town="Paris", country="FR", user=profile
+        )
         f_deleted.delete()
 
         request = MagicMock()
+        request.GET = {"deleted": "deleted"}
         filter_obj = SoftDeleteFilter(request, {"deleted": "deleted"}, Festival, MagicMock())
         qs = Festival.objects.with_deleted().filter(user=profile)
         result = filter_obj.queryset(request, qs)
@@ -49,7 +55,9 @@ class TestSoftDeleteFilter:
         """When no filter value, returns all."""
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         Festival.objects.create(name="Active", town="Paris", country="FR", user=profile)
-        f_deleted = Festival.objects.create(name="Deleted", town="Paris", country="FR", user=profile)
+        f_deleted = Festival.objects.create(
+            name="Deleted", town="Paris", country="FR", user=profile
+        )
         f_deleted.delete()
 
         request = MagicMock()
@@ -83,6 +91,8 @@ class TestFestivalAdmin:
         assert "Deleted" in str(html)
 
     def test_restore_festivals_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
         f1 = Festival.objects.create(name="F1", town="Paris", country="FR", user=profile)
         f2 = Festival.objects.create(name="F2", town="Paris", country="FR", user=profile)
@@ -92,23 +102,27 @@ class TestFestivalAdmin:
         admin = self._get_admin()
         request = MagicMock()
         queryset = Festival.objects.with_deleted().filter(user=profile)
-        admin.restore_festivals(request, queryset)
 
-        request.message_user.assert_called_once()
-        call_args = str(request.message_user.call_args)
-        assert "2" in call_args
+        with patch.object(admin, "message_user") as mock_message:
+            admin.restore_festivals(request, queryset)
+            mock_message.assert_called_once()
+            call_args = str(mock_message.call_args)
+            assert "2" in call_args
 
     def test_hard_delete_festivals_action(self):
+        from unittest.mock import patch
+
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        f1 = Festival.objects.create(name="F1", town="Paris", country="FR", user=profile)
-        f2 = Festival.objects.create(name="F2", town="Paris", country="FR", user=profile)
+        Festival.objects.create(name="F1", town="Paris", country="FR", user=profile)
+        Festival.objects.create(name="F2", town="Paris", country="FR", user=profile)
 
         admin = self._get_admin()
         request = MagicMock()
         queryset = Festival.objects.with_deleted().filter(user=profile)
-        admin.hard_delete_festivals(request, queryset)
 
-        request.message_user.assert_called_once()
+        with patch.object(admin, "message_user") as mock_message:
+            admin.hard_delete_festivals(request, queryset)
+            mock_message.assert_called_once()
         assert Festival.objects.with_deleted().filter(user=profile).count() == 0
 
     def test_get_queryset_includes_deleted(self):

@@ -27,7 +27,7 @@ class PerformanceSerializer(serializers.ModelSerializer):
     )
     trailer = NormalizedURLField(required=False, allow_blank=True, max_length=100)
     dossier_ids = serializers.ListField(
-        child=serializers.IntegerField(allow_null=True),
+        child=serializers.IntegerField(),
         write_only=True,
         required=False,
         allow_empty=True,
@@ -52,9 +52,6 @@ class PerformanceSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         dossier_files = validated_data.pop("dossier_files", [])
         dossier_ids = validated_data.pop("dossier_ids", None)
-        if dossier_ids == [""]:
-            dossier_ids = []
-        print("DOSSIERS:", dossier_ids, dossier_files)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

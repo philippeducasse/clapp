@@ -1,5 +1,6 @@
 """Tests for organisations/services.py."""
-from unittest.mock import MagicMock, patch
+
+from unittest.mock import MagicMock
 
 import pytest
 from django.utils import timezone
@@ -12,7 +13,6 @@ from organisations.services import (
     format_email,
     generate_application_mail_prompt,
     generate_enrich_prompt,
-    get_or_create_application,
     parse_performance_ids,
     send_application_email,
     validate_application_recipients,
@@ -36,9 +36,7 @@ class TestFormatContactsForPrompt:
         festival = Festival.objects.create(
             name="Test Fest", town="Paris", country="France", user=profile
         )
-        FestivalContact.objects.create(
-            festival=festival, email="info@fest.com", user=profile
-        )
+        FestivalContact.objects.create(festival=festival, email="info@fest.com", user=profile)
         result = _format_contacts_for_prompt(festival)
         assert "info@fest.com" in result
 
@@ -265,56 +263,6 @@ class TestParsePerformanceIds:
     def test_nonexistent_id_returns_empty(self):
         result = parse_performance_ids(99999)
         assert result == []
-
-
-@pytest.mark.django_db
-class TestGetOrCreateApplication:
-    def test_creates_new_application(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="Orch Fest", town="Paris", country="France", user=profile
-        )
-        app = get_or_create_application(
-            festival, profile, [], 2026, "Hello", "Subject", ["test@test.com"]
-        )
-        assert app.id is not None
-        assert app.message == "Hello"
-
-    def test_returns_existing_draft_application(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="test Fest", town="Paris", country="France", user=profile
-        )
-        # Create first application
-        app1 = get_or_create_application(
-            festival, profile, [], 2026, "First", "Subject1", ["test@test.com"]
-        )
-        # Get or create again - since "test" is in org name, should create new
-        app2 = get_or_create_application(
-            festival, profile, [], 2026, "Second", "Subject2", ["test@test.com"]
-        )
-        assert app2 is not None
-
-    def test_existing_applied_application_raises(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="Real Fest", town="Paris", country="France", user=profile
-        )
-        from django.contrib.contenttypes.models import ContentType
-
-        ct = ContentType.objects.get_for_model(Festival)
-        Application.objects.create(
-            content_type=ct,
-            object_id=festival.id,
-            profile=profile,
-            status="APPLIED",
-            application_date=timezone.now().date(),
-            email_recipients=["contact@real.com"],
-        )
-        with pytest.raises(ValueError, match="already exists"):
-            get_or_create_application(
-                festival, profile, [], 2026, "Second", "Subject2", ["contact@real.com"]
-            )
 
 
 @pytest.mark.django_db
