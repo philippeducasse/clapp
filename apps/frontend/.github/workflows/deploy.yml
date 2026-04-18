@@ -60,7 +60,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build NextJs image
-        run: docker build --build-arg NEXT_PUBLIC_BACKEND_URL=http://django:8000 -t ${{ secrets.DOCKER_USERNAME }}/clapp_frontend:latest .
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_BACKEND_URL=http://django:8000 \
+            --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/clapp_frontend:latest \
+            .
 
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/clapp_frontend:latest
