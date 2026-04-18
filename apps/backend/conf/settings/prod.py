@@ -1,10 +1,16 @@
 import os
 
 from .base import *  # noqa
+import sentry_sdk
 
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 DEBUG = False
 ENVIRONMENT = "prod"
+
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    send_default_pii=False,
+)
 
 APP_URL = os.getenv("APP_URL", "https://clapp.ovh")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
