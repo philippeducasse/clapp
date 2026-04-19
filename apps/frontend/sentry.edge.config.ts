@@ -17,4 +17,15 @@ Sentry.init({
   // Enable sending user PII (Personally Identifiable Information)
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: true,
+
+  beforeSend(event, hint) {
+    // Filter out Sentry's own internal OTel postEvent noise (known issue in @sentry/nextjs v10)
+    const message = hint?.originalException instanceof Error
+      ? hint.originalException.message
+      : String(hint?.originalException ?? "");
+    if (message.includes("postEvent") && message.includes("Method not found")) {
+      return null;
+    }
+    return event;
+  },
 });
