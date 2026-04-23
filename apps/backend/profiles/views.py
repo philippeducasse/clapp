@@ -54,11 +54,11 @@ def demo_login(request: Request) -> HttpResponseRedirect:
         user = Profile.objects.get(email=settings.DEMO_USER_EMAIL)
     except Profile.DoesNotExist:
         logger.warning(f"Demo account {settings.DEMO_USER_EMAIL} not found")
-        return Response({"error": "Demo account unavailable"}, status=500)
+        return redirect(f"{settings.APP_URL}/login?error=demo_account_unavailable")
 
     django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     logger.info(f"Demo user {user.email} logged in successfully")
-    return Response(status.HTTP_200_OK)
+    return redirect(f"{settings.APP_URL}/dashboard")
 
 
 @api_view(["POST"])
