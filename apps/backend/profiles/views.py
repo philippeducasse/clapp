@@ -51,7 +51,7 @@ def demo_login(request: Request) -> HttpResponseRedirect:
     """
     Allows users to login in directly to test account without providing credentials
     """
-    TEST_USER_ID = 36
+    TEST_USER_ID = 37
 
     try:
         user = User.objects.get(id=TEST_USER_ID)
