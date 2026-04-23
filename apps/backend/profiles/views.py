@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate, update_session_auth_hash
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
-from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -51,16 +50,14 @@ def demo_login(request: Request) -> HttpResponseRedirect:
     """
     Allows users to login in directly to test account without providing credentials
     """
-    TEST_USER_ID = 37
-
     try:
-        user = User.objects.get(id=TEST_USER_ID)
-    except User.DoesNotExist:
-        logger.warning("Demo account not found")
+        user = Profile.objects.get(email=settings.DEMO_USER_EMAIL)
+    except Profile.DoesNotExist:
+        logger.warning(f"Demo account {settings.DEMO_USER_EMAIL} not found")
         return Response({"error": "Demo account unavailable"}, status=500)
 
     django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    logger.info("Test user logged in successfully")
+    logger.info(f"Demo user {user.email} logged in successfully")
     return Response(status.HTTP_200_OK)
 
 
