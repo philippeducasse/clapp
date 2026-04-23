@@ -135,6 +135,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
+        "profiles.permissions.IsNotDemoUser",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 25,
@@ -204,3 +205,6 @@ MICROSOFT_OAUTH_TENANT_ID = os.getenv("MICROSOFT_OAUTH_TENANT_ID", "common")
 MICROSOFT_OAUTH_REDIRECT_URI = os.getenv(
     "MICROSOFT_OAUTH_REDIRECT_URI", "http://localhost:8000/api/profiles/oauth/outlook/callback/"
 )
+
+# Demo user configuration
+DEMO_USER_EMAIL = os.getenv("DEMO_USER_EMAIL", "demo@clapp.ovh")

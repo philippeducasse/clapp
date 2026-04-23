@@ -14,6 +14,7 @@ from profiles.views import (
     ProfileViewSet,
     ReminderViewSet,
     confirm_email,
+    demo_login,
     forgot_password,
     reset_password,
 )
@@ -22,6 +23,7 @@ router: DefaultRouter = DefaultRouter()
 router.register(r"", ProfileViewSet, basename="profile")
 router.register(r"me/reminders", ReminderViewSet, basename="reminder")
 urlpatterns: List[Union[URLPattern, URLResolver]] = [
+    path("demo-login/", demo_login, name="demo-login"),
     path("confirm-email/", confirm_email, name="confirm-email"),
     path("reset-password/", reset_password, name="confirm-email"),
     path("forgot-password/", forgot_password, name="forgot-password"),

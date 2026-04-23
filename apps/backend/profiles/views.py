@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, update_session_auth_hash
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
@@ -42,6 +43,25 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
     except Profile.DoesNotExist:
         logger.warning(f"No user found found for token {token}")
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
+
+
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def demo_login(request: Request) -> HttpResponseRedirect:
+    """
+    Allows users to login in directly to test account without providing credentials
+    """
+    TEST_USER_ID = 36
+
+    try:
+        user = User.objects.get(id=TEST_USER_ID)
+    except User.DoesNotExist:
+        logger.warning("Demo account not found")
+        return Response({"error": "Demo account unavailable"}, status=500)
+
+    django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    logger.info("Test user logged in successfully")
+    return Response(status.HTTP_200_OK)
 
 
 @api_view(["POST"])
