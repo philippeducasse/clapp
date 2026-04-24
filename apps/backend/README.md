@@ -1,36 +1,51 @@
-# switching from gemini to mistral search would shave off a lot in disk space:
+# Clapp Backend
 
-django@6d8a3cbddea5:/$ du -sh /app/.venv/lib/python3.12/site-packages/\* | sort -rh | head -20
-87M /app/.venv/lib/python3.12/site-packages/googleapiclient
-44M /app/.venv/lib/python3.12/site-packages/pandas
-39M /app/.venv/lib/python3.12/site-packages/django
-38M /app/.venv/lib/python3.12/site-packages/numpy.libs
-31M /app/.venv/lib/python3.12/site-packages/numpy
-23M /app/.venv/lib/python3.12/site-packages/phonenumbers
-15M /app/.venv/lib/python3.12/site-packages/grpc
-15M /app/.venv/lib/python3.12/site-packages/google
-11M /app/.venv/lib/python3.12/site-packages/psycopg2_binary.libs
-4.8M /app/.venv/lib/python3.12/site-packages/pydantic_core
-4.2M /app/.venv/lib/python3.12/site-packages/rest_framework
-2.7M /app/.venv/lib/python3.12/site-packages/tzdata
-2.7M /app/.venv/lib/python3.12/site-packages/pytz
-1.9M /app/.venv/lib/python3.12/site-packages/pydantic
-1.8M /app/.venv/lib/python3.12/site-packages/mistralai
-1.8M /app/.venv/lib/python3.12/site-packages/celery
-1.7M /app/.venv/lib/python3.12/site-packages/redis
-1.7M /app/.venv/lib/python3.12/site-packages/prompt_toolkit
-1016K /app/.venv/lib/python3.12/site-packages/pyasn1_modules
-900K /app/.venv/lib/python3.12/site-packages/kombu
+[![Tests](https://github.com/philippeducasse/clapp_backend/actions/workflows/tests.yml/badge.svg)](https://github.com/philippeducasse/clapp_backend/actions/workflows/tests.yml)
+[![Deploy](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml)
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Django](https://img.shields.io/badge/django-6.0-green)
+![DRF](https://img.shields.io/badge/DRF-3.16-red)
 
-# build image
+REST API backend for Clapp — a platform managing performer applications and organizational scheduling for freelance artists.
 
-docker build -f docker/dockerfile -t pducasse/clapp_backend:latest .
+## Stack
 
-# Push to Docker Hub
+- **Framework:** Django 6 + Django REST Framework
+- **Database:** PostgreSQL
+- **Cache / Queue:** Redis + Celery
+- **AI Search:** Mistral AI
+- **Auth integrations:** Google OAuth
+- **Deployment:** Docker + Gunicorn + Nginx
 
-docker push pducasse/clapp_backend:latest
+## Getting started
 
-# loading postgres into container:
+```bash
+# Install dependencies
+uv sync
 
-docker cp data_dump.json clapp-django-1:/app/data_dump.json
-docker compose exec django python manage.py loaddata /app/data_dump.json
+# Configure environment
+cp .env.example .env  # fill in your values
+
+# Run migrations
+python manage.py migrate
+
+# Start dev server
+python manage.py runserver
+```
+
+## Running tests
+
+```bash
+uv run pytest
+```
+
+Coverage reports are generated in `htmlcov/` automatically.
+
+```
+
+## Deployment
+
+Pushes to the `production` branch trigger the CI pipeline, which:
+1. Runs the full test suite
+2. Builds and pushes a Docker image to Docker Hub
+3. Deploys to the remote server via SSH + docker-compose
