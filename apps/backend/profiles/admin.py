@@ -11,7 +11,7 @@ class EmailTemplateInline(admin.TabularInline):
 
 class CustomUserAdmin(UserAdmin):
     model = Profile
-    list_display = ("email", "first_name", "last_name", "is_staff", "is_active")
+    list_display = ("email", "first_name", "last_name", "is_staff", "is_active", "last_login")
     inlines = [EmailTemplateInline]
     list_filter = ("is_staff", "is_active")
     fieldsets = (
