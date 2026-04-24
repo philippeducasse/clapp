@@ -44,6 +44,23 @@ def confirm_email(request: Request) -> HttpResponseRedirect:
         return redirect(f"{settings.APP_URL}/email-confirmation?status=error&message=invalid_token")
 
 
+@api_view(["GET"])
+@permission_classes([permissions.AllowAny])
+def demo_login(request: Request) -> HttpResponseRedirect:
+    """
+    Allows users to login in directly to test account without providing credentials
+    """
+    try:
+        user = Profile.objects.get(email=settings.DEMO_USER_EMAIL)
+    except Profile.DoesNotExist:
+        logger.warning(f"Demo account {settings.DEMO_USER_EMAIL} not found")
+        return redirect(f"{settings.APP_URL}/login?error=demo_account_unavailable")
+
+    django_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    logger.info(f"Demo user {user.email} logged in successfully")
+    return redirect(f"{settings.APP_URL}/dashboard")
+
+
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def forgot_password(request: Request) -> HttpResponseRedirect:
