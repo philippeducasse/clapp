@@ -1,7 +1,8 @@
 # Clapp Backend
 
 [![Tests](https://github.com/philippeducasse/clapp_backend/actions/workflows/tests.yml/badge.svg)](https://github.com/philippeducasse/clapp_backend/actions/workflows/tests.yml)
-[![Deploy](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml/badge.svg)](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml)
+[![Deploy](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/philippeducasse/clapp_backend/actions/workflows/deploy.yml)
+![769 tests](https://img.shields.io/badge/tests-769%20passing-brightgreen)
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![Django](https://img.shields.io/badge/django-6.0-green)
 ![DRF](https://img.shields.io/badge/DRF-3.16-red)
