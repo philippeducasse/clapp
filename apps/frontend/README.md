@@ -1,6 +1,6 @@
 # Clapp Frontend
 
-[![Tests](https://github.com/philippeducasse/clapp_frontend/actions/workflows/test.yml/badge.svg)](https://github.com/philippeducasse/clapp_frontend/actions/workflows/tests.yml)
+[![Tests](https://github.com/philippeducasse/clapp_frontend/actions/workflows/test.yml/badge.svg)](https://github.com/philippeducasse/clapp_frontend/actions/workflows/test.yml)
 [![Deploy](https://github.com/philippeducasse/clapp_frontend/actions/workflows/deploy.yml/badge.svg?branch=production)](https://github.com/philippeducasse/clapp_frontend/actions/workflows/deploy.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js&logoColor=white)](https://nextjs.org/)
