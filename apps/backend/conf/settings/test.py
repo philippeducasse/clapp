@@ -2,6 +2,11 @@
 
 import os
 
+from cryptography.fernet import Fernet
+
+if not os.environ.get("FERNET_KEY"):
+    os.environ["FERNET_KEY"] = Fernet.generate_key().decode()
+
 from .base import *  # noqa
 
 os.environ["SECRET_KEY"] = "test-secret-key-for-ci"
