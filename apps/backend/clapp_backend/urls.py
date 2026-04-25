@@ -7,6 +7,7 @@ from django.urls import URLPattern, include, path
 urlpatterns: List[URLPattern] = [
     path("admin/", admin.site.urls),
     path("health/", lambda request: JsonResponse({"status": "ok"})),
+    path("sentry-debug/", lambda request: 1 / 0),
     path(
         "api/",
         include(
