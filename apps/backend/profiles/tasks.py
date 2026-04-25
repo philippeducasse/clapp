@@ -124,6 +124,9 @@ def check_and_set_reminders() -> int:
 
         except Exception as e:
             logger.error(f"Failed to send reminder {reminder.id}: {str(e)}")
+            if reminder.organisation is None:
+                reminder.is_sent = True
+                reminder.save()
 
     logger.info(f"Sent {sent_count} reminders")
 
@@ -131,6 +134,8 @@ def check_and_set_reminders() -> int:
 
 
 def send_reminder_notification(reminder: Reminder):
+    if reminder.organisation is None:
+        raise ValueError(f"Organisation for reminder {reminder.id} no longer exists")
     subject = f"Reminder: {reminder.organisation.name}"
     message = f"""
 Hello,
