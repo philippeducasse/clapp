@@ -3,6 +3,7 @@ from typing import List
 from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import URLPattern, include, path
+from drf_spectacular.views import SpectacularAPIView
 
 urlpatterns: List[URLPattern] = [
     path("clappmin/", admin.site.urls),
@@ -20,6 +21,7 @@ urlpatterns: List[URLPattern] = [
                 path("venues/", include("organisations.venues.urls")),
                 path("profiles/", include("profiles.urls")),
                 path("support/", include("support.urls")),
+                path('schema/', SpectacularAPIView.as_view(), name='schema'),
             ]
         ),
     ),
