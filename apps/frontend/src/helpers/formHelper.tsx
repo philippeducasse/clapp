@@ -229,7 +229,7 @@ export const createZodFormSchema = (
         zodType = z
           .string()
           .regex(
-            /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/,
+            /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w .\-@]*)*\/?$/,
             "Please enter a valid URL",
           );
         break;
