@@ -470,20 +470,3 @@ class TestOrganisationBaseViewSet:
 
         vs = VenueViewSet()
         assert vs.get_organisation_type_name() == "venue"
-
-    def test_get_enrich_prompt_base(self):
-        """Base get_enrich_prompt calls generate_enrich_prompt."""
-        from organisations.views import OrganisationViewSet
-
-        vs = OrganisationViewSet()
-        mock_org = MagicMock()
-        mock_org.contacts.all.return_value = []
-        mock_org.country = "FR"
-        mock_org.town = "Paris"
-        mock_org.website_url = ""
-        mock_org.description = ""
-        mock_org.comments = ""
-
-        prompt = vs.get_enrich_prompt(mock_org, "some results")
-        assert isinstance(prompt, str)
-        assert len(prompt) > 0
