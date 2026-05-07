@@ -25,7 +25,6 @@ from .services import (
     extract_search_results,
     format_email,
     generate_application_mail_prompt,
-    generate_enrich_prompt,
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
@@ -128,13 +127,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         Used for search queries and prompts.
         """
         return "organisation"
-
-    def get_enrich_prompt(self, organisation: Organisation, search_results: str) -> str:
-        """
-        Generate enrichment prompt for the organisation.
-        Override in subclasses to provide type-specific prompts.
-        """
-        return generate_enrich_prompt(organisation, search_results)
 
     def get_queryset(self):
         """Return the base queryset for any organisation type.
