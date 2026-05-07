@@ -12,7 +12,6 @@ from organisations.services import (
     create_form_application,
     format_email,
     generate_application_mail_prompt,
-    generate_enrich_prompt,
     parse_performance_ids,
     send_application_email,
     validate_application_recipients,
@@ -51,39 +50,6 @@ class TestFormatContactsForPrompt:
         result = _format_contacts_for_prompt(festival)
         assert "Alice" in result
         assert "Director" in result
-
-
-@pytest.mark.django_db
-class TestGenerateEnrichPrompt:
-    def test_returns_string_prompt(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="Test Fest", town="Paris", country="France", user=profile
-        )
-        prompt = generate_enrich_prompt(festival, "some search results")
-        assert isinstance(prompt, str)
-        assert "France" in prompt
-        assert "Paris" in prompt
-
-    def test_with_no_search_results(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="Test Fest", town="Paris", country="France", user=profile
-        )
-        prompt = generate_enrich_prompt(festival, None)
-        assert isinstance(prompt, str)
-        assert "No search results" in prompt
-
-    def test_with_contacts(self):
-        profile = Profile.objects.create_user(email="t@example.com", password="pass")
-        festival = Festival.objects.create(
-            name="Test Fest", town="Paris", country="France", user=profile
-        )
-        FestivalContact.objects.create(
-            festival=festival, email="contact@fest.com", name="Bob", role="Manager", user=profile
-        )
-        prompt = generate_enrich_prompt(festival, "results")
-        assert "Bob" in prompt or "contact@fest.com" in prompt
 
 
 @pytest.mark.django_db
