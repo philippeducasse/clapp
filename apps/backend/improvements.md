@@ -67,10 +67,6 @@ Each module would be deep: a small interface hiding the logic that belongs there
 
 ## Other findings
 
-### Dead code
-- `services/tests/test_gemini_service.py` is entirely commented out. The Gemini integration is gone; the file should be deleted.
-- `generate_enrich_prompt()` in `organisations/services.py` (~line 90) is the generic fallback version, never called — all three subclasses override `get_enrich_prompt()` with type-specific versions, and `OrganisationViewSet` is never instantiated directly.
-
 ### Security
 - `FIELD_ENCRYPTION_KEY` in `clapp_backend/base.py` has a hardcoded fallback Fernet key. A deployment that omits the `FERNET_KEY` env var will encrypt `email_host_password` and OAuth tokens with a publicly known key, with no error raised.
 
