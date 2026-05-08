@@ -109,7 +109,6 @@ const ProfileForm = ({
         let updatedProfile;
         if (isEmailConfig || isDefaultSubject) {
           updatedProfile = { ...profile, ...values } as Profile;
-          console.log({ values, updatedProfile });
         } else {
           updatedProfile = { ...values, id: profile.id } as Profile;
         }

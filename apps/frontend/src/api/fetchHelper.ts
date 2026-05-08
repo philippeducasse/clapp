@@ -13,7 +13,7 @@ const getFullUrl = (url: string): string => {
     typeof window === "undefined"
       ? process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000"
       : "";
-  console.log("BASE URL: ", baseUrl, "PUBLIC_BACKEND_URL ", process.env.NEXT_PUBLIC_BACKEND_URL);
+  // console.log("BASE URL: ", baseUrl, "PUBLIC_BACKEND_URL ", process.env.NEXT_PUBLIC_BACKEND_URL);
   return `${baseUrl}${url}`;
 };
 
@@ -31,10 +31,7 @@ const getServerCookies = async (): Promise<string> => {
   return "";
 };
 
-const baseRequest = async (
-  url: string,
-  options: RequestInit = {},
-): Promise<Response> => {
+const baseRequest = async (url: string, options: RequestInit = {}): Promise<Response> => {
   const headers: Record<string, string> = {
     Accept: "application/json",
     ...(options.headers as Record<string, string>),
@@ -108,10 +105,7 @@ export const sendRequest = async <TReq, TRes>(
   return handleResponse<TRes>(res, url, toastMessage ?? "Success");
 };
 
-export const deleteRequest = async (
-  url: string,
-  toastMessage?: string,
-): Promise<void> => {
+export const deleteRequest = async (url: string, toastMessage?: string): Promise<void> => {
   const res = await baseRequest(url, { method: "DELETE" });
   await handleResponse(res, url, toastMessage ?? "Successfully deleted");
 };

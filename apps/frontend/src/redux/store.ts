@@ -6,9 +6,9 @@ export const store = configureStore({
   devTools: process.env.NODE_ENV !== "production",
 });
 
-store.subscribe(() => {
-  console.log("State updated:", store.getState());
-});
+// store.subscribe(() => {
+//   console.log("State updated:", store.getState());
+// });
 
 export type AppStore = typeof store;
 export type AppDispatch = typeof store.dispatch;
