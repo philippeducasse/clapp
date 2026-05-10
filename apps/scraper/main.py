@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import yaml
 from pydantic import BaseModel
 from schemas.schemas import ScrapedFestival
-from parser import parse_buskers_central
+from parser import parse_buskers_central, parse_open_street
 load_dotenv()
 
 app = FastAPI()
@@ -28,15 +28,19 @@ async def fetch_clapp_schema():
 class ScrapeRequest(BaseModel):
     url: str
 
-@app.post("/basic-scrape")
-async def basic_scrape(request: ScrapeRequest) -> list[ScrapedFestival]:
+@app.post("/buskerscentral")
+async def scrape_buskers_central(request: ScrapeRequest) -> list[ScrapedFestival]:
     async with httpx.AsyncClient() as client:
         response = await client.get(request.url)
-        last_modified = response.headers.get("last_modified")
-
-        print(f"Last modified: {last_modified}")
         festivals = parse_buskers_central(response.text)
-        print(festivals)
+
+    return festivals
+
+@app.post("/openstreet")
+async def scrape_open_street(request: ScrapeRequest) -> list[ScrapedFestival]:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(request.url)
+        festivals = parse_open_street(response.text)
 
     return festivals
 
