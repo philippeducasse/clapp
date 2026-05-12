@@ -1,10 +1,5 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useEffect, useState } from "react";
 import { Festival } from "@/interfaces/entities/Festival";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getFestivalFormFields } from "../../helpers/form/getFestivalFormFields";
 import { festivalApiService } from "@/api/festivalApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -16,6 +11,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
+import { useEntityForm } from "@/hooks/useEntityForm";
 
 interface FestivalBasicInfoFormProps {
   action: Action;
@@ -28,33 +24,15 @@ const FestivalBasicInfoForm = ({ action }: FestivalBasicInfoFormProps) => {
   const festivalId = Number(params?.id);
   const festival = useSelector((state: RootState) => selectFestival(state, festivalId || -1));
   const formFields = getFestivalFormFields();
-  const formSchema = createZodFormSchema(formFields);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const { form, isLoading, setIsLoading } = useEntityForm(
+    festival,
+    festivalId,
+    formFields,
+    refreshFestival,
+    dispatch
+  );
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, festival),
-    mode: "onSubmit",
-  });
-
-  // Fetch festival data if not available
-  useEffect(() => {
-    if (!festival && festivalId) {
-      refreshFestival(festivalId, dispatch);
-      setInitialDataLoaded(true);
-    }
-  }, [festivalId, festival, dispatch]);
-
-  // Reset form when festival data changes (but only once)
-  useEffect(() => {
-    if (festival && initialDataLoaded) {
-      form.reset(sanitizeFormData(festival));
-      setInitialDataLoaded(false);
-    }
-  }, [festival, form, initialDataLoaded]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {

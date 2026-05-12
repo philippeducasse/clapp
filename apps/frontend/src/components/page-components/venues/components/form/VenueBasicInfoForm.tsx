@@ -1,10 +1,5 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useEffect, useState } from "react";
 import { Venue } from "@/interfaces/entities/Venue";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { getVenueFormFields } from "../../helpers/form/getVenueFormFields";
 import { venueApiService } from "@/api/venueApiService";
 import { useRouter, useParams } from "next/navigation";
@@ -16,6 +11,7 @@ import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
+import { useEntityForm } from "@/hooks/useEntityForm";
 
 interface VenueFormProps {
   action: Action;
@@ -28,33 +24,9 @@ const VenueBasicInfoForm = ({ action }: VenueFormProps) => {
   const venueId = Number(params?.id);
   const venue = useSelector((state: RootState) => selectVenue(state, venueId || -1));
   const formFields = getVenueFormFields();
-  const formSchema = createZodFormSchema(formFields);
-  const [isLoading, setIsLoading] = useState(false);
-  const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+  const { form, isLoading, setIsLoading } = useEntityForm(venue, venueId, formFields, refreshVenue, dispatch);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, venue),
-    mode: "onSubmit",
-  });
-
-  // Fetch venue data if not available
-  useEffect(() => {
-    if (!venue && venueId) {
-      refreshVenue(venueId, dispatch);
-      setInitialDataLoaded(true);
-    }
-  }, [venueId, venue, dispatch]);
-
-  // Reset form when venue data changes (but only once)
-  useEffect(() => {
-    if (venue && initialDataLoaded) {
-      form.reset(sanitizeFormData(venue));
-      setInitialDataLoaded(false);
-    }
-  }, [venue, form, initialDataLoaded]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
