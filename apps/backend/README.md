@@ -7,7 +7,7 @@
 ![Django](https://img.shields.io/badge/django-6.0-green)
 ![DRF](https://img.shields.io/badge/DRF-3.16-red)
 
-REST API backend for Clapp — a platform managing performer applications and organizational scheduling for freelance artists.
+REST API backend for Clapp: a platform managing performer applications and organizational scheduling for freelance artists.
 
 ## Stack
 
