@@ -1,6 +1,9 @@
 "use client";
 import { useCallback, useMemo, useState } from "react";
-import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
+import {
+  Application,
+  ApplicationStatus,
+} from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
@@ -24,7 +27,9 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const [applicationData, setApplicationData] =
     useState<PaginatedResponse<Application>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(null);
+  const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(
+    null,
+  );
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteApplicationId(id);
@@ -47,11 +52,16 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
 
   const handleStatusChange = useCallback(
     async (id: number, status: ApplicationStatus) => {
-      const updatedApplication = await applicationApiService.changeStatus(id, status);
+      const updatedApplication = await applicationApiService.changeStatus(
+        id,
+        status,
+      );
 
       setApplicationData((prev) => ({
         ...prev,
-        results: prev.results.map((app) => (app.id === id ? updatedApplication : app)),
+        results: prev.results.map((app) =>
+          app.id === id ? updatedApplication : app,
+        ),
       }));
 
       dispatch(updateApplication(updatedApplication));
@@ -80,6 +90,7 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         onConfirm={onConfirmDelete}
         itemName="application"
       />
+
       <DataTable
         columns={columns}
         data={applicationData.results}
