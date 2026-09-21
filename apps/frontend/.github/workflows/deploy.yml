@@ -1,0 +1,87 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull backend image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest
+
+      - name: Start Django backend
+        run: |
+          docker run -d \
+            --name django-backend \
+            -p 8000:8000 \
+            -e DJANGO_SETTINGS_MODULE=conf.settings.test \
+            --entrypoint /bin/bash \
+            ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest \
+            -c "python manage.py migrate && python manage.py create_test_user && python manage.py runserver 0.0.0.0:8000"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm run test
+
+      - name: Show Django logs on failure
+        if: failure()
+        run: docker logs django-backend
+
+  build_and_deploy_image:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build NextJs image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_BACKEND_URL=http://django:8000 \
+            --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/clapp_frontend:latest \
+            .
+
+      - name: Push to registry
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/clapp_frontend:latest
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/clapp
+            docker compose pull next
+            docker compose up -d next

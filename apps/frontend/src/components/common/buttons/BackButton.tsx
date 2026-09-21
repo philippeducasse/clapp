@@ -1,0 +1,28 @@
+import { Button } from "../../ui/button";
+import { useRouter } from "next/navigation";
+import React from "react";
+import { Undo2 } from "lucide-react";
+
+interface BackButtonProps {
+  href: string;
+  label?: string;
+  icon?: boolean;
+  size?: "icon" | "default" | "sm" | "lg" | null | undefined;
+}
+
+const BackButton = ({ label, href, icon = true, size = "default" }: BackButtonProps) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(href);
+  };
+
+  return (
+    <Button size={size} variant="secondary" onClick={handleClick} type="button">
+      {icon && <Undo2 className="text-primary" />}
+      {label ?? "Go back"}
+    </Button>
+  );
+};
+
+export default BackButton;

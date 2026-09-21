@@ -1,0 +1,217 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { CircleUser, Cog, PenTool } from "lucide-react";
+import EditButton from "@/components/common/buttons/EditButton";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { getBasicProfileInfo } from "../helpers/getBasicProfileInfo";
+import { getProfileContactInfo } from "../helpers/getProfileContactInfo";
+import { useRouter } from "next/navigation";
+import { Info, NotebookTabs } from "lucide-react";
+import DetailsViewHeader from "@/components/common/details-view/DetailsViewHeader";
+import DetailsViewSection from "@/components/common/details-view/DetailsViewSection";
+import DetailsViewWrapper from "@/components/common/details-view/DetailsViewWrapper";
+import AddSection from "@/components/common/buttons/AddSection";
+import { profileApiService } from "@/api/profileApiService";
+import { performanceApiService } from "@/api/performanceApiService";
+import { selectProfile, updateProfile } from "@/redux/slices/authSlice";
+import { DeleteModal } from "@/components/common/modals/DeleteModal";
+import PerformanceViewSection from "./PerformanceViewSection";
+import EmailTemplatesSection from "./EmailTemplatesSection";
+import OAuthEmailSection from "./OAuthEmailSection";
+import { Profile } from "@/interfaces/entities/Profile";
+import { Performance } from "@/interfaces/entities/Performance";
+import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
+import { getPreferencesInfo } from "../helpers/getPreferencesInfo";
+import { useHashTab } from "@/hooks/useHashTab";
+import Link from "next/link";
+import ProfileRemindersCard from "./ProfileRemindersCard";
+import DeleteButton from "@/components/common/buttons/DeleteButton";
+import { Button } from "@/components/ui/button";
+import { getEmailSettings } from "../helpers/getEmailSettings";
+import { toast } from "sonner";
+import { getDefaultEmailSubject } from "../helpers/getEmailTemplateInfo";
+
+const ProfileView = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const profile = useSelector((state: RootState) => selectProfile(state));
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [itemName, setItemName] = useState<"profile" | "performance" | "email template">(
+    "performance",
+  );
+  const [idToDelete, setIdToDelete] = useState<number | undefined>();
+  const { activeTab, handleTabChange } = useHashTab("basic-information");
+
+  useEffect(() => {
+    const hash = window.location.hash; // e.g. "#email-settings?oauth=outlook&status=success"
+    const queryString = hash.includes("?") ? hash.slice(hash.indexOf("?") + 1) : "";
+    if (!queryString) return;
+
+    const params = new URLSearchParams(queryString);
+    const oauth = params.get("oauth");
+    const status = params.get("status");
+
+    if (oauth && status) {
+      const provider = oauth.charAt(0).toUpperCase() + oauth.slice(1);
+      setTimeout(() => {
+        if (status === "success") {
+          toast.success(`${provider} connected successfully`);
+        } else {
+          toast.error(`Failed to connect ${provider}`);
+        }
+      }, 100);
+    }
+  }, []);
+
+  const handleDelete = (entity: "profile" | "performance" | "email template", index?: number) => {
+    setIdToDelete(index);
+    setItemName(entity);
+    setOpenDeleteDialog(true);
+  };
+  const onConfirmDelete = async () => {
+    try {
+      if (itemName === "profile" && profile) {
+        await profileApiService.remove(profile.id);
+        router.push("/profiles");
+      } else if (itemName === "performance" && idToDelete !== undefined && profile) {
+        await performanceApiService.remove(idToDelete);
+
+        const updatedperformances =
+          profile.performances?.filter((p: Performance) => p.id !== idToDelete) ?? [];
+        const updatedProfile: Profile = {
+          ...profile,
+          performances: updatedperformances,
+        };
+        dispatch(updateProfile(updatedProfile));
+      } else if (itemName === "email template" && idToDelete !== undefined && profile) {
+        const updatedTemplates = profile.emailTemplates?.filter((t) => t.id !== idToDelete) ?? [];
+        const updatedProfileData = await profileApiService.update({
+          ...profile,
+          emailTemplates: updatedTemplates,
+        });
+        dispatch(updateProfile(updatedProfileData));
+      }
+    } catch (error) {
+      console.error(`Error deleting ${itemName}:`, error);
+    }
+  };
+  if (!profile) return;
+  return (
+    <DetailsViewWrapper href="/profile">
+      <DeleteModal
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        onConfirm={onConfirmDelete}
+        itemName={itemName}
+      />
+      <DetailsViewHeader
+        title={profile?.companyName || "Profile"}
+        subtitle={`${profile?.firstName} ${profile.lastName}`}
+        icon={<CircleUser className="text-primary" size={32} />}
+        entityId={profile.id}
+      />
+
+      <DetailsTabs defaultTab={activeTab} onTabChange={handleTabChange}>
+        <Tab name="Basic Information">
+          <DetailsViewSection
+            title="Basic information"
+            icon={<Info className="text-primary" />}
+            data={getBasicProfileInfo(profile)}
+            action={<EditButton href={`/profile/edit`} />}
+          />
+          <DetailsViewSection
+            title="Contact details"
+            icon={<NotebookTabs className="text-primary" />}
+            data={getProfileContactInfo(profile)}
+            action={<EditButton href={`/profile/edit`} />}
+          />
+        </Tab>
+
+        <Tab name="Performances">
+          {profile.performances && profile.performances.length > 0 ? (
+            <PerformanceViewSection
+              performances={profile.performances}
+              onDelete={(performanceId) => handleDelete("performance", performanceId)}
+            />
+          ) : (
+            <p className="flex justify-center py-6">No performances</p>
+          )}
+          <AddSection label="performance" href={`/profile/edit/performances/new`} />
+        </Tab>
+
+        <Tab name="Email Templates">
+          <DetailsViewSection
+            title="Default email subject"
+            icon={<PenTool className="text-primary" />}
+            data={getDefaultEmailSubject(profile)}
+            action={<EditButton href={`/profile/edit/default-subject`} />}
+          />
+          {profile.emailTemplates && profile.emailTemplates.length > 0 ? (
+            <EmailTemplatesSection
+              emailTemplates={profile.emailTemplates}
+              onDelete={(templateId) => handleDelete("email template", templateId)}
+            />
+          ) : (
+            <p className="flex justify-center py-6">No email templates</p>
+          )}
+          <AddSection label="email template" href={`/profile/edit/email-templates/new`} />
+        </Tab>
+
+        <Tab name="Email Settings">
+          <div className="mb-6">
+            <OAuthEmailSection profile={profile} />
+            <DetailsViewSection
+              title="Connect manually"
+              icon={<Cog className="text-primary" />}
+              data={getEmailSettings(profile)}
+              subtitle={
+                <>
+                  These values are used when contacting organisations.{" "}
+                  <Link
+                    href="/help/email-settings"
+                    target="_blank"
+                    className="text-blue-600 hover:text-blue-800 underline"
+                  >
+                    View setup guide
+                  </Link>
+                </>
+              }
+              action={<EditButton href={`/profile/edit/email-settings`} />}
+            />
+          </div>
+        </Tab>
+
+        <Tab name="Account">
+          <DetailsViewSection
+            title="Preferences"
+            icon={<Cog className="text-primary" />}
+            data={getPreferencesInfo(profile)}
+            action={<EditButton href={`/profile/edit/preferences`} />}
+          />
+          <div className="flex gap-4">
+            <Button
+              onClick={() => router.push("/profile/edit/change-password")}
+              variant={"secondary"}
+            >
+              Change Password
+            </Button>
+            <DeleteButton
+              label="Delete account"
+              onDelete={() => handleDelete("profile", profile.id)}
+            />
+          </div>
+        </Tab>
+
+        <Tab name="Reminders">
+          <ProfileRemindersCard />
+        </Tab>
+      </DetailsTabs>
+    </DetailsViewWrapper>
+  );
+};
+
+export default ProfileView;
