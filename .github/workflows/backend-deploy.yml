@@ -1,13 +1,18 @@
-name: deploy
+name: backend deploy
 
 on:
   push:
     branches:
       - production
+    paths:
+      - "apps/backend/**"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
 
     steps:
       - uses: actions/checkout@v4
@@ -39,14 +44,14 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Django image
-        run: docker build -f docker/dockerfile -t  ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest .
+        run: docker build -f apps/backend/docker/dockerfile -t  ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest apps/backend
 
       - name: Push to registry
         run: docker push ${{ secrets.DOCKER_USERNAME }}/clapp_backend:latest
 
       - name: Prepare .env file
         run: |
-          cat docker/.env.basic > .env
+          cat apps/backend/docker/.env.basic > .env
           echo "" >> .env
           echo "REGISTRY_URL=${{ secrets.REGISTRY_URL }}" >> .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
@@ -67,8 +72,8 @@ jobs:
         uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a # v47.0.4
         with:
           files: |
-            docker/docker-compose.yml
-            docker/nginx.conf
+            apps/backend/docker/docker-compose.yml
+            apps/backend/docker/nginx.conf
 
       - name: Copy .env file to server
         uses: appleboy/scp-action@v0.1.7
@@ -86,9 +91,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "docker/docker-compose.yml,docker/nginx.conf"
+          source: "apps/backend/docker/docker-compose.yml,apps/backend/docker/nginx.conf"
           target: "~/clapp/"
-          strip_components: 1
+          strip_components: 3
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.0
@@ -98,6 +103,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/clapp
-            docker compose pull 
+            docker compose pull
             docker compose up -d --pull always
             docker image prune -f

@@ -1,11 +1,19 @@
-name: tests
+name: backend tests
 
 on:
   push:
     branches-ignore:
       - production
       - main
+    paths:
+      - "apps/backend/**"
   pull_request:
+    paths:
+      - "apps/backend/**"
+
+defaults:
+  run:
+    working-directory: apps/backend
 
 jobs:
   test:
