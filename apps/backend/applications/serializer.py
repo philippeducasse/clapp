@@ -32,6 +32,31 @@ class ApplicationSerializer(serializers.ModelSerializer):
         source="performances",
     )
 
+    application_year = serializers.IntegerField(read_only=True)
+    season_id = serializers.PrimaryKeyRelatedField(
+        source="season", required=False, allow_null=True, read_only=True
+    )
+
+    def get_fields(self):
+        """
+        Dynamically set the season_id queryset to only include seasons belonging to the current user.
+
+        This prevents users from assigning their applications to seasons owned by other users.
+        The queryset is scoped per-request based on request.user.
+        """
+        fields = super().get_fields()
+        # Get the request from serializer context
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            from applications.models import ApplicationSeason
+
+            # Restrict season choices to only those owned by the current user
+            fields["season_id"].read_only = False
+            fields["season_id"].queryset = ApplicationSeason.objects.filter(
+                profile=request.user
+            )
+        return fields
+
     class Meta:
         model = Application
         fields = [
@@ -52,8 +77,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "attachments_sent",
             "status",
             "comments",
+            "application_year",
+            "season_id",
         ]
-        read_only_fields = ("id", "created_at", "updated_at")
+        read_only_fields = ("id", "created_at", "updated_at", "application_year")
 
     def get_organisation_type_display(self, object):
         if object.content_type:

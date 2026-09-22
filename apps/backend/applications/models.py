@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import Any, List, Tuple
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -29,6 +29,24 @@ APPLICATION_STATUS: List[Tuple[str, str]] = [
 ]
 
 
+class ApplicationSeason(models.Model):
+    """Represents an application season/year for organizing applications."""
+
+    year = models.IntegerField(unique=True)
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name="application_seasons"
+    )
+    name = models.CharField(max_length=100, blank=True)  # e.g., "2026 Season", "Fall 2026"
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-year"]
+        unique_together = [["year", "profile"]]
+
+    def __str__(self) -> str:
+        return f"{self.year} - {self.profile.email if self.profile else 'No profile'}"
+
+
 class Application(models.Model):
     # what type of model is this?
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
@@ -45,6 +63,13 @@ class Application(models.Model):
     organisation = GenericForeignKey("content_type", "object_id")
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="applications")
+    season = models.ForeignKey(
+        ApplicationSeason,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="applications",
+    )
     performances = models.ManyToManyField(Performance, related_name="applications", blank=True)
     application_date = models.DateField(blank=True, null=True)
     application_year_value = models.IntegerField(blank=True, null=True)
@@ -88,23 +113,3 @@ class Application(models.Model):
         """Restore a soft-deleted application"""
         self.deleted_at = None
         self.save()
-
-    @property
-    def application_year(self) -> int | None:
-        """Get the application year.
-
-        Returns stored application_year_value if set, otherwise derives from application_date.
-        """
-        if self.application_year_value is not None:
-            return self.application_year_value
-
-        if not self.application_date:
-            return None
-
-        month = self.application_date.month
-        year = self.application_date.year
-
-        if 9 <= month <= 12:
-            return year + 1
-        else:
-            return year

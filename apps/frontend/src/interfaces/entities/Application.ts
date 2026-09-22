@@ -20,6 +20,7 @@ export interface Application {
   createdAt: string;
   updatedAt?: string;
   emailRecipients?: string[];
+  applicationYear?: number;
 }
 
 export type ApplicationCreate = Partial<
