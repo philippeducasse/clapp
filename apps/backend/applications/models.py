@@ -93,7 +93,7 @@ class Application(models.Model):
 
     def __str__(self) -> str:
         org_name = self.organisation.name if self.organisation else "No organisation"
-        return f"{self.id}:{org_name} {self.application_year}"
+        return f"{self.id}:{org_name} {self.application_year_value}"
 
     def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
         """Soft delete the application"""
