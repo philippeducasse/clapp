@@ -40,10 +40,12 @@ const ProfileForm = ({
   const profile = useSelector((state: RootState) => selectProfile(state));
   const [isLoading, setIsLoading] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
-  const [isOtherEmailHost, setIsOtherEmailHost] = useState(profile?.emailHost === "OTHER");
-  const [selectedEmailHost, setSelectedEmailHost] = useState<EmailHost | null | undefined>(
-    profile?.emailHost,
+  const [isOtherEmailHost, setIsOtherEmailHost] = useState(
+    profile?.emailHost === "OTHER",
   );
+  const [selectedEmailHost, setSelectedEmailHost] = useState<
+    EmailHost | null | undefined
+  >(profile?.emailHost);
 
   const formFields = useMemo(() => {
     if (isDefaultSubject) return getDefaultEmailSubjectFormField();
@@ -52,7 +54,10 @@ const ProfileForm = ({
       : getProfileFormFields();
   }, [isDefaultSubject, isEmailConfig, isOtherEmailHost, selectedEmailHost]);
 
-  const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
+  const formSchema = useMemo(
+    () => createZodFormSchema(formFields),
+    [formFields],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -112,8 +117,10 @@ const ProfileForm = ({
         } else {
           updatedProfile = { ...values, id: profile.id } as Profile;
         }
-        const sanitisedData = prepareFormDataForSubmission(updatedProfile, formFields);
-
+        const sanitisedData = prepareFormDataForSubmission(
+          updatedProfile,
+          formFields,
+        );
         await profileApiService.update(sanitisedData);
         dispatch(updateProfile(updatedProfile));
         const tabHash = isDefaultSubject
