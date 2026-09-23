@@ -1,10 +1,10 @@
 from django.db.models import QuerySet
 from django.http import HttpRequest
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
 
 from applications.models import APPLICATION_STATUS, Application, ApplicationSeason
 from applications.serializer import ApplicationSerializer
