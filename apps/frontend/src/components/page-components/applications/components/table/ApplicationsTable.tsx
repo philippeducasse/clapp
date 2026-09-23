@@ -1,12 +1,12 @@
 "use client";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Application,
   ApplicationStatus,
 } from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   setApplications,
   deleteApplication,
@@ -17,6 +17,8 @@ import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
+import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
+import { useHashTab } from "@/hooks/useHashTab";
 
 interface ApplicationsTableProps {
   initialData: PaginatedResponse<Application>;
@@ -24,12 +26,22 @@ interface ApplicationsTableProps {
 
 export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const dispatch = useDispatch();
+
   const [applicationData, setApplicationData] =
     useState<PaginatedResponse<Application>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(
     null,
   );
+
+  const [seasons, setSeasons] = useState<number[]>([]);
+  const { activeTab, handleTabChange } = useHashTab(String(seasons[0]) ?? null);
+
+  useEffect(() => {
+    if (initialData?.metadata?.availableYears) {
+      setSeasons(initialData.metadata.availableYears as number[]);
+    }
+  }, [initialData]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteApplicationId(id);
@@ -91,6 +103,15 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         itemName="application"
       />
 
+      {seasons && (
+        <DetailsTabs defaultTab={activeTab} onTabChange={handleTabChange}>
+          {seasons.map((season) => (
+            <Tab name={String(season)}>
+              <></>
+            </Tab>
+          ))}
+        </DetailsTabs>
+      )}
       <DataTable
         columns={columns}
         data={applicationData.results}
