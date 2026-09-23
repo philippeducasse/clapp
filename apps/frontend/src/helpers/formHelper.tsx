@@ -1,4 +1,7 @@
-import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
+import {
+  ControlledFormElement,
+  SelectOptions,
+} from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { z, ZodObject, ZodType } from "zod";
 import { capitalize } from "lodash";
@@ -15,6 +18,7 @@ import ControlledSearch from "@/components/common/form/form-fields/ControlledSea
 import ControlledMultiEmail from "@/components/common/form/form-fields/ControlledMultiEmail";
 import { Input } from "@/components/ui/input";
 import ControlledSlider from "@/components/common/form/form-fields/ControlledSlider";
+
 export const getControlledInputs = (
   formField: ControlledFormElement,
   field: ControllerRenderProps,
@@ -25,7 +29,11 @@ export const getControlledInputs = (
     switch (formField.type) {
       case ControlledFormElementType.SELECT:
         return formField.options ? (
-          <ControlledSelect field={field} options={formField.options} showLabels={showLabels} />
+          <ControlledSelect
+            field={field}
+            options={formField.options}
+            showLabels={showLabels}
+          />
         ) : null;
       case ControlledFormElementType.MULTI_SELECT:
         return formField.options ? (
@@ -48,13 +56,24 @@ export const getControlledInputs = (
         return <Input type="password" {...field} />;
 
       case ControlledFormElementType.SEARCH:
-        return <ControlledSearch field={field} organisationType={organisationType} />;
+        return (
+          <ControlledSearch field={field} organisationType={organisationType} />
+        );
       case ControlledFormElementType.SLIDER:
         return formField.sliderOptions ? (
-          <ControlledSlider field={field} sliderOptions={formField.sliderOptions} />
+          <ControlledSlider
+            field={field}
+            sliderOptions={formField.sliderOptions}
+          />
         ) : null;
       default:
-        return <ControlledText field={field} type={formField.type} showLabels={showLabels} />;
+        return (
+          <ControlledText
+            field={field}
+            type={formField.type}
+            showLabels={showLabels}
+          />
+        );
     }
   }
 };
@@ -67,10 +86,8 @@ export const sanitizeFormData = <T extends Record<string, unknown>>(
 
   // Map dossiers to dossierFiles for form initialization
   if ("dossiers" in sanitizedData && Array.isArray(sanitizedData.dossiers)) {
-    sanitizedData["dossierFiles" as keyof T] = sanitizedData.dossiers as T[Extract<
-      keyof T,
-      string
-    >];
+    sanitizedData["dossierFiles" as keyof T] =
+      sanitizedData.dossiers as T[Extract<keyof T, string>];
   }
 
   for (const key in sanitizedData) {
@@ -104,27 +121,41 @@ export const prepareFormDataForSubmission = <T extends Record<string, unknown>>(
 ): T => {
   const preparedData = { ...data } as T;
 
-  const fieldConfigMap = new Map<string, { type: ControlledFormElementType; required: boolean }>();
+  const fieldConfigMap = new Map<
+    string,
+    { type: ControlledFormElementType; required: boolean }
+  >();
   formFields?.forEach((field) => {
-    fieldConfigMap.set(field.fieldName, { type: field.type, required: field.required ?? false });
+    fieldConfigMap.set(field.fieldName, {
+      type: field.type,
+      required: field.required ?? false,
+    });
   });
   for (const key in preparedData) {
     if (Object.prototype.hasOwnProperty.call(preparedData, key)) {
       const value = preparedData[key];
       const fieldConfig = fieldConfigMap.get(key);
 
-      if ((value === "" || value === null || value === undefined) && !fieldConfig?.required) {
+      if (
+        (value === "" || value === null || value === undefined) &&
+        !fieldConfig?.required
+      ) {
         if (
           fieldConfig?.type === ControlledFormElementType.DATE ||
           fieldConfig?.type === ControlledFormElementType.NUMBER ||
           fieldConfig?.type === ControlledFormElementType.URL ||
-          fieldConfig?.type === ControlledFormElementType.EMAIL
+          fieldConfig?.type === ControlledFormElementType.EMAIL ||
+          fieldConfig?.type === ControlledFormElementType.SELECT
         ) {
           delete preparedData[key];
         }
       }
 
-      if (Array.isArray(value) && value.length === 0 && !fieldConfig?.required) {
+      if (
+        Array.isArray(value) &&
+        value.length === 0 &&
+        !fieldConfig?.required
+      ) {
         if (
           fieldConfig?.type === ControlledFormElementType.MULTI_SELECT ||
           fieldConfig?.type === ControlledFormElementType.MULTI_EMAIL
@@ -174,7 +205,8 @@ export const createZodFormSchema = (
             const isValidExtension = ACCEPTED_EXCEL_EXTENSIONS.some((ext) =>
               data.name.toLowerCase().endsWith(ext),
             );
-            const isValidMimeType = !data.type || ACCEPTED_EXCEL_MIME_TYPES.includes(data.type);
+            const isValidMimeType =
+              !data.type || ACCEPTED_EXCEL_MIME_TYPES.includes(data.type);
             return isValidExtension && isValidMimeType;
           },
           {
@@ -207,15 +239,26 @@ export const createZodFormSchema = (
           );
         break;
       case ControlledFormElementType.DATE:
-        zodType = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in the format YYYY-MM-DD");
+        zodType = z
+          .string()
+          .regex(
+            /^\d{4}-\d{2}-\d{2}$/,
+            "Date must be in the format YYYY-MM-DD",
+          );
         break;
       case ControlledFormElementType.PASSWORD:
         if (isRegistration) {
           zodType = z
             .string()
             .min(1, "Password is required")
-            .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-            .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+            .regex(
+              /[A-Z]/,
+              "Password must contain at least one uppercase letter",
+            )
+            .regex(
+              /[a-z]/,
+              "Password must contain at least one lowercase letter",
+            )
             .regex(/\d/, "Password must contain at least one digit")
             .regex(
               /[!@#$%^&*(),.?":{}|<>]/,
@@ -282,7 +325,9 @@ export const createZodFormSchema = (
   return z.object(schema);
 };
 
-export const getOptions = <T extends Record<string, string>>(optionsEnum: T): SelectOptions[] => {
+export const getOptions = <T extends Record<string, string>>(
+  optionsEnum: T,
+): SelectOptions[] => {
   const options = Object.keys(optionsEnum).map((key) => ({
     value: key,
     label: capitalize(optionsEnum[key].replace(/_/g, " ").toLowerCase()),

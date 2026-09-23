@@ -19,14 +19,19 @@ import { getPreferencesFormFields } from "@/components/page-components/profile/h
 import { profileApiService } from "@/api/profileApiService";
 import { Action, EntityName } from "@/interfaces/Enums";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 
 const EditPreferencesPage = () => {
+  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const profile = useSelector((state: RootState) => selectProfile(state));
   const [isLoading, setIsLoading] = useState(false);
 
   const formFields = useMemo(() => getPreferencesFormFields(), []);
-  const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
+  const formSchema = useMemo(
+    () => createZodFormSchema(formFields),
+    [formFields],
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,15 +56,19 @@ const EditPreferencesPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    try {
-      const submissionData = prepareFormDataForSubmission(values, formFields);
-      const updatedProfile = await profileApiService.update(submissionData);
-      dispatch(updateProfile(updatedProfile));
-      form.reset(sanitizeFormData(updatedProfile));
-    } catch (error) {
-      console.error("Error updating preferences:", error);
-    } finally {
-      setIsLoading(false);
+    if (profile) {
+      try {
+        const submissionData = prepareFormDataForSubmission(values, formFields);
+        const aggregatedData = { ...profile, ...submissionData };
+        const updatedProfile = await profileApiService.update(aggregatedData);
+        dispatch(updateProfile(updatedProfile));
+        form.reset(sanitizeFormData(updatedProfile));
+        router.push("/profile");
+      } catch (error) {
+        console.error("Error updating preferences:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -85,7 +94,7 @@ const EditPreferencesPage = () => {
         isLoading={isLoading}
         action={Action.EDIT}
         submitButtonLabel="Save Preferences"
-        onCancelHref="/profile#preferences"
+        onCancelHref="/profile#account"
       />
     </>
   );

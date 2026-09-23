@@ -21,9 +21,9 @@ export const getPreferencesFormFields = (): ControlledFormElement[] => {
       type: ControlledFormElementType.SELECT,
       required: false,
       options: [
-        { value: "compact", label: "Compact (10 rows)" },
-        { value: "medium", label: "Medium (25 rows)" },
-        { value: "large", label: "Large (50 rows)" },
+        { value: "10", label: "Compact (10 rows)" },
+        { value: "25", label: "Medium (25 rows)" },
+        { value: "50", label: "Large (50 rows)" },
       ],
       helpText: "Choose how many rows to display in tables by default",
     },
@@ -32,7 +32,8 @@ export const getPreferencesFormFields = (): ControlledFormElement[] => {
       fieldName: "currentApplicationYear",
       type: ControlledFormElementType.NUMBER,
       required: false,
-      helpText: 'The year/season you are currently sending applications for. Defaults to current year. <a href="/help/application-year" target="_blank" class="text-blue-600 hover:text-blue-800 underline">more info</a>',
+      helpText:
+        'The year/season you are currently sending applications for. Defaults to current year. <a href="/help/application-year" target="_blank" class="text-blue-600 hover:text-blue-800 underline">more info</a>',
     },
   ];
 };
