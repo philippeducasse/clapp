@@ -17,8 +17,8 @@ import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
-import DetailsTabs, { Tab } from "@/components/common/details-view/DetailsTabs";
-import { useHashTab } from "@/hooks/useHashTab";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface ApplicationsTableProps {
   initialData: PaginatedResponse<Application>;
@@ -34,12 +34,14 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     null,
   );
 
-  const [seasons, setSeasons] = useState<number[]>([]);
-  const { activeTab, handleTabChange } = useHashTab(String(seasons[0]) ?? null);
+  const [seasons, setSeasons] = useState<string[]>([]);
+  const [selectedSeason, setSelectedSeason] = useState<string | undefined>();
 
   useEffect(() => {
-    if (initialData?.metadata?.availableYears) {
-      setSeasons(initialData.metadata.availableYears as number[]);
+    if (initialData?.metadata?.availableSeasons) {
+      const availableSeasons = initialData.metadata.availableSeasons as string[];
+      setSeasons(availableSeasons);
+      setSelectedSeason(availableSeasons[0]);
     }
   }, [initialData]);
 
@@ -94,6 +96,16 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     onStatusChange: handleStatusChange,
   });
   const filters = useMemo(() => getApplicationFilters(), []);
+
+  const fetchApplications = useCallback(
+    (params: Parameters<typeof applicationApiService.getAll>[0]) =>
+      applicationApiService.getAll({
+        ...params,
+        filters: { ...params?.filters, season: selectedSeason },
+      }),
+    [selectedSeason],
+  );
+
   return (
     <>
       <DeleteModal
@@ -104,13 +116,23 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
       />
 
       {seasons && (
-        <DetailsTabs defaultTab={activeTab} onTabChange={handleTabChange}>
+        <div className="inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground mb-4">
           {seasons.map((season) => (
-            <Tab name={String(season)}>
-              <></>
-            </Tab>
+            <Button
+              key={season}
+              type="button"
+              variant="ghost"
+              onClick={() => setSelectedSeason(season)}
+              className={cn(
+                "inline-flex h-auto items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium shadow-none ring-offset-background transition-all hover:bg-transparent hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+                selectedSeason === season &&
+                  "bg-background text-foreground shadow hover:bg-background hover:text-foreground",
+              )}
+            >
+              {season}
+            </Button>
           ))}
-        </DetailsTabs>
+        </div>
       )}
       <DataTable
         columns={columns}
@@ -119,7 +141,7 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
         totalCount={applicationData.count}
-        fetchData={applicationApiService.getAll}
+        fetchData={fetchApplications}
         onDataFetched={handleDataFetched}
       />
     </>

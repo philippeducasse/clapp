@@ -30,21 +30,20 @@ APPLICATION_STATUS: List[Tuple[str, str]] = [
 
 
 class ApplicationSeason(models.Model):
-    """Represents an application season/year for organizing applications."""
+    """Represents an application season for organizing applications, e.g. "2027" or "Christmas"."""
 
-    year = models.IntegerField(unique=True)
+    name = models.CharField(max_length=100)
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="application_seasons"
     )
-    name = models.CharField(max_length=100, blank=True)  # e.g., "2026 Season", "Fall 2026"
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["-year"]
-        unique_together = [["year", "profile"]]
+        ordering = ["-created_at"]
+        unique_together = [["name", "profile"]]
 
     def __str__(self) -> str:
-        return f"{self.year} - {self.profile.email if self.profile else 'No profile'}"
+        return f"{self.name} - {self.profile.email if self.profile else 'No profile'}"
 
 
 class Application(models.Model):

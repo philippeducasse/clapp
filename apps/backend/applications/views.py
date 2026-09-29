@@ -1,3 +1,4 @@
+import django_filters
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django_filters.rest_framework import DjangoFilterBackend
@@ -10,11 +11,21 @@ from applications.models import APPLICATION_STATUS, Application, ApplicationSeas
 from applications.serializer import ApplicationSerializer
 
 
+# converts URL query params into an ORM call.
+class ApplicationFilter(django_filters.FilterSet):
+    # this becomes queryset.filter(season__name=seasonname)
+    season = django_filters.CharFilter(field_name="season__name")
+
+    class Meta:
+        model = Application
+        fields = ["season"]
+
+
 class ApplicationViewSet(viewsets.ModelViewSet):
     queryset = Application.objects.all()
     serializer_class = ApplicationSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ["season"]
+    filterset_class = ApplicationFilter
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
@@ -22,12 +33,12 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         # Get all seasons for this user
         seasons = (
             ApplicationSeason.objects.filter(profile_id=request.user.id)
-            .values_list("year", flat=True)
-            .order_by("-year")
+            .values_list("name", flat=True)
+            .order_by("created_at")
         )
 
         response.data["metadata"] = {
-            "available_years": list(seasons),
+            "available_seasons": list(seasons),
         }
         return response
 
@@ -40,11 +51,9 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
         # If no season filter provided, default to most recent season
         if "season" not in self.request.query_params:
-            most_recent_season = (
-                ApplicationSeason.objects.filter(profile_id=self.request.user.id)
-                .order_by("-year")
-                .first()
-            )
+            most_recent_season = ApplicationSeason.objects.filter(
+                profile_id=self.request.user.id
+            ).first()
 
             if most_recent_season:
                 queryset = queryset.filter(season=most_recent_season)
