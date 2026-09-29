@@ -6,17 +6,6 @@ Generated from codebase analysis on 2026-03-25
 
 ## 🔴 Critical Issues
 
-### 1. Remove Redux Store Console Logging
-
-- **File**: `src/redux/store.ts` (lines 9-11)
-- **Issue**: Store subscription logs entire state on every update
-- **Impact**: Console spam, memory overhead in dev and production
-- **Fix**: Remove the console.log subscription, use Redux DevTools instead
-- **Effort**: 1 minute
-- [ ] Remove console.log subscription
-- [ ] Test Redux state updates don't log to console
-- [ ] Verify Redux DevTools still works in dev
-
 ### 2. Debounce Form Persistence
 
 - **File**: `src/hooks/useFormPersist.ts`

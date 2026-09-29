@@ -6,9 +6,6 @@ export const store = configureStore({
   devTools: process.env.NODE_ENV !== "production",
 });
 
-// store.subscribe(() => {
-// });
-
 export type AppStore = typeof store;
 export type AppDispatch = typeof store.dispatch;
 
