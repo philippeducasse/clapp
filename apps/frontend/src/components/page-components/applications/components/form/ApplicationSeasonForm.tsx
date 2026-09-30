@@ -3,12 +3,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState, useRef } from "react";
-import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
-import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
+import {
+  Application,
+  ApplicationCreate,
+  ApplicationSeason,
+} from "@/interfaces/entities/Application";
+import {
+  createZodFormSchema,
+  sanitizeFormData,
+  getInitialValues,
+} from "@/helpers/formHelper";
 import { applicationApiService } from "@/api/applicationApiService";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { updateApplication, selectApplication } from "@/redux/slices/applicationSlice";
 import { AppDispatch, RootState } from "@/redux/store";
 import { getApplicationSeasonFormFields } from "../../helpers/form/getApplicationSeasonFormFields";
 import FormHeader from "@/components/common/form/FormHeader";
@@ -17,6 +24,7 @@ import { Action } from "@/interfaces/Enums";
 import { EntityName } from "@/interfaces/Enums";
 import { refreshApplication } from "../../helpers/refreshApplication";
 import { selectProfile } from "@/redux/slices/authSlice";
+import { profileApiService } from "@/api/profileApiService";
 
 interface ApplicationSeasonFormProps {
   action: Action;
@@ -26,67 +34,70 @@ const ApplicationSeasonForm = ({ action }: ApplicationSeasonFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
-  const applicationId = Number(params?.id);
-  const application = useSelector((state: RootState) => selectApplication(state, applicationId));
+  const applicationSeasonId = Number(params?.id);
   const profile = useSelector((state: RootState) => selectProfile(state));
-  const performances = profile?.performances ?? [];
-  const seasons = profile?.applicationSeasons ?? [];
-  const formFields = getApplicationSeasonFormFields(performances, seasons);
+  const season = profile?.applicationSeasons?.find(
+    (season) => season.id === applicationSeasonId,
+  );
+  const formFields = getApplicationSeasonFormFields();
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const initialDataLoadedRef = useRef(false);
+
   useEffect(() => {
-    if (action !== Action.CREATE && !application) {
-      refreshApplication(applicationId, dispatch);
+    if (action !== Action.CREATE && !season) {
+      refreshApplication(applicationSeasonId, dispatch);
     }
-  }, [action, applicationId, application, dispatch]);
+  }, [action, applicationSeasonId, season, dispatch]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: getInitialValues(formFields, application as unknown as Record<string, unknown>),
+    defaultValues: getInitialValues(
+      formFields,
+      season as unknown as Record<string, unknown>,
+    ),
     mode: "onSubmit",
   });
 
   useEffect(() => {
-    if (application && !initialDataLoadedRef.current) {
-      const formData = {
-        ...application,
-        organisation:
-          typeof application.organisation === "object"
-            ? application.organisation?.id
-            : application.organisation,
-        performanceIds: application.performances?.map((p) => String(p.id)) ?? [],
-      };
-
-      form.reset(sanitizeFormData(formData as unknown as Record<string, unknown>));
+    if (season && !initialDataLoadedRef.current) {
+      form.reset(
+        sanitizeFormData(season as unknown as Record<string, unknown>),
+      );
       initialDataLoadedRef.current = true;
     }
-  }, [application, form]);
+  }, [season, form]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: { name: string }) => {
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
-        const updatedApplication = {
-          ...application,
+        const updatedApplicationSeason = {
           ...values,
-          id: applicationId,
+          id: applicationSeasonId,
           profileId: profile?.id,
-        } as Application;
-        await applicationApiService.update(updatedApplication);
+        } as ApplicationSeason;
+        await profileApiService.update(updatedApplicationSeason);
 
         const selectedPerformances = performances.filter((p) =>
           (values.performanceIds as string[])?.includes(String(p.id)),
         );
-        dispatch(updateApplication({ ...updatedApplication, performances: selectedPerformances }));
+        dispatch(
+          updateApplication({
+            ...updatedApplication,
+            performances: selectedPerformances,
+          }),
+        );
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
           const application: ApplicationCreate = {
             ...values,
             profileId: profile.id,
-            objectType: (values as Record<string, unknown>).organisationType as string,
-            objectId: (values as Record<string, unknown>).organisation as number,
+            objectType: (values as Record<string, unknown>)
+              .organisationType as string,
+            objectId: (values as Record<string, unknown>)
+              .organisation as number,
           };
           const newApplication = await applicationApiService.create(
             application as unknown as Application,
@@ -101,7 +112,9 @@ const ApplicationSeasonForm = ({ action }: ApplicationSeasonFormProps) => {
     }
   };
 
-  const onCancelHref = applicationId ? `/applications/${application?.id}` : "/applications";
+  const onCancelHref = applicationId
+    ? `/applications/${application?.id}`
+    : "/applications";
 
   return (
     <>

@@ -1,4 +1,7 @@
-import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
+import {
+  ControlledFormElement,
+  SelectOptions,
+} from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
@@ -16,7 +19,9 @@ export interface ApplicableEntity {
   applicationType?: string;
 }
 
-export const getEmailTemplateOptions = (emailTemplates: EmailTemplate[]): SelectOptions[] => {
+export const getEmailTemplateOptions = (
+  emailTemplates: EmailTemplate[],
+): SelectOptions[] => {
   return [
     ...emailTemplates.map((t) => ({
       value: String(t.id),
@@ -25,14 +30,18 @@ export const getEmailTemplateOptions = (emailTemplates: EmailTemplate[]): Select
   ];
 };
 
-export const getPerformanceOptions = (performances: Performance[]): SelectOptions[] => {
+export const getPerformanceOptions = (
+  performances: Performance[],
+): SelectOptions[] => {
   return performances.map((p) => ({
     value: String(p.id),
     label: p.performanceTitle,
   }));
 };
 
-export const getDossierOptions = (dossiers: Dossier[]): SelectOptions[] | undefined => {
+export const getDossierOptions = (
+  dossiers: Dossier[],
+): SelectOptions[] | undefined => {
   if (!dossiers.length) return;
   return dossiers.map((d) => ({
     value: String(d.id),
@@ -60,16 +69,23 @@ export const getApplicationFormFields = (
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
   const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
-  const userLanguageCodes = profile?.spokenLanguages?.length ? profile.spokenLanguages : ["en"];
-  const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
+  const userLanguageCodes = profile?.spokenLanguages?.length
+    ? profile.spokenLanguages
+    : ["en"];
+  const userLanguages = LANGUAGES.filter((lang) =>
+    userLanguageCodes.includes(lang.code),
+  );
 
-  const defaultEmailSubject = interpolateEmailTemplate(profile?.defaultEmailSubject, {
-    firstName: profile?.firstName,
-    lastName: profile?.lastName,
-    companyName: profile?.companyName,
-    organisation: entity?.name,
-    currentYear: new Date().getFullYear(),
-  });
+  const defaultEmailSubject = interpolateEmailTemplate(
+    profile?.defaultEmailSubject,
+    {
+      firstName: profile?.firstName,
+      lastName: profile?.lastName,
+      companyName: profile?.companyName,
+      organisation: entity?.name,
+      currentYear: new Date().getFullYear(),
+    },
+  );
 
   const emailApplicationFields: ControlledFormElement[] = [
     {
@@ -158,7 +174,8 @@ export const getApplicationFormFields = (
       fieldName: "performances",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
-      helpText: "Select with which performances you want to apply to this organisation",
+      helpText:
+        "Select with which performances you want to apply to this organisation",
     },
   ];
 
@@ -166,12 +183,21 @@ export const getApplicationFormFields = (
     displayedFields.push(...emailApplicationFields);
   }
 
-  displayedFields.push({
-    label: "Comments",
-    fieldName: "comments",
-    type: ControlledFormElementType.TEXT,
-    helpText: "These are for you and won't be included in the application",
-  });
+  displayedFields.push(
+    {
+      label: "Comments",
+      fieldName: "comments",
+      type: ControlledFormElementType.TEXT,
+      helpText: "These are for you and won't be included in the application",
+    },
+    {
+      label: "Season",
+      fieldName: "season",
+      type: ControlledFormElementType.SELECT,
+      helpText: "The season for which you are applying to",
+      options: getSeasonOptions(seasonsIds),
+    },
+  );
 
   return displayedFields;
 };

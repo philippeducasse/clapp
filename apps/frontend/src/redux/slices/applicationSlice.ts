@@ -1,10 +1,17 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { Application } from "@/interfaces/entities/Application";
+import {
+  Application,
+  ApplicationSeason,
+} from "@/interfaces/entities/Application";
 import { RootState } from "../store";
 import { applicationApiService } from "@/api/applicationApiService";
 import { GetAllParams } from "@/interfaces/api/ApiService";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
-import { createFilterReducers, BaseSliceState, createAsyncExtraReducers } from "../shared/sharedReducers";
+import {
+  createFilterReducers,
+  BaseSliceState,
+  createAsyncExtraReducers,
+} from "../shared/sharedReducers";
 
 interface ApplicationsState extends BaseSliceState {
   applications: Application[];
@@ -18,13 +25,13 @@ const initialState: ApplicationsState = {
   error: null,
 };
 
-export const fetchApplications = createAsyncThunk<PaginatedResponse<Application>, GetAllParams | undefined>(
-  "applications/fetchApplications",
-  async (params?: GetAllParams) => {
-    const response = await applicationApiService.getAll(params);
-    return response;
-  },
-);
+export const fetchApplications = createAsyncThunk<
+  PaginatedResponse<Application>,
+  GetAllParams | undefined
+>("applications/fetchApplications", async (params?: GetAllParams) => {
+  const response = await applicationApiService.getAll(params);
+  return response;
+});
 
 const applicationSlice = createSlice({
   name: "applications",
@@ -48,7 +55,9 @@ const applicationSlice = createSlice({
     },
     updateApplication(state, action: PayloadAction<Application>) {
       const { id } = action.payload;
-      const existingApplication = state.applications.find((application) => application.id === id);
+      const existingApplication = state.applications.find(
+        (application) => application.id === id,
+      );
       if (existingApplication) {
         Object.assign(existingApplication, action.payload);
       }
@@ -76,12 +85,15 @@ export const {
   setSearchBarFilter,
 } = applicationSlice.actions;
 
-export const selectAllApplications = (state: RootState) => state.applications.applications;
+export const selectAllApplications = (state: RootState) =>
+  state.applications.applications;
 export const selectApplication = (state: RootState, applicationId: number) =>
   state.applications.applications.find(
     (application: Application) => application.id === applicationId,
   );
-export const selectColumnFilters = (state: RootState) => state.applications.filters;
-export const selectsearchBarFilter = (state: RootState) => state.applications.searchBarFilter;
+export const selectColumnFilters = (state: RootState) =>
+  state.applications.filters;
+export const selectsearchBarFilter = (state: RootState) =>
+  state.applications.searchBarFilter;
 
 export default applicationSlice.reducer;

@@ -27,7 +27,7 @@ export interface Application {
 export interface ApplicationSeason {
   id: number;
   name: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export type ApplicationCreate = Partial<
