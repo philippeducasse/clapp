@@ -2,15 +2,17 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Performance } from "@/interfaces/entities/Performance";
 import { ApplicationStatusOptions } from "@/interfaces/forms/StatusOptions";
-import { getPerformanceOptions } from "./getApplicationFormFields";
+import { getPerformanceOptions, getSeasonOptions } from "./getApplicationFormFields";
 import { getOptions } from "@/helpers/formHelper";
-import { ApplicationMethod } from "@/interfaces/entities/Application";
+import { ApplicationMethod, ApplicationSeason } from "@/interfaces/entities/Application";
 import { OrganisationType, Action } from "@/interfaces/Enums";
 
 export const getManualApplicationFormFields = (
-  performances: Performance[]
+  performances: Performance[],
+  seasons: ApplicationSeason[],
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
+  const seasonOptions = getSeasonOptions(seasons);
   return [
     {
       label: "Organisation type",
@@ -44,7 +46,16 @@ export const getManualApplicationFormFields = (
       fieldName: "performanceIds",
       type: ControlledFormElementType.MULTI_SELECT,
       options: performanceOptions,
-      helpText: "Select with which performances you want to apply to this festival. Dossiers will automatically be attached.",
+      helpText:
+        "Select with which performances you want to apply to this festival. Dossiers will automatically be attached.",
+    },
+    {
+      label: "Season",
+      fieldName: "applicationSeason",
+      type: ControlledFormElementType.SELECT,
+      helpText: "Which season is this application for?",
+      options: seasonOptions,
+      defaultValue: seasonOptions && seasonOptions[0],
     },
     {
       label: "Comments",

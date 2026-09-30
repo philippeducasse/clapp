@@ -76,6 +76,8 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const formFields = useMemo(() => {
     const performances = profile?.performances ?? [];
     const emailTemplates = profile?.emailTemplates ?? [];
+    const seasons = profile?.applicationSeasons ?? [];
+    console.log("seasons", seasons, profile);
     return getApplicationFormFields(
       entity,
       performances,
@@ -83,6 +85,7 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
       profile as Profile,
       dossiers,
       emailTemplates,
+      seasons,
     );
   }, [entity, applicationMethod, profile, dossiers]);
 

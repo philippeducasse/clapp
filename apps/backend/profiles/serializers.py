@@ -1,10 +1,11 @@
 import re
-from typing import Any, Type
+from typing import Any, List, Type
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from rest_framework import serializers
 
+from applications.models import ApplicationSeason
 from clapp_backend.utils import NormalizedURLField
 from performances.serializers import PerformanceSerializer
 from profiles.models import EmailTemplate, Profile, Reminder
@@ -65,6 +66,15 @@ class ProfileSerializer(serializers.ModelSerializer):
     oauth_provider = serializers.SerializerMethodField()
     oauth_token_expiry = serializers.SerializerMethodField()
 
+    # application_season_ids = serializers.PrimaryKeyRelatedField(
+    #     many=True,
+    #     read_only=False,
+    #     source="application_seasons",
+    #     required=False,
+    #     queryset=ApplicationSeason.objects.all(),
+    # )
+    application_seasons = serializers.SerializerMethodField()
+
     def get_oauth_provider(self, obj: Profile) -> str | None:
         if obj.google_oauth_refresh_token:
             return "GMAIL"
@@ -78,6 +88,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         if obj.outlook_oauth_refresh_token and obj.outlook_oauth_token_expiry:
             return obj.outlook_oauth_token_expiry.isoformat()
         return None
+
+    def get_application_seasons(self, obj: Profile) -> List[ApplicationSeason]:
+        from applications.serializer import ApplicationSeasonSerializer
+
+        return ApplicationSeasonSerializer(obj.application_seasons.all(), many=True).data
 
     class Meta:
         model: Type[Profile] = Profile

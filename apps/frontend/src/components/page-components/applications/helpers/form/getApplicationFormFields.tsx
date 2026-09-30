@@ -7,6 +7,7 @@ import { ApplicationMethod } from "@/interfaces/entities/Application";
 import { LANGUAGES } from "@/constants/languages";
 import { getOptions } from "@/helpers/formHelper";
 import { interpolateEmailTemplate } from "@/helpers/emailTemplateHelper";
+import { ApplicationSeason } from "@/interfaces/entities/Application";
 
 export interface ApplicableEntity {
   id?: number;
@@ -39,6 +40,14 @@ export const getDossierOptions = (dossiers: Dossier[]): SelectOptions[] | undefi
   }));
 };
 
+export const getSeasonOptions = (seasons: ApplicationSeason[]) => {
+  if (!seasons.length) return;
+  return seasons.map((s) => ({
+    value: String(s.id),
+    label: s.name,
+  }));
+};
+
 export const getApplicationFormFields = (
   entity: ApplicableEntity | null | undefined,
   performances: Performance[],
@@ -46,6 +55,7 @@ export const getApplicationFormFields = (
   profile: Profile,
   dossiers: Dossier[],
   emailTemplates: EmailTemplate[] = [],
+  seasonsIds: ApplicationSeason[],
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);

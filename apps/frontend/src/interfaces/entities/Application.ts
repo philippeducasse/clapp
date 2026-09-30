@@ -13,6 +13,7 @@ export interface Application {
   applicationMethod: ApplicationMethod;
   performances?: Performance[];
   emailSubject?: string;
+  applicationSeason?: ApplicationSeason;
   message?: string;
   attachmentsSent?: File[];
   status: ApplicationStatus;
@@ -21,6 +22,12 @@ export interface Application {
   updatedAt?: string;
   emailRecipients?: string[];
   applicationYear?: number;
+}
+
+export interface ApplicationSeason {
+  id: number;
+  name: string;
+  createdAt: string;
 }
 
 export type ApplicationCreate = Partial<

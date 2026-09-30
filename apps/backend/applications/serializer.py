@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from applications.models import Application
+from applications.models import Application, ApplicationSeason
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
 from organisations.residencies.models import Residency
@@ -32,7 +32,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
         source="performances",
     )
 
-    application_year = serializers.IntegerField(read_only=True)
     season_id = serializers.PrimaryKeyRelatedField(
         source="season", required=False, allow_null=True, read_only=True
     )
@@ -52,9 +51,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
 
             # Restrict season choices to only those owned by the current user
             fields["season_id"].read_only = False
-            fields["season_id"].queryset = ApplicationSeason.objects.filter(
-                profile=request.user
-            )
+            fields["season_id"].queryset = ApplicationSeason.objects.filter(profile=request.user)
         return fields
 
     class Meta:
@@ -77,7 +74,6 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "attachments_sent",
             "status",
             "comments",
-            "application_year",
             "season_id",
         ]
         read_only_fields = ("id", "created_at", "updated_at", "application_year")
@@ -159,3 +155,11 @@ class MinimalApplicationSerializer(serializers.ModelSerializer):
         if obj.content_type:
             return obj.content_type.model
         return None
+
+
+class ApplicationSeasonSerializer(serializers.ModelSerializer):
+    profile_id = serializers.PrimaryKeyRelatedField(source="profile", read_only=True)
+
+    class Meta:
+        model = ApplicationSeason
+        fields: str = "__all__"

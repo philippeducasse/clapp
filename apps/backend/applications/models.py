@@ -71,7 +71,6 @@ class Application(models.Model):
     )
     performances = models.ManyToManyField(Performance, related_name="applications", blank=True)
     application_date = models.DateField(blank=True, null=True)
-    application_year_value = models.IntegerField(blank=True, null=True)
     application_method = models.CharField(
         max_length=50,
         choices=APPLICATION_TYPE,

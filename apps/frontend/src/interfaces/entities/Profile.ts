@@ -1,5 +1,6 @@
 import { Performance } from "./Performance";
 import { EmailHost } from "../Enums";
+import { ApplicationSeason } from "./Application";
 
 export interface EmailTemplate {
   [key: string]: unknown;
@@ -38,5 +39,5 @@ export interface Profile {
   tableSize?: string;
   oauthProvider?: "GMAIL" | "OUTLOOK" | null;
   oauthTokenExpiry?: string | null;
-  currentApplicationYear?: number;
+  applicationSeasons?: ApplicationSeason[];
 }

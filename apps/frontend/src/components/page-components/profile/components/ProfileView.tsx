@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CircleUser, Cog, Key, PenTool } from "lucide-react";
+import { CircleUser, Cog, Key, PenTool, Signature } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import { getEmailSettings } from "../helpers/getEmailSettings";
 import { toast } from "sonner";
 import { getDefaultEmailSubject } from "../helpers/getEmailTemplateInfo";
+import { getApplicationSeasonsInfo } from "../helpers/getApplicationInfo";
 
 const ProfileView = () => {
   const dispatch = useDispatch();
@@ -40,17 +41,15 @@ const ProfileView = () => {
   const profile = useSelector((state: RootState) => selectProfile(state));
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [itemName, setItemName] = useState<
-    "profile" | "performance" | "email template"
-  >("performance");
+  const [itemName, setItemName] = useState<"profile" | "performance" | "email template">(
+    "performance",
+  );
   const [idToDelete, setIdToDelete] = useState<number | undefined>();
   const { activeTab, handleTabChange } = useHashTab("basic-information");
 
   useEffect(() => {
     const hash = window.location.hash; // e.g. "#email-settings?oauth=outlook&status=success"
-    const queryString = hash.includes("?")
-      ? hash.slice(hash.indexOf("?") + 1)
-      : "";
+    const queryString = hash.includes("?") ? hash.slice(hash.indexOf("?") + 1) : "";
     if (!queryString) return;
 
     const params = new URLSearchParams(queryString);
@@ -69,10 +68,7 @@ const ProfileView = () => {
     }
   }, []);
 
-  const handleDelete = (
-    entity: "profile" | "performance" | "email template",
-    index?: number,
-  ) => {
+  const handleDelete = (entity: "profile" | "performance" | "email template", index?: number) => {
     setIdToDelete(index);
     setItemName(entity);
     setOpenDeleteDialog(true);
@@ -82,29 +78,18 @@ const ProfileView = () => {
       if (itemName === "profile" && profile) {
         await profileApiService.remove(profile.id);
         router.push("/profiles");
-      } else if (
-        itemName === "performance" &&
-        idToDelete !== undefined &&
-        profile
-      ) {
+      } else if (itemName === "performance" && idToDelete !== undefined && profile) {
         await performanceApiService.remove(idToDelete);
 
         const updatedperformances =
-          profile.performances?.filter(
-            (p: Performance) => p.id !== idToDelete,
-          ) ?? [];
+          profile.performances?.filter((p: Performance) => p.id !== idToDelete) ?? [];
         const updatedProfile: Profile = {
           ...profile,
           performances: updatedperformances,
         };
         dispatch(updateProfile(updatedProfile));
-      } else if (
-        itemName === "email template" &&
-        idToDelete !== undefined &&
-        profile
-      ) {
-        const updatedTemplates =
-          profile.emailTemplates?.filter((t) => t.id !== idToDelete) ?? [];
+      } else if (itemName === "email template" && idToDelete !== undefined && profile) {
+        const updatedTemplates = profile.emailTemplates?.filter((t) => t.id !== idToDelete) ?? [];
         const updatedProfileData = await profileApiService.update({
           ...profile,
           emailTemplates: updatedTemplates,
@@ -151,17 +136,28 @@ const ProfileView = () => {
           {profile.performances && profile.performances.length > 0 ? (
             <PerformanceViewSection
               performances={profile.performances}
-              onDelete={(performanceId) =>
-                handleDelete("performance", performanceId)
-              }
+              onDelete={(performanceId) => handleDelete("performance", performanceId)}
             />
           ) : (
             <p className="flex justify-center py-6">No performances</p>
           )}
-          <AddSection
-            label="performance"
-            href={`/profile/edit/performances/new`}
-          />
+          <AddSection label="performance" href={`/profile/edit/performances/new`} />
+        </Tab>
+
+        <Tab name="Applications">
+          {profile.applicationSeasons && profile.applicationSeasons.length > 0 ? (
+            profile.applicationSeasons.map((season) => (
+              <DetailsViewSection
+                key={season.id}
+                title={season.name}
+                icon={<Signature className="text-primary" />}
+                data={getApplicationSeasonsInfo(season)}
+              />
+            ))
+          ) : (
+            <p className="flex justify-center py-6">No performances</p>
+          )}
+          <AddSection label="season" href={`/profile/edit/seasons/new`} />
         </Tab>
 
         <Tab name="Email Templates">
@@ -174,17 +170,12 @@ const ProfileView = () => {
           {profile.emailTemplates && profile.emailTemplates.length > 0 ? (
             <EmailTemplatesSection
               emailTemplates={profile.emailTemplates}
-              onDelete={(templateId) =>
-                handleDelete("email template", templateId)
-              }
+              onDelete={(templateId) => handleDelete("email template", templateId)}
             />
           ) : (
             <p className="flex justify-center py-6">No email templates</p>
           )}
-          <AddSection
-            label="email template"
-            href={`/profile/edit/email-templates/new`}
-          />
+          <AddSection label="email template" href={`/profile/edit/email-templates/new`} />
         </Tab>
 
         <Tab name="Email Settings">

@@ -6,13 +6,14 @@ from celery.result import AsyncResult
 from django.apps import apps
 from django.db.models import Q
 from django.http import HttpRequest
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from applications.models import Application
+from applications.models import Application, ApplicationSeason
 from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
@@ -256,6 +257,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         profile = request.user
         application_method = request.data.get("application_method")
         performance_ids = request.data.get("performances")
+        season_id = request.data.get("season_id")
         performances = parse_performance_ids(performance_ids)
         comments = request.data.get("comments", None)
         logger.debug(f"Application method: {application_method}")
@@ -304,10 +306,10 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 {"error": "Message and/or subject not found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if season_id:
+            season = get_object_or_404(ApplicationSeason, pk=season_id)
 
-        application_year = profile.current_application_year or timezone.now().year
-
-        logger.debug(f"Creating application for year {application_year}")
+        logger.debug(f"Creating application for season {season}")
         try:
             from django.contrib.contenttypes.models import ContentType
 
@@ -317,7 +319,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 object_id=organisation.id,
                 profile=profile,
                 application_date=timezone.now().date(),
-                application_year_value=application_year,
+                season=season,
                 status="APPLIED",
                 message=message,
                 email_subject=subject,

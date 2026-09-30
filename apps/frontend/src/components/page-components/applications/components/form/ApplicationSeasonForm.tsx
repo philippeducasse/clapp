@@ -10,7 +10,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateApplication, selectApplication } from "@/redux/slices/applicationSlice";
 import { AppDispatch, RootState } from "@/redux/store";
-import { getManualApplicationFormFields } from "../../helpers/form/getManualApplicationFormFields";
+import { getApplicationSeasonFormFields } from "../../helpers/form/getApplicationSeasonFormFields";
 import FormHeader from "@/components/common/form/FormHeader";
 import BasicForm from "@/components/common/form/BasicForm";
 import { Action } from "@/interfaces/Enums";
@@ -18,11 +18,11 @@ import { EntityName } from "@/interfaces/Enums";
 import { refreshApplication } from "../../helpers/refreshApplication";
 import { selectProfile } from "@/redux/slices/authSlice";
 
-interface ManualApplicationFormProps {
+interface ApplicationSeasonFormProps {
   action: Action;
 }
 
-const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
+const ApplicationSeasonForm = ({ action }: ApplicationSeasonFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
@@ -31,7 +31,7 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   const profile = useSelector((state: RootState) => selectProfile(state));
   const performances = profile?.performances ?? [];
   const seasons = profile?.applicationSeasons ?? [];
-  const formFields = getManualApplicationFormFields(performances, seasons);
+  const formFields = getApplicationSeasonFormFields(performances, seasons);
   const formSchema = createZodFormSchema(formFields);
   const [isLoading, setIsLoading] = useState(false);
   const initialDataLoadedRef = useRef(false);
@@ -118,4 +118,4 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     </>
   );
 };
-export default ManualApplicationForm;
+export default ApplicationSeasonForm;

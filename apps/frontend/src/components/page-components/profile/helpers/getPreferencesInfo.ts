@@ -25,9 +25,5 @@ export const getPreferencesInfo = (profile: Profile): SectionCellProps[] => {
       title: "Table Size",
       value: profile.tableSize ? tableSizeLabel[profile.tableSize] : "Not set",
     },
-    {
-      title: "Current Application Year",
-      value: profile.currentApplicationYear ? String(profile.currentApplicationYear) : "Not set",
-    },
   ];
 };
