@@ -1,5 +1,5 @@
 import re
-from typing import Any, List, Type
+from typing import Any, Type
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
@@ -52,6 +52,15 @@ class EmailTemplateSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class ProfileApplicationSeasonSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = ApplicationSeason
+        fields = ["id", "name", "created_at"]
+        read_only_fields = ["created_at"]
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     performances = PerformanceSerializer(many=True, read_only=True)
     spoken_languages = serializers.ListField(
@@ -66,14 +75,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     oauth_provider = serializers.SerializerMethodField()
     oauth_token_expiry = serializers.SerializerMethodField()
 
-    # application_season_ids = serializers.PrimaryKeyRelatedField(
-    #     many=True,
-    #     read_only=False,
-    #     source="application_seasons",
-    #     required=False,
-    #     queryset=ApplicationSeason.objects.all(),
-    # )
-    application_seasons = serializers.SerializerMethodField()
+    application_seasons = ProfileApplicationSeasonSerializer(many=True, required=False)
 
     def get_oauth_provider(self, obj: Profile) -> str | None:
         if obj.google_oauth_refresh_token:
@@ -88,11 +90,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         if obj.outlook_oauth_refresh_token and obj.outlook_oauth_token_expiry:
             return obj.outlook_oauth_token_expiry.isoformat()
         return None
-
-    def get_application_seasons(self, obj: Profile) -> List[ApplicationSeason]:
-        from applications.serializer import ApplicationSeasonSerializer
-
-        return ApplicationSeasonSerializer(obj.application_seasons.all(), many=True).data
 
     class Meta:
         model: Type[Profile] = Profile
@@ -112,6 +109,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         email_templates = validated_data.pop("email_templates", [])
         email_templates_ids = validated_data.pop("email_templates_ids", [])
+        application_seasons = validated_data.pop("application_seasons", None)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -122,6 +120,16 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         for email_template in email_templates:
             EmailTemplate.objects.create(profile=instance, **email_template)
+
+        if application_seasons is not None:
+            kept_ids = [s["id"] for s in application_seasons if s.get("id")]
+            instance.application_seasons.exclude(id__in=kept_ids).delete()
+            for season in application_seasons:
+                season_id = season.get("id")
+                if season_id:
+                    instance.application_seasons.filter(id=season_id).update(name=season["name"])
+                else:
+                    ApplicationSeason.objects.create(profile=instance, name=season["name"])
 
         return instance
 
