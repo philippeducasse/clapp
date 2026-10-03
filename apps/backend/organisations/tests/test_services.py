@@ -1,6 +1,6 @@
 """Tests for organisations/services.py."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from django.utils import timezone
@@ -13,6 +13,7 @@ from organisations.services import (
     format_email,
     generate_application_mail_prompt,
     parse_performance_ids,
+    prepare_application_email,
     send_application_email,
     validate_application_recipients,
 )
@@ -250,6 +251,33 @@ class TestSendApplicationEmail:
         mock_email.send.assert_not_called()
         app.refresh_from_db()
         assert app.status == "APPLIED"
+
+
+@pytest.mark.django_db
+class TestPrepareApplicationEmail:
+    @patch("organisations.services.get_user_email_connection")
+    def test_uses_profile_email_as_sender_not_smtp_username(self, mock_connection):
+        profile = Profile.objects.create_user(
+            email="info@philippeducasse.com",
+            password="pass",
+            company_name="Philippe Ducasse",
+            email_host_user="info@12228359.brevosend.com",
+        )
+        application = MagicMock(
+            email_subject="Application",
+            message="Hello",
+        )
+
+        email = prepare_application_email(
+            application=application,
+            recipient_emails=["contact@festival.com"],
+            dossiers=None,
+            attachments=[],
+            profile=profile,
+            performances=None,
+        )
+
+        assert email.from_email == "Philippe Ducasse <info@philippeducasse.com>"
 
     def test_real_recipient_sends_email(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")

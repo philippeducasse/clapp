@@ -417,7 +417,8 @@ def prepare_application_email(
     except AttributeError:
         # locmem backend doesn't have these attributes
         pass
-    formatted_from_email = formataddr((profile.company_name, profile.email_host_user))
+    # SMTP credentials can differ from the address recipients should see.
+    formatted_from_email = formataddr((profile.company_name, profile.email))
 
     email = EmailMultiAlternatives(
         application.email_subject,
