@@ -1,4 +1,3 @@
-import React from "react";
 import PasswordForm from "@/components/page-components/auth/components/PasswordForm";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";

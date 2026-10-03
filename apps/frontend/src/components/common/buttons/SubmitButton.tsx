@@ -1,6 +1,6 @@
 import { Button } from "../../ui/button";
 import { Loader2Icon } from "lucide-react";
-import React from "react";
+
 import { Save } from "lucide-react";
 
 interface SubmitButtonProps {
@@ -27,7 +27,9 @@ const SubmitButton = ({
         </>
       ) : (
         <>
-          {showIcon && <Save className="text-primary-foreground dark:text-foreground" />}{" "}
+          {showIcon && (
+            <Save className="text-primary-foreground dark:text-foreground" />
+          )}{" "}
           {label ?? "Submit"}
         </>
       )}

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Pagination,
   PaginationContent,
@@ -43,7 +42,9 @@ function TablePagination<TData>({
     ? Math.ceil(totalCount / pagination.pageSize)
     : Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
 
-  const totalItems = totalCount ? totalCount : table.getFilteredRowModel().rows.length;
+  const totalItems = totalCount
+    ? totalCount
+    : table.getFilteredRowModel().rows.length;
 
   const getPageNumbers = () => {
     const pageNumbers = [];
@@ -77,11 +78,15 @@ function TablePagination<TData>({
     <Pagination className="justify-between mt-8">
       <div className="flex items-center gap-4">
         <div>
-          Page {currentPage} of {totalPages} | Total {capitalizeFirst(entityName)}s: {totalItems}
+          Page {currentPage} of {totalPages} | Total{" "}
+          {capitalizeFirst(entityName)}s: {totalItems}
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm">Per page:</span>
-          <Select value={String(pagination.pageSize)} onValueChange={handlePageSizeChange}>
+          <Select
+            value={String(pagination.pageSize)}
+            onValueChange={handlePageSizeChange}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -104,7 +109,10 @@ function TablePagination<TData>({
         {currentPage > 3 && (
           <>
             <PaginationItem>
-              <PaginationLink onClick={() => table.setPageIndex(0)} isActive={currentPage === 1}>
+              <PaginationLink
+                onClick={() => table.setPageIndex(0)}
+                isActive={currentPage === 1}
+              >
                 1
               </PaginationLink>
             </PaginationItem>

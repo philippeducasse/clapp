@@ -1,4 +1,3 @@
-import React from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -28,9 +27,12 @@ const ConfirmationMessage = () => {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Email Confirmed!</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            Email Confirmed!
+          </h2>
           <p className="text-muted-foreground">
-            Your email has been successfully confirmed. You can now log in to your account.
+            Your email has been successfully confirmed. You can now log in to
+            your account.
           </p>
         </>
       ) : (
@@ -50,7 +52,9 @@ const ConfirmationMessage = () => {
               />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-foreground">Confirmation Failed</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            Confirmation Failed
+          </h2>
           <p className="text-muted-foreground">
             {message === "invalid_token"
               ? "The confirmation link is invalid or has expired. Please request a new confirmation email."

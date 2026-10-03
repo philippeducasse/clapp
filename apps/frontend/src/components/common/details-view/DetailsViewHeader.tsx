@@ -1,4 +1,3 @@
-import React from "react";
 import { CardTitle, CardDescription } from "@/components/ui/card";
 import { TagsButton } from "../buttons/TagsButton";
 import { StatusButton } from "../buttons/StatusButton";
@@ -40,7 +39,11 @@ const DetailsViewHeader = <T,>({
         <div className="flex gap-6 self-end mx-8 items-stretch">
           {actionElements}
           {entityId && tagApiMethod && updateSlice && (
-            <TagsButton tag={tagApiMethod} entityId={entityId} updateSlice={updateSlice} />
+            <TagsButton
+              tag={tagApiMethod}
+              entityId={entityId}
+              updateSlice={updateSlice}
+            />
           )}
           {entityId && statusApiMethod && updateSlice && (
             <StatusButton

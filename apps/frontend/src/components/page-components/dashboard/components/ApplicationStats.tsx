@@ -1,17 +1,37 @@
-import React from "react";
-import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
+import {
+  Application,
+  ApplicationStatus,
+} from "@/interfaces/entities/Application";
 
-const ApplicationStats = ({ applications }: { applications: Application[] }) => {
+const ApplicationStats = ({
+  applications,
+}: {
+  applications: Application[];
+}) => {
   const applicationStats = {
-    accepted: applications.filter((app) => app.status === ApplicationStatus.ACCEPTED).length,
-    rejected: applications.filter((app) => app.status === ApplicationStatus.REJECTED).length,
-    inDiscussion: applications.filter((app) => app.status === ApplicationStatus.IN_DISCUSSION)
+    accepted: applications.filter(
+      (app) => app.status === ApplicationStatus.ACCEPTED,
+    ).length,
+    rejected: applications.filter(
+      (app) => app.status === ApplicationStatus.REJECTED,
+    ).length,
+    inDiscussion: applications.filter(
+      (app) => app.status === ApplicationStatus.IN_DISCUSSION,
+    ).length,
+    applied: applications.filter(
+      (app) => app.status === ApplicationStatus.APPLIED,
+    ).length,
+    draft: applications.filter((app) => app.status === ApplicationStatus.DRAFT)
       .length,
-    applied: applications.filter((app) => app.status === ApplicationStatus.APPLIED).length,
-    draft: applications.filter((app) => app.status === ApplicationStatus.DRAFT).length,
-    ignored: applications.filter((app) => app.status === ApplicationStatus.IGNORED).length,
-    postponed: applications.filter((app) => app.status === ApplicationStatus.POSTPONED).length,
-    cancelled: applications.filter((app) => app.status === ApplicationStatus.CANCELLED).length,
+    ignored: applications.filter(
+      (app) => app.status === ApplicationStatus.IGNORED,
+    ).length,
+    postponed: applications.filter(
+      (app) => app.status === ApplicationStatus.POSTPONED,
+    ).length,
+    cancelled: applications.filter(
+      (app) => app.status === ApplicationStatus.CANCELLED,
+    ).length,
   };
 
   return (

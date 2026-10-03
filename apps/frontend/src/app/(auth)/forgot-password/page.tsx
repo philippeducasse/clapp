@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import ForgotPasswordForm from "@/components/page-components/auth/components/ForgotPasswordForm";
 const page = () => {

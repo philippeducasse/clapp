@@ -1,4 +1,3 @@
-import React from "react";
 import { SectionCellProps } from "@/interfaces/DetailsView";
 import Row from "./Row";
 

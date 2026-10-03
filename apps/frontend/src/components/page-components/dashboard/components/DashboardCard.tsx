@@ -1,6 +1,11 @@
-import { Card, CardHeader, CardDescription, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardDescription,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import React from "react";
 
 export interface DashboardCardProps {
   title: string;
@@ -9,7 +14,12 @@ export interface DashboardCardProps {
   loading?: boolean;
 }
 
-const DashboardCard = ({ title, value, subtitle, loading }: DashboardCardProps) => {
+const DashboardCard = ({
+  title,
+  value,
+  subtitle,
+  loading,
+}: DashboardCardProps) => {
   return (
     <Card>
       <CardHeader className="pb-2">

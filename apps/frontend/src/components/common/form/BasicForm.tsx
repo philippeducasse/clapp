@@ -1,7 +1,7 @@
 "use client";
 
 import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement";
-import React from "react";
+
 import { UseFormReturn } from "react-hook-form";
 import {
   Form,
@@ -50,9 +50,15 @@ const BasicForm = ({
   disabled = false,
 }: BasicFormProps) => {
   const organisationType = form.watch("organisationType") ?? "";
-  const showIcon = action === Action.EDIT || action === Action.APPLY || action === Action.UPLOAD;
+  const showIcon =
+    action === Action.EDIT ||
+    action === Action.APPLY ||
+    action === Action.UPLOAD;
   const shouldPersist =
-    !!formTitle && action !== Action.EDIT && action !== Action.LOGIN && action !== Action.REGISTER;
+    !!formTitle &&
+    action !== Action.EDIT &&
+    action !== Action.LOGIN &&
+    action !== Action.REGISTER;
 
   const { clearStorage } = useFormPersist(formTitle || "", form, shouldPersist);
 
@@ -68,7 +74,8 @@ const BasicForm = ({
             <h3 className="text-xl text-bold text-primary">{formTitle}</h3>
             {formSubtitle && (
               <p className="text-base mt-2">
-                {typeof formSubtitle === "string" && formSubtitle.includes("<a ") ? (
+                {typeof formSubtitle === "string" &&
+                formSubtitle.includes("<a ") ? (
                   <span dangerouslySetInnerHTML={{ __html: formSubtitle }} />
                 ) : (
                   formSubtitle
@@ -109,11 +116,20 @@ const BasicForm = ({
                           )}
                       </FormLabel>
                       <FormControl>
-                        {getControlledInputs(formField, field, true, organisationType)}
+                        {getControlledInputs(
+                          formField,
+                          field,
+                          true,
+                          organisationType,
+                        )}
                       </FormControl>
                       <FormDescription>
                         {formField.helpText?.includes("<a ") ? (
-                          <span dangerouslySetInnerHTML={{ __html: formField.helpText }} />
+                          <span
+                            dangerouslySetInnerHTML={{
+                              __html: formField.helpText,
+                            }}
+                          />
                         ) : (
                           formField.helpText
                         )}
@@ -144,7 +160,11 @@ const BasicForm = ({
                 </Button>
               ) : action === Action.UPLOAD ? (
                 <Button disabled={isLoading}>
-                  {isLoading ? <Loader2 className="animate-spin" /> : <Upload />}
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <Upload />
+                  )}
                   {isLoading ? "Uploading..." : "Upload"}
                 </Button>
               ) : (

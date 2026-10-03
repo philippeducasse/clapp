@@ -1,10 +1,16 @@
-import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { BaseControlledPropsWithLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
 
-const ControlledBoolean = ({ field, showLabels }: BaseControlledPropsWithLabels) => {
+const ControlledBoolean = ({
+  field,
+  showLabels,
+}: BaseControlledPropsWithLabels) => {
   return showLabels ? (
-    <Switch className="my-1" checked={field?.value as boolean} onCheckedChange={field.onChange} />
+    <Switch
+      className="my-1"
+      checked={field?.value as boolean}
+      onCheckedChange={field.onChange}
+    />
   ) : (
     <input
       type="checkbox"

@@ -1,4 +1,3 @@
-import React from "react";
 import { Performance } from "@/interfaces/entities/Performance";
 import { getPerformanceInfo } from "../helpers/getPerformanceInfo";
 import { PartyPopper } from "lucide-react";
@@ -9,7 +8,10 @@ interface PerformanceViewSectionProps {
   onDelete: (index: number) => void;
 }
 
-const PerformanceViewSection = ({ performances, onDelete }: PerformanceViewSectionProps) => {
+const PerformanceViewSection = ({
+  performances,
+  onDelete,
+}: PerformanceViewSectionProps) => {
   return (
     <>
       {performances.map((performance, index) => (

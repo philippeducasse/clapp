@@ -1,4 +1,3 @@
-import React from "react";
 import ManualApplicationForm from "@/components/page-components/applications/components/form/ManualApplicationForm";
 import { Action } from "@/interfaces/Enums";
 

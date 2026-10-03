@@ -1,8 +1,10 @@
-import React from "react";
 import { BaseControlledPropsWithLabels } from "@/interfaces/forms/ControlledFormFieldsProps";
 import TextareaAutosize from "react-textarea-autosize";
 
-const ControlledTextArea = ({ field, showLabels }: BaseControlledPropsWithLabels) => {
+const ControlledTextArea = ({
+  field,
+  showLabels,
+}: BaseControlledPropsWithLabels) => {
   return showLabels ? (
     <textarea
       className="h-42 fit file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex w-full min-w-0 rounded-md border bg-transparent p-3 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm
@@ -13,7 +15,11 @@ const ControlledTextArea = ({ field, showLabels }: BaseControlledPropsWithLabels
       style={undefined}
     />
   ) : (
-    <TextareaAutosize className="p-2 w-full min-h-fit" {...field} value={field.value as string} />
+    <TextareaAutosize
+      className="p-2 w-full min-h-fit"
+      {...field}
+      value={field.value as string}
+    />
   );
 };
 

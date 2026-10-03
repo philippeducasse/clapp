@@ -1,4 +1,3 @@
-import React from "react";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { getFestivalContacts } from "@/components/page-components/festivals/helpers/getFestivaContacts";
 import { Contact2 } from "lucide-react";

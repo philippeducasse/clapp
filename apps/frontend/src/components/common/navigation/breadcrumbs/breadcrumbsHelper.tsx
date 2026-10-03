@@ -1,4 +1,3 @@
-import React from "react";
 import { RootState } from "@/redux/store";
 import { selectFestival } from "@/redux/slices/festivalSlice";
 import { selectVenue } from "@/redux/slices/venueSlice";
@@ -22,8 +21,13 @@ export interface EntityData {
   organisationName?: string;
 }
 
-export const buildBreadcrumbs = (pathname: string, entityName?: string): Breadcrumb[] => {
-  const crumbs: Breadcrumb[] = [{ path: "/", label: <Home className="text-primary" /> }];
+export const buildBreadcrumbs = (
+  pathname: string,
+  entityName?: string,
+): Breadcrumb[] => {
+  const crumbs: Breadcrumb[] = [
+    { path: "/", label: <Home className="text-primary" /> },
+  ];
   const segments = pathname.split("/").filter(Boolean);
 
   const entityKey = segments[0];
@@ -44,7 +48,10 @@ export const buildBreadcrumbs = (pathname: string, entityName?: string): Breadcr
   }
 
   const name = entityName ?? `ID: ${id}`;
-  crumbs.push({ path: config.hasDetailsView ? `/${entityKey}/${id}` : "#", label: name });
+  crumbs.push({
+    path: config.hasDetailsView ? `/${entityKey}/${id}` : "#",
+    label: name,
+  });
 
   const action = segments[2];
   if (segments[2]) {

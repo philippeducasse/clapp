@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import LoginForm from "@/components/page-components/auth/components/LoginForm";
 

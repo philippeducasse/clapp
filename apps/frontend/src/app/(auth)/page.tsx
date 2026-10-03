@@ -1,9 +1,16 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CalendarCheck, Building2, Globe, Send, Star, BarChart3, ArrowRight } from "lucide-react";
+import {
+  CalendarCheck,
+  Building2,
+  Globe,
+  Send,
+  Star,
+  BarChart3,
+  ArrowRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -73,15 +80,24 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
         <div className="relative mx-auto max-w-6xl px-6 text-center">
           <div className="flex justify-center gap-8 mb-16">
-            <h1 className="font-clapp text-8xl text-primary self-center">Clapp</h1>
-            <Image src={"/logo.png"} width={150} height={150} alt="Clapp logo" />
+            <h1 className="font-clapp text-8xl text-primary self-center">
+              Clapp
+            </h1>
+            <Image
+              src={"/logo.png"}
+              width={150}
+              height={150}
+              alt="Clapp logo"
+            />
           </div>
           <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            Your freelance arts career, <span className="text-primary">all in one place</span>
+            Your freelance arts career,{" "}
+            <span className="text-primary">all in one place</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl">
-            Track festivals, residencies, venues, and applications. Clapp is your personal assistant
-            for managing every step of your career as a freelance artist.
+            Track festivals, residencies, venues, and applications. Clapp is
+            your personal assistant for managing every step of your career as a
+            freelance artist.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button size="lg" className="text-base px-8" asChild>
@@ -89,7 +105,12 @@ export default function LandingPage() {
                 Start for free <ArrowRight className="ml-1 size-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="secondary" className="text-base px-8" asChild>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="text-base px-8"
+              asChild
+            >
               <a href="#login">Log in to your account</a>
             </Button>
           </div>
@@ -107,8 +128,8 @@ export default function LandingPage() {
               Manage your career with confidence
             </h2>
             <p className="mt-4 text-muted-foreground">
-              From discovering opportunities to tracking applications, Clapp gives freelance artists
-              the tools to stay organized and focused.
+              From discovering opportunities to tracking applications, Clapp
+              gives freelance artists the tools to stay organized and focused.
             </p>
           </div>
           <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +143,9 @@ export default function LandingPage() {
                     <feature.icon className="size-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -142,8 +165,8 @@ export default function LandingPage() {
                 Ready to pick up where you left off?
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Log in to access your dashboard, review upcoming deadlines, and manage your
-                applications.
+                Log in to access your dashboard, review upcoming deadlines, and
+                manage your applications.
               </p>
               <Separator className="my-8" />
               <p className="text-sm text-muted-foreground">
@@ -170,7 +193,9 @@ export default function LandingPage() {
             <Image src="/logo.png" width={24} height={24} alt="Clapp logo" />
             <span className="font-clapp text-lg text-primary">Clapp</span>
           </div>
-          <p className="text-sm text-muted-foreground">Built for artists, by artists.</p>
+          <p className="text-sm text-muted-foreground">
+            Built for artists, by artists.
+          </p>
         </div>
       </footer>
     </div>

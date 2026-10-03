@@ -1,4 +1,3 @@
-import React from "react";
 import BackButton from "../buttons/BackButton";
 
 interface DetailsViewWrapperProps extends React.PropsWithChildren {

@@ -10,7 +10,10 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
-import { buildBreadcrumbs, Breadcrumb as BreadcrumbType } from "./breadcrumbsHelper";
+import {
+  buildBreadcrumbs,
+  Breadcrumb as BreadcrumbType,
+} from "./breadcrumbsHelper";
 import { entityRegistry } from "./breadcrumbsConfig";
 const Breadcrumbs = () => {
   const pathname = usePathname();

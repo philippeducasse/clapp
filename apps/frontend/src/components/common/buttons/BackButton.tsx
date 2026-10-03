@@ -1,6 +1,6 @@
 import { Button } from "../../ui/button";
 import { useRouter } from "next/navigation";
-import React from "react";
+
 import { Undo2 } from "lucide-react";
 
 interface BackButtonProps {
@@ -10,7 +10,12 @@ interface BackButtonProps {
   size?: "icon" | "default" | "sm" | "lg" | null | undefined;
 }
 
-const BackButton = ({ label, href, icon = true, size = "default" }: BackButtonProps) => {
+const BackButton = ({
+  label,
+  href,
+  icon = true,
+  size = "default",
+}: BackButtonProps) => {
   const router = useRouter();
 
   const handleClick = () => {

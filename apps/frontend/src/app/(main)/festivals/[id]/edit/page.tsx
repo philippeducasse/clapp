@@ -1,4 +1,3 @@
-import React from "react";
 import FestivalForm from "@/components/page-components/festivals/components/form/FestivalBasicInfoForm";
 import { Action } from "@/interfaces/Enums";
 

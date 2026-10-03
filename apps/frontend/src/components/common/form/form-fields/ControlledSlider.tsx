@@ -1,4 +1,3 @@
-import React from "react";
 import { Slider } from "@/components/ui/slider";
 import { SliderOptions } from "@/interfaces/forms/ControlledFormElement";
 import { BaseControlledProps } from "@/interfaces/forms/ControlledFormFieldsProps";
@@ -25,7 +24,9 @@ const ControlledSlider = ({ field, sliderOptions }: ControlledSliderProps) => {
         step={step}
       />
       {currentLabel && (
-        <div className="text-xs text-muted-foreground text-center mt-1">{currentLabel}</div>
+        <div className="text-xs text-muted-foreground text-center mt-1">
+          {currentLabel}
+        </div>
       )}
     </div>
   );

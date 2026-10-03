@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import DetailsView from "./DetailsView";
 import { SectionCellProps } from "@/interfaces/DetailsView";
@@ -30,7 +29,9 @@ const DetailsViewSection = ({
     <div className={`${sideText ? "flex" : ""}`}>
       {sideText && <p className="flex-1 p-2">{sideText}</p>}
       <Card className="mb-6 relative overflow-hidden flex-2">
-        {ribbonType && ribbonValue && <Ribbon ribbonType={ribbonType} ribbonValue={ribbonValue} />}
+        {ribbonType && ribbonValue && (
+          <Ribbon ribbonType={ribbonType} ribbonValue={ribbonValue} />
+        )}
         <CardContent>
           <div className="flex items-center justify-between gap-2 mb-6">
             <div className="flex items-center gap-2">

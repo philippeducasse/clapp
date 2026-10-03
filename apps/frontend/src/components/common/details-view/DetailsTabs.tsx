@@ -17,8 +17,14 @@ interface DetailsTabsProps {
   onTabChange?: (value: string) => void;
 }
 
-const DetailsTabs = ({ defaultTab, children, onTabChange }: DetailsTabsProps) => {
-  const tabs = React.Children.toArray(children) as React.ReactElement<TabProps>[];
+const DetailsTabs = ({
+  defaultTab,
+  children,
+  onTabChange,
+}: DetailsTabsProps) => {
+  const tabs = React.Children.toArray(
+    children,
+  ) as React.ReactElement<TabProps>[];
 
   const tabSections = tabs.map((tab) => ({
     key: tab.props.name.toLowerCase().replace(/\s+/g, "-"),

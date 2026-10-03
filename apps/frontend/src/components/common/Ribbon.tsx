@@ -1,4 +1,3 @@
-import React from "react";
 import { TagAction } from "@/interfaces/Enums";
 import { ApplicationStatus } from "@/interfaces/entities/Application";
 import {
@@ -34,13 +33,19 @@ const TAG_CONFIG = {
 const STATUS_CONFIG = {
   [ApplicationStatus.DRAFT]: { color: "bg-gray-500", icon: FileText },
   [ApplicationStatus.APPLIED]: { color: "bg-blue-600", icon: Send },
-  [ApplicationStatus.IN_DISCUSSION]: { color: "bg-purple-600", icon: MessageCircle },
+  [ApplicationStatus.IN_DISCUSSION]: {
+    color: "bg-purple-600",
+    icon: MessageCircle,
+  },
   [ApplicationStatus.ACCEPTED]: { color: "bg-green-600", icon: CheckCircle },
   [ApplicationStatus.REJECTED]: { color: "bg-red-600", icon: XCircle },
   [ApplicationStatus.IGNORED]: { color: "bg-gray-600", icon: EyeOff },
   [ApplicationStatus.POSTPONED]: { color: "bg-yellow-600", icon: Clock },
   [ApplicationStatus.CANCELLED]: { color: "bg-orange-600", icon: Ban },
-  [ApplicationStatus.OTHER]: { color: "bg-purple-700", icon: CircleQuestionMark },
+  [ApplicationStatus.OTHER]: {
+    color: "bg-purple-700",
+    icon: CircleQuestionMark,
+  },
 };
 
 const Ribbon = ({ ribbonType, ribbonValue }: RibbonProps) => {
