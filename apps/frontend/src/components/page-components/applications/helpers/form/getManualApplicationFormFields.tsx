@@ -55,7 +55,7 @@ export const getManualApplicationFormFields = (
       type: ControlledFormElementType.SELECT,
       helpText: "Which season is this application for?",
       options: seasonOptions,
-      defaultValue: seasonOptions && seasonOptions[0],
+      defaultValue: seasonOptions?.[0]?.value,
     },
     {
       label: "Comments",
