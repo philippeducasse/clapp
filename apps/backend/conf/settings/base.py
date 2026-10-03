@@ -193,6 +193,11 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:3020"
 # FERNET_KEY for reverse encryption of email_host_password
 FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY")
 
+# Brevo SMTP relay for the designated account
+BREVO_PROFILE_EMAIL = os.getenv("BREVO_PROFILE_EMAIL", "info@philippeducasse.com")
+BREVO_SMTP_USERNAME = os.getenv("BREVO_SMTP_USERNAME", "")
+BREVO_SMTP_PASSWORD = os.getenv("BREVO_SMTP_PASSWORD", "")
+
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")

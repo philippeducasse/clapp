@@ -461,10 +461,7 @@ class TestApplicationWorkflowIntegration:
         assert festival.applications.count() == 1
         assert festival.applications.first() == application
 
-        # Verify application year calculation
-        current_date = timezone.now().date()
-        expected_year = current_date.year + 1 if current_date.month >= 9 else current_date.year
-        assert application.application_year == expected_year
+        assert application.application_date == timezone.now().date()
 
         # Verify email was sent via locmem backend (not mocked)
         assert len(mail.outbox) == 1
@@ -595,53 +592,6 @@ class TestApplicationWorkflowIntegration:
         # No applications should be created
         assert Application.objects.count() == 0
 
-    def test_application_year_calculation_september_rule(
-        self, authenticated_client, festival, authenticated_user
-    ):
-        """
-        Integration test: Application year uses profile.current_application_year when set,
-        otherwise defaults to the current calendar year regardless of month.
-        """
-        mail.outbox.clear()
-
-        # Configure user email
-        authenticated_user.email_host = "OTHER"
-        authenticated_user.other_email_host = "ssl0.ovh.net"
-
-        authenticated_user.email_host_user = "test@test.com"
-        authenticated_user.email_host_password = "TestPassword123!"
-        authenticated_user.save()
-
-        data = {
-            "message": "<p>Test message</p>",
-            "email_subject": "Test Subject",
-            "recipients": "contact@festival.com",
-        }
-
-        # Applying in August with no current_application_year → uses calendar year
-        with patch("django.utils.timezone.now") as mock_now:
-            mock_now.return_value = timezone.make_aware(datetime(2025, 8, 15))
-
-            response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
-
-            assert response.status_code == status.HTTP_200_OK
-            application = Application.objects.first()
-            assert application.application_year == 2025
-
-        application.hard_delete()
-        mail.outbox.clear()
-
-        # Applying in October with no current_application_year → still uses calendar year (2025)
-        with patch("django.utils.timezone.now") as mock_now:
-            mock_now.return_value = timezone.make_aware(datetime(2025, 10, 1))
-
-            response = authenticated_client.post(f"/api/festivals/{festival.id}/apply/", data)
-
-            assert response.status_code == status.HTTP_200_OK
-            application = Application.objects.first()
-            assert application.application_year == 2025
-
-
 @pytest.mark.django_db
 class TestDatabaseRelationshipsIntegration:
     """Test complex database relationships and cascade behaviors"""
@@ -726,12 +676,12 @@ class TestDatabaseRelationshipsIntegration:
         application = Application.objects.get(id=application_id)
         assert application.organisation == festival
 
-    def test_complex_query_applications_by_year_and_status(
+    def test_complex_query_applications_by_date_and_status(
         self, authenticated_client, festival, authenticated_user
     ):
         """
         Integration test: Complex queries across applications should work correctly
-        with calculated fields like application_year.
+        with application dates and statuses.
         """
         mail.outbox.clear()
 
@@ -743,9 +693,9 @@ class TestDatabaseRelationshipsIntegration:
         authenticated_user.email_host_password = "TestPassword123!"
         authenticated_user.save()
 
-        # Create applications for different years
+        # Create applications on different dates
         with patch("django.utils.timezone.now") as mock_now:
-            # Application for 2025
+            # Application dated 2025
             mock_now.return_value = timezone.make_aware(datetime(2025, 3, 1))
 
             data = {
@@ -768,7 +718,7 @@ class TestDatabaseRelationshipsIntegration:
         mail.outbox.clear()
 
         with patch("django.utils.timezone.now") as mock_now:
-            # Application for 2026
+            # Application dated 2026
             mock_now.return_value = timezone.make_aware(datetime(2026, 3, 1))
 
             data = {
@@ -780,12 +730,12 @@ class TestDatabaseRelationshipsIntegration:
             assert response.status_code == status.HTTP_200_OK
             app_2026_id = response.data["applicationId"]
 
-        # Query applications by year using the property
+        # Verify the persisted application dates
         app_2025 = Application.objects.get(id=app_2025_id)
         app_2026 = Application.objects.get(id=app_2026_id)
 
-        assert app_2025.application_year == 2025
-        assert app_2026.application_year == 2026
+        assert app_2025.application_date == date(2025, 3, 1)
+        assert app_2026.application_date == date(2026, 3, 1)
 
         # Query all applications for the user
         user_applications = Application.objects.filter(profile=authenticated_user)

@@ -306,6 +306,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 {"error": "Message and/or subject not found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        season = None
         if season_id:
             season = get_object_or_404(ApplicationSeason, pk=season_id)
 

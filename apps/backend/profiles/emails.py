@@ -14,6 +14,18 @@ from profiles.oauth_smtp_backend import XOAuth2EmailBackend
 
 def get_user_email_connection(user: Profile):
     """Get SMTP connection for user, handling OAuth or manual SMTP."""
+    if user.email.lower() == settings.BREVO_PROFILE_EMAIL.lower():
+        if not settings.BREVO_SMTP_USERNAME or not settings.BREVO_SMTP_PASSWORD:
+            raise Exception("Brevo SMTP credentials are not configured")
+        return get_connection(
+            backend="django.core.mail.backends.smtp.EmailBackend",
+            host="smtp-relay.brevo.com",
+            port=587,
+            username=settings.BREVO_SMTP_USERNAME,
+            password=settings.BREVO_SMTP_PASSWORD,
+            use_tls=True,
+        )
+
     # Try OAuth if tokens exist
     if user.email_host == "GMAIL" and user.google_oauth_refresh_token:
         return _gmail_oauth_connection(user)

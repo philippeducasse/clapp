@@ -66,6 +66,8 @@ jobs:
           echo "MISTRAL_API_KEY=${{ secrets.MISTRAL_API_KEY }}" >> .env
           echo "FERNET_KEY=${{ secrets.FERNET_KEY }}" >> .env
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
+          echo "BREVO_SMTP_USERNAME=${{ secrets.BREVO_SMTP_USERNAME }}" >> .env
+          echo "BREVO_SMTP_PASSWORD=${{ secrets.BREVO_SMTP_PASSWORD }}" >> .env
 
       - name: Get changed files in docker folder
         id: changed-files-docker

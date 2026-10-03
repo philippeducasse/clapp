@@ -76,7 +76,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "comments",
             "season_id",
         ]
-        read_only_fields = ("id", "created_at", "updated_at", "application_year")
+        read_only_fields = ("id", "created_at", "updated_at")
 
     def get_organisation_type_display(self, object):
         if object.content_type:

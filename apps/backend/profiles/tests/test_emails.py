@@ -1,4 +1,5 @@
 import pytest
+from django.test import override_settings
 from unittest.mock import patch, MagicMock
 from profiles.emails import get_user_email_connection
 from profiles.models import Profile
@@ -7,6 +8,37 @@ from profiles.models import Profile
 @pytest.mark.django_db
 class TestEmailFunctions:
     """Tests for email utility functions."""
+
+    @override_settings(BREVO_SMTP_USERNAME="brevo-user", BREVO_SMTP_PASSWORD="brevo-password")
+    def test_get_user_email_connection_uses_brevo_for_designated_profile(self):
+        profile = Profile.objects.create_user(
+            email="info@philippeducasse.com",
+            password="testpass123",
+        )
+
+        with patch("profiles.emails.get_connection") as mock_get_connection:
+            mock_get_connection.return_value = MagicMock()
+            connection = get_user_email_connection(profile)
+
+        mock_get_connection.assert_called_once_with(
+            backend="django.core.mail.backends.smtp.EmailBackend",
+            host="smtp-relay.brevo.com",
+            port=587,
+            username="brevo-user",
+            password="brevo-password",
+            use_tls=True,
+        )
+        assert connection is not None
+
+    @override_settings(BREVO_SMTP_USERNAME="", BREVO_SMTP_PASSWORD="")
+    def test_get_user_email_connection_requires_brevo_credentials(self):
+        profile = Profile.objects.create_user(
+            email="info@philippeducasse.com",
+            password="testpass123",
+        )
+
+        with pytest.raises(Exception, match="Brevo SMTP credentials are not configured"):
+            get_user_email_connection(profile)
 
     def test_get_user_email_connection_with_known_host(self):
         """Test getting email connection with a known email host."""

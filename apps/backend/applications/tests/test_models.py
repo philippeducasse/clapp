@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from applications.models import Application
+from applications.models import Application, ApplicationSeason
 from organisations.festivals.models import Festival
 from performances.models import Performance
 from profiles.models import Profile
@@ -45,20 +45,26 @@ class TestApplicationModel:
         )
 
         assert "Test Festival" in str(application)
+        assert "2025" in str(application)
 
-    def test_application_year_property(self, festival, profile):
-        """Test application_year property calculation"""
-        # Test for date before September (returns same year)
-        app1 = Application.objects.create(
-            organisation=festival, profile=profile, application_date=date(2025, 3, 15)
-        )
-        assert app1.application_year == 2025
+    def test_application_string_representation_without_date(self, festival, profile):
+        """Test the __str__ method when no application date is set."""
+        application = Application.objects.create(organisation=festival, profile=profile)
 
-        # Test for date in/after September (returns next year)
-        app2 = Application.objects.create(
-            organisation=festival, profile=profile, application_date=date(2025, 10, 15)
+        assert "No date" in str(application)
+
+    def test_application_string_representation_uses_season(self, festival, profile):
+        """Test the __str__ method prefers the season to the application date."""
+        season = ApplicationSeason.objects.create(name="Summer 2027", profile=profile)
+        application = Application.objects.create(
+            organisation=festival,
+            profile=profile,
+            season=season,
+            application_date=date(2025, 3, 15),
         )
-        assert app2.application_year == 2026
+
+        assert "Summer 2027 - test@example.com" in str(application)
+        assert "2025" not in str(application)
 
     def test_application_with_performances(self, festival, profile, performance):
         """Test application with performances many-to-many relationship"""
