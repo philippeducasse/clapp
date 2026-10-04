@@ -175,6 +175,26 @@ const ACCEPTED_EXCEL_MIME_TYPES = [
 ];
 const ACCEPTED_EXCEL_EXTENSIONS = [".xlsx", ".xls"];
 
+// Hostname must have a dot and a real TLD (letters, or punycode for internationalised TLDs).
+const HOSTNAME_REGEX = /^([a-z\d-]+\.)+([a-z]{2,}|xn--[a-z\d-]+)$/i;
+
+/**
+ * Accepts http(s) URLs, with or without the scheme (e.g. "example.com/page?x=1").
+ * Uses the URL parser rather than a regex so query strings, fragments, ports, etc. are handled.
+ */
+export const isValidUrl = (value: string): boolean => {
+  const trimmed = value.trim();
+  if (!trimmed || /\s/.test(trimmed)) return false;
+
+  const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+  try {
+    const { protocol, hostname } = new URL(withScheme);
+    return (protocol === "http:" || protocol === "https:") && HOSTNAME_REGEX.test(hostname);
+  } catch {
+    return false;
+  }
+};
+
 export const createZodFormSchema = (
   formFields: ControlledFormElement[],
 ): ZodObject<Record<string, ZodType>> => {
@@ -269,12 +289,7 @@ export const createZodFormSchema = (
         }
         break;
       case ControlledFormElementType.URL:
-        zodType = z
-          .string()
-          .regex(
-            /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w .\-@]*)*\/?$/,
-            "Please enter a valid URL",
-          );
+        zodType = z.string().refine(isValidUrl, "Please enter a valid URL");
         break;
       case ControlledFormElementType.EMAIL:
         zodType = z.email();
