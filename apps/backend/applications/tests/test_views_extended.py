@@ -3,7 +3,7 @@
 import pytest
 from rest_framework.test import APIClient
 
-from applications.models import Application
+from applications.models import Application, ApplicationSeason
 from profiles.models import Profile
 
 
@@ -61,6 +61,53 @@ class TestApplicationTagAction:
             assert response.data["count"] == 2
         else:
             assert len(response.data) == 2
+
+    def test_list_includes_applications_without_a_season(self):
+        profile = Profile.objects.create_user(email="t@example.com", password="pass")
+        season = ApplicationSeason.objects.create(profile=profile, name="2027")
+        in_season = Application.objects.create(profile=profile, season=season, status="DRAFT")
+        without_season = Application.objects.create(profile=profile, status="APPLIED")
+
+        client = APIClient()
+        client.force_authenticate(user=profile)
+        response = client.get("/api/applications/")
+
+        assert response.status_code == 200
+        assert response.data["count"] == 2
+        assert {application["id"] for application in response.data["results"]} == {
+            in_season.id,
+            without_season.id,
+        }
+
+    def test_list_can_be_filtered_by_season(self):
+        profile = Profile.objects.create_user(email="t@example.com", password="pass")
+        season = ApplicationSeason.objects.create(profile=profile, name="2027")
+        in_season = Application.objects.create(profile=profile, season=season, status="DRAFT")
+        Application.objects.create(profile=profile, status="APPLIED")
+
+        client = APIClient()
+        client.force_authenticate(user=profile)
+        response = client.get("/api/applications/?season=2027")
+
+        assert response.status_code == 200
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["id"] == in_season.id
+        assert response.data["results"][0]["season_name"] == "2027"
+
+    def test_list_can_be_filtered_to_applications_without_a_season(self):
+        profile = Profile.objects.create_user(email="t@example.com", password="pass")
+        season = ApplicationSeason.objects.create(profile=profile, name="2027")
+        Application.objects.create(profile=profile, season=season, status="DRAFT")
+        without_season = Application.objects.create(profile=profile, status="APPLIED")
+
+        client = APIClient()
+        client.force_authenticate(user=profile)
+        response = client.get("/api/applications/?season=__none__")
+
+        assert response.status_code == 200
+        assert response.data["count"] == 1
+        assert response.data["results"][0]["id"] == without_season.id
+        assert response.data["results"][0]["season_name"] is None
 
     def test_other_user_cannot_see_applications(self):
         profile1 = Profile.objects.create_user(email="user1@example.com", password="pass")

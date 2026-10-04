@@ -4,8 +4,14 @@ import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
 import { ApplicationStatus } from "@/interfaces/entities/Application";
 import { OrganisationType } from "@/interfaces/Enums";
 
-export const getApplicationFilters = (): FilterConfig[] => {
+export const getApplicationFilters = (seasons: string[]): FilterConfig[] => {
   return [
+    {
+      column: "season",
+      label: "Season",
+      type: FilterType.SELECT,
+      options: [...seasons.map((season) => ({ label: season, value: season }))],
+    },
     {
       column: "status",
       label: "Status",

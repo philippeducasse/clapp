@@ -35,6 +35,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
     season_id = serializers.PrimaryKeyRelatedField(
         source="season", required=False, allow_null=True, read_only=True
     )
+    season = serializers.CharField(source="season.name", read_only=True, default=None)
 
     def get_fields(self):
         """
@@ -75,6 +76,7 @@ class ApplicationSerializer(serializers.ModelSerializer):
             "status",
             "comments",
             "season_id",
+            "season",
         ]
         read_only_fields = ("id", "created_at", "updated_at")
 

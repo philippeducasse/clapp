@@ -111,7 +111,9 @@ const DataTableHeader = <TData,>({
             <input
               placeholder="Search"
               value={searchBarFilter}
-              onChange={(event) => handlesearchBarFilterChange(event.target.value)}
+              onChange={(event) =>
+                handlesearchBarFilterChange(event.target.value)
+              }
               type="search"
               className="w-full p-2 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-foreground"
             />
@@ -126,7 +128,12 @@ const DataTableHeader = <TData,>({
                       variant="outline"
                       size="sm"
                       className="h-7 px-2 text-xs gap-1"
-                      onClick={() => handleRemoveFilter(filter?.column as string, filter?.value)}
+                      onClick={() =>
+                        handleRemoveFilter(
+                          filter?.column as string,
+                          filter?.value,
+                        )
+                      }
                     >
                       <span>{capitalizeFirst(String(filter?.value))}</span>
                       <X className="h-3 w-3 ml-1 text-primary" />
@@ -140,14 +147,21 @@ const DataTableHeader = <TData,>({
 
         <div className="flex gap-4">
           {filters && (
-            <Button variant={"secondary"} onClick={() => setOpenFilterDialog(true)}>
+            <Button
+              variant={"secondary"}
+              onClick={() => setOpenFilterDialog(true)}
+            >
               <SlidersHorizontal className="text-primary" />
               Filters
             </Button>
           )}
           <CreateButton
             label={`Create new ${capitalizeFirst(entityName)}`}
-            href={entityName !== "residency" ? `${entityName}s/create` : "residencies/create"}
+            href={
+              entityName !== "residency"
+                ? `${entityName}s/create`
+                : "residencies/create"
+            }
           />
         </div>
       </div>

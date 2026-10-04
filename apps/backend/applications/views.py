@@ -13,12 +13,18 @@ from applications.serializer import ApplicationSerializer
 
 # converts URL query params into an ORM call.
 class ApplicationFilter(django_filters.FilterSet):
-    # this becomes queryset.filter(season__name=seasonname)
-    season = django_filters.CharFilter(field_name="season__name")
+    season = django_filters.CharFilter(method="filter_season")
 
     class Meta:
         model = Application
         fields = ["season"]
+
+    def filter_season(
+        self, queryset: QuerySet[Application], name: str, value: str
+    ) -> QuerySet[Application]:
+        if not value:
+            return queryset.filter(season__isnull=True)
+        return queryset.filter(season__name=value)
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -43,22 +49,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         return response
 
     def get_queryset(self) -> QuerySet[Application]:
-        queryset = (
+        return (
             Application.objects.filter(profile_id=self.request.user.id)
             .select_related("content_type", "season")
             .prefetch_related("organisation")
         )
-
-        # If no season filter provided, default to most recent season
-        if "season" not in self.request.query_params:
-            most_recent_season = ApplicationSeason.objects.filter(
-                profile_id=self.request.user.id
-            ).first()
-
-            if most_recent_season:
-                queryset = queryset.filter(season=most_recent_season)
-
-        return queryset
 
     @action(detail=True, methods=["patch"], url_path="status/(?P<new_status>[^/.]+)")
     def tag(self, request: HttpRequest, pk: int, new_status: str) -> Response:

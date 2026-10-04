@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   totalCount?: number;
   filters?: FilterConfig[];
   defaultSorting?: SortingState;
+  defaultColumnFilters?: ColumnFiltersState;
   fetchData?: (params: FetchParams) => Promise<PaginatedResponse<TData>>;
   onDataFetched?: (data: PaginatedResponse<TData>) => void;
 }
@@ -53,12 +54,13 @@ export function DataTable<TData, TValue>({
   totalCount,
   filters,
   defaultSorting = [],
+  defaultColumnFilters = [],
   fetchData,
   onDataFetched,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
   const [searchBarFilter, setSearchBarFilter] = useState<string>("");
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 25,

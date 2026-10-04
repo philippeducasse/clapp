@@ -1,6 +1,9 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Application, ApplicationStatus } from "@/interfaces/entities/Application";
+import {
+  Application,
+  ApplicationStatus,
+} from "@/interfaces/entities/Application";
 import { Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -27,7 +30,7 @@ const useApplicationColumns = ({
     (id: string) => {
       router.push(`/applications/${id}/edit`);
     },
-    [router]
+    [router],
   );
 
   return useMemo(
@@ -65,13 +68,33 @@ const useApplicationColumns = ({
         header: getSortableHeader("Status"),
         size: 110,
         filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
+          if (!Array.isArray(filterValue) || filterValue.length === 0)
+            return true;
           return filterValue.includes(row.getValue(columnId));
         },
         cell: ({ row }) => {
           const application = row.original;
           return <StatusBadge status={application.status} />;
         },
+      },
+      {
+        id: "season",
+        accessorKey: "season",
+        header: "Season",
+        size: 110,
+        // Filtering happens server-side; mirror it so client-side filtering stays consistent.
+        filterFn: (row, columnId, filterValue) => {
+          if (!filterValue) return true;
+          const seasonName = row.getValue<string | null | undefined>(columnId);
+          return seasonName === filterValue;
+        },
+        cell: ({ row }) => (
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+            {row.original.season ?? (
+              <span className="text-muted-foreground">–</span>
+            )}
+          </div>
+        ),
       },
       {
         accessorKey: "organisationType",
@@ -89,7 +112,10 @@ const useApplicationColumns = ({
           const application = row.original;
           return (
             <div className="flex gap-2">
-              <StatusDropdown entityId={application.id as number} onStatusChange={onStatusChange} />
+              <StatusDropdown
+                entityId={application.id as number}
+                onStatusChange={onStatusChange}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -111,7 +137,7 @@ const useApplicationColumns = ({
         },
       },
     ],
-    [onEdit, onDeleteClick, onStatusChange]
+    [onEdit, onDeleteClick, onStatusChange],
   );
 };
 

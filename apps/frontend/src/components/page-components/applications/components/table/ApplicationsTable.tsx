@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   Application,
   ApplicationStatus,
@@ -17,8 +17,6 @@ import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 interface ApplicationsTableProps {
   initialData: PaginatedResponse<Application>;
@@ -33,17 +31,6 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   const [deleteApplicationId, setDeleteApplicationId] = useState<number | null>(
     null,
   );
-
-  const [seasons, setSeasons] = useState<string[]>([]);
-  const [selectedSeason, setSelectedSeason] = useState<string | undefined>();
-
-  useEffect(() => {
-    if (initialData?.metadata?.availableSeasons) {
-      const availableSeasons = initialData.metadata.availableSeasons as string[];
-      setSeasons(availableSeasons);
-      setSelectedSeason(availableSeasons[0]);
-    }
-  }, [initialData]);
 
   const handleDeleteClick = useCallback((id: number) => {
     setDeleteApplicationId(id);
@@ -95,15 +82,17 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
     onDeleteClick: handleDeleteClick,
     onStatusChange: handleStatusChange,
   });
-  const filters = useMemo(() => getApplicationFilters(), []);
+  const seasons = useMemo(
+    () => (initialData.metadata?.availableSeasons as string[]) ?? [],
+    [initialData.metadata?.availableSeasons],
+  );
+  const filters = useMemo(() => getApplicationFilters(seasons), [seasons]);
 
-  const fetchApplications = useCallback(
-    (params: Parameters<typeof applicationApiService.getAll>[0]) =>
-      applicationApiService.getAll({
-        ...params,
-        filters: { ...params?.filters, season: selectedSeason },
-      }),
-    [selectedSeason],
+  // Seasons are ordered by created_at ascending, so the last one is the most recent
+  const latestSeason = seasons.at(-1);
+  const defaultColumnFilters = useMemo(
+    () => (latestSeason ? [{ id: "season", value: latestSeason }] : []),
+    [latestSeason],
   );
 
   return (
@@ -115,33 +104,15 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         itemName="application"
       />
 
-      {seasons && (
-        <div className="inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground mb-4">
-          {seasons.map((season) => (
-            <Button
-              key={season}
-              type="button"
-              variant="ghost"
-              onClick={() => setSelectedSeason(season)}
-              className={cn(
-                "inline-flex h-auto items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium shadow-none ring-offset-background transition-all hover:bg-transparent hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-                selectedSeason === season &&
-                  "bg-background text-foreground shadow hover:bg-background hover:text-foreground",
-              )}
-            >
-              {season}
-            </Button>
-          ))}
-        </div>
-      )}
       <DataTable
         columns={columns}
         data={applicationData.results}
         entityName={EntityName.APPLICATION}
         filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
+        defaultColumnFilters={defaultColumnFilters}
         totalCount={applicationData.count}
-        fetchData={fetchApplications}
+        fetchData={applicationApiService.getAll}
         onDataFetched={handleDataFetched}
       />
     </>

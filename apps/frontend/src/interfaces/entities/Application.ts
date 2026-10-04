@@ -14,6 +14,7 @@ export interface Application {
   performances?: Performance[];
   emailSubject?: string;
   applicationSeason?: ApplicationSeason;
+  season?: string | null;
   message?: string;
   attachmentsSent?: File[];
   status: ApplicationStatus;
