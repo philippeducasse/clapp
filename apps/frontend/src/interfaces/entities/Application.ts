@@ -31,6 +31,9 @@ export interface ApplicationSeason {
   createdAt?: string;
 }
 
+// Filter value for "applications without a season". Must match NO_SEASON in the backend's applications/views.py.
+export const NO_SEASON_FILTER = "__none__";
+
 export type ApplicationCreate = Partial<
   Omit<Application, "id" | "createdAt" | "updatedAt" | "festival">
 > & {

@@ -1,7 +1,7 @@
 import { getOptions } from "@/helpers/formHelper";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
-import { ApplicationStatus } from "@/interfaces/entities/Application";
+import { ApplicationStatus, NO_SEASON_FILTER } from "@/interfaces/entities/Application";
 import { OrganisationType } from "@/interfaces/Enums";
 
 export const getApplicationFilters = (seasons: string[]): FilterConfig[] => {
@@ -10,7 +10,10 @@ export const getApplicationFilters = (seasons: string[]): FilterConfig[] => {
       column: "season",
       label: "Season",
       type: FilterType.SELECT,
-      options: [...seasons.map((season) => ({ label: season, value: season }))],
+      options: [
+        ...seasons.map((season) => ({ label: season, value: season })),
+        { label: "No season", value: NO_SEASON_FILTER },
+      ],
     },
     {
       column: "status",

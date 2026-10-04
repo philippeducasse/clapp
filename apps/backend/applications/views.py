@@ -11,6 +11,11 @@ from applications.models import APPLICATION_STATUS, Application, ApplicationSeas
 from applications.serializer import ApplicationSerializer
 
 
+# Sentinel for "applications without a season". django-filter skips empty values,
+# so an empty string can't be used to express this.
+NO_SEASON = "__none__"
+
+
 # converts URL query params into an ORM call.
 class ApplicationFilter(django_filters.FilterSet):
     season = django_filters.CharFilter(method="filter_season")
@@ -22,7 +27,7 @@ class ApplicationFilter(django_filters.FilterSet):
     def filter_season(
         self, queryset: QuerySet[Application], name: str, value: str
     ) -> QuerySet[Application]:
-        if not value:
+        if value == NO_SEASON:
             return queryset.filter(season__isnull=True)
         return queryset.filter(season__name=value)
 

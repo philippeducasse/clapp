@@ -92,7 +92,7 @@ class TestApplicationTagAction:
         assert response.status_code == 200
         assert response.data["count"] == 1
         assert response.data["results"][0]["id"] == in_season.id
-        assert response.data["results"][0]["season_name"] == "2027"
+        assert response.data["results"][0]["season"] == "2027"
 
     def test_list_can_be_filtered_to_applications_without_a_season(self):
         profile = Profile.objects.create_user(email="t@example.com", password="pass")
@@ -107,7 +107,7 @@ class TestApplicationTagAction:
         assert response.status_code == 200
         assert response.data["count"] == 1
         assert response.data["results"][0]["id"] == without_season.id
-        assert response.data["results"][0]["season_name"] is None
+        assert response.data["results"][0]["season"] is None
 
     def test_other_user_cannot_see_applications(self):
         profile1 = Profile.objects.create_user(email="user1@example.com", password="pass")

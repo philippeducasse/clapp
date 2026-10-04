@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import {
   Application,
   ApplicationStatus,
+  NO_SEASON_FILTER,
 } from "@/interfaces/entities/Application";
 import { Pencil, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ const useApplicationColumns = ({
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue) return true;
           const seasonName = row.getValue<string | null | undefined>(columnId);
+          if (filterValue === NO_SEASON_FILTER) return seasonName == null;
           return seasonName === filterValue;
         },
         cell: ({ row }) => (
