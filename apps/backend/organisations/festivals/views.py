@@ -16,6 +16,21 @@ from organisations.views import OrganisationViewSet
 
 class FestivalViewSet(OrganisationViewSet):
     serializer_class = FestivalSerializer
+    enrich_fields = (
+        "country",
+        "town",
+        "website_url",
+        "description",
+        "comments",
+        "festival_type",
+        "approximate_date",
+        "estimated_start_date",
+        "start_date",
+        "end_date",
+        "application_date_start",
+        "application_date_end",
+        "application_type",
+    )
 
     # DRF automatically reads the column and search filter with these paramters.
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

@@ -12,12 +12,24 @@ from organisations.models import Organisation
 
 class ResidencyViewSet(OrganisationViewSet):
     serializer_class = ResidencySerializer
+    enrich_fields = (
+        "country",
+        "town",
+        "website_url",
+        "description",
+        "comments",
+        "approximate_date",
+        "start_date",
+        "end_date",
+        "application_date_start",
+        "application_date_end",
+        "application_type",
+    )
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "application_type"]
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name", "start_date", "application_date_start"]
     ordering = ["name"]
-
 
     def get_organisation_type_name(self) -> str:
         return "residency"

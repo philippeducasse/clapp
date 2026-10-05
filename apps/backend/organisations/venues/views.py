@@ -12,12 +12,19 @@ from organisations.models import Organisation
 
 class VenueViewSet(OrganisationViewSet):
     serializer_class = VenueSerializer
+    enrich_fields = (
+        "country",
+        "town",
+        "website_url",
+        "description",
+        "comments",
+        "venue_type",
+    )
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "venue_type"]
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name"]
     ordering = ["name"]
-
 
     def get_organisation_type_name(self) -> str:
         return "venue"

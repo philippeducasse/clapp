@@ -9,8 +9,8 @@ def extract_fields_from_llm(llm_response: str) -> Dict[str, Any]:
     """Extract fields from LLM JSON response."""
     json_str: str = re.sub(r"```json\s*|\s*```", "", llm_response).strip()
     try:
-        response_data: Dict[str, Any] = json.loads(json_str)
-        return response_data
+        response_data = json.loads(json_str)
+        return response_data if isinstance(response_data, dict) else {}
     except json.JSONDecodeError as e:
         print(f"An error occurred while parsing the JSON response: {e}")
         return {}

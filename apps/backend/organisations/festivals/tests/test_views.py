@@ -172,6 +172,46 @@ class TestFestivalEnrichAction:
         assert mock_mistral.chat.called
 
     @patch("organisations.views.MistralClient")
+    def test_enrich_ignores_non_whitelisted_fields(self, mock_mistral_client, api_client, festival):
+        mock_mistral = Mock()
+        mock_mistral.search.return_value = Mock(outputs=[])
+        mock_mistral.chat.return_value = (
+            '{"description": "Enriched", "id": 9999, "user": null, "is_seed_clone": true}'
+        )
+        mock_mistral_client.return_value = mock_mistral
+
+        response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["id"] == festival.id
+        assert response.data["description"].startswith("Enriched")
+        assert mock_mistral.chat.call_args.kwargs["json_mode"] is True
+
+    @patch("organisations.views.MistralClient")
+    def test_enrich_unparseable_llm_response_returns_502(
+        self, mock_mistral_client, api_client, festival
+    ):
+        mock_mistral = Mock()
+        mock_mistral.search.return_value = Mock(outputs=[])
+        mock_mistral.chat.return_value = "not json"
+        mock_mistral_client.return_value = mock_mistral
+
+        response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+
+    @patch("organisations.views.MistralClient")
+    def test_enrich_search_failure_returns_502(self, mock_mistral_client, api_client, festival):
+        mock_mistral = Mock()
+        mock_mistral.search.side_effect = Exception("boom")
+        mock_mistral_client.return_value = mock_mistral
+
+        response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
+
+        assert response.status_code == status.HTTP_502_BAD_GATEWAY
+        assert not mock_mistral.chat.called
+
+    @patch("organisations.views.MistralClient")
     def test_enrich_festival_not_found(self, mock_mistral_client, api_client):
         """Test enriching a non-existent festival"""
         response = api_client.get("/api/festivals/9999/enrich/")

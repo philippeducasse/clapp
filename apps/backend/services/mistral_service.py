@@ -2,6 +2,7 @@
 
 import logging
 import os
+import threading
 
 from mistralai import ConversationResponse, Mistral
 from rest_framework.exceptions import Throttled
@@ -12,10 +13,28 @@ logger = logging.getLogger(__name__)
 
 
 class MistralClient:
+    # The web search agent is a remote resource: create it once per process
+    # (or reuse MISTRAL_SEARCH_AGENT_ID) instead of once per request.
+    _search_agent_id: str | None = None
+    _search_agent_lock = threading.Lock()
+
     def __init__(self) -> None:
         self.client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self.model = os.getenv("MISTRAL_DEFAULT_MODEL")
-        self.search_agent = self.client.beta.agents.create(
+
+    @property
+    def search_agent_id(self) -> str:
+        cls = type(self)
+        if cls._search_agent_id is None:
+            with cls._search_agent_lock:
+                if cls._search_agent_id is None:
+                    cls._search_agent_id = (
+                        os.getenv("MISTRAL_SEARCH_AGENT_ID") or self._create_search_agent()
+                    )
+        return cls._search_agent_id
+
+    def _create_search_agent(self) -> str:
+        agent = self.client.beta.agents.create(
             model="mistral-medium-2508",
             description="Agent able to search information regarding circus and street festivals over the web",
             name="Websearch Agent",
@@ -26,16 +45,19 @@ class MistralClient:
                 "top_p": 0.95,
             },
         )
+        logger.info("Created Mistral search agent %s", agent.id)
+        return agent.id
 
-    def chat(self, prompt: str, tenant_schema: str) -> str:
+    def chat(self, prompt: str, tenant_schema: str, json_mode: bool = False) -> str:
         allowed, _remaining = check_llm_rate_limit(tenant_schema)
         logger.info(f"user {tenant_schema} rate: {allowed}, left: {_remaining}")
         if not allowed:
             raise Throttled(detail="Daily LLM generation limit reached. Try again tomorrow.")
 
+        extra = {"response_format": {"type": "json_object"}} if json_mode else {}
         try:
             chat_response = self.client.chat.complete(
-                model=self.model, messages=[{"role": "user", "content": prompt}]
+                model=self.model, messages=[{"role": "user", "content": prompt}], **extra
             )
             # TODO: return limit to frontend?
             new_count = increment_llm_call_counter(tenant_schema)  # noqa
@@ -49,6 +71,6 @@ class MistralClient:
 
     def search(self, query: str) -> ConversationResponse:
         response: ConversationResponse = self.client.beta.conversations.start(
-            agent_id=self.search_agent.id, inputs=query
+            agent_id=self.search_agent_id, inputs=query
         )
         return response

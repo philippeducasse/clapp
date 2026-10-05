@@ -6,6 +6,14 @@ from rest_framework.exceptions import Throttled
 from services.mistral_service import MistralClient
 
 
+@pytest.fixture(autouse=True)
+def reset_search_agent_cache(monkeypatch):
+    monkeypatch.delenv("MISTRAL_SEARCH_AGENT_ID", raising=False)
+    MistralClient._search_agent_id = None
+    yield
+    MistralClient._search_agent_id = None
+
+
 @pytest.mark.django_db
 class TestMistralClientInit:
     """Tests for MistralClient initialization."""
@@ -30,20 +38,39 @@ class TestMistralClientInit:
         "os.environ", {"MISTRAL_API_KEY": "test_key", "MISTRAL_DEFAULT_MODEL": "mistral-small"}
     )
     @patch("services.mistral_service.Mistral")
-    def test_init_creates_search_agent(self, mock_mistral_class):
-        """Test that search agent is created on initialization."""
+    def test_search_agent_created_lazily_and_cached(self, mock_mistral_class):
+        """Search agent is created on first use and shared across instances."""
         mock_client = MagicMock()
         mock_mistral_class.return_value = mock_client
-        mock_agent = MagicMock(id="agent123")
-        mock_client.beta.agents.create.return_value = mock_agent
+        mock_client.beta.agents.create.return_value = MagicMock(id="agent123")
 
         client = MistralClient()
+        mock_client.beta.agents.create.assert_not_called()
+
+        assert client.search_agent_id == "agent123"
+        assert MistralClient().search_agent_id == "agent123"
 
         mock_client.beta.agents.create.assert_called_once()
         call_kwargs = mock_client.beta.agents.create.call_args[1]
         assert call_kwargs["name"] == "Websearch Agent"
         assert call_kwargs["model"] == "mistral-medium-2508"
-        assert client.search_agent.id == "agent123"
+
+    @patch.dict(
+        "os.environ",
+        {
+            "MISTRAL_API_KEY": "test_key",
+            "MISTRAL_DEFAULT_MODEL": "mistral-small",
+            "MISTRAL_SEARCH_AGENT_ID": "env_agent",
+        },
+    )
+    @patch("services.mistral_service.Mistral")
+    def test_search_agent_from_env(self, mock_mistral_class):
+        """A configured agent id is reused instead of creating one."""
+        mock_client = MagicMock()
+        mock_mistral_class.return_value = mock_client
+
+        assert MistralClient().search_agent_id == "env_agent"
+        mock_client.beta.agents.create.assert_not_called()
 
 
 @pytest.mark.django_db
@@ -193,7 +220,7 @@ class TestMistralClientSearch:
     )
     @patch("services.mistral_service.Mistral")
     def test_search_uses_initialized_agent(self, mock_mistral_class):
-        """Test that search uses the agent created during initialization."""
+        """Test that search uses the cached search agent."""
         mock_client = MagicMock()
         mock_mistral_class.return_value = mock_client
         mock_agent = MagicMock(id="agent_xyz")
@@ -202,8 +229,7 @@ class TestMistralClientSearch:
         mock_client.beta.conversations.start.return_value = mock_response
 
         client = MistralClient()
-        # Verify that the agent is stored
-        assert client.search_agent.id == "agent_xyz"
+        assert client.search_agent_id == "agent_xyz"
 
         client.search("test")
         # Verify that search uses the stored agent

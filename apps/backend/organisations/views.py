@@ -203,6 +203,9 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+    # Fields the LLM is allowed to write during enrichment. Override in subclasses.
+    enrich_fields: tuple[str, ...] = ("country", "town", "website_url", "description", "comments")
+
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
         """Enrich organisation data using LLM and web search."""
@@ -210,30 +213,50 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         org_type = self.get_organisation_type_name()
 
         query = f"{organisation.website_url} {organisation.name} {organisation.country} {datetime.now().year} {org_type}"
-        # search_results = self.gemini_client.search(query, request.user.id)
 
-        search_results: ConversationResponse = self.mistral_client.search(query=query)
+        try:
+            search_results: ConversationResponse = self.mistral_client.search(query=query)
+        except Exception:
+            logger.exception("Web search failed while enriching %s %s", org_type, organisation.id)
+            return Response(
+                {"error": "Web search failed, please try again later."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
         parsed_results: str = extract_search_results(search_results)
+        logger.debug("SEARCH: %s", parsed_results)
 
-        logger.info("SEARCH: %s", search_results)
         prompt: str = self.get_enrich_prompt(organisation, parsed_results)
-        logger.info("prompt: %s", prompt)
+        logger.debug("prompt: %s", prompt)
 
-        # TODO: after postgres migration, change to tenant_schema
-        llm_response: str = self.mistral_client.chat(prompt, request.user.id)
-        logger.info("RESPONSE: %s", llm_response)
+        llm_response: str = self.mistral_client.chat(prompt, request.user.id, json_mode=True)
+        logger.debug("RESPONSE: %s", llm_response)
 
         updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
+        if not updated_fields:
+            logger.warning(
+                "Enrichment returned no usable data for %s %s", org_type, organisation.id
+            )
+            return Response(
+                {"error": "Could not enrich data, please try again later."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
 
-        # Update the fields with LLM-provided values (including contacts)
-        for field, value in updated_fields.items():
-            if field not in ["sources", "updated_fields", "contacts"]:
-                setattr(organisation, field, value)
+        ignored = (
+            set(updated_fields)
+            - set(self.enrich_fields)
+            - {"contacts", "sources", "updated_fields"}
+        )
+        if ignored:
+            logger.info("Ignoring non-enrichable fields from LLM: %s", sorted(ignored))
+
+        for field in self.enrich_fields:
+            if field in updated_fields:
+                setattr(organisation, field, updated_fields[field])
 
         clean_organisation_data(organisation)
         enriched_data = self.get_serializer(organisation).data
 
-        if "contacts" in updated_fields:
+        if isinstance(updated_fields.get("contacts"), list):
             enriched_data["contacts"] = updated_fields["contacts"]
 
         return Response(enriched_data)
@@ -308,7 +331,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             )
         season = None
         if season_id:
-            season = get_object_or_404(ApplicationSeason, pk=season_id)
+            season = get_object_or_404(ApplicationSeason, pk=season_id, profile=request.user)
 
         logger.debug(f"Creating application for season {season}")
         try:
