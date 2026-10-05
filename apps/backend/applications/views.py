@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from applications.models import APPLICATION_STATUS, Application, ApplicationSeason
 from applications.serializer import ApplicationSerializer
 
-
 # Sentinel for "applications without a season". django-filter skips empty values,
 # so an empty string can't be used to express this.
 NO_SEASON = "__none__"
@@ -61,8 +60,8 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         )
 
     @action(detail=True, methods=["patch"], url_path="status/(?P<new_status>[^/.]+)")
-    def tag(self, request: HttpRequest, pk: int, new_status: str) -> Response:
-        """Add or remove tags from organisation."""
+    def update_status(self, request: HttpRequest, pk: int, new_status: str) -> Response:
+        """Update status on an existing application"""
         application = self.get_object()
         valid_actions = [status[0] for status in APPLICATION_STATUS]
 
