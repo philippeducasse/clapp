@@ -30,7 +30,6 @@ def validate_application_recipients(recipients_input: str) -> List[str]:
     return recipient_emails
 
 
-
 def prepare_application_email(
     application: Application,
     recipient_emails: List[str],
@@ -100,7 +99,6 @@ def prepare_application_email(
     return email
 
 
-
 def send_application_email(email: Any, application: Application) -> None:
     """
     Send the application email and update application status.
@@ -114,12 +112,12 @@ def send_application_email(email: Any, application: Application) -> None:
         application.save()
         return
 
-    logger.debug(f"Sending email for application {application.id}")
     message_id = make_msgid(domain=application.profile.email.rsplit("@", 1)[-1])
+    logger.debug(f"Sending email for application {application.id} with message_id: {message_id}")
     email.extra_headers["Message-ID"] = message_id
     email.send(fail_silently=False)
     logger.debug("Email sent, updating application status to APPLIED")
-    application.email_id = message_id
+    application.sent_message_id = message_id
     application.status = "APPLIED"
     application.save()
     logger.debug(f"Application {application.id} status updated")

@@ -77,6 +77,8 @@ All URL fields use the `normalize_url()` utility (clapp_backend/utils.py) to aut
 - `organisations/services.py`: Contains business logic for enriching organisation data using AI services
 - `services/gemini_service.py`: Google Gemini API integration for web search and data enrichment
 - `services/mistral_service.py`: Mistral AI integration
+- `applications/services.py`: `set_application_status` (validates the status, adds an optional note)
+- `applications/inbox.py`: Reads replies to application emails over IMAP and suggests status updates for manual approval (see `docs/inbox_pipeline.md`)
 
 ### Django Apps Structure
 

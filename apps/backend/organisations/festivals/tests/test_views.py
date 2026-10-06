@@ -71,6 +71,7 @@ def mock_email():
     """Fixture to provide a properly configured email mock"""
     with patch("django.core.mail.EmailMultiAlternatives") as mock:
         mock_instance = Mock()
+        mock_instance.extra_headers = {}
         mock_instance.send.return_value = 1  # Simulate successful send
         mock_instance.attach_alternative = Mock()
         mock_instance.attach = Mock()
@@ -312,6 +313,7 @@ class TestFestivalApplyAction:
         """Test that applying creates an application"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.extra_headers = {}
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
@@ -340,6 +342,7 @@ class TestFestivalApplyAction:
         """Test applying with performances attached"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.extra_headers = {}
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
         print("PERFORMANCE", performance, "ID: ", performance.id)
@@ -365,6 +368,7 @@ class TestFestivalApplyAction:
         """Test that multiple applications for the same festival are allowed"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.extra_headers = {}
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 
@@ -398,6 +402,7 @@ class TestFestivalApplyAction:
         """Test handling of email sending failure"""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.extra_headers = {}
         mock_email_instance.send.side_effect = Exception("Email server error")
         mock_email.return_value = mock_email_instance
 
@@ -420,6 +425,7 @@ class TestFestivalApplyAction:
         """Test that applying records the current date."""
         mock_connection.return_value = Mock()
         mock_email_instance = Mock()
+        mock_email_instance.extra_headers = {}
         mock_email_instance.send.return_value = 1
         mock_email.return_value = mock_email_instance
 

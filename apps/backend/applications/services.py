@@ -1,18 +1,19 @@
-from rest_framework import status
-from rest_framework.response import Response
+from typing import Optional
+
+from rest_framework.exceptions import ValidationError
 
 from .models import APPLICATION_STATUS, Application
 
 
-def set_application_status(application: Application, new_status: str, note=None):
-    current_status = application.status
-    if new_status not in {value for value, _ in APPLICATION_STATUS}:
-        return Response(
-            {"error": "Invalid application status"},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+def set_application_status(
+    application: Application, new_status: str, note: Optional[str] = None
+) -> Application:
+    """Set a new status. An optional note is added to the application's comments."""
+    if new_status not in dict(APPLICATION_STATUS):
+        raise ValidationError({"error": f"Invalid application status: {new_status}"})
 
-    if current_status != new_status:
-        application.status = new_status
-        application.comments = note
-        application.save()
+    application.status = new_status
+    if note:
+        application.comments = f"{application.comments}\n{note}".strip()
+    application.save()
+    return application

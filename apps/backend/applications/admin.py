@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from applications.models import Application, ApplicationSeason
+from applications.models import Application, ApplicationSeason, InboundEmail
 
 
 class ApplicationAdmin(admin.ModelAdmin):
@@ -13,3 +13,9 @@ class ApplicationSeasonAdmin(admin.ModelAdmin):
 
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(ApplicationSeason, ApplicationSeasonAdmin)
+
+
+@admin.register(InboundEmail)
+class InboundEmailAdmin(admin.ModelAdmin):
+    list_display = ("received_at", "from_address", "subject", "suggested_status", "state")
+    list_filter = ("state",)

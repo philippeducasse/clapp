@@ -258,6 +258,7 @@ dependencies = [
     { name = "httplib2" },
     { name = "httpx" },
     { name = "idna" },
+    { name = "imap-tools" },
     { name = "mistralai" },
     { name = "msal" },
     { name = "pandas" },
@@ -336,6 +337,7 @@ requires-dist = [
     { name = "httplib2", specifier = "==0.22.0" },
     { name = "httpx", specifier = "==0.28.1" },
     { name = "idna", specifier = "==3.10" },
+    { name = "imap-tools", specifier = ">=1.15.1" },
     { name = "mistralai", specifier = "==1.9.1" },
     { name = "msal", specifier = ">=1.28.0" },
     { name = "pandas", specifier = "==2.3.0" },
@@ -950,6 +952,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f1/70/7703c29685631f5a7590aa73f1f1d3fa9a380e654b86af429e0934a32f7d/idna-3.10.tar.gz", hash = "sha256:12f65c9b470abda6dc35cf8e63cc574b1c52b11df2c86030af0ac09b01b13ea9", size = 190490, upload-time = "2024-09-15T18:07:39.745Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/76/c6/c88e154df9c4e1a2a66ccf0005a88dfb2650c1dffb6f5ce603dfbd452ce3/idna-3.10-py3-none-any.whl", hash = "sha256:946d195a0d259cbba61165e88e65941f16e9b36ea6ddb97f00452bae8b1287d3", size = 70442, upload-time = "2024-09-15T18:07:37.964Z" },
+]
+
+[[package]]
+name = "imap-tools"
+version = "1.15.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/99/3c/676a0bbbe26e534329265d702dc1d9b9a7996a06f1f6c0e5355d2def8e79/imap_tools-1.15.1.tar.gz", hash = "sha256:5930cc4e37ce0b5685e941d71b9de042ccf7a1bdf5ae568c395a82dd928c0157", size = 48986, upload-time = "2026-10-06T11:08:31.335Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/98/55/67e11499f4bb8d65a0ded25bfa61c512a239a9615fbbf72ad905defa25d5/imap_tools-1.15.1-py3-none-any.whl", hash = "sha256:6bee6c9399fdf3e92326ffc729bb3faaa5bcfffbe59a6e6c97060528151a9f57", size = 36581, upload-time = "2026-10-06T11:08:28.645Z" },
 ]
 
 [[package]]

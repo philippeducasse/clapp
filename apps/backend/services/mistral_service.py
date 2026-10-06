@@ -69,6 +69,16 @@ class MistralClient:
             print(f"An error occurred with Mistral: {e}")
             return str(e)
 
+    def parse(self, prompt: str, response_format):
+        """Returns an instance of the given Pydantic model, filled in by the LLM."""
+        response = self.client.chat.parse(
+            response_format=response_format,
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0,
+        )
+        return response.choices[0].message.parsed
+
     def search(self, query: str) -> ConversationResponse:
         response: ConversationResponse = self.client.beta.conversations.start(
             agent_id=self.search_agent_id, inputs=query

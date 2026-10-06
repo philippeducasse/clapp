@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from django.urls import URLPattern, include, path
 from drf_spectacular.views import SpectacularAPIView
 
+from applications.urls import inbound_email_urlpatterns
+
 urlpatterns: List[URLPattern] = [
     path("clappmin/", admin.site.urls),
     path("health/", lambda request: JsonResponse({"status": "ok"})),
@@ -16,6 +18,7 @@ urlpatterns: List[URLPattern] = [
                 path("organisations/", include("organisations.urls")),
                 path("festivals/", include("organisations.festivals.urls")),
                 path("applications/", include("applications.urls")),
+                path("inbound-emails/", include(inbound_email_urlpatterns)),
                 path("performances/", include("performances.urls")),
                 path("residencies/", include("organisations.residencies.urls")),
                 path("venues/", include("organisations.venues.urls")),

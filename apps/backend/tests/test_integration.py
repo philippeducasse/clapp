@@ -1118,7 +1118,7 @@ class TestApplicationViewSet:
         )
 
         assert tag_response.status_code == status.HTTP_400_BAD_REQUEST
-        assert "Invalid action" in tag_response.data["error"]
+        assert "Invalid application status" in str(tag_response.data["error"])
 
 
 @pytest.mark.django_db

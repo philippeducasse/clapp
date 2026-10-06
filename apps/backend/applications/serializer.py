@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from applications.models import Application, ApplicationSeason
+from applications.models import Application, ApplicationSeason, InboundEmail
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
 from organisations.residencies.models import Residency
@@ -165,3 +165,12 @@ class ApplicationSeasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicationSeason
         fields: str = "__all__"
+
+
+class InboundEmailSerializer(serializers.ModelSerializer):
+    organisation_name = serializers.CharField(source="application.organisation.name", default=None)
+    application_status = serializers.CharField(source="application.status")
+
+    class Meta:
+        model = InboundEmail
+        fields = "__all__"

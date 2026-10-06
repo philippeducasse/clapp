@@ -7,8 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
-from applications.models import Application, ApplicationSeason
-from applications.serializer import ApplicationSerializer
+from applications.models import Application, ApplicationSeason, InboundEmail
+from applications.serializer import ApplicationSerializer, InboundEmailSerializer
 from applications.services import set_application_status
 
 # Sentinel for "applications without a season". django-filter skips empty values,
@@ -62,10 +62,36 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["patch"], url_path="status/(?P<new_status>[^/.]+)")
     def update_status(self, request: HttpRequest, pk: int, new_status: str) -> Response:
-        """Update status on an existing application"""
+        """Update the status of an application."""
         application = self.get_object()
 
         set_application_status(application, new_status)
 
         serializer = self.get_serializer(application)
         return Response(serializer.data)
+
+
+class InboundEmailViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = InboundEmailSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["state"]
+
+    def get_queryset(self) -> QuerySet[InboundEmail]:
+        return InboundEmail.objects.filter(application__profile_id=self.request.user.id)
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request: HttpRequest, pk: int) -> Response:
+        """Apply the suggested status, or the "status" given in the request body."""
+        email = self.get_object()
+        new_status = request.data.get("status") or email.suggested_status
+        set_application_status(email.application, new_status, note=email.summary)
+        email.state = "APPROVED"
+        email.save()
+        return Response(self.get_serializer(email).data)
+
+    @action(detail=True, methods=["post"])
+    def dismiss(self, request: HttpRequest, pk: int) -> Response:
+        email = self.get_object()
+        email.state = "DISMISSED"
+        email.save()
+        return Response(self.get_serializer(email).data)

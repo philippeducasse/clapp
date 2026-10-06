@@ -79,7 +79,7 @@ class Application(models.Model):
     )
     email_subject = models.CharField(max_length=100, blank=True)
     email_recipients = models.JSONField(blank=True, null=True)
-    email_id = models.CharField(max_length=256, db_index=True, blank=True)
+    sent_message_id = models.CharField(max_length=256, db_index=True, blank=True)
     message = models.CharField(max_length=10000, blank=True)
     attachments_sent = models.JSONField(blank=True, null=True)
     status = models.CharField(max_length=50, choices=APPLICATION_STATUS, default="DRAFT")
@@ -114,3 +114,33 @@ class Application(models.Model):
         """Restore a soft-deleted application"""
         self.deleted_at = None
         self.save()
+
+
+INBOUND_EMAIL_STATES: List[Tuple[str, str]] = [
+    ("PENDING_REVIEW", "Pending review"),
+    ("APPROVED", "Approved"),
+    ("DISMISSED", "Dismissed"),
+]
+
+
+class InboundEmail(models.Model):
+    """A reply to an application email, with a suggested status waiting for review."""
+
+    application = models.ForeignKey(
+        Application, on_delete=models.CASCADE, related_name="inbound_emails"
+    )
+    message_id = models.CharField(max_length=512, unique=True)
+    from_address = models.CharField(max_length=320)
+    subject = models.CharField(max_length=998, blank=True)
+    body = models.TextField(blank=True)
+    received_at = models.DateTimeField(null=True, blank=True)
+    suggested_status = models.CharField(max_length=50, choices=APPLICATION_STATUS, blank=True)
+    summary = models.TextField(blank=True)
+    state = models.CharField(max_length=20, choices=INBOUND_EMAIL_STATES, default="PENDING_REVIEW")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-received_at"]
+
+    def __str__(self) -> str:
+        return f"{self.from_address}: {self.subject}"

@@ -16,5 +16,9 @@ app.conf.beat_schedule = {
     "check-reminders-every-hour": {
         "task": "profiles.tasks.check_and_set_reminders",
         "schedule": crontab(minute=EVERY_HOUR),
-    }
+    },
+    "check-inbox-every-10-minutes": {
+        "task": "applications.tasks.check_inbox_task",
+        "schedule": crontab(minute="*/10"),
+    },
 }
