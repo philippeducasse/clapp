@@ -1,7 +1,18 @@
+from enum import Enum
 from typing import Any, Optional
 
 from organisations.venues.models import Venue
-from organisations.llm import _build_enrich_prompt, _format_contacts_for_prompt
+from organisations.llm import (
+    OrganisationEnrichment,
+    _build_enrich_prompt,
+    _format_contacts_for_prompt,
+)
+
+VenueType = Enum("VenueType", [(v, v) for v, _ in Venue.VENUE_TYPE], type=str)
+
+
+class VenueEnrichment(OrganisationEnrichment):
+    venue_type: Optional[VenueType] = None  # type: ignore[valid-type]
 
 
 def generate_enrich_prompt(venue: Venue, search_results: Optional[str]) -> str:
@@ -23,9 +34,6 @@ description: {nv(venue.description)}
 contacts: {contacts_display}
 comments: {nv(venue.comments)}"""
 
-    output_keys = """country, town, website_url, venue_type, description,
-contacts, sources, updated_fields"""
-
     type_field_section = f"""
     RECOGNITION HINTS
     venue_type (choose one from: {venue_types_str})
@@ -34,25 +42,24 @@ contacts, sources, updated_fields"""
     - If type is not clear, use "UNKNOWN".
     """
 
-    required_json_example = """{{
+    required_json_example = """{
       "country": "Belgium",
       "town": "Brussels",
       "website_url": "https://example-venue.be",
       "venue_type": "CONCERT_HALL",
       "description": "A modern concert hall hosting international and local performances.",
       "contacts": [
-        {{"email": "info@example-venue.be"}},
-        {{"email": "programming@example-venue.be", "name": "Jane Smith", "role": "Programming Director"}},
+        {"email": "info@example-venue.be"},
+        {"email": "programming@example-venue.be", "name": "Jane Smith", "role": "Programming Director"}
       ],
       "comments": "this is a comment."
-    }}"""
+    }"""
 
     return _build_enrich_prompt(
         venue,
         search_results,
         "venue",
         current_record_fields,
-        output_keys,
         type_field_section,
         required_json_example,
     )

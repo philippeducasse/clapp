@@ -8,6 +8,7 @@ from rest_framework.test import APIClient
 
 from applications.models import Application
 from organisations.festivals.models import Festival
+from organisations.festivals.utils import FestivalEnrichment
 from performances.models import Performance
 from profiles.models import Profile
 
@@ -157,28 +158,24 @@ class TestFestivalEnrichAction:
         mock_search_response = Mock(outputs=[mock_output])
         mock_mistral.search.return_value = mock_search_response
 
-        mock_mistral.chat.return_value = """
-        {
-            "description": "Enriched description",
-            "start_date": "2025-07-15",
-            "end_date": "2025-07-20"
-        }
-        """
+        mock_mistral.parse.return_value = FestivalEnrichment(
+            description="Enriched description",
+            start_date="2025-07-15",
+            end_date="2025-07-20",
+        )
         mock_mistral_client.return_value = mock_mistral
 
         response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
         assert mock_mistral.search.called
-        assert mock_mistral.chat.called
+        assert mock_mistral.parse.call_args.args[1] is FestivalEnrichment
 
     @patch("organisations.views.MistralClient")
-    def test_enrich_ignores_non_whitelisted_fields(self, mock_mistral_client, api_client, festival):
+    def test_enrich_ignores_none_fields(self, mock_mistral_client, api_client, festival):
         mock_mistral = Mock()
         mock_mistral.search.return_value = Mock(outputs=[])
-        mock_mistral.chat.return_value = (
-            '{"description": "Enriched", "id": 9999, "user": null, "is_seed_clone": true}'
-        )
+        mock_mistral.parse.return_value = FestivalEnrichment(description="Enriched", town=None)
         mock_mistral_client.return_value = mock_mistral
 
         response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
@@ -186,15 +183,13 @@ class TestFestivalEnrichAction:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["id"] == festival.id
         assert response.data["description"].startswith("Enriched")
-        assert mock_mistral.chat.call_args.kwargs["json_mode"] is True
+        assert response.data["town"] == "Paris"
 
     @patch("organisations.views.MistralClient")
-    def test_enrich_unparseable_llm_response_returns_502(
-        self, mock_mistral_client, api_client, festival
-    ):
+    def test_enrich_llm_failure_returns_502(self, mock_mistral_client, api_client, festival):
         mock_mistral = Mock()
         mock_mistral.search.return_value = Mock(outputs=[])
-        mock_mistral.chat.return_value = "not json"
+        mock_mistral.parse.side_effect = Exception("validation failed")
         mock_mistral_client.return_value = mock_mistral
 
         response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
@@ -210,7 +205,7 @@ class TestFestivalEnrichAction:
         response = api_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_502_BAD_GATEWAY
-        assert not mock_mistral.chat.called
+        assert not mock_mistral.parse.called
 
     @patch("organisations.views.MistralClient")
     def test_enrich_festival_not_found(self, mock_mistral_client, api_client):

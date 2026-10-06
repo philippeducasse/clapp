@@ -1,7 +1,25 @@
+from enum import Enum
 from typing import Any, Optional
 
 from organisations.residencies.models import Residency
-from organisations.llm import _build_enrich_prompt, _format_contacts_for_prompt
+from organisations.llm import (
+    OrganisationEnrichment,
+    _build_enrich_prompt,
+    _format_contacts_for_prompt,
+)
+
+ResidencyApplicationType = Enum(
+    "ResidencyApplicationType", [(v, v) for v, _ in Residency.APPLICATION_TYPE], type=str
+)
+
+
+class ResidencyEnrichment(OrganisationEnrichment):
+    approximate_date: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    application_date_start: Optional[str] = None
+    application_date_end: Optional[str] = None
+    application_type: Optional[ResidencyApplicationType] = None  # type: ignore[valid-type]
 
 
 def generate_enrich_prompt(residency: Residency, search_results: Optional[str]) -> str:
@@ -27,11 +45,6 @@ application_date_start: {nv(residency.application_date_start)}
 application_date_end: {nv(residency.application_date_end)}
 application_type: {nv(residency.application_type)}
 comments: {nv(residency.comments)}"""
-
-    output_keys = """country, town, approximate_date, start_date, end_date, website_url,
-description,
-application_date_start, application_date_end, application_type,
-contacts, sources, updated_fields"""
 
     type_field_section = f"""
     DATE RULES
@@ -63,7 +76,7 @@ contacts, sources, updated_fields"""
     - Treat hints as concepts, not exact strings (any language).
     """
 
-    required_json_example = """{{
+    required_json_example = """{
       "country": "Belgium",
       "town": "Brussels",
       "approximate_date": "mid September",
@@ -75,18 +88,17 @@ contacts, sources, updated_fields"""
       "application_date_end": "2026-06-30",
       "application_type": "FORM",
       "contacts": [
-        {{"email": "info@example-residency.be"}},
-        {{"email": "coordinator@example-residency.be", "name": "Alice Johnson", "role": "Residency Coordinator"}},
+        {"email": "info@example-residency.be"},
+        {"email": "coordinator@example-residency.be", "name": "Alice Johnson", "role": "Residency Coordinator"}
       ],
       "comments": "this is a comment."
-    }}"""
+    }"""
 
     return _build_enrich_prompt(
         residency,
         search_results,
         "residency",
         current_record_fields,
-        output_keys,
         type_field_section,
         required_json_example,
     )

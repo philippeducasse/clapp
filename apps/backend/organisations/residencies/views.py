@@ -6,7 +6,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from organisations.residencies.models import Residency
 from organisations.residencies.serializer import ResidencySerializer
 from organisations.views import OrganisationViewSet
-from organisations.residencies.utils import generate_enrich_prompt
+from organisations.residencies.utils import ResidencyEnrichment, generate_enrich_prompt
 from organisations.models import Organisation
 
 
@@ -25,6 +25,7 @@ class ResidencyViewSet(OrganisationViewSet):
         "application_date_end",
         "application_type",
     )
+    enrich_response_format = ResidencyEnrichment
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "application_type"]
     search_fields = ["name", "country", "website_url"]

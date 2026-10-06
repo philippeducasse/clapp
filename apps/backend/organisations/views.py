@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
+from rest_framework.exceptions import Throttled
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -27,9 +28,14 @@ from .emails import (
     send_application_email,
     validate_application_recipients,
 )
-from .llm import extract_search_results, format_email, generate_application_mail_prompt
+from .llm import (
+    OrganisationEnrichment,
+    extract_search_results,
+    format_email,
+    generate_application_mail_prompt,
+)
 from .tasks import upload_user_data
-from .utils import clean_organisation_data, extract_fields_from_llm
+from .utils import clean_organisation_data
 
 logger = logging.getLogger(__name__)
 
@@ -203,6 +209,8 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
     # Fields the LLM is allowed to write during enrichment. Override in subclasses.
     enrich_fields: tuple[str, ...] = ("country", "town", "website_url", "description", "comments")
+    # Pydantic model the LLM output is constrained to during enrichment. Override in subclasses.
+    enrich_response_format: type[OrganisationEnrichment] = OrganisationEnrichment
 
     @action(detail=True, methods=["get"])
     def enrich(self, request: HttpRequest, pk: int | None = None) -> Response:
@@ -226,10 +234,20 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         prompt: str = self.get_enrich_prompt(organisation, parsed_results)
         logger.debug("prompt: %s", prompt)
 
-        llm_response: str = self.mistral_client.chat(prompt, request.user.id, json_mode=True)
-        logger.debug("RESPONSE: %s", llm_response)
+        try:
+            enrichment: OrganisationEnrichment | None = self.mistral_client.parse(
+                prompt, self.enrich_response_format, tenant_schema=request.user.id
+            )
+        except Throttled:
+            raise
+        except Exception:
+            logger.exception("Enrichment LLM call failed for %s %s", org_type, organisation.id)
+            enrichment = None
+        logger.debug("RESPONSE: %s", enrichment)
 
-        updated_fields: Dict[str, Any] = extract_fields_from_llm(llm_response)
+        updated_fields: Dict[str, Any] = (
+            enrichment.model_dump(mode="json", exclude_none=True) if enrichment else {}
+        )
         if not updated_fields:
             logger.warning(
                 "Enrichment returned no usable data for %s %s", org_type, organisation.id

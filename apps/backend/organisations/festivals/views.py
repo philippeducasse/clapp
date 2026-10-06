@@ -9,6 +9,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from applications.models import Application
 from organisations.festivals.models import Festival
 from organisations.festivals.serializer import FestivalSerializer
+from organisations.festivals.utils import FestivalEnrichment
 from organisations.festivals.utils import generate_enrich_prompt as generate_festival_enrich_prompt
 from organisations.models import Organisation
 from organisations.views import OrganisationViewSet
@@ -31,6 +32,7 @@ class FestivalViewSet(OrganisationViewSet):
         "application_date_end",
         "application_type",
     )
+    enrich_response_format = FestivalEnrichment
 
     # DRF automatically reads the column and search filter with these paramters.
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

@@ -69,14 +69,21 @@ class MistralClient:
             print(f"An error occurred with Mistral: {e}")
             return str(e)
 
-    def parse(self, prompt: str, response_format):
+    def parse(self, prompt: str, response_format, tenant_schema: str | None = None):
         """Returns an instance of the given Pydantic model, filled in by the LLM."""
+        if tenant_schema is not None:
+            allowed, _remaining = check_llm_rate_limit(tenant_schema)
+            if not allowed:
+                raise Throttled(detail="Daily LLM generation limit reached. Try again tomorrow.")
+
         response = self.client.chat.parse(
             response_format=response_format,
             model=self.model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
         )
+        if tenant_schema is not None:
+            increment_llm_call_counter(tenant_schema)
         return response.choices[0].message.parsed
 
     def search(self, query: str) -> ConversationResponse:

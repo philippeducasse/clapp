@@ -376,17 +376,15 @@ class TestFestivalEnrichmentIntegration:
         mock_search_response = Mock(outputs=[mock_output])
         mock_mistral.search.return_value = mock_search_response
 
-        mock_mistral.chat.return_value = """
-        {
-            "description": "A renowned street arts festival featuring international circus performers",
-            "country": "France",
-            "town": "Paris",
-            "start_date": "2026-07-15",
-            "end_date": "2026-07-20",
-            "application_date_start": "December",
-            "application_date_end": "March"
-        }
-        """
+        from organisations.festivals.utils import FestivalEnrichment
+
+        mock_mistral.parse.return_value = FestivalEnrichment(
+            description="A renowned street arts festival featuring international circus performers",
+            country="France",
+            town="Paris",
+            start_date="2026-07-15",
+            end_date="2026-07-20",
+        )
         mock_mistral_client.return_value = mock_mistral
 
         response = authenticated_client.get(f"/api/festivals/{festival.id}/enrich/")
@@ -395,7 +393,7 @@ class TestFestivalEnrichmentIntegration:
 
         # Verify Mistral service was called
         assert mock_mistral.search.called
-        assert mock_mistral.chat.called
+        assert mock_mistral.parse.called
 
         # Note: Enrichment endpoint returns data but doesn't auto-save
         # This is the actual behavior - the frontend decides whether to save
@@ -1324,18 +1322,16 @@ class TestResidencyViewSet:
         mock_search_response = Mock(outputs=[mock_output])
         mock_mistral.search.return_value = mock_search_response
 
-        mock_mistral.chat.return_value = """
-        {
-            "description": "A test residency"
-        }
-        """
+        from organisations.residencies.utils import ResidencyEnrichment
+
+        mock_mistral.parse.return_value = ResidencyEnrichment(description="A test residency")
         mock_mistral_client.return_value = mock_mistral
 
         response = authenticated_client.get(f"/api/residencies/{residency.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
         assert mock_mistral.search.called
-        assert mock_mistral.chat.called
+        assert mock_mistral.parse.call_args.args[1] is ResidencyEnrichment
 
 
 @pytest.mark.django_db
@@ -1646,20 +1642,21 @@ class TestOrganisationEnrichEnhancements:
         mock_search_response = Mock(outputs=[mock_output])
         mock_mistral.search.return_value = mock_search_response
 
-        mock_mistral.chat.return_value = """
-        {
-            "description": "A test festival",
-            "contacts": ["contact1@example.com", "contact2@example.com"]
-        }
-        """
+        from organisations.festivals.utils import FestivalEnrichment
+
+        mock_mistral.parse.return_value = FestivalEnrichment(
+            description="A test festival",
+            contacts=[{"email": "contact1@example.com"}, {"email": "contact2@example.com"}],
+        )
         mock_mistral_client.return_value = mock_mistral
 
         response = authenticated_client.get(f"/api/festivals/{festival.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
-        # Contacts should be included in response
-        if "contacts" in response.data:
-            assert len(response.data["contacts"]) == 2
+        assert [c["email"] for c in response.data["contacts"]] == [
+            "contact1@example.com",
+            "contact2@example.com",
+        ]
 
 
 @pytest.mark.django_db
@@ -2023,15 +2020,13 @@ class TestVenueViewSet:
         mock_search_response = Mock(outputs=[mock_output])
         mock_mistral.search.return_value = mock_search_response
 
-        mock_mistral.chat.return_value = """
-        {
-            "description": "A test venue"
-        }
-        """
+        from organisations.venues.utils import VenueEnrichment
+
+        mock_mistral.parse.return_value = VenueEnrichment(description="A test venue")
         mock_mistral_client.return_value = mock_mistral
 
         response = authenticated_client.get(f"/api/venues/{venue.id}/enrich/")
 
         assert response.status_code == status.HTTP_200_OK
         assert mock_mistral.search.called
-        assert mock_mistral.chat.called
+        assert mock_mistral.parse.call_args.args[1] is VenueEnrichment

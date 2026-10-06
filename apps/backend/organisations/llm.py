@@ -1,10 +1,37 @@
 from typing import List, Optional
 
 from mistralai import ConversationResponse, TextChunk
+from pydantic import BaseModel, Field
 
 from organisations.models import Organisation
 from performances.models import Performance
 from profiles.models import Profile
+
+
+class EnrichedContact(BaseModel):
+    email: str = Field(
+        description="An email address found verbatim in the search results. Never invent or guess."
+    )
+    name: Optional[str] = None
+    role: Optional[str] = None
+
+
+class OrganisationEnrichment(BaseModel):
+    """Structured output for the enrichment LLM call. Subclassed per organisation type."""
+
+    country: Optional[str] = None
+    town: Optional[str] = None
+    website_url: Optional[str] = None
+    description: Optional[str] = None
+    comments: Optional[str] = None
+    contacts: List[EnrichedContact] = Field(
+        default_factory=list,
+        description="Only contacts whose email address appears in the search results. Empty if none.",
+    )
+    sources: List[str] = Field(default_factory=list, description="URLs used as sources.")
+    updated_fields: List[str] = Field(
+        default_factory=list, description="Names of the fields that were changed."
+    )
 
 
 def _format_contacts_for_prompt(organisation: Organisation) -> str:
@@ -25,19 +52,20 @@ def _build_enrich_prompt(
     search_results: Optional[str],
     org_type_display: str,
     current_record_fields: str,
-    output_keys: str,
     type_field_section: str,
     required_json_example: str,
 ) -> str:
     """
     Build enrichment prompt with shared structure and type-specific content.
 
+    The output shape is enforced via response_format (see OrganisationEnrichment),
+    so the prompt only carries semantic rules.
+
     Args:
         organisation: The organisation to enrich
         search_results: Web search snippets
         org_type_display: Display name (e.g., "festival", "venue", "residency")
         current_record_fields: The CURRENT RECORD section content
-        output_keys: The exact output keys required
         type_field_section: Type-specific recognition hints section (can be empty)
         required_json_example: Example JSON output for this type
     """
@@ -57,13 +85,8 @@ def _build_enrich_prompt(
     - Prefer official organisation website > reputable cultural listings > news > blogs.
     - If sources conflict, pick the **most recent official source**.
 
-    OUTPUT FORMAT
-    - Return **only** a single JSON object, no prose.
-    - Valid JSON. No comments. No trailing commas.
-    - Exactly these keys (strings):
-      {output_keys}
-    - contacts should be an array of objects with: email (required), name (optional), role (optional).
-      **IMPORTANT: Only include contacts if you find actual email addresses in the search results.
+    CONTACTS
+    - **Only include contacts if you find actual email addresses in the search results.
       If no email addresses are found, return an empty array []. Do NOT invent or guess email addresses.**
 
     CURRENT RECORD
@@ -72,7 +95,7 @@ def _build_enrich_prompt(
     WEB SEARCH SNIPPETS (include URLs if you have them)
     {sr}
 {type_field_section}
-    REQUIRED JSON SHAPE (example, syntactically correct — values are illustrative):
+    EXAMPLE OUTPUT (values are illustrative):
     {required_json_example}
     """
     return prompt

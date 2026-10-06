@@ -1,7 +1,28 @@
+from enum import Enum
 from typing import Any, Optional
 
 from organisations.festivals.models import Festival
-from organisations.llm import _build_enrich_prompt, _format_contacts_for_prompt
+from organisations.llm import (
+    OrganisationEnrichment,
+    _build_enrich_prompt,
+    _format_contacts_for_prompt,
+)
+
+FestivalType = Enum("FestivalType", [(v, v) for v, _ in Festival.FESTIVAL_TYPES], type=str)
+FestivalApplicationType = Enum(
+    "FestivalApplicationType", [(v, v) for v, _ in Festival.APPLICATION_TYPE], type=str
+)
+
+
+class FestivalEnrichment(OrganisationEnrichment):
+    festival_type: Optional[FestivalType] = None  # type: ignore[valid-type]
+    approximate_date: Optional[str] = None
+    estimated_start_date: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    application_date_start: Optional[str] = None
+    application_date_end: Optional[str] = None
+    application_type: Optional[FestivalApplicationType] = None  # type: ignore[valid-type]
 
 
 def generate_enrich_prompt(festival: Festival, search_results: Optional[str]) -> str:
@@ -31,11 +52,6 @@ application_date_start: {nv(festival.application_date_start)}
 application_date_end: {nv(festival.application_date_end)}
 application_type: {nv(festival.application_type)}
 comments: {nv(festival.comments)}"""
-
-    output_keys = """country, town, approximate_date, start_date, end_date, website_url,
-festival_type, description,
-application_date_start, application_date_end, application_type,
-contacts, sources, updated_fields"""
 
     type_field_section = f"""
     APPROXIMATE DATE RULES
@@ -74,10 +90,11 @@ contacts, sources, updated_fields"""
     - festival_type: look for domain terms: street festival, circus, music, theatre, dance, film, circus.
     """
 
-    required_json_example = """{{
+    required_json_example = """{
       "country": "Belgium",
       "town": "Brussels",
       "approximate_date": "mid October",
+      "estimated_start_date": "2026-10-15",
       "start_date": "2026-10-15",
       "end_date": "2026-10-20",
       "website_url": "https://examplefest.be",
@@ -87,18 +104,17 @@ contacts, sources, updated_fields"""
       "application_date_end": "2026-06-15",
       "application_type": "FORM",
       "contacts": [
-        {{"email": "info@examplefest.be"}},
-        {{"email": "programming@examplefest.be", "name": "John Smith", "role": "Programming Manager"}},
+        {"email": "info@examplefest.be"},
+        {"email": "programming@examplefest.be", "name": "John Smith", "role": "Programming Manager"}
       ],
       "comments": "this is a comment."
-    }}"""
+    }"""
 
     return _build_enrich_prompt(
         festival,
         search_results,
         "festival",
         current_record_fields,
-        output_keys,
         type_field_section,
         required_json_example,
     )

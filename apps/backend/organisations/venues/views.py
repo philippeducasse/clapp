@@ -6,7 +6,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from organisations.venues.models import Venue
 from organisations.venues.serializer import VenueSerializer
 from organisations.views import OrganisationViewSet
-from organisations.venues.utils import generate_enrich_prompt
+from organisations.venues.utils import VenueEnrichment, generate_enrich_prompt
 from organisations.models import Organisation
 
 
@@ -20,6 +20,7 @@ class VenueViewSet(OrganisationViewSet):
         "comments",
         "venue_type",
     )
+    enrich_response_format = VenueEnrichment
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["country", "venue_type"]
     search_fields = ["name", "country", "website_url"]
