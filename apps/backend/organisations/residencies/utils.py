@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 from organisations.residencies.models import Residency
-from organisations.services import _build_enrich_prompt, _format_contacts_for_prompt
+from organisations.llm import _build_enrich_prompt, _format_contacts_for_prompt
 
 
 def generate_enrich_prompt(residency: Residency, search_results: Optional[str]) -> str:

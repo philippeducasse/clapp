@@ -1,4 +1,4 @@
-"""Tests for organisations/services.py."""
+"""Tests for organisations llm, emails and applications modules."""
 
 from unittest.mock import MagicMock, patch
 
@@ -7,15 +7,16 @@ from django.utils import timezone
 
 from applications.models import Application
 from organisations.festivals.models import Festival, FestivalContact
-from organisations.services import (
-    _format_contacts_for_prompt,
-    create_form_application,
-    format_email,
-    generate_application_mail_prompt,
-    parse_performance_ids,
+from organisations.applications import create_form_application, parse_performance_ids
+from organisations.emails import (
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
+)
+from organisations.llm import (
+    _format_contacts_for_prompt,
+    format_email,
+    generate_application_mail_prompt,
 )
 from performances.models import Performance
 from profiles.models import Profile
@@ -255,7 +256,7 @@ class TestSendApplicationEmail:
 
 @pytest.mark.django_db
 class TestPrepareApplicationEmail:
-    @patch("organisations.services.get_user_email_connection")
+    @patch("organisations.emails.get_user_email_connection")
     def test_uses_profile_email_as_sender_not_smtp_username(self, mock_connection):
         profile = Profile.objects.create_user(
             email="info@philippeducasse.com",

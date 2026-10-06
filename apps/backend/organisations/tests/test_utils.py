@@ -1,6 +1,6 @@
 import pytest
 from organisations.festivals.models import Festival
-from organisations.services import format_email
+from organisations.llm import format_email
 from organisations.utils import clean_organisation_data, extract_fields_from_llm
 
 

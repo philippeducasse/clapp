@@ -21,15 +21,13 @@ from performances.models import Performance
 from services.mistral_service import ConversationResponse, MistralClient
 
 from .models import Organisation
-from .services import (
-    create_form_application,
-    extract_search_results,
-    format_email,
-    generate_application_mail_prompt,
+from .applications import create_form_application
+from .emails import (
     prepare_application_email,
     send_application_email,
     validate_application_recipients,
 )
+from .llm import extract_search_results, format_email, generate_application_mail_prompt
 from .tasks import upload_user_data
 from .utils import clean_organisation_data, extract_fields_from_llm
 
@@ -275,7 +273,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 {"error": f"{self.get_organisation_type_name().capitalize()} not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        from organisations.services import parse_performance_ids
+        from organisations.applications import parse_performance_ids
 
         profile = request.user
         application_method = request.data.get("application_method")

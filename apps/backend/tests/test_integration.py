@@ -105,7 +105,7 @@ def patch_email_connection():
     emails appear in mail.outbox for verification.
     """
     with patch(
-        "organisations.services.get_user_email_connection", side_effect=get_test_email_connection
+        "organisations.emails.get_user_email_connection", side_effect=get_test_email_connection
     ):
         yield
 

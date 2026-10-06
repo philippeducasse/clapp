@@ -305,7 +305,7 @@ class TestFestivalApplyAction:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     @patch("profiles.emails.get_user_email_connection")
-    @patch("organisations.services.EmailMultiAlternatives")
+    @patch("organisations.emails.EmailMultiAlternatives")
     def test_apply_creates_application(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
@@ -333,7 +333,7 @@ class TestFestivalApplyAction:
         assert application.status == "APPLIED"
 
     @patch("profiles.emails.get_user_email_connection")
-    @patch("organisations.services.EmailMultiAlternatives")
+    @patch("organisations.emails.EmailMultiAlternatives")
     def test_apply_with_performances(
         self, mock_email, mock_connection, api_client, festival, profile, performance
     ):
@@ -358,7 +358,7 @@ class TestFestivalApplyAction:
         assert application.performances.count() == 1
 
     @patch("profiles.emails.get_user_email_connection")
-    @patch("organisations.services.EmailMultiAlternatives")
+    @patch("organisations.emails.EmailMultiAlternatives")
     def test_apply_duplicate_application_same_year(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
@@ -391,7 +391,7 @@ class TestFestivalApplyAction:
         assert Application.objects.count() == 2
 
     @patch("profiles.emails.get_user_email_connection")
-    @patch("organisations.services.EmailMultiAlternatives")
+    @patch("organisations.emails.EmailMultiAlternatives")
     def test_apply_email_sending_failure(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
@@ -413,7 +413,7 @@ class TestFestivalApplyAction:
         assert "Email failed to send" in response.data["error"]
 
     @patch("profiles.emails.get_user_email_connection")
-    @patch("organisations.services.EmailMultiAlternatives")
+    @patch("organisations.emails.EmailMultiAlternatives")
     def test_apply_sets_current_application_date(
         self, mock_email, mock_connection, api_client, festival, profile
     ):
