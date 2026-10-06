@@ -34,7 +34,8 @@ RUN apt-get update && apt-get install -y \
 RUN addgroup --system --gid 999 django && \
     adduser --system --uid 999 --gid 999 django
 
-RUN chown django:django /app
+RUN mkdir -p /app/media/dossiers /app/staticfiles && \
+    chown -R django:django /app
 
 # Copy venv and strip unnecessary files
 COPY --from=deps --chown=django:django /app/.venv /app/.venv
