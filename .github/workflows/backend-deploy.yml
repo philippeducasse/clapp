@@ -68,6 +68,8 @@ jobs:
           echo "SENTRY_DSN=${{ secrets.SENTRY_DSN }}" >> .env
           echo "BREVO_SMTP_USERNAME=${{ secrets.BREVO_SMTP_USERNAME }}" >> .env
           echo "BREVO_SMTP_PASSWORD=${{ secrets.BREVO_SMTP_PASSWORD }}" >> .env
+          echo "IMAP_USERNAME=${{ secrets.IMAP_USERNAME }}" >> .env
+          echo "IMAP_PASSWORD=${{ secrets.IMAP_PASSWORD }}" >> .env
 
       - name: Get changed files in docker folder
         id: changed-files-docker

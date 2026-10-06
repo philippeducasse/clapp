@@ -18,6 +18,7 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
 import { useRouter } from "next/navigation";
+import InboundEmailsCard from "./InboundEmailsCard";
 
 const ApplicationView = () => {
   const params = useParams();
@@ -71,6 +72,10 @@ const ApplicationView = () => {
         data={getApplicationBasicInfo(application)}
         ribbonValue={application.status}
         ribbonType="status"
+      />
+      <InboundEmailsCard
+        applicationId={applicationId}
+        onApproved={() => refreshApplication(applicationId, dispatch)}
       />
     </DetailsViewWrapper>
   );

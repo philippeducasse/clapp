@@ -43,8 +43,8 @@ To check by hand: `python manage.py shell -c "from applications.inbox import che
 
 ## Limitations
 
-- Only replies that keep the original `Message-ID` in their headers are found. Still to verify:
-  Brevo must not rewrite the `Message-ID`.
+- Only replies that keep the original `Message-ID` in their headers are found. Checked: Brevo keeps
+  the `Message-ID` we set.
 - Automatic replies are imported too. Mistral should leave `suggested_status` empty for them; dismiss them.
 
 ## Tests

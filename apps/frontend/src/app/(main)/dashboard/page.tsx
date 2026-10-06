@@ -14,6 +14,7 @@ import DashboardCard, {
 } from "@/components/page-components/dashboard/components/DashboardCard";
 import ApplicationStats from "@/components/page-components/dashboard/components/ApplicationStats";
 import ProfileCompletionCard from "@/components/page-components/dashboard/components/ProfileCompletionCard";
+import InboundEmailsCard from "@/components/page-components/applications/components/details/InboundEmailsCard";
 import { RootState } from "@/redux/store";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -70,9 +71,7 @@ const Page = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-semibold text-primary">
-            Dashboard
-          </h1>
+          <h1 className="text-3xl font-semibold text-primary">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
             Welcome back! Here&apos;s your performance career overview.
           </p>
@@ -94,11 +93,11 @@ const Page = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Takes 2/3 */}
         <div className="lg:col-span-2 space-y-6">
+          <InboundEmailsCard />
+
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl text-primary">
-                Application Breakdown
-              </CardTitle>
+              <CardTitle className="text-3xl text-primary">Application Breakdown</CardTitle>
               <CardDescription className="text-xl">
                 Detailed status of all your applications
               </CardDescription>
@@ -120,9 +119,7 @@ const Page = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-3xl text-primary">
-                Profile Completion
-              </CardTitle>
+              <CardTitle className="text-3xl text-primary">Profile Completion</CardTitle>
               <CardDescription className="text-xl">
                 Complete your profile to improve application success
               </CardDescription>
@@ -138,9 +135,7 @@ const Page = () => {
         </div>
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl text-primary">
-              Upcoming Deadlines
-            </CardTitle>
+            <CardTitle className="text-3xl text-primary">Upcoming Deadlines</CardTitle>
             <CardDescription className="text-xl">
               Application deadlines and important dates
             </CardDescription>

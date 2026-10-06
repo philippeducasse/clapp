@@ -74,7 +74,7 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 class InboundEmailViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = InboundEmailSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["state"]
+    filterset_fields = ["state", "application"]
 
     def get_queryset(self) -> QuerySet[InboundEmail]:
         return InboundEmail.objects.filter(application__profile_id=self.request.user.id)

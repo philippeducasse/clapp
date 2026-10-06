@@ -103,6 +103,13 @@ class TestInboundEmailApi:
         response = client.get("/api/inbound-emails/?state=PENDING_REVIEW")
         assert [e["id"] for e in response.data["results"]] == [email.id]
 
+    def test_filter_by_application(self, client, email, application, profile):
+        other_app = Application.objects.create(profile=profile, sent_message_id="<z@y>")
+        InboundEmail.objects.create(application=other_app, message_id="<other@y>")
+
+        response = client.get(f"/api/inbound-emails/?application={application.id}")
+        assert [e["id"] for e in response.data["results"]] == [email.id]
+
     def test_approve_uses_suggested_status(self, client, email, application):
         response = client.post(f"/api/inbound-emails/{email.id}/approve/")
         assert response.status_code == 200
