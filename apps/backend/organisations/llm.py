@@ -307,7 +307,7 @@ def generate_application_mail_prompt(
 
 
 def format_email(message: str):
-    return message.replace("\n", "<br>").replace("*", "").replace("—", ",")
+    return message.replace("\n", "<br>").replace("*", "").replace("—", ",").replace("–", ",")
 
 
 def extract_search_results(search_results: ConversationResponse):
