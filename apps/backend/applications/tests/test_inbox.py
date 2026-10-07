@@ -6,7 +6,13 @@ from imap_tools import MailMessage
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIClient
 
-from applications.inbox import EmailClassification, check_inbox, import_email
+from applications.inbox import (
+    EmailClassification,
+    check_inbox,
+    import_email,
+    is_auto_reply,
+    is_skipped,
+)
 from applications.models import Application, InboundEmail
 from applications.services import set_application_status
 from profiles.models import Profile
@@ -67,6 +73,46 @@ class TestImportEmail:
         with patch("applications.inbox.fetch_recent_emails") as fetch:
             fetch.return_value = [load("reply.eml"), load("unrelated.eml")]
             assert check_inbox() == 1
+
+
+class TestPreFilter:
+    def test_newsletter_is_skipped(self):
+        assert is_skipped(load("newsletter.eml"))
+
+    def test_reply_is_not_skipped(self):
+        assert not is_skipped(load("reply.eml"))
+
+    def test_auto_reply_is_not_skipped(self):
+        message = load("auto_reply.eml")
+        assert not is_skipped(message)
+        assert is_auto_reply(message)
+
+    def test_reply_is_not_auto_reply(self):
+        assert not is_auto_reply(load("reply.eml"))
+
+    @pytest.mark.parametrize("sender", ["MAILER-DAEMON@mx.example.org", "postmaster@example.org"])
+    def test_bounce_is_skipped(self, sender):
+        message = MailMessage.from_bytes(
+            f"From: {sender}\nSubject: Undelivered\nMessage-ID: <b@x>\n\nBounce".encode()
+        )
+        assert is_skipped(message)
+
+    def test_own_message_is_skipped(self, monkeypatch):
+        monkeypatch.setenv("IMAP_USERNAME", "info@philippeducasse.com")
+        message = MailMessage.from_bytes(
+            b"From: Info@philippeducasse.com\nSubject: Hi\nMessage-ID: <o@x>\n\nHi"
+        )
+        assert is_skipped(message)
+
+
+@pytest.mark.django_db
+class TestImportEmailPreFilter:
+    def test_newsletter_is_not_imported(self, application, mock_llm):
+        assert import_email(load("newsletter.eml")) is None
+        mock_llm.assert_not_called()
+
+    def test_auto_reply_is_imported(self, application, mock_llm):
+        assert import_email(load("auto_reply.eml")) is not None
 
 
 @pytest.mark.django_db

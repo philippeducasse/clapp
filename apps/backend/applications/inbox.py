@@ -37,6 +37,33 @@ def fetch_recent_emails() -> list[MailMessage]:
         return list(mailbox.fetch(AND(date_gte=since), mark_seen=False))
 
 
+BULK_HEADERS = ("list-id", "list-unsubscribe")
+BULK_PRECEDENCE = ("bulk", "list", "junk")
+BOUNCE_SENDERS = ("mailer-daemon@", "postmaster@")
+
+
+def is_skipped(message: MailMessage) -> bool:
+    """Mailing lists, newsletters, bounces and our own messages. Auto-replies are kept."""
+    headers = message.headers
+    if any(name in headers for name in BULK_HEADERS):
+        return True
+    precedence = " ".join(headers.get("precedence", ())).strip().lower()
+    if precedence in BULK_PRECEDENCE:
+        return True
+    sender = message.from_.lower()
+    if sender.startswith(BOUNCE_SENDERS):
+        return True
+    return sender == os.getenv("IMAP_USERNAME", "").lower()
+
+
+def is_auto_reply(message: MailMessage) -> bool:
+    headers = message.headers
+    auto_submitted = " ".join(headers.get("auto-submitted", ())).strip().lower()
+    return (
+        (auto_submitted not in ("", "no")) or "x-autoreply" in headers or "x-autorespond" in headers
+    )
+
+
 def find_application(message: MailMessage) -> Optional[Application]:
     """Find the application this email replies to, using the reply headers."""
     headers = " ".join(
@@ -67,6 +94,8 @@ def import_email(message: MailMessage) -> Optional[InboundEmail]:
     """Save a reply with a suggested status. Returns None if it is not a new reply."""
     message_id = " ".join(message.headers.get("message-id", ())).strip()
     if not message_id or InboundEmail.objects.filter(message_id=message_id).exists():
+        return None
+    if is_skipped(message):
         return None
 
     application = find_application(message)
