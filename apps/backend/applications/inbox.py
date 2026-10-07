@@ -1,7 +1,9 @@
-"""Read replies to application emails and suggest a new status. Every suggestion needs approval.
+"""Read emails about applications and suggest a new status. Every suggestion needs approval.
 
-Only replies are kept: an email is imported when its In-Reply-To or References header contains
-the Message-ID we stored on an Application when sending it (Application.sent_message_id).
+1. Skip mailing lists, bounces and our own messages (auto-replies are kept).
+2. Find candidate applications (applications/matching.py): reply headers, sender, domain, name.
+3. Emails without candidates only go to Mistral if they contain a keyword.
+4. Mistral picks the application among the candidates and suggests a status.
 """
 
 import logging
@@ -14,8 +16,9 @@ from typing import Literal, Optional
 from imap_tools import AND, MailBox, MailMessage
 from pydantic import BaseModel
 
-from applications.matching import by_header
+from applications.matching import Candidates, find_candidates
 from applications.models import APPLICATION_STATUS, Application, InboundEmail
+from profiles.models import Profile
 from services.mistral_service import MistralClient
 
 logger = logging.getLogger(__name__)
@@ -26,7 +29,10 @@ StatusLiteral = Literal[tuple(value for value, _ in APPLICATION_STATUS)]  # type
 
 
 class EmailClassification(BaseModel):
+    is_application_related: bool
+    application_id: Optional[int]
     suggested_status: Optional[StatusLiteral]  # type: ignore[valid-type]
+    is_auto_reply: bool
     summary: str
 
 
@@ -107,51 +113,98 @@ def is_auto_reply(message: MailMessage) -> bool:
     )
 
 
-def classify(application: Application, body: str) -> EmailClassification:
+def inbox_profile() -> Optional[Profile]:
+    """The profile that owns the inbox. Without it, only replies (HEADER) can be matched."""
+    return Profile.objects.filter(email__iexact=os.getenv("IMAP_USERNAME", "")).first()
+
+
+def describe(application: Application, message_chars: int) -> str:
+    organisation = application.organisation
+    return f"""- id: {application.id}
+  organisation: {organisation.name if organisation else "unknown"}
+  season: {application.season.name if application.season else "none"}
+  status: {application.status}
+  applied on: {application.application_date or "not sent"}
+  application email: {application.message[:message_chars] or "none (applied outside the app)"}"""
+
+
+def classify(message: MailMessage, candidates: Candidates) -> EmailClassification:
     statuses = ", ".join(value for value, _ in APPLICATION_STATUS)
-    prompt = f"""A performing artist applied to "{application.organisation}" and received this reply.
-Suggest the new status of the application, one of: {statuses}.
-Use null if the email is an automatic reply or does not change anything.
-Write a one-sentence summary of the reply in English.
+    message_chars = 3000 if len(candidates.applications) == 1 else 500
+    applications = "\n".join(describe(a, message_chars) for a in candidates.applications)
+    organisations = ", ".join(o.name for o in candidates.organisations)
+    body = message.text or message.html or ""
+    prompt = f"""A performing artist (circus, street theatre) applies to festivals, venues and residencies.
+Read the email below that the artist received.
 
-Application email:
-{application.message[:3000]}
+1. is_application_related: is it about one of the artist's applications, or about booking,
+   inviting or programming the artist? Newsletters, invoices and personal mail are not.
+2. application_id: the id of the application it is about, chosen from the candidates below.
+   Use null if none of them fits.
+3. suggested_status: the new status of that application, one of: {statuses}.
+   - A confirmation that an application was received, for a DRAFT application: APPLIED.
+   - Never move an application backwards (e.g. from IN_DISCUSSION or ACCEPTED to APPLIED).
+   - Use null if the email does not change anything.
+4. is_auto_reply: is it an automatic reply (out of office, automatic confirmation)?
+5. summary: one sentence in English. For an out-of-office reply, include the return date.
 
-Reply:
+Candidate applications:
+{applications or "none"}
+
+Organisations the sender may belong to: {organisations or "unknown"}
+
+Email:
+From: {message.from_values.full if message.from_values else message.from_}
+Subject: {message.subject}
+
 {body[:5000]}"""
     return MistralClient().parse(prompt, EmailClassification)
 
 
+def choose_application(
+    candidates: Candidates, result: EmailClassification
+) -> Optional[Application]:
+    if candidates.method == "HEADER":
+        return candidates.applications[0]
+    if not result.is_application_related:
+        return None
+    return next((a for a in candidates.applications if a.id == result.application_id), None)
+
+
 def import_email(message: MailMessage) -> Optional[InboundEmail]:
-    """Save a reply with a suggested status. Returns None if it is not a new reply."""
+    """Save an email about an application with a suggested status. Returns None if it is
+    already imported or not about an application."""
     message_id = " ".join(message.headers.get("message-id", ())).strip()
     if not message_id or InboundEmail.objects.filter(message_id=message_id).exists():
         return None
     if is_skipped(message):
         return None
 
-    applications = by_header(message)
-    if not applications:
+    candidates = find_candidates(message, inbox_profile())
+    if candidates.method == "NONE" and not mentions_keyword(message):
         return None
-    application = applications[0]
 
-    body = message.text or message.html
-    result = classify(application, body)
+    result = classify(message, candidates)
+    application = choose_application(candidates, result)
+    if application is None:
+        # Kept as UNMATCHED once InboundEmail.application is nullable (step 5).
+        return None
+
     return InboundEmail.objects.create(
         application=application,
         message_id=message_id,
         from_address=message.from_,
         subject=message.subject,
-        body=body,
-        received_at=message.date,
+        body=message.text or message.html,
+        received_at=message.date if message.date_str else None,
         suggested_status=result.suggested_status or "",
         summary=result.summary,
     )
 
 
 def check_inbox() -> int:
-    """Import new replies. Returns how many were imported."""
+    """Import new emails about applications. Returns how many were imported."""
     imported = [import_email(message) for message in fetch_recent_emails()]
     count = len([email for email in imported if email])
-    logger.info("Imported %d application replies", count)
+    logger.info("Imported %d application emails", count)
     return count

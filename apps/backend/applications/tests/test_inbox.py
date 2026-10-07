@@ -2,19 +2,23 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from imap_tools import MailMessage
 from rest_framework.exceptions import ValidationError
 from rest_framework.test import APIClient
 
 from applications.inbox import (
     EmailClassification,
+    classify,
     check_inbox,
     import_email,
     is_auto_reply,
     is_skipped,
     mentions_keyword,
 )
+from applications.matching import Candidates
 from applications.models import Application, InboundEmail
+from organisations.festivals.models import Festival, FestivalContact
 from applications.services import set_application_status
 from profiles.models import Profile
 
@@ -43,10 +47,100 @@ def application(profile):
 @pytest.fixture
 def mock_llm():
     with patch("applications.inbox.classify") as classify:
-        classify.return_value = EmailClassification(
-            suggested_status="IN_DISCUSSION", summary="They want to talk about dates."
-        )
+        classify.return_value = classification()
         yield classify
+
+
+def classification(**kwargs) -> EmailClassification:
+    return EmailClassification(
+        **{
+            "is_application_related": True,
+            "application_id": None,
+            "suggested_status": "IN_DISCUSSION",
+            "is_auto_reply": False,
+            "summary": "They want to talk about dates.",
+            **kwargs,
+        }
+    )
+
+
+def raw_email(sender: str, subject: str, body: str = "Hello") -> MailMessage:
+    raw = f"From: {sender}\nSubject: {subject}\nMessage-ID: <{abs(hash(subject))}@x>\n"
+    raw += 'Content-Type: text/plain; charset="utf-8"\n\n' + body
+    return MailMessage.from_bytes(raw.encode())
+
+
+@pytest.mark.django_db
+class TestImportWithoutReplyHeaders:
+    @pytest.fixture(autouse=True)
+    def inbox_owner(self, monkeypatch, profile):
+        monkeypatch.setenv("IMAP_USERNAME", profile.email)
+
+    @pytest.fixture
+    def festival(self, profile):
+        festival = Festival.objects.create(name="Fringe Wonderland", user=profile)
+        FestivalContact.objects.create(festival=festival, email="anna@fringe.org", user=profile)
+        return festival
+
+    @pytest.fixture
+    def festival_application(self, festival, profile):
+        return Application.objects.create(
+            profile=profile,
+            content_type=ContentType.objects.get_for_model(Festival),
+            object_id=festival.id,
+            status="DRAFT",
+        )
+
+    def test_llm_picks_a_candidate(self, festival_application, mock_llm):
+        mock_llm.return_value = classification(
+            application_id=festival_application.id, suggested_status="APPLIED"
+        )
+        email = import_email(raw_email("anna@fringe.org", "New thread"))
+
+        assert email.application == festival_application
+        assert email.suggested_status == "APPLIED"
+        candidates = mock_llm.call_args.args[1]
+        assert (candidates.method, candidates.applications) == ("SENDER", [festival_application])
+
+    def test_llm_cannot_pick_an_application_that_is_not_a_candidate(
+        self, festival_application, application, mock_llm
+    ):
+        mock_llm.return_value = classification(application_id=application.id)
+        assert import_email(raw_email("anna@fringe.org", "New thread")) is None
+
+    def test_no_candidate_chosen(self, festival_application, mock_llm):
+        assert import_email(raw_email("anna@fringe.org", "New thread")) is None
+        assert InboundEmail.objects.count() == 0
+
+    def test_not_application_related(self, festival_application, mock_llm):
+        mock_llm.return_value = classification(
+            application_id=festival_application.id, is_application_related=False
+        )
+        assert import_email(raw_email("anna@fringe.org", "Christmas party")) is None
+
+    def test_no_candidates_and_no_keyword_skips_llm(self, mock_llm):
+        assert import_email(raw_email("friend@gmail.com", "Dinner on Saturday?")) is None
+        mock_llm.assert_not_called()
+
+    def test_no_candidates_with_keyword_asks_llm(self, mock_llm):
+        import_email(raw_email("someone@newfest.org", "Invitation to our festival"))
+        assert mock_llm.call_args.args[1].method == "NONE"
+
+    def test_header_match_ignores_llm_choice(self, application, festival_application, mock_llm):
+        mock_llm.return_value = classification(
+            application_id=festival_application.id, is_application_related=False
+        )
+        assert import_email(load("reply.eml")).application == application
+
+
+@pytest.mark.django_db
+def test_classify_prompt_lists_candidates(application):
+    with patch("applications.inbox.MistralClient") as client:
+        classify(load("reply.eml"), Candidates("HEADER", [application]))
+        prompt = client.return_value.parse.call_args.args[0]
+    assert f"- id: {application.id}" in prompt
+    assert "I would like to propose my show" in prompt
+    assert "From: Anna Booker <anna@festival-example.org>" in prompt
 
 
 @pytest.mark.django_db
