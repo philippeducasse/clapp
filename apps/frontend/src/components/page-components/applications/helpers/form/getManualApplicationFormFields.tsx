@@ -51,7 +51,7 @@ export const getManualApplicationFormFields = (
     },
     {
       label: "Season",
-      fieldName: "applicationSeason",
+      fieldName: "seasonId",
       type: ControlledFormElementType.SELECT,
       helpText: "Which season is this application for?",
       options: seasonOptions,

@@ -77,7 +77,6 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     const performances = profile?.performances ?? [];
     const emailTemplates = profile?.emailTemplates ?? [];
     const seasons = profile?.applicationSeasons ?? [];
-    console.log("seasons", seasons, profile);
     return getApplicationFormFields(
       entity,
       performances,

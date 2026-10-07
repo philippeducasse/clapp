@@ -94,7 +94,9 @@ class Application(models.Model):
         org_name = self.organisation.name if self.organisation else "No organisation"
         season = self.season if self.season else None
         year = self.application_date.year if self.application_date else "No date"
-        return f"{self.id}:{org_name} {season if season else year}"
+        return (
+            f"{self.id}:{org_name} - {self.profile.email} {f'Season: {season}' if season else year}"
+        )
 
     def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
         """Soft delete the application"""
