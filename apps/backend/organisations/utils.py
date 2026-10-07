@@ -51,13 +51,13 @@ def clean_organisation_data(organisation: Organisation) -> None:
 
 
 def normalize_domain(url: str) -> str:
+    """Return the lowercase host of a URL without "www.", e.g. "https://www.x.org/a" -> "x.org"."""
+    url = (url or "").strip().lower()
     if not url:
         return ""
 
     if not url.startswith(("http://", "https://")):
         url = f"https://{url}"
 
-    parsed = urlparse(url.lower())
-    domain = parsed.netloc or parsed.path.split("/")[0]
-
-    return domain.replace("www", "")
+    host = urlparse(url).hostname or ""
+    return host.removeprefix("www.")

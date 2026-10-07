@@ -1,7 +1,11 @@
 import pytest
 from organisations.festivals.models import Festival
 from organisations.llm import format_email
-from organisations.utils import clean_organisation_data, extract_fields_from_llm
+from organisations.utils import (
+    clean_organisation_data,
+    extract_fields_from_llm,
+    normalize_domain,
+)
 
 
 @pytest.mark.django_db
@@ -320,3 +324,19 @@ class TestFormatEmail:
         message = '<a href="https://example.com/*param">link</a>'
         result = format_email(message)
         assert result == '<a href="https://example.com/param">link</a>'
+
+
+@pytest.mark.parametrize(
+    "url, domain",
+    [
+        ("https://www.fringe.org/apply", "fringe.org"),
+        ("fringe.org", "fringe.org"),
+        ("WWW.Fringe.org", "fringe.org"),
+        ("http://sub.fringe.org:8080/x", "sub.fringe.org"),
+        ("https://awww.de", "awww.de"),
+        ("", ""),
+        (None, ""),
+    ],
+)
+def test_normalize_domain(url, domain):
+    assert normalize_domain(url) == domain
