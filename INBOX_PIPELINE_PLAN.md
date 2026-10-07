@@ -5,6 +5,24 @@ Read incoming emails on `info@philippeducasse.com`. Detect emails about applicat
 status updates on `Application`. **Every update needs manual approval** (including auto-replies).
 The design is personal-use first, but it should be possible to add more users later.
 
+## Status
+| Step | | |
+|---|---|---|
+| Header matching (commit 1769a39) | ✅ done | in production |
+| 1. Pre-filter | ✅ done | backend, not deployed yet |
+| 2. Candidate search | ✅ done | backend, not deployed yet |
+| 3. Keyword gate | ✅ done | backend, not deployed yet |
+| 4. Classification | ✅ done | backend, not deployed yet |
+| 5. Model changes | ✅ done | migration `0016_inbound_email_unmatched` |
+| 6. API | ✅ done | backend, not deployed yet |
+| 7. Frontend | ⏳ todo | |
+| 8. Tests | ✅ done for steps 1–6 | `test_inbox.py`, `test_matching.py` |
+| 9. Docs | ⏳ todo | `apps/backend/docs/inbox_pipeline.md` still describes header matching only |
+
+**Before deploying:** test migration `0016` on a copy of the prod database (it fills
+`InboundEmail.profile` from existing rows), and make sure a `Profile` with the same email as
+`IMAP_USERNAME` exists. Without it only `HEADER` matching runs.
+
 ## Context
 - Outgoing application emails are sent by the app through the **Brevo SMTP relay**
   (`organisations/emails.py`). Brevo only sends mail and plays no part in receiving it.
@@ -30,47 +48,55 @@ The design is personal-use first, but it should be possible to add more users la
 - Review queue in the dashboard.
 
 **Limitation addressed below:** emails without our `Message-ID` in `In-Reply-To`/`References`
-are discarded. That loses new threads started by organisers, responses to applications made through
-online forms, and organisers reaching out directly.
+were discarded. That lost new threads started by organisers, responses to applications made
+through online forms, and organisers reaching out directly.
 
-## Next: matching without a Message-ID
+## Matching without a Message-ID
 
-### 1. Pre-filter (no LLM, not stored)
+### 1. Pre-filter ✅ (`is_skipped` in `applications/inbox.py`, no LLM, not stored)
 Skip:
-- mailing lists / bulk: `List-Id`, `List-Unsubscribe`, `Precedence: bulk|list`
+- mailing lists / bulk: `List-Id`, `List-Unsubscribe`, `Precedence: bulk|list|junk`
 - bounces: sender `mailer-daemon@…` / `postmaster@…`
-- own messages: sender == `IMAP_USERNAME`
+- own messages: sender == `IMAP_USERNAME` (case-insensitive)
 
-**Auto-replies are NOT skipped** (`Auto-Submitted: auto-replied`, `X-Autoreply`, `X-Autorespond`).
-They go through matching like any other email and are flagged (see step 4).
+**Auto-replies are NOT skipped.** `is_auto_reply` recognises them from the headers
+(`Auto-Submitted` other than `no`, `X-Autoreply`, `X-Autorespond`).
 
-### 2. Candidate search (`find_candidates(message) -> (match_method, list[Application])`)
+### 2. Candidate search ✅ (`applications/matching.py`)
+`find_candidates(message, profile) -> Candidates(method, applications, organisations)`.
 In order, stop at the first method that finds something:
 
 | `match_method` | Rule | Applications searched |
 |---|---|---|
-| `HEADER` | `In-Reply-To`/`References` contains `Application.sent_message_id` (existing) | — |
-| `SENDER` | sender address (lowercased) in `Application.email_recipients` or an organisation `*Contact.email` | not deleted |
-| `DOMAIN` | `normalize_domain(sender)` == domain of organisation `website_url` or of a contact email. Free-mail domains (gmail.com, gmx.de, web.de, outlook.com, hotmail.*, yahoo.*, icloud.com, …) never match | not deleted |
-| `NAME` | normalised organisation name appears in the subject or first ~2k chars of the body. Names below a minimum length / generic words are ignored | current + previous season, **including `DRAFT`** |
+| `HEADER` | `In-Reply-To`/`References` contains `Application.sent_message_id` | any |
+| `SENDER` | sender address (case-insensitive) in `Application.email_recipients` or a Festival/Venue/Residency contact email | profile's, not deleted |
+| `DOMAIN` | sender domain == `normalize_domain(website_url)` or the domain of a contact email. Free-mail domains (`FREE_MAIL_DOMAINS`) never match | profile's, not deleted |
+| `NAME` | normalised organisation name appears as a whole phrase in the subject or first 2,000 chars of the body. Names under 5 characters and `GENERIC_NAMES` are ignored | profile's, **created in the last 365 days, including `DRAFT`** |
 | `NONE` | nothing found | — |
 
-- Organisations are Festival / Venue / Residency (generic FK on `Application`). Search the
-  contacts of all three types.
-- If an organisation is found but has no application, keep it on the email (`organisation`) so
-  that "Create application" can prefill it.
-- `NAME` covers form confirmations ("Thank you for your application to *Fringe XY*") for
-  applications made outside the app, which are still `DRAFT`.
-- Subject matching (the old idea) is dropped: if the subject still matches, it is a reply and `HEADER` catches it.
+Differences from the original plan:
+- `NAME` uses "created in the last 365 days" instead of "current + previous season", because
+  seasons are free text and not every application has one.
+- Matching only uses the inbox owner's data: `inbox_profile()` = the `Profile` whose email is
+  `IMAP_USERNAME`.
+- Organisations found without an application are returned in `Candidates.organisations` and
+  stored on unmatched emails so "Create application" can prefill them.
+- Subject matching is dropped: if the subject still matches, it is a reply and `HEADER` catches it.
+- `organisations.utils.normalize_domain` was fixed (it turned `www.x.org` into `.x.org`) and is
+  now used here.
 
-### 3. Keyword gate for unmatched emails
-Only emails with `match_method == NONE` go through this check. If the subject + body contain none
-of a multilingual keyword list (e.g. *festival, booking, programme/programm, show, spectacle,
-performance, residency/résidence, application, candidature, Bewerbung, Anfrage, Gastspiel,
-Auftritt, tour, …*), the email is discarded **without calling Mistral**. This stops personal mail from being sent to Mistral.
-Keep the list in one constant in `applications/inbox.py`.
+### 3. Keyword gate ✅ (`mentions_keyword` in `applications/inbox.py`)
+Only emails with `match_method == NONE` go through this check. Subject + first 5,000 chars of the
+body, accents removed, must contain a keyword (EN/DE/FR/ES/IT/NL), otherwise the email is
+discarded **without calling Mistral**.
+- `KEYWORD_STEMS` match the start of a word (`festival` → festivals, `program` → programme,
+  Programm, programmation…).
+- `KEYWORD_WORDS` are short words that must match a whole word, with an optional plural "s"
+  (`show` must not match "shower").
+- Left out on purpose: `fee` (feedback), `gig` (gigabyte), `appl` (Apple).
 
-### 4. Classification (one Mistral call per kept email)
+### 4. Classification ✅ (`classify` / `choose_application` in `applications/inbox.py`)
+One Mistral call per kept email, including `HEADER` matches.
 ```python
 class EmailClassification(BaseModel):
     is_application_related: bool
@@ -79,68 +105,83 @@ class EmailClassification(BaseModel):
     is_auto_reply: bool
     summary: str
 ```
-Prompt input: email (subject, sender, body), candidate applications (id, organisation, season,
-current status, application date, start of the original message) and valid statuses.
+Prompt input: the email (sender with display name, subject, body), the candidate applications
+(id, organisation, season, status, application date, start of the original application email:
+3,000 chars for one candidate, 500 for several) and organisations found without an application.
 
 Prompt rules:
-- Confirmation that an application was received (form or auto-reply) for a `DRAFT` application → `APPLIED`.
+- Confirmation that an application was received, for a `DRAFT` application → `APPLIED`.
 - Auto-reply to an `APPLIED` application → `AUTO_REPLY_RECEIVED`.
-- Never suggest moving an application backwards (e.g. from `IN_DISCUSSION`/`ACCEPTED` to
-  `AUTO_REPLY_RECEIVED`). Use `null` instead. The email is still saved for information.
-- Out-of-office replies: put the return date in the summary ("Away until 12 Oct").
+- Never move an application backwards (order: DRAFT, APPLIED, AUTO_REPLY_RECEIVED,
+  IN_DISCUSSION, final answer). Use `null` instead. This is only a prompt rule, not checked in code.
+- Out-of-office replies: put the return date in the summary.
 
 After the call:
-- `HEADER` match: the application is already known. `application_id` from the LLM is ignored.
-- Candidates exist and the LLM picks one → `PENDING_REVIEW` with that application.
-- Candidates exist but the LLM picks none, or no candidates: if `is_application_related` →
-  `UNMATCHED`, otherwise discard.
+- `HEADER` match: the application is already known. The LLM's `application_id` is ignored.
+- Other methods: the LLM's `application_id` must be one of the candidates (an invented id is
+  rejected) and `is_application_related` must be true → `PENDING_REVIEW`.
+- No application chosen and `is_application_related` → `UNMATCHED` (`match_method = NONE`).
+  Otherwise the email is discarded.
 - `is_auto_reply` = header flag OR the LLM's answer.
+- `received_at` is empty when the email has no `Date` header (imap-tools returns 1900-01-01).
 
-### 5. Model changes
-- `APPLICATION_STATUS`: add `("AUTO_REPLY_RECEIVED", "Auto-reply received")` between `APPLIED`
-  and `IN_DISCUSSION` (migration, plus the frontend status list, labels and colours).
+### 5. Model changes ✅ (migration `0016_inbound_email_unmatched`)
+- `APPLICATION_STATUS`: added `("AUTO_REPLY_RECEIVED", "Auto-reply received")` between
+  `APPLIED` and `IN_DISCUSSION`. **Still missing in the frontend** (step 7).
 - `InboundEmail`:
+  - `profile` (FK, required), **not in the original plan**: unmatched emails have no
+    application, so ownership can't come from `application.profile` any more. The migration
+    fills it from existing rows.
   - `application` → nullable
   - `match_method`: `HEADER` / `SENDER` / `DOMAIN` / `NAME` / `NONE`
   - `is_auto_reply` (bool)
-  - `organisation` (generic FK via `content_type` + `object_id`, nullable): organisation found without an application
-  - `state`: add `UNMATCHED`
-- Compare `email_recipients` in lowercase (or lowercase them when saving).
+  - `organisation` (generic FK via `organisation_content_type` + `organisation_id`, nullable)
+  - `state`: added `UNMATCHED`
+- `email_recipients` is compared in lowercase (not lowercased when saving).
+- Admin: `match_method` column, filters on `state`, `match_method`, `is_auto_reply`.
 
-### 6. API
-- `POST /inbound-emails/{id}/link/` `{application_id}`: attach the email to an application.
-  Used to fix a wrong fuzzy match, to resolve an `UNMATCHED` email, and after "Create application".
-  The email then goes to `PENDING_REVIEW` (or `APPROVED` if `approve: true` is sent).
-- `approve` / `dismiss`: no changes. Approve requires an application (400 if none).
-- Allow filtering the list by `state=UNMATCHED`.
+### 6. API ✅ (`InboundEmailViewSet` in `applications/views.py`)
+- The list is scoped by `InboundEmail.profile`, filterable by `state` (incl. `UNMATCHED`) and
+  `application`.
+- Serializer: `organisation_name` (from the application, or the email's organisation),
+  `organisation_type` (`festival` / `venue` / `residency`), `organisation_id`,
+  `application_status` (null without an application).
+- `POST /inbound-emails/{id}/approve/` with optional `status`: 400 if the email has no application.
+- `POST /inbound-emails/{id}/link/` `{application_id, approve?, status?}`: attaches the email to
+  one of the user's applications and sets `PENDING_REVIEW`. With `approve: true` the status is
+  applied at once. 400 for a missing id or another user's application. Used to fix a wrong
+  match, to resolve an `UNMATCHED` email and after "Create application".
+- `POST /inbound-emails/{id}/dismiss/`: unchanged.
+- "Create application" needs no new endpoint: the frontend calls `POST /applications/`, then
+  `link` with `approve: true`.
 
-### 7. Frontend
+### 7. Frontend ⏳
 - Review queue shows: the `match_method` badge (HEADER = sure, SENDER/DOMAIN/NAME = check),
   an "Auto-reply" badge, and a "Draft application" hint when approving moves a `DRAFT` to `APPLIED`.
 - "Change application" action on each email → picker → `link`.
 - Unmatched tab (`state=UNMATCHED`) with:
   - **Create application**: opens the manual application form
-    (`ManualApplicationForm` / `applications/create`) prefilled with the organisation (if found),
-    status = suggested status, method = `EMAIL`, comments = summary. On save → `link` + approve.
+    (`ManualApplicationForm` / `applications/create`) prefilled with the organisation
+    (`organisation_type` + `organisation_id`, if found), status = suggested status,
+    method = `EMAIL`, comments = summary. On save → `link` with `approve: true`.
     This covers organisers reaching out directly.
   - **Link to existing application** → picker → `link`.
   - **Dismiss**.
 - `AUTO_REPLY_RECEIVED` added to status filters, labels and colours.
 
-### 8. Tests (`applications/tests/test_inbox.py`, `.eml` samples, Mistral mocked)
-- new thread from a contact address → `SENDER`
-- sender on the organisation's domain → `DOMAIN`
-- gmail sender with an unknown address → no `DOMAIN` match
-- form confirmation that names an organisation with a `DRAFT` application → `NAME`, suggests `APPLIED`
-- auto-reply to an `APPLIED` application → kept, `is_auto_reply`, suggests `AUTO_REPLY_RECEIVED`
-- direct enquiry from an unknown organisation with keywords → `UNMATCHED`
-- personal mail without keywords → discarded, Mistral not called
-- newsletter (`List-Id`) → skipped
-- organisation with a short/generic name → no `NAME` match
-- `link` endpoint, approve without an application → 400
+### 8. Tests ✅ (Mistral mocked)
+- `applications/tests/test_matching.py`: each matching method, free-mail domains, partial and
+  generic names, old applications, other users' data, deleted applications.
+- `applications/tests/test_inbox.py`: pre-filter (`newsletter.eml`, `auto_reply.eml`, bounces,
+  own messages), keyword gate in six languages plus false positives, import with candidates,
+  invented `application_id`, `UNMATCHED` storage, inbox owner missing, `match_method` /
+  `is_auto_reply`, prompt contents, API (`approve` without an application, `link`, link + approve,
+  other users' applications, unmatched list).
+- `organisations/tests/test_utils.py`: `normalize_domain`.
+- Not covered: migration `0016` filling `profile` on existing rows.
 
-### 9. Docs
-Update `apps/backend/docs/inbox_pipeline.md` (how it works, matching table, limitations).
+### 9. Docs ⏳
+Update `apps/backend/docs/inbox_pipeline.md` (how it works, matching table, API, limitations).
 
 ## Later (not needed for this feature)
 - `MailboxConnection` per profile (provider, host, credentials, `last_uid`, `enabled`) and
@@ -149,7 +190,9 @@ Update `apps/backend/docs/inbox_pipeline.md` (how it works, matching table, limi
 - Audit fields: `confidence`, `llm_model`, `prompt_version`, `raw_llm_response`, `reviewed_at`,
   `final_status`.
 - Auto-approving auto-replies (for now every suggestion needs approval).
+- Possibly apply the keyword gate to `DOMAIN` matches too, so that personal mail from someone at
+  a known organisation is not sent to Mistral.
 
 ## Open points
-1. Keyword list: fill in the languages actually used by organisers (EN/DE/FR/ES/IT/NL?).
-2. Minimum name length and generic-word list for `NAME` matching: tune them on real data.
+1. Keyword list: check it against real mail. `tour` and `stage` are the broadest words.
+2. Minimum name length and `GENERIC_NAMES` for `NAME` matching: tune them on real data.
