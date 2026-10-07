@@ -40,6 +40,12 @@ from .utils import clean_organisation_data
 logger = logging.getLogger(__name__)
 
 
+def get_visibility_filter(user) -> Q:
+    if user.is_staff:
+        return Q(user__isnull=True) | Q(is_seed_clone=False) | Q(user=user)
+    return Q(user=user)
+
+
 @api_view(["GET"])
 def search(request: Request) -> Response:
     """
@@ -59,7 +65,7 @@ def search(request: Request) -> Response:
         Q(name__icontains=search_query)
         | Q(website_url__icontains=search_query)
         | Q(description__icontains=search_query)
-    )
+    ) & get_visibility_filter(request.user)
 
     if organisation_type:
         MODEL_MAP = {
@@ -75,20 +81,20 @@ def search(request: Request) -> Response:
 
         try:
             Entity = apps.get_model(app_label, model_name)
-            results = Entity.objects.filter(search_filter, user=request.user).values(
+            results = Entity.objects.filter(search_filter).distinct().values(
                 *ORGANISATION_SEARCH_FIELDS
             )[:20]
         except LookupError:
             return Response({"error": "Model not found"}, status=400)
 
     else:
-        festivals = Festival.objects.filter(search_filter, user=request.user).values(
+        festivals = Festival.objects.filter(search_filter).distinct().values(
             *ORGANISATION_SEARCH_FIELDS
         )[:20]
-        venues = Venue.objects.filter(search_filter, user=request.user).values(
+        venues = Venue.objects.filter(search_filter).distinct().values(
             *ORGANISATION_SEARCH_FIELDS
         )[:20]
-        residencies = Residency.objects.filter(search_filter, user=request.user).values(
+        residencies = Residency.objects.filter(search_filter).distinct().values(
             *ORGANISATION_SEARCH_FIELDS
         )[:20]
 
@@ -150,12 +156,7 @@ class OrganisationViewSet(viewsets.ModelViewSet):
             self.request.query_params.get("include_deleted", "false").lower() == "true"
         )
 
-        if self.request.user.is_staff:
-            visibility_filter = (
-                Q(user__isnull=True) | Q(is_seed_clone=False) | Q(user=self.request.user)
-            )
-        else:
-            visibility_filter = Q(user=self.request.user)
+        visibility_filter = get_visibility_filter(self.request.user)
 
         manager = model_class.objects.with_deleted() if include_deleted else model_class.objects
         return manager.filter(visibility_filter).distinct().select_related("user")
