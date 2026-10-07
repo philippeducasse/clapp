@@ -17,5 +17,12 @@ admin.site.register(ApplicationSeason, ApplicationSeasonAdmin)
 
 @admin.register(InboundEmail)
 class InboundEmailAdmin(admin.ModelAdmin):
-    list_display = ("received_at", "from_address", "subject", "suggested_status", "state")
-    list_filter = ("state",)
+    list_display = (
+        "received_at",
+        "from_address",
+        "subject",
+        "match_method",
+        "suggested_status",
+        "state",
+    )
+    list_filter = ("state", "match_method", "is_auto_reply")

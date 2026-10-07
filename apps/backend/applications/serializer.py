@@ -168,9 +168,17 @@ class ApplicationSeasonSerializer(serializers.ModelSerializer):
 
 
 class InboundEmailSerializer(serializers.ModelSerializer):
-    organisation_name = serializers.CharField(source="application.organisation.name", default=None)
-    application_status = serializers.CharField(source="application.status")
+    organisation_name = serializers.SerializerMethodField()
+    # "festival", "venue" or "residency", to prefill "Create application" for UNMATCHED emails.
+    organisation_type = serializers.CharField(
+        source="organisation_content_type.model", default=None
+    )
+    application_status = serializers.CharField(source="application.status", default=None)
 
     class Meta:
         model = InboundEmail
         fields = "__all__"
+
+    def get_organisation_name(self, email: InboundEmail) -> str | None:
+        organisation = email.application.organisation if email.application else email.organisation
+        return organisation.name if organisation else None

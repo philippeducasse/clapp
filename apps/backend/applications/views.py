@@ -4,6 +4,7 @@ from django.http import HttpRequest
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
@@ -77,17 +78,42 @@ class InboundEmailViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ["state", "application"]
 
     def get_queryset(self) -> QuerySet[InboundEmail]:
-        return InboundEmail.objects.filter(application__profile_id=self.request.user.id)
+        return InboundEmail.objects.filter(profile_id=self.request.user.id)
 
     @action(detail=True, methods=["post"])
     def approve(self, request: HttpRequest, pk: int) -> Response:
         """Apply the suggested status, or the "status" given in the request body."""
         email = self.get_object()
-        new_status = request.data.get("status") or email.suggested_status
-        set_application_status(email.application, new_status, note=email.summary)
+        if email.application is None:
+            raise ValidationError({"error": "Link the email to an application first."})
+        self._approve(email, request.data.get("status"))
+        return Response(self.get_serializer(email).data)
+
+    @action(detail=True, methods=["post"])
+    def link(self, request: HttpRequest, pk: int) -> Response:
+        """Attach the email to another application, e.g. an UNMATCHED email or a wrong match.
+
+        Body: {"application_id": ..., "approve": false, "status": optional}. With "approve",
+        the status is applied at once (used after creating an application from the email).
+        """
+        email = self.get_object()
+        application = Application.objects.filter(
+            pk=request.data.get("application_id"), profile_id=request.user.id
+        ).first()
+        if application is None:
+            raise ValidationError({"error": "Application not found."})
+
+        email.application = application
+        email.state = "PENDING_REVIEW"
+        email.save()
+        if request.data.get("approve"):
+            self._approve(email, request.data.get("status"))
+        return Response(self.get_serializer(email).data)
+
+    def _approve(self, email: InboundEmail, status: str | None) -> None:
+        set_application_status(email.application, status or email.suggested_status, email.summary)
         email.state = "APPROVED"
         email.save()
-        return Response(self.get_serializer(email).data)
 
     @action(detail=True, methods=["post"])
     def dismiss(self, request: HttpRequest, pk: int) -> Response:

@@ -19,6 +19,7 @@ APPLICATION_TYPE: List[Tuple[str, str]] = [
 APPLICATION_STATUS: List[Tuple[str, str]] = [
     ("DRAFT", "Draft"),
     ("APPLIED", "Applied"),
+    ("AUTO_REPLY_RECEIVED", "Auto-reply received"),
     ("IN_DISCUSSION", "In discussion"),
     ("REJECTED", "Rejected"),
     ("IGNORED", "Ignored"),
@@ -120,15 +121,40 @@ INBOUND_EMAIL_STATES: List[Tuple[str, str]] = [
     ("PENDING_REVIEW", "Pending review"),
     ("APPROVED", "Approved"),
     ("DISMISSED", "Dismissed"),
+    ("UNMATCHED", "Unmatched"),
+]
+
+MATCH_METHODS: List[Tuple[str, str]] = [
+    ("HEADER", "Reply headers"),
+    ("SENDER", "Sender address"),
+    ("DOMAIN", "Sender domain"),
+    ("NAME", "Organisation name"),
+    ("NONE", "No match"),
 ]
 
 
 class InboundEmail(models.Model):
-    """A reply to an application email, with a suggested status waiting for review."""
+    """An email about an application, with a suggested status waiting for review.
 
+    UNMATCHED emails have no application yet: one can be linked or created from the email.
+    """
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="inbound_emails")
     application = models.ForeignKey(
-        Application, on_delete=models.CASCADE, related_name="inbound_emails"
+        Application,
+        on_delete=models.CASCADE,
+        related_name="inbound_emails",
+        null=True,
+        blank=True,
     )
+    match_method = models.CharField(max_length=10, choices=MATCH_METHODS, default="HEADER")
+    is_auto_reply = models.BooleanField(default=False)
+    # An organisation the sender belongs to, found without an application (UNMATCHED emails).
+    organisation_content_type = models.ForeignKey(
+        ContentType, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    organisation_id = models.PositiveIntegerField(null=True, blank=True)
+    organisation = GenericForeignKey("organisation_content_type", "organisation_id")
     message_id = models.CharField(max_length=512, unique=True)
     from_address = models.CharField(max_length=320)
     subject = models.CharField(max_length=998, blank=True)

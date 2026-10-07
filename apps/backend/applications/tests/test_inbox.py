@@ -106,11 +106,21 @@ class TestImportWithoutReplyHeaders:
         self, festival_application, application, mock_llm
     ):
         mock_llm.return_value = classification(application_id=application.id)
-        assert import_email(raw_email("anna@fringe.org", "New thread")) is None
+        email = import_email(raw_email("anna@fringe.org", "New thread"))
+        assert (email.state, email.application) == ("UNMATCHED", None)
 
-    def test_no_candidate_chosen(self, festival_application, mock_llm):
-        assert import_email(raw_email("anna@fringe.org", "New thread")) is None
-        assert InboundEmail.objects.count() == 0
+    def test_no_candidate_chosen_is_unmatched(self, festival_application, profile, mock_llm):
+        email = import_email(raw_email("anna@fringe.org", "New thread"))
+
+        assert email.state == "UNMATCHED"
+        assert email.application is None
+        assert email.match_method == "NONE"
+        assert email.profile == profile
+        assert email.suggested_status == "IN_DISCUSSION"
+
+    def test_organisation_without_application_is_kept(self, festival, mock_llm):
+        email = import_email(raw_email("anna@fringe.org", "Would you play for us?"))
+        assert (email.state, email.organisation) == ("UNMATCHED", festival)
 
     def test_not_application_related(self, festival_application, mock_llm):
         mock_llm.return_value = classification(
@@ -122,9 +132,25 @@ class TestImportWithoutReplyHeaders:
         assert import_email(raw_email("friend@gmail.com", "Dinner on Saturday?")) is None
         mock_llm.assert_not_called()
 
-    def test_no_candidates_with_keyword_asks_llm(self, mock_llm):
-        import_email(raw_email("someone@newfest.org", "Invitation to our festival"))
+    def test_direct_enquiry_is_unmatched(self, mock_llm):
+        email = import_email(raw_email("someone@newfest.org", "Invitation to our festival"))
         assert mock_llm.call_args.args[1].method == "NONE"
+        assert (email.state, email.organisation) == ("UNMATCHED", None)
+
+    def test_unmatched_needs_inbox_owner(self, monkeypatch, mock_llm):
+        monkeypatch.setenv("IMAP_USERNAME", "nobody@example.com")
+        assert import_email(raw_email("someone@newfest.org", "Invitation to our festival")) is None
+
+    def test_match_method_and_auto_reply_are_saved(self, festival_application, mock_llm):
+        mock_llm.return_value = classification(
+            application_id=festival_application.id,
+            suggested_status="AUTO_REPLY_RECEIVED",
+            is_auto_reply=True,
+        )
+        email = import_email(raw_email("info@fringe.org", "Automatic reply"))
+        assert email.match_method == "DOMAIN"
+        assert email.is_auto_reply
+        assert email.suggested_status == "AUTO_REPLY_RECEIVED"
 
     def test_header_match_ignores_llm_choice(self, application, festival_application, mock_llm):
         mock_llm.return_value = classification(
@@ -245,7 +271,10 @@ class TestImportEmailPreFilter:
         mock_llm.assert_not_called()
 
     def test_auto_reply_is_imported(self, application, mock_llm):
-        assert import_email(load("auto_reply.eml")) is not None
+        email = import_email(load("auto_reply.eml"))
+        assert email.is_auto_reply  # from the headers, although the LLM said False
+        assert email.match_method == "HEADER"
+        assert email.profile == application.profile
 
 
 @pytest.mark.django_db
@@ -277,17 +306,25 @@ class TestInboundEmailApi:
     def test_list_only_shows_own_emails(self, client, email):
         other = Profile.objects.create_user(email="other@example.com", password="pw")
         other_app = Application.objects.create(profile=other, sent_message_id="<x@y>")
-        InboundEmail.objects.create(application=other_app, message_id="<other@y>")
+        InboundEmail.objects.create(profile=other, application=other_app, message_id="<other@y>")
 
         response = client.get("/api/inbound-emails/?state=PENDING_REVIEW")
         assert [e["id"] for e in response.data["results"]] == [email.id]
 
     def test_filter_by_application(self, client, email, application, profile):
         other_app = Application.objects.create(profile=profile, sent_message_id="<z@y>")
-        InboundEmail.objects.create(application=other_app, message_id="<other@y>")
+        InboundEmail.objects.create(profile=profile, application=other_app, message_id="<other@y>")
 
         response = client.get(f"/api/inbound-emails/?application={application.id}")
         assert [e["id"] for e in response.data["results"]] == [email.id]
+
+    def test_list_unmatched(self, client, email, profile):
+        unmatched = InboundEmail.objects.create(
+            profile=profile, message_id="<u@y>", state="UNMATCHED"
+        )
+        response = client.get("/api/inbound-emails/?state=UNMATCHED")
+        assert [e["id"] for e in response.data["results"]] == [unmatched.id]
+        assert response.data["results"][0]["application_status"] is None
 
     def test_approve_uses_suggested_status(self, client, email, application):
         response = client.post(f"/api/inbound-emails/{email.id}/approve/")
@@ -307,3 +344,68 @@ class TestInboundEmailApi:
         application.refresh_from_db()
         assert email.state == "DISMISSED"
         assert application.status == "APPLIED"
+
+    @pytest.fixture
+    def unmatched(self, profile):
+        festival = Festival.objects.create(name="New Fest", user=profile)
+        return InboundEmail.objects.create(
+            profile=profile,
+            message_id="<u@y>",
+            state="UNMATCHED",
+            match_method="NONE",
+            organisation=festival,
+            suggested_status="IN_DISCUSSION",
+            summary="They invite the show.",
+        )
+
+    def test_unmatched_shows_organisation(self, client, unmatched):
+        data = client.get(f"/api/inbound-emails/{unmatched.id}/").data
+        assert (data["organisation_name"], data["organisation_type"]) == ("New Fest", "festival")
+        assert data["organisation_id"] == unmatched.organisation_id
+
+    def test_approve_without_application(self, client, unmatched):
+        response = client.post(f"/api/inbound-emails/{unmatched.id}/approve/")
+        assert response.status_code == 400
+        unmatched.refresh_from_db()
+        assert unmatched.state == "UNMATCHED"
+
+    def test_link(self, client, unmatched, application):
+        response = client.post(
+            f"/api/inbound-emails/{unmatched.id}/link/", {"application_id": application.id}
+        )
+        assert response.status_code == 200
+        unmatched.refresh_from_db()
+        application.refresh_from_db()
+        assert (unmatched.state, unmatched.application) == ("PENDING_REVIEW", application)
+        assert application.status == "APPLIED"
+
+    def test_link_and_approve(self, client, unmatched, application):
+        client.post(
+            f"/api/inbound-emails/{unmatched.id}/link/",
+            {"application_id": application.id, "approve": True},
+            format="json",
+        )
+        unmatched.refresh_from_db()
+        application.refresh_from_db()
+        assert unmatched.state == "APPROVED"
+        assert application.status == "IN_DISCUSSION"
+        assert "They invite the show." in application.comments
+
+    def test_link_corrects_a_wrong_match(self, client, email, profile):
+        other = Application.objects.create(profile=profile, status="APPLIED")
+        client.post(f"/api/inbound-emails/{email.id}/link/", {"application_id": other.id})
+        email.refresh_from_db()
+        assert email.application == other
+
+    def test_link_to_another_users_application(self, client, unmatched):
+        other = Profile.objects.create_user(email="other@example.com", password="pw")
+        other_app = Application.objects.create(profile=other)
+        response = client.post(
+            f"/api/inbound-emails/{unmatched.id}/link/", {"application_id": other_app.id}
+        )
+        assert response.status_code == 400
+        unmatched.refresh_from_db()
+        assert unmatched.application is None
+
+    def test_link_without_application_id(self, client, unmatched):
+        assert client.post(f"/api/inbound-emails/{unmatched.id}/link/").status_code == 400

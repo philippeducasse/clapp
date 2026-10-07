@@ -143,7 +143,10 @@ Read the email below that the artist received.
    Use null if none of them fits.
 3. suggested_status: the new status of that application, one of: {statuses}.
    - A confirmation that an application was received, for a DRAFT application: APPLIED.
-   - Never move an application backwards (e.g. from IN_DISCUSSION or ACCEPTED to APPLIED).
+   - An automatic reply to an APPLIED application: AUTO_REPLY_RECEIVED.
+   - Never move an application backwards (order: DRAFT, APPLIED, AUTO_REPLY_RECEIVED,
+     IN_DISCUSSION, then a final answer). For example an automatic reply to an
+     IN_DISCUSSION or ACCEPTED application gets null.
    - Use null if the email does not change anything.
 4. is_auto_reply: is it an automatic reply (out of office, automatic confirmation)?
 5. summary: one sentence in English. For an out-of-office reply, include the return date.
@@ -172,26 +175,37 @@ def choose_application(
 
 
 def import_email(message: MailMessage) -> Optional[InboundEmail]:
-    """Save an email about an application with a suggested status. Returns None if it is
-    already imported or not about an application."""
+    """Save an email about an application with a suggested status, as PENDING_REVIEW when an
+    application was found and UNMATCHED otherwise. Returns None if it is already imported or
+    not about an application."""
     message_id = " ".join(message.headers.get("message-id", ())).strip()
     if not message_id or InboundEmail.objects.filter(message_id=message_id).exists():
         return None
     if is_skipped(message):
         return None
 
-    candidates = find_candidates(message, inbox_profile())
+    profile = inbox_profile()
+    candidates = find_candidates(message, profile)
     if candidates.method == "NONE" and not mentions_keyword(message):
         return None
 
     result = classify(message, candidates)
     application = choose_application(candidates, result)
-    if application is None:
-        # Kept as UNMATCHED once InboundEmail.application is nullable (step 5).
+    if application is None and not result.is_application_related:
+        return None
+    profile = application.profile if application else profile
+    if profile is None:
         return None
 
     return InboundEmail.objects.create(
+        profile=profile,
         application=application,
+        organisation=None
+        if application or not candidates.organisations
+        else candidates.organisations[0],
+        match_method=candidates.method if application else "NONE",
+        state="PENDING_REVIEW" if application else "UNMATCHED",
+        is_auto_reply=is_auto_reply(message) or result.is_auto_reply,
         message_id=message_id,
         from_address=message.from_,
         subject=message.subject,
