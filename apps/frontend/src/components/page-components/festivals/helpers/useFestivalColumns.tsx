@@ -22,7 +22,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
     (id: string) => {
       router.push(`/festivals/${id}/edit`);
     },
-    [router]
+    [router],
   );
 
   return useMemo(
@@ -43,7 +43,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
       {
         accessorKey: "currentYearApplications",
         header: getSortableHeader("Applied"),
-        size: 70,
+        size: 50,
         filterFn: (row, _columnId, filterValue) => {
           if (filterValue === undefined) return true;
           const hasApplication = !!(row.original?.currentYearApplication as Application)?.id;
@@ -61,12 +61,12 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
       {
         accessorKey: "country",
         header: getSortableHeader("Country"),
-        size: 70,
+        size: 50,
       },
       {
         accessorKey: "tag",
         header: getSortableHeader("Tag"),
-        size: 50,
+        size: 30,
         filterFn: (row, columnId, filterValue) => {
           if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
           return filterValue.includes(row.getValue(columnId));
@@ -75,6 +75,12 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
           const tag = row.original?.tag;
           return <TagBadge tag={tag} />;
         },
+      },
+      {
+        accessorKey: "applicationType",
+        header: getSortableHeader("Application"),
+        size: 50,
+        cell: ({ row }) => capitalizeFirst(row.original.applicationType),
       },
       {
         accessorKey: "festivalType",
@@ -146,7 +152,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
         },
       },
     ],
-    [onDeleteClick, onEdit, router]
+    [onDeleteClick, onEdit, router],
   );
 };
 
