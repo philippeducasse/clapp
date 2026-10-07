@@ -7,12 +7,14 @@ the Message-ID we stored on an Application when sending it (Application.sent_mes
 import logging
 import os
 import re
+import unicodedata
 from datetime import date, timedelta
 from typing import Literal, Optional
 
 from imap_tools import AND, MailBox, MailMessage
 from pydantic import BaseModel
 
+from applications.matching import by_header
 from applications.models import APPLICATION_STATUS, Application, InboundEmail
 from services.mistral_service import MistralClient
 
@@ -41,6 +43,38 @@ BULK_HEADERS = ("list-id", "list-unsubscribe")
 BULK_PRECEDENCE = ("bulk", "list", "junk")
 BOUNCE_SENDERS = ("mailer-daemon@", "postmaster@")
 
+# Words (accents removed) that suggest an email is about booking or applying.
+# Stems match the start of a word: "festival" also matches "festivals", "program" matches
+# "programme", "programmation", "programmazione"...
+KEYWORD_STEMS = (
+    # en
+    "festival", "booking", "program", "lineup", "line-up", "perform", "residenc",
+    "application", "invitation", "invite", "audition",
+    # de
+    "auftritt", "auftreten", "vorstellung", "auffuhrung", "gastspiel", "bewerbung",
+    "beworben", "anfrage", "einladung", "honorar", "veranstalt", "spielplan",
+    # fr
+    "spectacle", "representation", "candidature", "postul", "tournee",
+    # es / it
+    "espectaculo", "actuacion", "candidatura", "solicitud", "spettacolo", "esibizione",
+    "residenza",
+    # nl
+    "voorstelling", "optreden", "aanvraag", "sollicitatie",
+)  # fmt: skip
+# Short words match whole words only (plural "s" allowed): "show" must not match "shower".
+KEYWORD_WORDS = (
+    "show", "apply", "applied", "tour", "venue", "stage", "buhne", "gage", "cachet",
+    "scene", "gira",
+)  # fmt: skip
+KEYWORD_PATTERN = re.compile(
+    r"\b(?:"
+    + "|".join(map(re.escape, KEYWORD_STEMS))
+    + r")|\b(?:"
+    + "|".join(map(re.escape, KEYWORD_WORDS))
+    + r")s?\b"
+)
+KEYWORD_SEARCH_CHARS = 5000
+
 
 def is_skipped(message: MailMessage) -> bool:
     """Mailing lists, newsletters, bounces and our own messages. Auto-replies are kept."""
@@ -56,23 +90,21 @@ def is_skipped(message: MailMessage) -> bool:
     return sender == os.getenv("IMAP_USERNAME", "").lower()
 
 
+def mentions_keyword(message: MailMessage) -> bool:
+    """Cheap check before sending an unmatched email to Mistral."""
+    body = message.text or message.html or ""
+    # Make body more search friendly by normalising text
+    text = unicodedata.normalize("NFKD", f"{message.subject}\n{body[:KEYWORD_SEARCH_CHARS]}")
+    text = "".join(c for c in text if not unicodedata.combining(c)).lower()
+    return KEYWORD_PATTERN.search(text) is not None
+
+
 def is_auto_reply(message: MailMessage) -> bool:
     headers = message.headers
     auto_submitted = " ".join(headers.get("auto-submitted", ())).strip().lower()
     return (
         (auto_submitted not in ("", "no")) or "x-autoreply" in headers or "x-autorespond" in headers
     )
-
-
-def find_application(message: MailMessage) -> Optional[Application]:
-    """Find the application this email replies to, using the reply headers."""
-    headers = " ".join(
-        message.headers.get("in-reply-to", ()) + message.headers.get("references", ())
-    )
-    message_ids = re.findall(r"<[^<>\s]+>", headers)
-    if not message_ids:
-        return None
-    return Application.objects.filter(sent_message_id__in=message_ids).first()
 
 
 def classify(application: Application, body: str) -> EmailClassification:
@@ -98,9 +130,10 @@ def import_email(message: MailMessage) -> Optional[InboundEmail]:
     if is_skipped(message):
         return None
 
-    application = find_application(message)
-    if application is None:
+    applications = by_header(message)
+    if not applications:
         return None
+    application = applications[0]
 
     body = message.text or message.html
     result = classify(application, body)

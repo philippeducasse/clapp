@@ -12,6 +12,7 @@ from applications.inbox import (
     import_email,
     is_auto_reply,
     is_skipped,
+    mentions_keyword,
 )
 from applications.models import Application, InboundEmail
 from applications.services import set_application_status
@@ -103,6 +104,44 @@ class TestPreFilter:
             b"From: Info@philippeducasse.com\nSubject: Hi\nMessage-ID: <o@x>\n\nHi"
         )
         assert is_skipped(message)
+
+
+class TestMentionsKeyword:
+    @staticmethod
+    def message(subject: str, body: str = "") -> MailMessage:
+        raw = f"From: x@y.org\nSubject: {subject}\nMessage-ID: <k@x>\n"
+        raw += 'Content-Type: text/plain; charset="utf-8"\n\n' + body
+        return MailMessage.from_bytes(raw.encode())
+
+    @pytest.mark.parametrize(
+        "subject, body",
+        [
+            ("Your show at our Festivals", ""),
+            ("Hallo", "Danke für Ihre Bewerbung"),
+            ("Anfrage Gastspiel 2027", ""),
+            ("Bonjour", "Nous aimerions accueillir votre spectacle"),
+            ("Votre candidature", ""),
+            ("Re: Représentation", ""),  # accents are ignored
+            ("Propuesta", "Nos encantaría su espectáculo"),
+            ("Ciao", "Il vostro spettacolo"),
+            ("Vraag", "Uw voorstelling"),
+            ("Hi", "We would like to invite you to perform"),
+        ],
+    )
+    def test_matches(self, subject, body):
+        assert mentions_keyword(self.message(subject, body))
+
+    @pytest.mark.parametrize(
+        "subject, body",
+        [
+            ("Dinner on Saturday?", "Shall we meet at eight?"),
+            ("Your invoice", "Thanks for your feedback, see attached."),
+            ("Apple ID", "Your Apple account was updated"),
+            ("Showerhead order", ""),
+        ],
+    )
+    def test_does_not_match(self, subject, body):
+        assert not mentions_keyword(self.message(subject, body))
 
 
 @pytest.mark.django_db
