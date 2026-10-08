@@ -152,6 +152,48 @@ class TestImportWithoutReplyHeaders:
         assert email.is_auto_reply
         assert email.suggested_status == "AUTO_REPLY_RECEIVED"
 
+    @pytest.fixture
+    def ascona(self, profile):
+        return Festival.objects.create(name="Ascona Street Festival", user=profile)
+
+    def test_form_confirmation_creates_from_organisation(
+        self, ascona, festival_application, mock_llm
+    ):
+        mock_llm.return_value = classification(application_id=None, suggested_status=None)
+        email = import_email(load("jotform_confirmation.eml"))
+
+        candidates = mock_llm.call_args.args[1]
+        assert (candidates.method, candidates.organisations) == ("FORM", [ascona])
+        assert (email.state, email.application, email.organisation) == ("UNMATCHED", None, ascona)
+        assert email.match_method == "FORM"
+        assert email.suggested_status == "APPLIED"
+        assert email.is_auto_reply  # form provider, although the LLM said False
+
+    def test_form_confirmation_for_existing_application(self, ascona, profile, mock_llm):
+        existing = Application.objects.create(
+            profile=profile,
+            content_type=ContentType.objects.get_for_model(Festival),
+            object_id=ascona.id,
+            status="APPLIED",
+            application_method="FORM",
+        )
+        mock_llm.return_value = classification(
+            application_id=existing.id, suggested_status="AUTO_REPLY_RECEIVED"
+        )
+        email = import_email(load("jotform_confirmation.eml"))
+        assert (email.state, email.application) == ("PENDING_REVIEW", existing)
+        assert (email.match_method, email.suggested_status) == ("FORM", "AUTO_REPLY_RECEIVED")
+
+    def test_form_confirmation_for_unknown_organisation(self, festival_application, mock_llm):
+        mock_llm.return_value = classification(application_id=None)
+        email = import_email(load("jotform_confirmation.eml"))
+        assert (email.state, email.application, email.organisation) == ("UNMATCHED", None, None)
+        assert (email.match_method, email.suggested_status) == ("FORM", "APPLIED")
+
+    def test_unrelated_form_email_is_not_imported(self, mock_llm):
+        mock_llm.return_value = classification(is_application_related=False)
+        assert import_email(load("jotform_confirmation.eml")) is None
+
     def test_header_match_ignores_llm_choice(self, application, festival_application, mock_llm):
         mock_llm.return_value = classification(
             application_id=festival_application.id, is_application_related=False
@@ -205,6 +247,11 @@ class TestPreFilter:
 
     def test_auto_reply_is_not_skipped(self):
         message = load("auto_reply.eml")
+        assert not is_skipped(message)
+        assert is_auto_reply(message)
+
+    def test_form_confirmation_is_auto_reply(self):
+        message = load("jotform_confirmation.eml")
         assert not is_skipped(message)
         assert is_auto_reply(message)
 

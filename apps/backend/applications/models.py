@@ -129,6 +129,7 @@ MATCH_METHODS: List[Tuple[str, str]] = [
     ("SENDER", "Sender address"),
     ("DOMAIN", "Sender domain"),
     ("NAME", "Organisation name"),
+    ("FORM", "Web form confirmation"),
     ("NONE", "No match"),
 ]
 

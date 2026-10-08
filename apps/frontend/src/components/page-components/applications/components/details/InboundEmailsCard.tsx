@@ -45,6 +45,11 @@ const MATCH_METHOD_LABELS: Record<MatchMethod, { label: string; className: strin
       className: "bg-amber-100 text-amber-700 border-amber-200",
       title: "The organisation's name appears in the email. Check the application",
     },
+    [MatchMethod.FORM]: {
+      label: "Form confirmation",
+      className: "bg-amber-100 text-amber-700 border-amber-200",
+      title: "You applied on the organisation's website form. Create the application from it",
+    },
     [MatchMethod.NONE]: {
       label: "No match",
       className: "bg-slate-100 text-slate-700 border-slate-200",
@@ -215,7 +220,7 @@ const InboundEmailItem = ({
             {email.receivedAt && ` · ${formatDate(email.receivedAt)}`}
           </p>
           <div className="flex flex-wrap gap-1 mt-1">
-            {matchMethod && !isUnmatched && (
+            {matchMethod && (!isUnmatched || email.matchMethod === MatchMethod.FORM) && (
               <Badge variant="outline" className={matchMethod.className} title={matchMethod.title}>
                 {matchMethod.label}
               </Badge>

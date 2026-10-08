@@ -12,6 +12,7 @@ export enum MatchMethod {
   SENDER = "SENDER",
   DOMAIN = "DOMAIN",
   NAME = "NAME",
+  FORM = "FORM",
   NONE = "NONE",
 }
 

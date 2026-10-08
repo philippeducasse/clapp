@@ -2,14 +2,16 @@
 
 Methods are tried in order and the first one that finds something wins:
 HEADER (reply headers), SENDER (exact address), DOMAIN (sender domain), NAME (organisation
-name in the text). Organisations found without an application are returned too, so an
-application can be created from the email.
+name in the text, or its distinctive words). Web form confirmations (FORM) look for the
+organisation by name instead, as there is usually no application yet. Organisations found
+without an application are returned too, so an application can be created from the email.
 """
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Iterable, Optional
+from typing import Any, Callable, Iterable, Optional
 
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
@@ -75,6 +77,53 @@ GENERIC_NAMES = {
 }
 NAME_SEARCH_CHARS = 2000
 NAME_SEARCH_DAYS = 365
+
+# Words that do not identify an organisation on their own, ignored when matching names by
+# tokens: "Ascona Street Festival" is found by "ascona" alone. Written without accents.
+GENERIC_WORDS = GENERIC_NAMES | {
+    # en
+    "festivals", "fest", "international", "artists", "artist", "arts", "theatres", "theaters",
+    "performing", "performance", "residency", "stage", "show", "shows", "open", "days",
+    "week", "weekend", "city", "town", "house", "centre", "center", "the", "of", "and", "for",
+    # de
+    "strasse", "strassen", "strassenfestival", "kunst", "kunstler", "kuenstler",
+    "theaterfestival", "zirkusfestival", "kulturfestival", "festspiele", "internationales",
+    "internationale", "tage", "woche", "haus", "und", "der", "die", "das",
+    # fr
+    "artistes", "rue", "rues", "spectacle", "spectacles", "fete", "des", "de", "du", "la",
+    "le", "les", "et",
+    # it / es
+    "artisti", "artistidistrada", "strada", "strade", "teatro", "festa", "internazionale",
+    "artistas", "calle", "internacional", "di", "del", "della", "y", "e",
+    # nl
+    "straat", "straattheater", "kunsten", "van", "het", "en",
+}  # fmt: skip
+NAME_TOKEN_MIN_LENGTH = 4
+
+# Senders of web form confirmations. They never come from the organisation's own domain, so
+# they are matched by name, or with the FORM fallback.
+FORM_PROVIDER_DOMAINS = {
+    "jotform.com",
+    "formresponse.com",
+    "typeform.com",
+    "tally.so",
+    "wufoo.com",
+    "cognitoforms.com",
+    "formstack.com",
+    "123formbuilder.com",
+    "paperform.co",
+    "zohoforms.com",
+    "wixforms.com",
+    "submittable.com",
+    "formspree.io",
+    "fillout.com",
+    "framaforms.org",
+}
+# Providers whose domain also sends other mail: only these exact addresses count.
+FORM_PROVIDER_ADDRESSES = {
+    "forms-receipts-noreply@google.com",
+    "forms-noreply@google.com",
+}
 
 
 @dataclass
@@ -157,20 +206,77 @@ def name_is_searchable(name: str) -> bool:
     return len(name) >= NAME_MIN_LENGTH and name not in GENERIC_NAMES
 
 
+def fold(text: str) -> str:
+    """normalise() without accents: "Fête" -> "fete"."""
+    text = unicodedata.normalize("NFKD", normalise(text).replace("ß", "ss"))
+    return "".join(c for c in text if not unicodedata.combining(c))
+
+
+def distinctive_tokens(name: str) -> set[str]:
+    """The words of an organisation name that identify it: "Ascona Street Festival" -> {"ascona"}."""
+    return {
+        token
+        for token in fold(name).split()
+        if len(token) >= NAME_TOKEN_MIN_LENGTH and token not in GENERIC_WORDS
+    }
+
+
+def names_in_text(items: list, name_of: Callable[[Any], str], text: str) -> list:
+    """Items whose name is in the text. The whole name is searched first; only if nothing is
+    found that way, an item matches when all the distinctive words of its name are in it."""
+    phrase_text = f" {normalise(text)} "
+    found = [
+        item
+        for item in items
+        if name_is_searchable(name_of(item)) and f" {normalise(name_of(item))} " in phrase_text
+    ]
+    if found:
+        return found
+    words = set(fold(text).split())
+    return [
+        item for item in items if (tokens := distinctive_tokens(name_of(item))) and tokens <= words
+    ]
+
+
 def by_name(text: str, profile: Profile) -> list[Application]:
     """Recent applications (drafts included) whose organisation name appears in the text."""
-    text = f" {normalise(text)} "
     since = timezone.now() - timedelta(days=NAME_SEARCH_DAYS)
-    applications = Application.objects.filter(
-        profile=profile, created_at__gte=since, object_id__isnull=False
-    ).order_by("-created_at")
-    return [
+    applications = [
         application
-        for application in applications
+        for application in Application.objects.filter(
+            profile=profile, created_at__gte=since, object_id__isnull=False
+        ).order_by("-created_at")
         if application.organisation is not None
-        and name_is_searchable(application.organisation.name)
-        and f" {normalise(application.organisation.name)} " in text
     ]
+    return names_in_text(applications, lambda a: a.organisation.name, text)
+
+
+def organisations_by_name(text: str, profile: Profile) -> list:
+    """The profile's festivals, venues and residencies whose name appears in the text."""
+    organisations = [
+        organisation
+        for model in ORGANISATION_MODELS
+        for organisation in model.objects.filter(user=profile, deleted_at__isnull=True).only(
+            "id", "name"
+        )
+    ]
+    return names_in_text(organisations, lambda o: o.name, text)
+
+
+# "form" in the sender address (jotform, formresponse, forms-receipts...), but not in
+# "information", "performance", "platform", "transform", "uniform", "reform", "formation"...
+FORM_IN_ADDRESS = re.compile(r"(?<!in)(?<!per)(?<!plat)(?<!trans)(?<!uni)(?<!re)form(?!at)")
+
+
+def is_form_provider(sender: str) -> bool:
+    """Is the sender a web form service (Jotform, Typeform, Google Forms...)?"""
+    sender = sender.strip().lower()
+    domain = email_domain(sender)
+    return (
+        sender in FORM_PROVIDER_ADDRESSES
+        or any(domain == p or domain.endswith(f".{p}") for p in FORM_PROVIDER_DOMAINS)
+        or FORM_IN_ADDRESS.search(sender) is not None
+    )
 
 
 def find_candidates(message: MailMessage, profile: Optional[Profile]) -> Candidates:
@@ -192,9 +298,18 @@ def find_candidates(message: MailMessage, profile: Optional[Profile]) -> Candida
     if organisations:
         return Candidates("DOMAIN", applications_for(organisations, profile), organisations)
 
-    # Fourth screen: tries to find applications by matching subject or body with and organisation.contacts or organisation name
     body = message.text or message.html or ""
-    applications = by_name(f"{message.subject}\n{body[:NAME_SEARCH_CHARS]}", profile)
+    text = f"{message.subject}\n{body[:NAME_SEARCH_CHARS]}"
+
+    # Web form confirmation: the artist applied on the organisation's website, so usually
+    # there is no application yet. Find the organisation by name, so one can be created from
+    # the email. Applications that already exist for it are still offered, to avoid duplicates.
+    if is_form_provider(sender):
+        organisations = organisations_by_name(text, profile)
+        return Candidates("FORM", applications_for(organisations, profile), organisations)
+
+    # Fourth screen: tries to find applications by matching subject or body with the organisation name
+    applications = by_name(text, profile)
     if applications:
         return Candidates("NAME", applications)
 

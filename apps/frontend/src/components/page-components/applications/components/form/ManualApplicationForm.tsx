@@ -12,6 +12,7 @@ import {
 import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { applicationApiService } from "@/api/applicationApiService";
 import { inboundEmailApiService } from "@/api/inboundEmailApiService";
+import { MatchMethod } from "@/interfaces/entities/InboundEmail";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateApplication, selectApplication } from "@/redux/slices/applicationSlice";
@@ -86,7 +87,9 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
               ? `${email.organisationType ?? ""}: ${email.organisationName}`
               : "",
           status: email.suggestedStatus || ApplicationStatus.APPLIED,
-          applicationMethod: ApplicationMethod.EMAIL,
+          // A web form confirmation: the artist applied on the organisation's website.
+          applicationMethod:
+            email.matchMethod === MatchMethod.FORM ? ApplicationMethod.FORM : ApplicationMethod.EMAIL,
           comments: email.summary,
         });
       })

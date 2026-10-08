@@ -1,7 +1,9 @@
 """Read emails about applications and suggest a new status. Every suggestion needs approval.
 
 1. Skip mailing lists, bounces and our own messages (auto-replies are kept).
-2. Find candidate applications (applications/matching.py): reply headers, sender, domain, name.
+2. Find candidate applications (applications/matching.py): reply headers, sender, domain,
+   name. Web form confirmations usually have no application: they stay UNMATCHED with the
+   organisation found by name, so an application can be created from them.
 3. Emails without candidates only go to Mistral if they contain a keyword.
 4. Mistral picks the application among the candidates and suggests a status.
 """
@@ -16,7 +18,7 @@ from typing import Literal, Optional
 from imap_tools import AND, MailBox, MailMessage
 from pydantic import BaseModel
 
-from applications.matching import Candidates, find_candidates
+from applications.matching import Candidates, find_candidates, is_form_provider
 from applications.models import APPLICATION_STATUS, Application, InboundEmail
 from profiles.models import Profile
 from services.mistral_service import MistralClient
@@ -106,10 +108,14 @@ def mentions_keyword(message: MailMessage) -> bool:
 
 
 def is_auto_reply(message: MailMessage) -> bool:
+    """Auto-reply headers, or a confirmation sent by a web form service."""
     headers = message.headers
     auto_submitted = " ".join(headers.get("auto-submitted", ())).strip().lower()
     return (
-        (auto_submitted not in ("", "no")) or "x-autoreply" in headers or "x-autorespond" in headers
+        (auto_submitted not in ("", "no"))
+        or "x-autoreply" in headers
+        or "x-autorespond" in headers
+        or is_form_provider(message.from_)
     )
 
 
@@ -144,6 +150,10 @@ Read the email below that the artist received.
 3. suggested_status: the new status of that application, one of: {statuses}.
    - A confirmation that an application was received, for a DRAFT application: APPLIED.
    - An automatic reply to an APPLIED application: AUTO_REPLY_RECEIVED.
+   - A web form submission confirmation (Jotform, Typeform, Google Forms...) means the
+     artist applied on the organisation's website. Usually there is no application for it
+     yet: then use application_id null and APPLIED. If a candidate is the application to
+     that organisation: AUTO_REPLY_RECEIVED if it is APPLIED, APPLIED if it is a DRAFT.
    - Never move an application backwards (order: DRAFT, APPLIED, AUTO_REPLY_RECEIVED,
      IN_DISCUSSION, then a final answer). For example an automatic reply to an
      IN_DISCUSSION or ACCEPTED application gets null.
@@ -197,13 +207,17 @@ def import_email(message: MailMessage) -> Optional[InboundEmail]:
     if profile is None:
         return None
 
+    # A form confirmation without an application: the artist applied on the website, an
+    # application is created from the email (UNMATCHED, with the organisation if found).
+    is_form = candidates.method == "FORM"
+    suggested_status = "APPLIED" if is_form and not application else result.suggested_status
     return InboundEmail.objects.create(
         profile=profile,
         application=application,
         organisation=None
         if application or not candidates.organisations
         else candidates.organisations[0],
-        match_method=candidates.method if application else "NONE",
+        match_method=candidates.method if application or is_form else "NONE",
         state="PENDING_REVIEW" if application else "UNMATCHED",
         is_auto_reply=is_auto_reply(message) or result.is_auto_reply,
         message_id=message_id,
@@ -211,7 +225,7 @@ def import_email(message: MailMessage) -> Optional[InboundEmail]:
         subject=message.subject,
         body=message.text or message.html,
         received_at=message.date if message.date_str else None,
-        suggested_status=result.suggested_status or "",
+        suggested_status=suggested_status or "",
         summary=result.summary,
     )
 
