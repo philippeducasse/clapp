@@ -18,7 +18,7 @@ import DeleteButton from "@/components/common/buttons/DeleteButton";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
 import { useRouter } from "next/navigation";
-import InboundEmailsCard from "./InboundEmailsCard";
+import InboundEmailsCard from "@/components/page-components/inbound-emails/components/InboundEmailsCard";
 
 const ApplicationView = () => {
   const params = useParams();

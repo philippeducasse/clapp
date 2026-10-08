@@ -52,4 +52,13 @@ const dismiss = (id: number): Promise<InboundEmail> => {
   );
 };
 
-export const inboundEmailApiService = { getAll, get, approve, link, dismiss };
+const restore = (id: number): Promise<InboundEmail> => {
+  return sendRequest<object, InboundEmail>(
+    `${inboundEmailEndpoint}/${id}/restore`,
+    {},
+    "POST",
+    "Email restored",
+  );
+};
+
+export const inboundEmailApiService = { getAll, get, approve, link, dismiss, restore };

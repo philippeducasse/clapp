@@ -51,6 +51,10 @@ export const entityRegistry: Record<string, EntityConfig> = {
     label: "Help",
     hasDetailsView: false,
   },
+  "inbound-emails": {
+    label: "Inbound emails",
+    hasDetailsView: false,
+  },
   upload: {
     label: "Upload",
     hasDetailsView: false,

@@ -8,6 +8,7 @@ import {
   Theater,
   Bug,
   UserRound,
+  Mail,
 } from "lucide-react";
 
 import {
@@ -49,6 +50,11 @@ const items = [
     icon: ClipboardEdit,
   },
   {
+    title: "Inbound emails",
+    url: "/inbound-emails",
+    icon: Mail,
+  },
+  {
     title: "Report a bug",
     url: "/report-bug",
     icon: Bug,
@@ -82,7 +88,7 @@ const Sidebar = () => {
           <SidebarGroupContent className="h-full my-6">
             <SidebarMenu className="flex h-full">
               {items.map((item, index) => (
-                <SidebarMenuItem key={item.title} className={index == 5 ? `mt-auto` : ""}>
+                <SidebarMenuItem key={item.title} className={index == 6 ? `mt-auto` : ""}>
                   <SidebarMenuButton asChild size={"lg"}>
                     <a href={item.url}>
                       <item.icon className="text-primary h-6! w-6!" />

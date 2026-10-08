@@ -392,6 +392,18 @@ class TestInboundEmailApi:
         assert email.state == "DISMISSED"
         assert application.status == "APPLIED"
 
+    def test_restore_dismissed(self, client, email):
+        client.post(f"/api/inbound-emails/{email.id}/dismiss/")
+        client.post(f"/api/inbound-emails/{email.id}/restore/")
+        email.refresh_from_db()
+        assert email.state == "PENDING_REVIEW"
+
+    def test_restore_unmatched(self, client, unmatched):
+        client.post(f"/api/inbound-emails/{unmatched.id}/dismiss/")
+        client.post(f"/api/inbound-emails/{unmatched.id}/restore/")
+        unmatched.refresh_from_db()
+        assert unmatched.state == "UNMATCHED"
+
     @pytest.fixture
     def unmatched(self, profile):
         festival = Festival.objects.create(name="New Fest", user=profile)

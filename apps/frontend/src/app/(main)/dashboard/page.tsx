@@ -14,7 +14,7 @@ import DashboardCard, {
 } from "@/components/page-components/dashboard/components/DashboardCard";
 import ApplicationStats from "@/components/page-components/dashboard/components/ApplicationStats";
 import ProfileCompletionCard from "@/components/page-components/dashboard/components/ProfileCompletionCard";
-import InboundEmailsCard from "@/components/page-components/applications/components/details/InboundEmailsCard";
+import InboundEmailsCard from "@/components/page-components/inbound-emails/components/InboundEmailsCard";
 import { RootState } from "@/redux/store";
 import { Skeleton } from "@/components/ui/skeleton";
 

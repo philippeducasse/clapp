@@ -121,3 +121,11 @@ class InboundEmailViewSet(viewsets.ReadOnlyModelViewSet):
         email.state = "DISMISSED"
         email.save()
         return Response(self.get_serializer(email).data)
+
+    @action(detail=True, methods=["post"])
+    def restore(self, request: HttpRequest, pk: int) -> Response:
+        """Put a dismissed or approved email back to review. An applied status is kept."""
+        email = self.get_object()
+        email.state = "PENDING_REVIEW" if email.application else "UNMATCHED"
+        email.save()
+        return Response(self.get_serializer(email).data)
