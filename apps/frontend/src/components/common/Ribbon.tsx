@@ -14,6 +14,7 @@ import {
   Clock,
   Ban,
   FileText,
+  MailCheck,
 } from "lucide-react";
 
 interface RibbonProps {
@@ -33,6 +34,7 @@ const TAG_CONFIG = {
 const STATUS_CONFIG = {
   [ApplicationStatus.DRAFT]: { color: "bg-gray-500", icon: FileText },
   [ApplicationStatus.APPLIED]: { color: "bg-blue-600", icon: Send },
+  [ApplicationStatus.AUTO_REPLY_RECEIVED]: { color: "bg-sky-600", icon: MailCheck },
   [ApplicationStatus.IN_DISCUSSION]: {
     color: "bg-purple-600",
     icon: MessageCircle,

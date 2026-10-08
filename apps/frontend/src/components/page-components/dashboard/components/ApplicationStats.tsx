@@ -19,7 +19,9 @@ const ApplicationStats = ({
       (app) => app.status === ApplicationStatus.IN_DISCUSSION,
     ).length,
     applied: applications.filter(
-      (app) => app.status === ApplicationStatus.APPLIED,
+      (app) =>
+        app.status === ApplicationStatus.APPLIED ||
+        app.status === ApplicationStatus.AUTO_REPLY_RECEIVED,
     ).length,
     draft: applications.filter((app) => app.status === ApplicationStatus.DRAFT)
       .length,

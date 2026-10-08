@@ -18,6 +18,7 @@ import {
   CircleQuestionMark,
   EyeOff,
   Flag,
+  MailCheck,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { PayloadAction } from "@reduxjs/toolkit";
@@ -50,6 +51,16 @@ export const StatusButton = <T,>({ entityId, updateStatus, updateSlice }: Status
             onClick={() => changeStatus(ApplicationStatus.APPLIED)}
           >
             <Send /> Applied
+          </Button>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <Button
+            variant={"ghost"}
+            className="text-sky-600"
+            onClick={() => changeStatus(ApplicationStatus.AUTO_REPLY_RECEIVED)}
+          >
+            <MailCheck /> Auto-reply
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

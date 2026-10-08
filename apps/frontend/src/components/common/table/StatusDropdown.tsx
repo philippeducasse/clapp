@@ -30,6 +30,11 @@ export const StatusDropdown = ({ entityId, onStatusChange }: StatusDropdownProps
           Applied
         </DropdownMenuItem>
         <DropdownMenuItem
+          onClick={() => onStatusChange(entityId, ApplicationStatus.AUTO_REPLY_RECEIVED)}
+        >
+          Auto-reply received
+        </DropdownMenuItem>
+        <DropdownMenuItem
           onClick={() => onStatusChange(entityId, ApplicationStatus.IN_DISCUSSION)}
         >
           In Discussion

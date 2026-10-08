@@ -3,10 +3,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useEffect, useState, useRef } from "react";
-import { Application, ApplicationCreate } from "@/interfaces/entities/Application";
+import {
+  Application,
+  ApplicationCreate,
+  ApplicationMethod,
+  ApplicationStatus,
+} from "@/interfaces/entities/Application";
 import { createZodFormSchema, sanitizeFormData, getInitialValues } from "@/helpers/formHelper";
 import { applicationApiService } from "@/api/applicationApiService";
-import { useRouter, useParams } from "next/navigation";
+import { inboundEmailApiService } from "@/api/inboundEmailApiService";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { updateApplication, selectApplication } from "@/redux/slices/applicationSlice";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -26,6 +32,8 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   const dispatch: AppDispatch = useDispatch();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const inboundEmailId = Number(searchParams?.get("inboundEmail")) || undefined;
   const applicationId = Number(params?.id);
   const application = useSelector((state: RootState) => selectApplication(state, applicationId));
   const profile = useSelector((state: RootState) => selectProfile(state));
@@ -63,6 +71,28 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     }
   }, [application, form]);
 
+  // "Create application" from an unmatched inbound email: prefill from the email.
+  useEffect(() => {
+    if (action !== Action.CREATE || !inboundEmailId) return;
+    inboundEmailApiService
+      .get(inboundEmailId)
+      .then((email) => {
+        form.reset({
+          ...form.getValues(),
+          organisationType: email.organisationType?.toUpperCase() ?? "",
+          organisation: email.organisationId ?? "",
+          organisationLabel:
+            email.organisationId && email.organisationName
+              ? `${email.organisationType ?? ""}: ${email.organisationName}`
+              : "",
+          status: email.suggestedStatus || ApplicationStatus.APPLIED,
+          applicationMethod: ApplicationMethod.EMAIL,
+          comments: email.summary,
+        });
+      })
+      .catch((error) => console.error("Failed to fetch inbound email:", error));
+  }, [action, inboundEmailId, form]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
@@ -91,6 +121,12 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
           const newApplication = await applicationApiService.create(
             application as unknown as Application,
           );
+          if (inboundEmailId && newApplication?.id) {
+            await inboundEmailApiService.link(inboundEmailId, newApplication.id, {
+              approve: true,
+              status: values.status as ApplicationStatus,
+            });
+          }
           router.push(`/applications/${newApplication?.id}`);
         }
       }
@@ -101,7 +137,9 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     }
   };
 
-  const onCancelHref = applicationId ? `/applications/${application?.id}` : "/applications";
+  const onCancelHref = inboundEmailId
+    ? "/dashboard"
+    : applicationId ? `/applications/${application?.id}` : "/applications";
 
   return (
     <>

@@ -11,6 +11,8 @@ const statusBadgeVariants = cva("", {
         "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800/40",
       [ApplicationStatus.APPLIED]:
         "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800/40",
+      [ApplicationStatus.AUTO_REPLY_RECEIVED]:
+        "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400 border-sky-200 dark:border-sky-800/40",
       [ApplicationStatus.IN_DISCUSSION]:
         "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/40",
       [ApplicationStatus.REJECTED]:

@@ -53,6 +53,7 @@ export enum ApplicationMethod {
 export enum ApplicationStatus {
   DRAFT = "DRAFT",
   APPLIED = "APPLIED",
+  AUTO_REPLY_RECEIVED = "AUTO_REPLY_RECEIVED",
   IN_DISCUSSION = "IN_DISCUSSION",
   REJECTED = "REJECTED",
   IGNORED = "IGNORED",

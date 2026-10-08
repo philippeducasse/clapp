@@ -10,7 +10,7 @@ interface ControlledSearchProps extends BaseControlledProps {
 }
 
 const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) => {
-  const { setValue, getValues } = useFormContext();
+  const { setValue, getValues, watch } = useFormContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<OrganisationSearchResponse[]>([]);
   const [isLoading, setLoading] = useState(false);
@@ -51,6 +51,17 @@ const ControlledSearch = ({ field, organisationType }: ControlledSearchProps) =>
     }, 300);
     return () => clearTimeout(timeoutId);
   }, [searchQuery, organisationType]);
+
+  // A prefilled organisation (e.g. from an inbound email) sets its name in "<field>Label".
+  const prefilledLabel = watch(`${field.name}Label`) as string | undefined;
+  const [appliedLabel, setAppliedLabel] = useState<string | undefined>(undefined);
+  if (prefilledLabel !== appliedLabel) {
+    setAppliedLabel(prefilledLabel);
+    if (prefilledLabel && field.value && !isSelected) {
+      setSearchQuery(prefilledLabel);
+      setIsSelected(true);
+    }
+  }
 
   const prevOrgTypeRef = useRef(organisationType);
   useEffect(() => {

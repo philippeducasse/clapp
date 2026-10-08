@@ -15,9 +15,9 @@ The design is personal-use first, but it should be possible to add more users la
 | 4. Classification | ✅ done | backend, not deployed yet |
 | 5. Model changes | ✅ done | migration `0016_inbound_email_unmatched` |
 | 6. API | ✅ done | backend, not deployed yet |
-| 7. Frontend | ⏳ todo | |
+| 7. Frontend | ✅ done | `InboundEmailsCard`, `ApplicationPicker`, `ManualApplicationForm` prefill |
 | 8. Tests | ✅ done for steps 1–6 | `test_inbox.py`, `test_matching.py` |
-| 9. Docs | ⏳ todo | `apps/backend/docs/inbox_pipeline.md` still describes header matching only |
+| 9. Docs | ✅ done | `apps/backend/docs/inbox_pipeline.md` |
 
 **Before deploying:** test migration `0016` on a copy of the prod database (it fills
 `InboundEmail.profile` from existing rows), and make sure a `Profile` with the same email as
@@ -127,7 +127,7 @@ After the call:
 
 ### 5. Model changes ✅ (migration `0016_inbound_email_unmatched`)
 - `APPLICATION_STATUS`: added `("AUTO_REPLY_RECEIVED", "Auto-reply received")` between
-  `APPLIED` and `IN_DISCUSSION`. **Still missing in the frontend** (step 7).
+  `APPLIED` and `IN_DISCUSSION`. Added to the frontend in step 7.
 - `InboundEmail`:
   - `profile` (FK, required), **not in the original plan**: unmatched emails have no
     application, so ownership can't come from `application.profile` any more. The migration
@@ -155,7 +155,7 @@ After the call:
 - "Create application" needs no new endpoint: the frontend calls `POST /applications/`, then
   `link` with `approve: true`.
 
-### 7. Frontend ⏳
+### 7. Frontend ✅
 - Review queue shows: the `match_method` badge (HEADER = sure, SENDER/DOMAIN/NAME = check),
   an "Auto-reply" badge, and a "Draft application" hint when approving moves a `DRAFT` to `APPLIED`.
 - "Change application" action on each email → picker → `link`.
@@ -180,7 +180,7 @@ After the call:
 - `organisations/tests/test_utils.py`: `normalize_domain`.
 - Not covered: migration `0016` filling `profile` on existing rows.
 
-### 9. Docs ⏳
+### 9. Docs ✅
 Update `apps/backend/docs/inbox_pipeline.md` (how it works, matching table, API, limitations).
 
 ## Later (not needed for this feature)

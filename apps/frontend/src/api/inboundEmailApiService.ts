@@ -23,6 +23,26 @@ const approve = (id: number, status?: ApplicationStatus): Promise<InboundEmail> 
   );
 };
 
+const get = (id: number): Promise<InboundEmail> => {
+  return fetchRequest<InboundEmail>(`${inboundEmailEndpoint}/${id}`);
+};
+
+const link = (
+  id: number,
+  applicationId: number,
+  options: { approve?: boolean; status?: ApplicationStatus } = {},
+): Promise<InboundEmail> => {
+  return sendRequest<
+    { applicationId: number; approve?: boolean; status?: ApplicationStatus },
+    InboundEmail
+  >(
+    `${inboundEmailEndpoint}/${id}/link`,
+    { applicationId, ...options },
+    "POST",
+    options.approve ? "Application status updated" : "Email linked to application",
+  );
+};
+
 const dismiss = (id: number): Promise<InboundEmail> => {
   return sendRequest<object, InboundEmail>(
     `${inboundEmailEndpoint}/${id}/dismiss`,
@@ -32,4 +52,4 @@ const dismiss = (id: number): Promise<InboundEmail> => {
   );
 };
 
-export const inboundEmailApiService = { getAll, approve, dismiss };
+export const inboundEmailApiService = { getAll, get, approve, link, dismiss };

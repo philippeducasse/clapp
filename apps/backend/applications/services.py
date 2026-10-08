@@ -13,7 +13,7 @@ def set_application_status(
         raise ValidationError({"error": f"Invalid application status: {new_status}"})
 
     application.status = new_status
-    if note:
+    if note and note not in (application.comments or ""):
         application.comments = f"{application.comments}\n{note}".strip()
     application.save()
     return application
