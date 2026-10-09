@@ -2,15 +2,18 @@ import logging
 from datetime import datetime
 from typing import Any, Dict, List
 
+import django_filters
 from celery.result import AsyncResult
 from django.apps import apps
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import Throttled
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -38,6 +41,23 @@ from .tasks import upload_user_data
 from .utils import clean_organisation_data
 
 logger = logging.getLogger(__name__)
+
+
+def filter_in_iexact(queryset: QuerySet, name: str, value: str) -> QuerySet:
+    """Match any of the comma-separated values, case-insensitively (e.g. ?country=france,spain)."""
+    values = [v.strip() for v in value.split(",") if v.strip()]
+    if not values:
+        return queryset
+    query = Q()
+    for v in values:
+        query |= Q(**{f"{name}__iexact": v})
+    return queryset.filter(query)
+
+
+# Django filters transforms query params into ORM .filter() calls.
+# Filters shared by all organisation types; subclass per entity to add type-specific ones.
+class OrganisationFilter(django_filters.FilterSet):
+    country = django_filters.CharFilter(method=filter_in_iexact)
 
 
 def get_visibility_filter(user) -> Q:
@@ -121,6 +141,10 @@ class OrganisationViewSet(viewsets.ModelViewSet):
     Base ViewSet for all organisation types (festivals, venues, residencies).
     Provides shared functionality like enrich, apply, and generate_email.
     """
+
+    # DRF automatically reads the column, search and ordering filters with these parameters.
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = OrganisationFilter
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

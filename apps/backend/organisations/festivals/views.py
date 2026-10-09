@@ -1,10 +1,9 @@
 from datetime import date
 from typing import Optional
 
+import django_filters
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Exists, OuterRef, Prefetch, QuerySet
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter, SearchFilter
 
 from applications.models import Application
 from organisations.festivals.models import Festival
@@ -12,7 +11,15 @@ from organisations.festivals.serializer import FestivalSerializer
 from organisations.festivals.utils import FestivalEnrichment
 from organisations.festivals.utils import generate_enrich_prompt as generate_festival_enrich_prompt
 from organisations.models import Organisation
-from organisations.views import OrganisationViewSet
+from organisations.views import OrganisationFilter, OrganisationViewSet, filter_in_iexact
+
+
+class FestivalFilter(OrganisationFilter):
+    festival_type = django_filters.CharFilter(method=filter_in_iexact)
+
+    class Meta:
+        model = Festival
+        fields = ["country", "festival_type"]
 
 
 class FestivalViewSet(OrganisationViewSet):
@@ -33,10 +40,7 @@ class FestivalViewSet(OrganisationViewSet):
         "application_type",
     )
     enrich_response_format = FestivalEnrichment
-
-    # DRF automatically reads the column and search filter with these paramters.
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["country", "festival_type"]
+    filterset_class = FestivalFilter
     search_fields = ["name", "country", "website_url", "festival_type"]
     ordering_fields = ["name", "start_date", "application_date_start"]
     ordering = ["name"]

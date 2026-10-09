@@ -1,13 +1,20 @@
 from typing import Optional
 
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter, SearchFilter
+import django_filters
 
 from organisations.venues.models import Venue
 from organisations.venues.serializer import VenueSerializer
-from organisations.views import OrganisationViewSet
+from organisations.views import OrganisationFilter, OrganisationViewSet, filter_in_iexact
 from organisations.venues.utils import VenueEnrichment, generate_enrich_prompt
 from organisations.models import Organisation
+
+
+class VenueFilter(OrganisationFilter):
+    venue_type = django_filters.CharFilter(method=filter_in_iexact)
+
+    class Meta:
+        model = Venue
+        fields = ["country", "venue_type"]
 
 
 class VenueViewSet(OrganisationViewSet):
@@ -21,8 +28,7 @@ class VenueViewSet(OrganisationViewSet):
         "venue_type",
     )
     enrich_response_format = VenueEnrichment
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ["country", "venue_type"]
+    filterset_class = VenueFilter
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name"]
     ordering = ["name"]
