@@ -105,30 +105,37 @@ def send_forgot_password_email(email: str):
 @shared_task
 def check_and_set_reminders() -> int:
     """
-    Check for due reminders and send notifications.
+    Check for due reminders, deliver them in-app and send email notifications.
     Runs every hour via Celery Beat.
+
+    In-app delivery (delivered_at) is independent of the email: a reminder is
+    delivered in-app even when the email fails. Failed emails are retried on
+    the next run since is_sent stays False.
     """
 
     now = timezone.now()
 
-    due_reminders = Reminder.objects.filter(remind_at__lte=now, is_sent=False)
+    due_reminders = Reminder.objects.filter(remind_at__lte=now)
+
+    delivered_count = due_reminders.filter(delivered_at__isnull=True).update(delivered_at=now)
+    logger.info(f"Delivered {delivered_count} reminders in-app")
 
     sent_count = 0
 
-    for reminder in due_reminders:
+    for reminder in due_reminders.filter(is_sent=False):
         try:
             send_reminder_notification(reminder)
             reminder.is_sent = True
-            reminder.save()
+            reminder.save(update_fields=["is_sent"])
             sent_count += 1
 
         except Exception as e:
             logger.error(f"Failed to send reminder {reminder.id}: {str(e)}")
             if reminder.organisation is None:
                 reminder.is_sent = True
-                reminder.save()
+                reminder.save(update_fields=["is_sent"])
 
-    logger.info(f"Sent {sent_count} reminders")
+    logger.info(f"Sent {sent_count} reminder emails")
 
     return sent_count
 

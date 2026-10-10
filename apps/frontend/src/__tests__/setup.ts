@@ -6,6 +6,7 @@ export const mockSendRequest = vi.fn();
 export const mockDeleteRequest = vi.fn();
 export const mockPatchRequest = vi.fn();
 export const mockSendFormDataRequest = vi.fn();
+export const mockSilentRequest = vi.fn();
 
 vi.mock('@/api/fetchHelper', () => ({
   fetchRequest: mockFetchRequest,
@@ -13,6 +14,7 @@ vi.mock('@/api/fetchHelper', () => ({
   deleteRequest: mockDeleteRequest,
   patchRequest: mockPatchRequest,
   sendFormDataRequest: mockSendFormDataRequest,
+  silentRequest: mockSilentRequest,
 }));
 
 export const resetAllMocks = () => {
@@ -21,4 +23,5 @@ export const resetAllMocks = () => {
   mockDeleteRequest.mockReset();
   mockPatchRequest.mockReset();
   mockSendFormDataRequest.mockReset();
+  mockSilentRequest.mockReset();
 };

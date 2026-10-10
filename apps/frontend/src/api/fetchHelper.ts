@@ -140,6 +140,25 @@ export const patchRequest = async <TRes>(url: string, toastMessage?: string): Pr
   return handleResponse<TRes>(res, url, toastMessage);
 };
 
+/**
+ * Body-less request that never shows toasts (neither success nor error).
+ * Intended for background work such as polling. Still throws on failure.
+ */
+export const silentRequest = async <TRes>(
+  url: string,
+  method: "GET" | "POST" = "GET",
+): Promise<TRes> => {
+  const res = await baseRequest(url, { method });
+  if (!res.ok) {
+    throw new Error(`Request failed for ${url}: ${res.status}`);
+  }
+  try {
+    return transformKeysToCamelCase(await res.json());
+  } catch {
+    return {} as TRes;
+  }
+};
+
 const getCsrfToken = (): string | null => {
   if (typeof document === "undefined") {
     return null;

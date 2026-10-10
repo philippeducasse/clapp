@@ -1,6 +1,6 @@
 import { Reminder, ReminderCreate } from "@/interfaces/entities/Reminder";
 import { OrganisationType } from "@/interfaces/Enums";
-import { sendRequest, deleteRequest, fetchRequest } from "./fetchHelper";
+import { sendRequest, deleteRequest, fetchRequest, silentRequest } from "./fetchHelper";
 
 export const reminderEndpoint = "/api/profiles/me/reminders";
 
@@ -32,9 +32,24 @@ const getRemindersForEntity = (
   return fetchRequest<Reminder[]>(`${reminderEndpoint}?${params.toString()}`);
 };
 
+const getUnreadCount = async (): Promise<number> => {
+  const { count } = await silentRequest<{ count: number }>(`${reminderEndpoint}/unread-count`);
+  return count;
+};
+
+const markAllRead = async (): Promise<number> => {
+  const { updated } = await silentRequest<{ updated: number }>(
+    `${reminderEndpoint}/mark-read`,
+    "POST",
+  );
+  return updated;
+};
+
 export const reminderApiService = {
   setReminder,
   deleteReminder,
   getReminders,
   getRemindersForEntity,
+  getUnreadCount,
+  markAllRead,
 };

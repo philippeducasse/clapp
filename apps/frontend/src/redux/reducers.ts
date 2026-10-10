@@ -5,6 +5,7 @@ import residenciesReducer from "./slices/residencySlice";
 import venuesReducer from "./slices/venueSlice";
 import authReducer from "./slices/authSlice";
 import applicationReducer from "./slices/applicationSlice"
+import reminderReducer from "./slices/reminderSlice";
 
 const rootReducer = combineReducers({
   festivals: festivalsReducer,
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
   venues: venuesReducer,
   profile: authReducer,
   applications: applicationReducer,
+  reminders: reminderReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

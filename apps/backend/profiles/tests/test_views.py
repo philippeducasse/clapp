@@ -195,3 +195,130 @@ class TestProfileViews:
         )
 
         assert response.status_code in [200, 403]
+
+
+@pytest.mark.django_db
+class TestReminderNotificationViews:
+    """Tests for the in-app reminder notification endpoints."""
+
+    @pytest.fixture
+    def profile(self):
+        return Profile.objects.create_user(email="user@example.com", password="testpass123")
+
+    @pytest.fixture
+    def other_profile(self):
+        return Profile.objects.create_user(email="other@example.com", password="testpass123")
+
+    @pytest.fixture
+    def festival(self):
+        return Festival.objects.create(name="Test Festival", town="Paris", country="France")
+
+    @pytest.fixture
+    def client(self, profile):
+        client = APIClient()
+        client.force_authenticate(user=profile)
+        return client
+
+    def _reminder(self, profile, festival, delivered=False, read=False, **kwargs):
+        from django.utils import timezone
+
+        now = timezone.now()
+        return Reminder.objects.create(
+            profile=profile,
+            content_type=ContentType.objects.get_for_model(Festival),
+            object_id=festival.id,
+            message=kwargs.get("message", "Reminder"),
+            remind_at=now - timezone.timedelta(hours=1)
+            if delivered
+            else now + timezone.timedelta(days=1),
+            delivered_at=now if delivered else None,
+            read_at=now if read else None,
+        )
+
+    def test_unread_count_counts_only_delivered_unread(self, client, profile, festival):
+        self._reminder(profile, festival, delivered=True)
+        self._reminder(profile, festival, delivered=True)
+        self._reminder(profile, festival, delivered=True, read=True)
+        self._reminder(profile, festival)  # upcoming
+
+        response = client.get("/api/profiles/me/reminders/unread-count/")
+
+        assert response.status_code == 200
+        assert response.data == {"count": 2}
+
+    def test_unread_count_ignores_other_users(self, client, other_profile, festival):
+        self._reminder(other_profile, festival, delivered=True)
+
+        response = client.get("/api/profiles/me/reminders/unread-count/")
+
+        assert response.data == {"count": 0}
+
+    def test_unread_count_requires_authentication(self):
+        response = APIClient().get("/api/profiles/me/reminders/unread-count/")
+
+        assert response.status_code in [401, 403]
+
+    def test_mark_read_marks_only_own_delivered_reminders(
+        self, client, profile, other_profile, festival
+    ):
+        own_delivered = self._reminder(profile, festival, delivered=True)
+        own_upcoming = self._reminder(profile, festival)
+        other_delivered = self._reminder(other_profile, festival, delivered=True)
+
+        response = client.post("/api/profiles/me/reminders/mark-read/")
+
+        assert response.status_code == 200
+        assert response.data == {"updated": 1}
+        own_delivered.refresh_from_db()
+        own_upcoming.refresh_from_db()
+        other_delivered.refresh_from_db()
+        assert own_delivered.read_at is not None
+        assert own_upcoming.read_at is None
+        assert other_delivered.read_at is None
+
+        count = client.get("/api/profiles/me/reminders/unread-count/")
+        assert count.data == {"count": 0}
+
+    def test_mark_read_does_not_overwrite_existing_read_at(self, client, profile, festival):
+        already_read = self._reminder(profile, festival, delivered=True, read=True)
+        original_read_at = already_read.read_at
+
+        response = client.post("/api/profiles/me/reminders/mark-read/")
+
+        assert response.data == {"updated": 0}
+        already_read.refresh_from_db()
+        assert already_read.read_at == original_read_at
+
+    def test_mark_read_allowed_for_demo_user(self, festival, settings):
+        demo = Profile.objects.create_user(email="demo@example.com", password="testpass123")
+        settings.DEMO_USER_EMAIL = demo.email
+        self._reminder(demo, festival, delivered=True)
+        client = APIClient()
+        client.force_authenticate(user=demo)
+
+        response = client.post("/api/profiles/me/reminders/mark-read/")
+
+        assert response.status_code == 200
+        assert response.data == {"updated": 1}
+
+    def test_list_includes_delivered_and_read_fields(self, client, profile, festival):
+        self._reminder(profile, festival, delivered=True)
+
+        response = client.get("/api/profiles/me/reminders/")
+
+        assert response.status_code == 200
+        assert response.data[0]["delivered_at"] is not None
+        assert response.data[0]["read_at"] is None
+
+    def test_delivered_and_read_fields_are_read_only(self, client, profile, festival):
+        reminder = self._reminder(profile, festival)
+
+        client.patch(
+            f"/api/profiles/me/reminders/{reminder.id}/",
+            {"delivered_at": "2020-01-01T00:00:00Z", "read_at": "2020-01-01T00:00:00Z"},
+            format="json",
+        )
+
+        reminder.refresh_from_db()
+        assert reminder.delivered_at is None
+        assert reminder.read_at is None

@@ -59,6 +59,10 @@ export const entityRegistry: Record<string, EntityConfig> = {
     label: "Upload",
     hasDetailsView: false,
   },
+  reminders: {
+    label: "Reminders",
+    hasDetailsView: false,
+  },
   report: {
     label: "Report bug",
     hasDetailsView: false,

@@ -92,12 +92,12 @@ const RemindersCard = ({ organisationType, entityId }: RemindersCardProps) => {
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {formatDate(reminder.remindAt)}
-                      {reminder.isSent && (
+                      {(reminder.deliveredAt || reminder.isSent) && (
                         <span className="ml-2 text-gray-400 dark:text-gray-500">(sent)</span>
                       )}
                     </p>
                   </div>
-                  {!reminder.isSent && (
+                  {!(reminder.deliveredAt || reminder.isSent) && (
                     <Button
                       variant="ghost"
                       size="sm"

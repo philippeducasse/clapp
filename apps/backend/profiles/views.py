@@ -7,6 +7,7 @@ from django.contrib.auth import logout as django_logout
 from django.db.models import QuerySet
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils import timezone
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.request import Request
@@ -211,3 +212,25 @@ class ReminderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer) -> None:
         serializer.save(profile=self.request.user)
+
+    def _unread_queryset(self) -> QuerySet[Reminder]:
+        return Reminder.objects.filter(
+            profile=self.request.user, delivered_at__isnull=False, read_at__isnull=True
+        )
+
+    @action(detail=False, methods=["get"], url_path="unread-count")
+    def unread_count(self, request: Request) -> Response:
+        """Number of reminders delivered in-app that the user hasn't seen yet."""
+        return Response({"count": self._unread_queryset().count()})
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="mark-read",
+        # Marking own reminders as read is harmless, so the demo user is allowed too
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def mark_read(self, request: Request) -> Response:
+        """Mark all delivered reminders of the user as read."""
+        updated = self._unread_queryset().update(read_at=timezone.now())
+        return Response({"updated": updated})

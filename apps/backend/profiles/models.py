@@ -133,7 +133,10 @@ class Reminder(models.Model):
     message = models.TextField()
     remind_at = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
+    # is_sent tracks email delivery only; in-app delivery is tracked by delivered_at
     is_sent = models.BooleanField(default=False)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    read_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["remind_at"]

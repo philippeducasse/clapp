@@ -92,7 +92,7 @@ const ProfileRemindersCard = () => {
                     <p className="text-forground break-words">{reminder.message}</p>
                     <p className="mt-1">{formatDate(reminder.remindAt)}</p>
                   </div>
-                  {reminder.isSent ? (
+                  {(reminder.deliveredAt || reminder.isSent) ? (
                     <div className="flex gap-2">
                       <p className="">Sent</p>
                       <CheckCheck size={25} className="text-primary" />

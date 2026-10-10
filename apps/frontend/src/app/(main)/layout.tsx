@@ -3,11 +3,13 @@ import Sidebar from "@/components/common/navigation/Sidebar";
 import Navbar from "@/components/common/navigation/Navbar";
 import StoreProvider from "@/redux/StoreProvider";
 import ProfileHydrator from "@/components/ProfileHydrator";
+import ReminderPoller from "@/components/ReminderPoller";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <StoreProvider>
       <ProfileHydrator />
+      <ReminderPoller />
       <SidebarProvider>
         <Sidebar />
         <div className="container mx-auto flex-grow p-4 sm:p-6 lg:p-8">

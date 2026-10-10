@@ -57,6 +57,7 @@ import applicationReducer, {
   updateApplication,
   deleteApplication,
 } from "@/redux/slices/applicationSlice";
+import reminderReducer from "@/redux/slices/reminderSlice";
 import { Application, ApplicationMethod, ApplicationStatus } from "@/interfaces/entities/Application";
 
 describe("Redux Slices", () => {
@@ -208,6 +209,7 @@ describe("Redux Slices", () => {
           residencies: residencyReducer,
           venues: venueReducer,
           applications: applicationReducer,
+          reminders: reminderReducer,
         },
         preloadedState: {
           profile: { profile: mockProfile },
@@ -215,6 +217,7 @@ describe("Redux Slices", () => {
           residencies: { residencies: [], filters: [], searchBarFilter: "", loading: false, error: null },
           venues: { venues: [], filters: [], searchBarFilter: "", loading: false, error: null },
           applications: { applications: [], filters: [], searchBarFilter: "", loading: false, error: null },
+          reminders: { unreadCount: 0 },
         },
       });
 

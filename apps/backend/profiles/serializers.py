@@ -25,9 +25,18 @@ class ReminderSerializer(serializers.ModelSerializer):
             "message",
             "remind_at",
             "is_sent",
+            "delivered_at",
+            "read_at",
             "created_at",
         ]
-        read_only_fields = ["id", "is_sent", "created_at", "organisation_name"]
+        read_only_fields = [
+            "id",
+            "is_sent",
+            "delivered_at",
+            "read_at",
+            "created_at",
+            "organisation_name",
+        ]
 
     def to_representation(self, instance: Reminder) -> dict[str, Any]:
         """Return organisation_type as uppercase to match frontend enum."""

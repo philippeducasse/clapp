@@ -8,6 +8,10 @@ export interface Reminder {
   message: string;
   remindAt: string;
   isSent?: boolean;
+  /** Set when the reminder fired (in-app delivery), independent of the email */
+  deliveredAt?: string | null;
+  /** Set once the user has seen the delivered reminder */
+  readAt?: string | null;
   createdAt?: string;
 }
 

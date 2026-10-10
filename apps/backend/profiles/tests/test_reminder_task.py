@@ -256,3 +256,79 @@ class TestReminderTask:
         result2 = check_and_set_reminders()
         assert result2 == 0
         assert len(mail.outbox) == 1  # Still just 1 email
+
+    def test_task_marks_due_reminder_as_delivered(self, profile, festival):
+        """Due reminders get a delivered_at timestamp, future ones don't."""
+        festival_ct = ContentType.objects.get_for_model(Festival)
+        due = Reminder.objects.create(
+            profile=profile,
+            message="Due",
+            content_type=festival_ct,
+            object_id=festival.id,
+            remind_at=timezone.now() - timezone.timedelta(hours=1),
+        )
+        future = Reminder.objects.create(
+            profile=profile,
+            message="Future",
+            content_type=festival_ct,
+            object_id=festival.id,
+            remind_at=timezone.now() + timezone.timedelta(hours=1),
+        )
+
+        check_and_set_reminders()
+
+        due.refresh_from_db()
+        future.refresh_from_db()
+        assert due.delivered_at is not None
+        assert due.read_at is None
+        assert future.delivered_at is None
+
+    def test_task_delivers_in_app_even_when_email_fails(self, profile, festival, monkeypatch):
+        """A failing email does not prevent in-app delivery, and is retried later."""
+        mail.outbox.clear()
+        reminder = Reminder.objects.create(
+            profile=profile,
+            message="Email will fail",
+            content_type=ContentType.objects.get_for_model(Festival),
+            object_id=festival.id,
+            remind_at=timezone.now() - timezone.timedelta(hours=1),
+        )
+
+        def failing_send_mail(*args, **kwargs):
+            raise ConnectionError("SMTP down")
+
+        monkeypatch.setattr("profiles.tasks.send_mail", failing_send_mail)
+        result = check_and_set_reminders()
+
+        reminder.refresh_from_db()
+        assert result == 0
+        assert reminder.is_sent is False
+        assert reminder.delivered_at is not None
+        first_delivered_at = reminder.delivered_at
+
+        # Next run: email works again, delivered_at stays untouched
+        monkeypatch.undo()
+        result = check_and_set_reminders()
+
+        reminder.refresh_from_db()
+        assert result == 1
+        assert len(mail.outbox) == 1
+        assert reminder.is_sent is True
+        assert reminder.delivered_at == first_delivered_at
+
+    def test_task_delivers_reminder_of_deleted_organisation(self, profile, festival):
+        """Reminders whose organisation was deleted are still delivered in-app."""
+        reminder = Reminder.objects.create(
+            profile=profile,
+            message="Orphan",
+            content_type=ContentType.objects.get_for_model(Festival),
+            object_id=festival.id,
+            remind_at=timezone.now() - timezone.timedelta(hours=1),
+        )
+        festival.delete()
+
+        check_and_set_reminders()
+
+        reminder.refresh_from_db()
+        assert reminder.delivered_at is not None
+        assert reminder.is_sent is True

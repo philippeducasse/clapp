@@ -6,5 +6,6 @@ export {
   mockDeleteRequest,
   mockPatchRequest,
   mockSendFormDataRequest,
+  mockSilentRequest,
   resetAllMocks,
 } from '../setup';
