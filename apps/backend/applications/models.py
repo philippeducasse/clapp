@@ -37,11 +37,22 @@ class ApplicationSeason(models.Model):
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name="application_seasons"
     )
+    is_default = models.BooleanField(
+        default=False,
+        help_text="Default season preselected on new applications. At most one per profile.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ["-created_at"]
         unique_together = [["name", "profile"]]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["profile"],
+                condition=models.Q(is_default=True),
+                name="unique_default_season_per_profile",
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} - {self.profile.email if self.profile else 'No profile'}"

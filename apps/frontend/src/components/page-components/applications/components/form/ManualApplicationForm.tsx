@@ -72,6 +72,13 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
     }
   }, [application, form]);
 
+  // Preselect the default season on create (profile may load after the form mounts).
+  const defaultSeasonId = formFields.find((f) => f.fieldName === "seasonId")?.defaultValue;
+  useEffect(() => {
+    if (action !== Action.CREATE || !defaultSeasonId) return;
+    if (!form.getValues("seasonId")) form.setValue("seasonId", defaultSeasonId);
+  }, [action, defaultSeasonId, form]);
+
   // "Create application" from an unmatched inbound email: prefill from the email.
   useEffect(() => {
     if (action !== Action.CREATE || !inboundEmailId) return;

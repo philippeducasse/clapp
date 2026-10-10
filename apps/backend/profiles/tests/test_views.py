@@ -2,6 +2,7 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.test import APIClient
 
+from applications.models import ApplicationSeason
 from organisations.festivals.models import Festival
 from profiles.models import Profile, Reminder
 
@@ -28,6 +29,40 @@ class TestProfileViews:
         response = client.get(f"/api/profiles/{profile.id}/")
 
         assert response.status_code in [200, 403]
+
+    def test_update_profile_sets_single_default_season(self):
+        profile = Profile.objects.create_user(email="test@example.com", password="testpass123")
+        old = ApplicationSeason.objects.create(profile=profile, name="2026", is_default=True)
+        client = APIClient()
+        client.force_authenticate(user=profile)
+
+        data = {
+            "application_seasons": [
+                {"id": old.id, "name": "2026", "is_default": False},
+                {"name": "2027", "is_default": True},
+            ]
+        }
+        response = client.patch(f"/api/profiles/{profile.id}/", data, format="json")
+
+        assert response.status_code == 200
+        defaults = list(profile.application_seasons.filter(is_default=True))
+        assert [s.name for s in defaults] == ["2027"]
+
+    def test_update_profile_keeps_only_one_default_when_several_flagged(self):
+        profile = Profile.objects.create_user(email="test@example.com", password="testpass123")
+        client = APIClient()
+        client.force_authenticate(user=profile)
+
+        data = {
+            "application_seasons": [
+                {"name": "2026", "is_default": True},
+                {"name": "2027", "is_default": True},
+            ]
+        }
+        response = client.patch(f"/api/profiles/{profile.id}/", data, format="json")
+
+        assert response.status_code == 200
+        assert profile.application_seasons.filter(is_default=True).count() == 1
 
     def test_update_profile(self):
         """Test updating profile."""

@@ -48,6 +48,11 @@ export const getSeasonOptions = (seasons: ApplicationSeason[]) => {
   }));
 };
 
+export const getDefaultSeasonId = (seasons: ApplicationSeason[]) => {
+  const defaultSeason = seasons.find((s) => s.isDefault);
+  return defaultSeason ? String(defaultSeason.id) : undefined;
+};
+
 export const getApplicationFormFields = (
   entity: ApplicableEntity | null | undefined,
   performances: Performance[],
@@ -179,6 +184,7 @@ export const getApplicationFormFields = (
       type: ControlledFormElementType.SELECT,
       helpText: "The season for which you are applying to",
       options: getSeasonOptions(seasons),
+      defaultValue: getDefaultSeasonId(seasons),
     },
   );
 

@@ -14,7 +14,10 @@ import FormHeader from "@/components/common/form/FormHeader";
 import { Action, EntityName } from "@/interfaces/Enums";
 import BasicForm from "@/components/common/form/BasicForm";
 import { createZodFormSchema, getInitialValues } from "@/helpers/formHelper";
-import { getApplicationFormFields } from "../../helpers/form/getApplicationFormFields";
+import {
+  getApplicationFormFields,
+  getDefaultSeasonId,
+} from "../../helpers/form/getApplicationFormFields";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -135,6 +138,13 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
       dossiersSetRef.current = true;
     }
   }, [dossiers, form]);
+
+  // Preselect the default season (profile may load after the form mounts).
+  const defaultSeasonId = getDefaultSeasonId(profile?.applicationSeasons ?? []);
+  useEffect(() => {
+    if (!defaultSeasonId) return;
+    if (!form.getValues("seasonId")) form.setValue("seasonId", defaultSeasonId);
+  }, [defaultSeasonId, form]);
 
   useEffect(() => {
     if (!entity) {

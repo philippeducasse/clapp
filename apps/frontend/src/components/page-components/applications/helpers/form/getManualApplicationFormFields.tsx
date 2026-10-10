@@ -2,7 +2,11 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Performance } from "@/interfaces/entities/Performance";
 import { ApplicationStatusOptions } from "@/interfaces/forms/StatusOptions";
-import { getPerformanceOptions, getSeasonOptions } from "./getApplicationFormFields";
+import {
+  getDefaultSeasonId,
+  getPerformanceOptions,
+  getSeasonOptions,
+} from "./getApplicationFormFields";
 import { getOptions } from "@/helpers/formHelper";
 import { ApplicationMethod, ApplicationSeason } from "@/interfaces/entities/Application";
 import { OrganisationType, Action } from "@/interfaces/Enums";
@@ -56,7 +60,7 @@ export const getManualApplicationFormFields = (
       hidden: !seasonOptions,
       helpText: "Which season is this application for?",
       options: seasonOptions,
-      defaultValue: seasonOptions?.[0]?.value,
+      defaultValue: getDefaultSeasonId(seasons) ?? seasonOptions?.[0]?.value,
     },
     {
       label: "Comments",

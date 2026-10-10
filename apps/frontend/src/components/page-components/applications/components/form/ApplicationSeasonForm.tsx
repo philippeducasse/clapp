@@ -70,15 +70,21 @@ const ApplicationSeasonForm = ({ action }: ApplicationSeasonFormProps) => {
         values,
         formFields,
       ) as Omit<ApplicationSeason, "id">;
-      const existingSeasons = profile.applicationSeasons ?? [];
+      const isDefault = Boolean(cleanedData.isDefault);
+      // Only one default season: unset it on the others when this one becomes default
+      const existingSeasons = (profile.applicationSeasons ?? []).map((s) =>
+        isDefault ? { ...s, isDefault: false } : s,
+      );
 
       let updatedSeasons: Partial<ApplicationSeason>[];
       if (action === Action.EDIT && seasonId) {
         updatedSeasons = existingSeasons.map((s) =>
-          s.id === seasonId ? { ...s, ...cleanedData, id: seasonId } : s,
+          s.id === seasonId
+            ? { ...s, ...cleanedData, isDefault, id: seasonId }
+            : s,
         );
       } else {
-        updatedSeasons = [...existingSeasons, { ...cleanedData }];
+        updatedSeasons = [...existingSeasons, { ...cleanedData, isDefault }];
       }
 
       const updatedProfile = await profileApiService.update({

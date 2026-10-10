@@ -28,6 +28,7 @@ export interface Application {
 export interface ApplicationSeason {
   id: number;
   name: string;
+  isDefault?: boolean;
   createdAt?: string;
 }
 

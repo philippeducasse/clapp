@@ -327,10 +327,14 @@ class OrganisationViewSet(viewsets.ModelViewSet):
         logger.debug(f"Application method: {application_method}")
         logger.debug(f"Parsed performances: {performances}")
 
+        season = None
+        if season_id:
+            season = get_object_or_404(ApplicationSeason, pk=season_id, profile=request.user)
+
         if application_method == "FORM":
             try:
                 online_form_application = create_form_application(
-                    organisation, performances, profile, comments
+                    organisation, performances, profile, comments, season
                 )
                 logger.info(
                     f"Form application created for organisation {organisation.id} by user {profile.id}"
@@ -370,10 +374,6 @@ class OrganisationViewSet(viewsets.ModelViewSet):
                 {"error": "Message and/or subject not found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        season = None
-        if season_id:
-            season = get_object_or_404(ApplicationSeason, pk=season_id, profile=request.user)
-
         logger.debug(f"Creating application for season {season}")
         try:
             from django.contrib.contenttypes.models import ContentType

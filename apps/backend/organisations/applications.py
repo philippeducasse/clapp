@@ -1,8 +1,8 @@
-from typing import Any, List
+from typing import Any, List, Optional
 
 from django.utils import timezone
 
-from applications.models import Application
+from applications.models import Application, ApplicationSeason
 from organisations.models import Organisation
 from performances.models import Performance
 from profiles.models import Profile
@@ -13,6 +13,7 @@ def create_form_application(
     performances: List[Performance],
     default_profile: Profile,
     comments: str,
+    season: Optional[ApplicationSeason] = None,
 ) -> Application:
     application = Application.objects.create(
         application_method="FORM",
@@ -21,6 +22,7 @@ def create_form_application(
         comments=comments,
         status="APPLIED",
         application_date=timezone.now().date(),
+        season=season,
     )
 
     if performances:

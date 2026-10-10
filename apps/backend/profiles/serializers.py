@@ -66,8 +66,9 @@ class ProfileApplicationSeasonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ApplicationSeason
-        fields = ["id", "name", "created_at"]
+        fields = ["id", "name", "is_default", "created_at"]
         read_only_fields = ["created_at"]
+        extra_kwargs = {"is_default": {"required": False}}
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -115,6 +116,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ("id",)
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         email_templates = validated_data.pop("email_templates", [])
         email_templates_ids = validated_data.pop("email_templates_ids", [])
@@ -133,12 +135,22 @@ class ProfileSerializer(serializers.ModelSerializer):
         if application_seasons is not None:
             kept_ids = [s["id"] for s in application_seasons if s.get("id")]
             instance.application_seasons.exclude(id__in=kept_ids).delete()
+            # Only one default season per profile: clear all, then set the last one flagged.
+            instance.application_seasons.update(is_default=False)
+            default_season = None
             for season in application_seasons:
                 season_id = season.get("id")
                 if season_id:
                     instance.application_seasons.filter(id=season_id).update(name=season["name"])
+                    season_obj = instance.application_seasons.filter(id=season_id).first()
                 else:
-                    ApplicationSeason.objects.create(profile=instance, name=season["name"])
+                    season_obj = ApplicationSeason.objects.create(
+                        profile=instance, name=season["name"]
+                    )
+                if season.get("is_default") and season_obj:
+                    default_season = season_obj
+            if default_season:
+                ApplicationSeason.objects.filter(pk=default_season.pk).update(is_default=True)
 
         return instance
 

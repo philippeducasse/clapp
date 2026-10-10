@@ -8,6 +8,7 @@ export const getApplicationSeasonsInfo = (
 ): SectionCellProps[] => {
   return [
     { title: "Season name", value: applicationSeason.name },
+    { title: "Default season", value: Boolean(applicationSeason.isDefault) },
     { title: "Creation date", value: applicationSeason.createdAt ? formatDate(applicationSeason.createdAt) : "-" },
   ];
 };
