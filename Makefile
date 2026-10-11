@@ -11,7 +11,7 @@ help:
 dev:
 	@echo "Starting backend and frontend servers..."
 	@trap 'kill 0' EXIT; \
-	(cd apps/backend && source .venv/bin/activate && python manage.py runserver) & \
+	(cd apps/backend && source .venv/bin/activate && python manage.py migrate && python manage.py runserver) & \
 	(cd apps/frontend && pnpm run dev) & \
 	wait
 
