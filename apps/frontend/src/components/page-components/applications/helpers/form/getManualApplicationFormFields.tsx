@@ -46,6 +46,12 @@ export const getManualApplicationFormFields = (
       required: true,
     },
     {
+      label: "Application date",
+      fieldName: "applicationDate",
+      type: ControlledFormElementType.DATE,
+      helpText: "When did you apply? Defaults to today if left empty (unless the status is Draft).",
+    },
+    {
       label: "Performance(s)",
       fieldName: "performanceIds",
       type: ControlledFormElementType.MULTI_SELECT,

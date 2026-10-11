@@ -108,6 +108,18 @@ class Application(models.Model):
         year = self.application_date.year if self.application_date else "No date"
         return f"{self.id}:{org_name} - {f'Season: {season}' if season else {f'{self.profile.email} {year}'}}"
 
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        # Once an application leaves DRAFT it has been sent, so it needs a date: listings
+        # (e.g. the festivals "Applied" column) only include applications dated in the current season.
+        if self.status != "DRAFT" and self.application_date is None:
+            from django.utils import timezone
+
+            self.application_date = timezone.localdate()
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                kwargs["update_fields"] = {*update_fields, "application_date"}
+        super().save(*args, **kwargs)
+
     def delete(self, using: Any = None, keep_parents: bool = False) -> tuple[int, dict[str, int]]:
         """Soft delete the application"""
         from django.utils import timezone

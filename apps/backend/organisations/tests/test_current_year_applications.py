@@ -91,3 +91,68 @@ class TestCurrentSeasonApplicationInList:
 
         assert row["has_application_this_year"] is False
         assert not row["current_year_application"].get("id")
+
+    def test_manually_created_application_without_date_is_listed(
+        self, model, url, api_client, user
+    ):
+        """Manual applications are sent without a date; a non-draft one defaults to today."""
+        org = model.objects.create(name="Org", user=user)
+        response = api_client.post(
+            "/api/applications/",
+            {
+                "organisation_type": model.__name__.upper(),
+                "organisation": org.id,
+                "profile_id": user.id,
+                "status": "APPLIED",
+                "application_date": None,
+            },
+            format="json",
+        )
+        assert response.status_code == 201, response.data
+        assert response.data["application_date"] == "2026-10-11"
+
+        row = next(r for r in _results(api_client.get(url)) if r["id"] == org.id)
+
+        assert row["has_application_this_year"] is True
+        assert row["current_year_application"]["id"] == response.data["id"]
+        assert row["current_year_application"]["application_date"] == "2026-10-11"
+
+
+@pytest.mark.django_db
+class TestApplicationDateDefault:
+    @pytest.fixture
+    def user(self):
+        return Profile.objects.create_user(email="date@example.com", password="testpass")
+
+    @pytest.fixture(autouse=True)
+    def today(self, monkeypatch):
+        monkeypatch.setattr(timezone, "localdate", lambda: date(2026, 10, 11))
+
+    def test_draft_keeps_no_date(self, user):
+        application = Application.objects.create(profile=user, status="DRAFT")
+        assert application.application_date is None
+
+    def test_non_draft_defaults_to_today(self, user):
+        application = Application.objects.create(profile=user, status="APPLIED")
+        assert application.application_date == date(2026, 10, 11)
+
+    def test_explicit_date_is_kept(self, user):
+        application = Application.objects.create(
+            profile=user, status="APPLIED", application_date=date(2026, 9, 2)
+        )
+        assert application.application_date == date(2026, 9, 2)
+
+    def test_leaving_draft_sets_date(self, user):
+        from applications.services import set_application_status
+
+        application = Application.objects.create(profile=user, status="DRAFT")
+        set_application_status(application, "APPLIED")
+        application.refresh_from_db()
+        assert application.application_date == date(2026, 10, 11)
+
+    def test_save_with_update_fields_persists_date(self, user):
+        application = Application.objects.create(profile=user, status="DRAFT")
+        application.status = "ACCEPTED"
+        application.save(update_fields=["status"])
+        application.refresh_from_db()
+        assert application.application_date == date(2026, 10, 11)

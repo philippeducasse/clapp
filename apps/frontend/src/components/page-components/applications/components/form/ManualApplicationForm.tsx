@@ -5,7 +5,6 @@ import { z } from "zod";
 import { useEffect, useState, useRef } from "react";
 import {
   Application,
-  ApplicationCreate,
   ApplicationMethod,
   ApplicationStatus,
 } from "@/interfaces/entities/Application";
@@ -104,26 +103,37 @@ const ManualApplicationForm = ({ action }: ManualApplicationFormProps) => {
   }, [action, inboundEmailId, form]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // The backend rejects "" for a date; null lets it default to today for non-draft applications.
+    const applicationDate = (values.applicationDate as string | undefined) || null;
     setIsLoading(true);
     try {
       if (action === Action.EDIT) {
         const updatedApplication = {
           ...application,
           ...values,
+          applicationDate,
           id: applicationId,
           profileId: profile?.id,
-        } as Application;
-        await applicationApiService.update(updatedApplication);
+        } as unknown as Application;
+        const savedApplication = await applicationApiService.update(updatedApplication);
 
         const selectedPerformances = performances.filter((p) =>
           (values.performanceIds as string[])?.includes(String(p.id)),
         );
-        dispatch(updateApplication({ ...updatedApplication, performances: selectedPerformances }));
+        dispatch(
+          updateApplication({
+            ...updatedApplication,
+            // Use the saved date: the backend may have defaulted it to today.
+            applicationDate: savedApplication?.applicationDate ?? updatedApplication.applicationDate,
+            performances: selectedPerformances,
+          }),
+        );
         router.push(`/applications/${application?.id}`);
       } else {
         if (profile) {
-          const application: ApplicationCreate = {
+          const application = {
             ...values,
+            applicationDate,
             profileId: profile.id,
             objectType: (values as Record<string, unknown>).organisationType as string,
             objectId: (values as Record<string, unknown>).organisation as number,
