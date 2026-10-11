@@ -1,11 +1,12 @@
 import logging
-from datetime import datetime
-from typing import Any, Dict, List
+from datetime import date, datetime
+from typing import Any, Dict, List, Optional, Tuple
 
 import django_filters
 from celery.result import AsyncResult
 from django.apps import apps
-from django.db.models import Q, QuerySet
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Exists, OuterRef, Prefetch, Q, QuerySet
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -58,6 +59,16 @@ def filter_in_iexact(queryset: QuerySet, name: str, value: str) -> QuerySet:
 # Filters shared by all organisation types; subclass per entity to add type-specific ones.
 class OrganisationFilter(django_filters.FilterSet):
     country = django_filters.CharFilter(method=filter_in_iexact)
+
+
+def get_current_application_year_range(today: Optional[date] = None) -> Tuple[date, date]:
+    """Return the (start, end) dates of the application season containing `today`.
+
+    Seasons run from 1 September to 31 August of the following year.
+    """
+    today = today or timezone.localdate()
+    start_year = today.year if today.month >= 9 else today.year - 1
+    return date(start_year, 9, 1), date(start_year + 1, 8, 31)
 
 
 def get_visibility_filter(user) -> Q:
@@ -184,6 +195,32 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         manager = model_class.objects.with_deleted() if include_deleted else model_class.objects
         return manager.filter(visibility_filter).distinct().select_related("user")
+
+    def with_current_year_applications(self, queryset: QuerySet) -> QuerySet:
+        """Annotate `has_application_this_year` and prefetch the user's applications
+        for the current application year (Sep 1 → Aug 31, independent of ApplicationSeason) into `_prefetched_current_year_apps`,
+        newest first. Requires the model to define an `applications` GenericRelation.
+        """
+        content_type = ContentType.objects.get_for_model(queryset.model)
+        season_start, season_end = get_current_application_year_range()
+        current_season_apps = Application.objects.filter(
+            content_type=content_type,
+            application_date__gte=season_start,
+            application_date__lte=season_end,
+            profile_id=self.request.user.id,
+            deleted_at__isnull=True,
+        )
+        return queryset.annotate(
+            has_application_this_year=Exists(current_season_apps.filter(object_id=OuterRef("pk")))
+        ).prefetch_related(
+            Prefetch(
+                "applications",
+                queryset=current_season_apps.select_related("content_type").order_by(
+                    "-application_date", "-created_at"
+                ),
+                to_attr="_prefetched_current_year_apps",
+            )
+        )
 
     def perform_create(self, serializer):
         instance = serializer.save(user=self.request.user, is_seed_clone=False)

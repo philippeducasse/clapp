@@ -1,6 +1,7 @@
 from typing import Optional
 
 import django_filters
+from django.db.models import QuerySet
 
 from organisations.residencies.models import Residency
 from organisations.residencies.serializer import ResidencySerializer
@@ -37,6 +38,11 @@ class ResidencyViewSet(OrganisationViewSet):
     search_fields = ["name", "country", "website_url"]
     ordering_fields = ["name", "start_date", "application_date_start"]
     ordering = ["name"]
+
+    def get_queryset(self) -> QuerySet[Residency]:
+        return self.with_current_year_applications(super().get_queryset()).prefetch_related(
+            "contacts"
+        )
 
     def get_organisation_type_name(self) -> str:
         return "residency"

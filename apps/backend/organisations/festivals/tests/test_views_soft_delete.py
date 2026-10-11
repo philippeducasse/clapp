@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import timedelta
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
@@ -7,6 +7,7 @@ from rest_framework.test import APIClient
 
 from applications.models import Application
 from organisations.festivals.models import Festival, FestivalContact
+from organisations.views import get_current_application_year_range
 from profiles.models import Profile
 
 
@@ -236,17 +237,18 @@ class TestFestivalViewSetSoftDelete:
         festival = Festival.objects.create(name="Test Festival", user=user)
 
         content_type = ContentType.objects.get_for_model(Festival)
+        season_start, _ = get_current_application_year_range()
         app1 = Application.objects.create(
             content_type=content_type,
             object_id=festival.id,
             profile=user,
-            application_date=date(2026, 1, 1),
+            application_date=season_start,
         )
         app2 = Application.objects.create(  # noqa
             content_type=content_type,
             object_id=festival.id,
             profile=user,
-            application_date=date(2026, 2, 1),
+            application_date=season_start + timedelta(days=1),
         )
 
         # Delete one application

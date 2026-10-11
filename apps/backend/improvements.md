@@ -2,15 +2,15 @@
 
 ## Silent bugs (fix before any refactor)
 
-### 1. `ResidencyViewSet` missing `get_queryset()` override
-**File:** `organisations/residencies/views.py`
-
-`ResidencySerializer` declares `has_application_this_year` and `current_year_application` fields but the view never annotates or prefetches them. These fields always return null at runtime.
-
-### 2. `create_form_application()` silently drops the organisation FK
+### 1. `create_form_application()` silently drops the organisation FK
 **File:** `organisations/services.py` (~line 410)
 
 Passes `organisation=organisation` to `Application.objects.create()`, but `organisation` is a `GenericForeignKey` descriptor, not a real database field. Django silently ignores it. Form applications are created with `content_type=NULL, object_id=NULL`.
+
+### 2. `latest_application_status` / `latest_application_date` never populated
+**Files:** `organisations/festivals/serializer.py`, `organisations/residencies/serializer.py`
+
+Both serializers declare these read-only fields but no view annotates them, so they always serialize as null.
 
 ---
 
@@ -35,9 +35,9 @@ Each module would be deep: a small interface hiding the logic that belongs there
 ### 2. Serializer duplication across the three organisation types
 **Files:** `organisations/festivals/serializers.py`, `organisations/venues/serializers.py`, `organisations/residencies/serializers.py`
 
-**Problem:** All three serializers copy-paste an identical `update()` body: pop `contacts_data`, call `super().update()`, call `handle_nested_contacts()`. Festival and Residency serializers additionally copy the same `has_application_this_year` field declarations and `get_current_year_application()` method — but only the Festival view populates them, making the Residency version dead. The interface of `OrganisationSerializer` (the base) promises nothing about contact handling, so every subclass re-implements it independently. Apply the deletion test: delete `update()` from all three — the identical complexity reappears across three files. That's a sign the base serializer should own it.
+**Problem:** All three serializers copy-paste an identical `update()` body: pop `contacts_data`, call `super().update()`, call `handle_nested_contacts()`. Festival and Residency serializers additionally copy the same `has_application_this_year` field declarations and `get_current_year_application()` method (both views now populate them via `OrganisationViewSet.with_current_year_applications()`). The interface of `OrganisationSerializer` (the base) promises nothing about contact handling, so every subclass re-implements it independently. Apply the deletion test: delete `update()` from all three — the identical complexity reappears across three files. That's a sign the base serializer should own it.
 
-**Solution:** Move the `update()` body into a base `OrganisationSerializer` mixin that owns the `contacts_data` dance. Move `has_application_this_year` / `get_current_year_application()` into the same mixin, then align `ResidencyViewSet.get_queryset()` to actually populate it (fixing silent bug #1 above simultaneously).
+**Solution:** Move the `update()` body into a base `OrganisationSerializer` mixin that owns the `contacts_data` dance. Move `has_application_this_year` / `get_current_year_application()` into the same mixin.
 
 **Benefits:** Adding a fourth organisation type (e.g. Workshop) gets correct contact handling for free. The `has_application_this_year` logic has one home. Tests for update-with-contacts can be written once against the base serializer.
 
