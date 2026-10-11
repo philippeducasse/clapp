@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  Application,
-  ApplicationSeason,
-} from "@/interfaces/entities/Application";
+import { Application } from "@/interfaces/entities/Application";
+import { Profile } from "@/interfaces/entities/Profile";
+import { fetchProfile, setProfile } from "./authSlice";
+import { getDefaultFilters } from "@/helpers/defaultFilters";
+import { EntityName } from "@/interfaces/Enums";
 import { RootState } from "../store";
 import { applicationApiService } from "@/api/applicationApiService";
 import { GetAllParams } from "@/interfaces/api/ApiService";
@@ -21,6 +22,7 @@ const initialState: ApplicationsState = {
   applications: [],
   filters: [],
   searchBarFilter: "",
+  filtersInitialized: false,
   loading: false,
   error: null,
 };
@@ -69,7 +71,28 @@ const applicationSlice = createSlice({
     },
     ...createFilterReducers<ApplicationsState>(),
   },
-  extraReducers: createAsyncExtraReducers(fetchApplications, "applications"),
+  extraReducers: (builder) => {
+    // Apply the profile-derived default filters (see helpers/defaultFilters).
+    // Only applies while filters are uninitialized, so it never overrides filters
+    // the user has changed (e.g. after saving the profile).
+    const applyDefaultFilters = (
+      state: ApplicationsState,
+      action: PayloadAction<Profile>,
+    ) => {
+      if (state.filtersInitialized) return;
+      const defaultFilters = getDefaultFilters(EntityName.APPLICATION, action.payload);
+      if (defaultFilters.length === 0) return;
+      state.filters = defaultFilters;
+      state.filtersInitialized = true;
+    };
+    builder
+      .addCase(fetchProfile.fulfilled, applyDefaultFilters)
+      .addCase(setProfile, applyDefaultFilters);
+    createAsyncExtraReducers<Application, ApplicationsState, GetAllParams | undefined>(
+      fetchApplications,
+      "applications",
+    )(builder);
+  },
 });
 
 export const {
@@ -83,6 +106,7 @@ export const {
   removeColumnFilter,
   clearColumnFilters,
   setSearchBarFilter,
+  initializeColumnFilters,
 } = applicationSlice.actions;
 
 export const selectAllApplications = (state: RootState) =>
@@ -93,7 +117,7 @@ export const selectApplication = (state: RootState, applicationId: number) =>
   );
 export const selectColumnFilters = (state: RootState) =>
   state.applications.filters;
-export const selectsearchBarFilter = (state: RootState) =>
+export const selectSearchBarFilter = (state: RootState) =>
   state.applications.searchBarFilter;
 
 export default applicationSlice.reducer;

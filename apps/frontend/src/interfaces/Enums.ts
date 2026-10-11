@@ -20,6 +20,13 @@ export enum EntityName {
   PREFERENCES = "PREFERENCES",
 }
 
+/** Entities that have a DataTable listing (and filter state in their slice). */
+export type TableEntityName =
+  | EntityName.FESTIVAL
+  | EntityName.VENUE
+  | EntityName.RESIDENCY
+  | EntityName.APPLICATION;
+
 export enum TagAction {
   STAR = "STAR",
   WATCH = "WATCH",

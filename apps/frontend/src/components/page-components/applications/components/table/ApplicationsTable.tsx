@@ -6,7 +6,7 @@ import {
 } from "@/interfaces/entities/Application";
 import { useApplicationColumns } from "../../helpers/useApplicationColumns";
 import { DataTable } from "@/components/common/table/DataTable";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   setApplications,
   deleteApplication,
@@ -17,12 +17,18 @@ import { EntityName } from "@/interfaces/Enums";
 import { getApplicationFilters } from "../../helpers/getApplicationFilters";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { applicationApiService } from "@/api/applicationApiService";
+import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 
 interface ApplicationsTableProps {
   initialData: PaginatedResponse<Application>;
+  /** Filters the server applied to `initialData` (e.g. the default season). */
+  initialColumnFilters?: ColumnFilter[];
 }
 
-export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
+export const ApplicationsTable = ({
+  initialData,
+  initialColumnFilters,
+}: ApplicationsTableProps) => {
   const dispatch = useDispatch();
 
   const [applicationData, setApplicationData] =
@@ -88,13 +94,6 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
   );
   const filters = useMemo(() => getApplicationFilters(seasons), [seasons]);
 
-  // Seasons are ordered by created_at ascending, so the last one is the most recent
-  const latestSeason = seasons.at(-1);
-  const defaultColumnFilters = useMemo(
-    () => (latestSeason ? [{ id: "season", value: latestSeason }] : []),
-    [latestSeason],
-  );
-
   return (
     <>
       <DeleteModal
@@ -110,7 +109,7 @@ export const ApplicationsTable = ({ initialData }: ApplicationsTableProps) => {
         entityName={EntityName.APPLICATION}
         filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
-        defaultColumnFilters={defaultColumnFilters}
+        initialColumnFilters={initialColumnFilters}
         totalCount={applicationData.count}
         fetchData={applicationApiService.getAll}
         onDataFetched={handleDataFetched}

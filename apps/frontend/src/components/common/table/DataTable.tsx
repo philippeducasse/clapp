@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -23,8 +23,11 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import TablePagination from "./TablePagination";
-import { EntityName } from "@/interfaces/Enums";
+import { useDispatch, useSelector } from "react-redux";
 import DataTableHeader from "./DataTableHeader";
+import { TableEntityName } from "@/interfaces/Enums";
+import { tableFilterSlices } from "@/redux/shared/tableFilterSlices";
+import { toFilterParams } from "@/helpers/defaultFilters";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
@@ -35,17 +38,40 @@ interface FetchParams {
   filters?: Record<string, unknown>;
 }
 
+const DEFAULT_PAGE_SIZE = 25;
+
+const buildFetchParams = (
+  pagination: PaginationState,
+  columnFilters: ColumnFiltersState,
+  searchBarFilter: string,
+): FetchParams => {
+  const filterParams = toFilterParams(columnFilters);
+  return {
+    offset: pagination.pageIndex * pagination.pageSize,
+    limit: pagination.pageSize,
+    search: searchBarFilter || undefined,
+    filters: Object.keys(filterParams).length > 0 ? filterParams : undefined,
+  };
+};
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  /** Server-rendered first page, fetched with `initialColumnFilters`, no search, offset 0. */
   data: TData[];
-  entityName: EntityName;
+  entityName: TableEntityName;
   totalCount?: number;
   filters?: FilterConfig[];
   defaultSorting?: SortingState;
-  defaultColumnFilters?: ColumnFiltersState;
+  /**
+   * Filters the server used to fetch `data`. Used until the entity slice's filters
+   * are initialized, then written to the slice once (no-op if already initialized).
+   */
+  initialColumnFilters?: ColumnFiltersState;
   fetchData?: (params: FetchParams) => Promise<PaginatedResponse<TData>>;
   onDataFetched?: (data: PaginatedResponse<TData>) => void;
 }
+
+const EMPTY_FILTERS: ColumnFiltersState = [];
 
 export function DataTable<TData, TValue>({
   columns,
@@ -54,18 +80,45 @@ export function DataTable<TData, TValue>({
   totalCount,
   filters,
   defaultSorting = [],
-  defaultColumnFilters = [],
+  initialColumnFilters = EMPTY_FILTERS,
   fetchData,
   onDataFetched,
 }: DataTableProps<TData, TValue>) {
+  const dispatch = useDispatch();
+  const filterSlice = tableFilterSlices[entityName];
   const [sorting, setSorting] = useState<SortingState>(defaultSorting);
-  const [searchBarFilter, setSearchBarFilter] = useState<string>("");
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters);
+
+  // Column filters and search live in the entity's Redux slice, so they persist
+  // across navigation and can be defaulted from the slice (e.g. default season).
+  // Until the slice is initialized, use the filters the server rendered with,
+  // so the first render matches the server data (no flash of unfiltered rows).
+  const filterState = useSelector(filterSlice.selectFilterState);
+  const columnFilters: ColumnFiltersState = filterState.filtersInitialized
+    ? filterState.filters
+    : initialColumnFilters;
+  const searchBarFilter = filterState.searchBarFilter;
+
+  useEffect(() => {
+    if (initialColumnFilters.length > 0) {
+      dispatch(filterSlice.initializeColumnFilters(initialColumnFilters));
+    }
+  }, [dispatch, filterSlice, initialColumnFilters]);
+
+  const setColumnFilters: OnChangeFn<ColumnFiltersState> = useCallback(
+    (updater) => {
+      const next = typeof updater === "function" ? updater(columnFilters) : updater;
+      dispatch(filterSlice.setColumnFilters(next));
+    },
+    [columnFilters, dispatch, filterSlice],
+  );
+  const setSearchBarFilter = useCallback(
+    (value: string) => dispatch(filterSlice.setSearchBarFilter(value)),
+    [dispatch, filterSlice],
+  );
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 25,
+    pageSize: DEFAULT_PAGE_SIZE,
   });
-  const [hasInitialized, setHasInitialized] = useState(false);
 
   const handlePaginationChange: OnChangeFn<PaginationState> = useCallback((updater) => {
     setPagination((prev) => {
@@ -74,36 +127,41 @@ export function DataTable<TData, TValue>({
     });
   }, []);
 
-  // Initialize state with data on mount
+  // Push the server-rendered data to the parent once on mount
+  const hasSentInitialData = useRef(false);
   useEffect(() => {
-    if (data.length > 0 && onDataFetched && !hasInitialized) {
+    if (hasSentInitialData.current) return;
+    hasSentInitialData.current = true;
+    if (data.length > 0 && onDataFetched) {
       onDataFetched({
         results: data,
         count: totalCount || data.length,
       } as PaginatedResponse<TData>);
     }
-  }, [data, totalCount, onDataFetched, hasInitialized]);
+  }, [data, totalCount, onDataFetched]);
+
+  // Key of the params the currently shown data was fetched with. Starts as the
+  // server's request, so we don't refetch on mount unless the params differ
+  // (e.g. persisted filters/search from a previous visit).
+  const lastRequestKey = useRef(
+    JSON.stringify(
+      buildFetchParams({ pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE }, initialColumnFilters, ""),
+    ),
+  );
 
   // Fetch data when pagination, filters, or search changes
   useEffect(() => {
-    if (fetchData && (data.length === 0 || hasInitialized)) {
-      const offset = pagination.pageIndex * pagination.pageSize;
+    if (!fetchData) return;
+    const params = buildFetchParams(pagination, columnFilters, searchBarFilter);
+    const key = JSON.stringify(params);
+    if (key === lastRequestKey.current) return;
+    lastRequestKey.current = key;
 
-      // Convert columnFilters to a simple object for the API
-      const filterParams: Record<string, unknown> = {};
-      columnFilters.forEach((filter) => {
-        filterParams[filter.id] = filter.value;
-      });
-
-      fetchData({
-        offset,
-        limit: pagination.pageSize,
-        search: searchBarFilter || undefined,
-        filters: Object.keys(filterParams).length > 0 ? filterParams : undefined,
-      }).then(onDataFetched);
-    }
-    setHasInitialized(true);
-  }, [pagination, columnFilters, searchBarFilter, fetchData, onDataFetched, data.length, hasInitialized]);
+    fetchData(params).then((response) => {
+      // Ignore stale responses if params changed while the request was in flight
+      if (lastRequestKey.current === key) onDataFetched?.(response);
+    });
+  }, [pagination, columnFilters, searchBarFilter, fetchData, onDataFetched]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({

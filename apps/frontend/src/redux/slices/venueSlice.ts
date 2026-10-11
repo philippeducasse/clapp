@@ -14,6 +14,7 @@ const initialState: VenuesState = {
   venues: [],
   filters: [],
   searchBarFilter: "",
+  filtersInitialized: false,
   loading: false,
   error: null,
 };
@@ -70,6 +71,7 @@ export const {
   removeColumnFilter,
   clearColumnFilters,
   setSearchBarFilter,
+  initializeColumnFilters,
 } = venueSlice.actions;
 
 export const selectAllVenues = (state: RootState) => state.venues.venues;

@@ -8,6 +8,7 @@ import authReducer, {
   addPerformance,
   updatePerformance,
   selectProfile,
+  fetchProfile,
 } from "@/redux/slices/authSlice";
 import { Profile } from "@/interfaces/entities/Profile";
 import { Performance, PerformanceGenre, PerformanceType } from "@/interfaces/entities/Performance";
@@ -24,6 +25,7 @@ import festivalReducer, {
   removeColumnFilter,
   clearColumnFilters,
   setSearchBarFilter,
+  initializeColumnFilters,
 } from "@/redux/slices/festivalSlice";
 import { Festival, FestivalType } from "@/interfaces/entities/Festival";
 
@@ -56,6 +58,7 @@ import applicationReducer, {
   addApplication,
   updateApplication,
   deleteApplication,
+  clearColumnFilters as clearApplicationColumnFilters,
 } from "@/redux/slices/applicationSlice";
 import reminderReducer from "@/redux/slices/reminderSlice";
 import { Application, ApplicationMethod, ApplicationStatus } from "@/interfaces/entities/Application";
@@ -213,10 +216,10 @@ describe("Redux Slices", () => {
         },
         preloadedState: {
           profile: { profile: mockProfile },
-          festivals: { festivals: [], filters: [], searchBarFilter: "", loading: false, error: null },
-          residencies: { residencies: [], filters: [], searchBarFilter: "", loading: false, error: null },
-          venues: { venues: [], filters: [], searchBarFilter: "", loading: false, error: null },
-          applications: { applications: [], filters: [], searchBarFilter: "", loading: false, error: null },
+          festivals: { festivals: [], filters: [], searchBarFilter: "", filtersInitialized: false, loading: false, error: null },
+          residencies: { residencies: [], filters: [], searchBarFilter: "", filtersInitialized: false, loading: false, error: null },
+          venues: { venues: [], filters: [], searchBarFilter: "", filtersInitialized: false, loading: false, error: null },
+          applications: { applications: [], filters: [], searchBarFilter: "", filtersInitialized: false, loading: false, error: null },
           reminders: { unreadCount: 0 },
         },
       });
@@ -231,6 +234,7 @@ describe("Redux Slices", () => {
       festivals: [],
       filters: [],
       searchBarFilter: "",
+      filtersInitialized: false,
       loading: false,
       error: null,
     };
@@ -414,6 +418,37 @@ describe("Redux Slices", () => {
 
       expect(state.searchBarFilter).toBe("jazz");
     });
+
+    describe("filtersInitialized", () => {
+      const typeFilter = { id: "type", value: "MUSIC" };
+
+      it("is false initially", () => {
+        expect(festivalReducer(undefined, { type: "unknown" }).filtersInitialized).toBe(false);
+      });
+
+      it("initializeColumnFilters sets filters when not initialized", () => {
+        const state = festivalReducer(initialState, initializeColumnFilters([typeFilter]));
+        expect(state.filters).toEqual([typeFilter]);
+        expect(state.filtersInitialized).toBe(true);
+      });
+
+      it("initializeColumnFilters is a no-op once initialized", () => {
+        const state = festivalReducer(
+          { ...initialState, filtersInitialized: true },
+          initializeColumnFilters([typeFilter]),
+        );
+        expect(state.filters).toEqual([]);
+      });
+
+      it.each([
+        ["setColumnFilters", setColumnFilters([typeFilter])],
+        ["setColumnFilter", setColumnFilter(typeFilter)],
+        ["removeColumnFilter", removeColumnFilter("type")],
+        ["clearColumnFilters", clearColumnFilters()],
+      ])("%s marks filters as initialized", (_, action) => {
+        expect(festivalReducer(initialState, action).filtersInitialized).toBe(true);
+      });
+    });
   });
 
   describe("Residency Slice", () => {
@@ -421,6 +456,7 @@ describe("Redux Slices", () => {
       residencies: [],
       filters: [],
       searchBarFilter: "",
+      filtersInitialized: false,
       loading: false,
       error: null,
     };
@@ -525,6 +561,7 @@ describe("Redux Slices", () => {
       venues: [],
       filters: [],
       searchBarFilter: "",
+      filtersInitialized: false,
       loading: false,
       error: null,
     };
@@ -635,6 +672,7 @@ describe("Redux Slices", () => {
       applications: [],
       filters: [],
       searchBarFilter: "",
+      filtersInitialized: false,
       loading: false,
       error: null,
     };
@@ -642,6 +680,84 @@ describe("Redux Slices", () => {
     it("should have initial state", () => {
       const state = applicationReducer(undefined, { type: "unknown" });
       expect(state.applications).toEqual([]);
+    });
+
+    describe("default season filter", () => {
+      const baseProfile: Profile = {
+        id: 1,
+        email: "test@example.com",
+        firstName: "John",
+        lastName: "Doe",
+        confirmedAccount: true,
+        performances: [],
+      };
+
+      it("filters on the default season when the profile is set", () => {
+        const state = applicationReducer(
+          initialState,
+          setProfile({
+            ...baseProfile,
+            applicationSeasons: [
+              { id: 1, name: "2025", isDefault: false },
+              { id: 2, name: "2026", isDefault: true },
+            ],
+          }),
+        );
+        expect(state.filters).toEqual([{ id: "season", value: "2026" }]);
+      });
+
+      it("filters on the default season when the profile is fetched", () => {
+        const state = applicationReducer(
+          initialState,
+          fetchProfile.fulfilled(
+            { ...baseProfile, applicationSeasons: [{ id: 2, name: "2026", isDefault: true }] },
+            "requestId",
+          ),
+        );
+        expect(state.filters).toEqual([{ id: "season", value: "2026" }]);
+      });
+
+      it("does not override filters that are already initialized", () => {
+        const state = applicationReducer(
+          {
+            ...initialState,
+            filters: [{ id: "status", value: "APPLIED" }],
+            filtersInitialized: true,
+          },
+          setProfile({
+            ...baseProfile,
+            applicationSeasons: [{ id: 2, name: "2026", isDefault: true }],
+          }),
+        );
+        expect(state.filters).toEqual([{ id: "status", value: "APPLIED" }]);
+      });
+
+      it("does not re-apply the default after the user cleared filters", () => {
+        const profile = {
+          ...baseProfile,
+          applicationSeasons: [{ id: 2, name: "2026", isDefault: true }],
+        };
+        let state = applicationReducer(initialState, setProfile(profile));
+        state = applicationReducer(state, clearApplicationColumnFilters());
+        state = applicationReducer(state, setProfile(profile));
+        expect(state.filters).toEqual([]);
+      });
+
+      it("applies no filter when there is no default season", () => {
+        const state = applicationReducer(
+          initialState,
+          setProfile({
+            ...baseProfile,
+            applicationSeasons: [{ id: 1, name: "2025", isDefault: false }],
+          }),
+        );
+        expect(state.filters).toEqual([]);
+      });
+
+      it("applies no filter when the profile has no seasons", () => {
+        const state = applicationReducer(initialState, setProfile(baseProfile));
+        expect(state.filters).toEqual([]);
+      });
     });
 
     it("should set applications", () => {

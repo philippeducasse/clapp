@@ -18,6 +18,7 @@ const initialState: FestivalsState = {
   festivals: [],
   filters: [],
   searchBarFilter: "",
+  filtersInitialized: false,
   loading: false,
   error: null,
 };
@@ -76,6 +77,7 @@ export const {
   removeColumnFilter,
   clearColumnFilters,
   setSearchBarFilter,
+  initializeColumnFilters,
 } = festivalSlice.actions;
 
 export const selectAllFestivals = (state: RootState) => state.festivals.festivals;

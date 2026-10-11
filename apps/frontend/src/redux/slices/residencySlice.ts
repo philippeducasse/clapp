@@ -14,6 +14,7 @@ const initialState: ResidenciesState = {
   residencies: [],
   filters: [],
   searchBarFilter: "",
+  filtersInitialized: false,
   loading: false,
   error: null,
 };
@@ -72,6 +73,7 @@ export const {
   removeColumnFilter,
   clearColumnFilters,
   setSearchBarFilter,
+  initializeColumnFilters,
 } = residencySlice.actions;
 
 export const selectAllResidencies = (state: RootState) => state.residencies.residencies;

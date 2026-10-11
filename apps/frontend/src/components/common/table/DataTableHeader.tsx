@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { Table } from "@tanstack/react-table";
 import CreateButton from "../buttons/CreateButton";
@@ -8,15 +8,6 @@ import { SlidersHorizontal } from "lucide-react";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { X } from "lucide-react";
 import { capitalizeFirst } from "@/utils/stringUtils";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux";
-import {
-  selectColumnFilters,
-  selectSearchBarFilter,
-  setColumnFilters,
-  setSearchBarFilter as setReduxsearchBarFilter,
-  removeColumnFilter,
-} from "@/redux/slices/festivalSlice";
 
 interface DataTableHeaderProps<TData> {
   searchBarFilter: string;
@@ -33,29 +24,7 @@ const DataTableHeader = <TData,>({
   table,
   filters,
 }: DataTableHeaderProps<TData>) => {
-  const dispatch = useDispatch();
-
-  const reduxFilters = useSelector(selectColumnFilters);
-  const reduxsearchBarFilter = useSelector(selectSearchBarFilter);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
-
-  useEffect(() => {
-    if (reduxFilters.length > 0) {
-      table.setColumnFilters(reduxFilters);
-    }
-    if (reduxsearchBarFilter) {
-      setSearchBarFilter(reduxsearchBarFilter);
-    }
-  }, [table, reduxFilters, reduxsearchBarFilter, setSearchBarFilter]);
-
-  useEffect(() => {
-    const columnFilters = table.getState().columnFilters;
-    dispatch(setColumnFilters(columnFilters));
-  }, [table, dispatch, openFilterDialog]);
-
-  useEffect(() => {
-    dispatch(setReduxsearchBarFilter(searchBarFilter));
-  }, [searchBarFilter, dispatch]);
 
   const activeFilters =
     filters
@@ -84,17 +53,9 @@ const DataTableHeader = <TData,>({
 
     if (Array.isArray(currentValue)) {
       const newValue = currentValue.filter((v) => v !== valueToRemove);
-
-      if (newValue.length === 0) {
-        column?.setFilterValue(undefined);
-        dispatch(removeColumnFilter(columnId));
-      } else {
-        column?.setFilterValue(newValue);
-        dispatch(setColumnFilters([{ id: columnId, value: newValue }]));
-      }
+      column?.setFilterValue(newValue.length === 0 ? undefined : newValue);
     } else {
       column?.setFilterValue(undefined);
-      dispatch(removeColumnFilter(columnId));
     }
   };
 
