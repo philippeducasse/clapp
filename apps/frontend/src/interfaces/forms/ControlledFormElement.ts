@@ -21,6 +21,17 @@ export interface ControlledFormElement {
   isRegistration?: boolean;
   sliderOptions?: SliderOptions;
   register?: boolean;
+  addToContacts?: AddToContactsOptions;
+}
+
+/**
+ * Enables an "Add to contacts?" checkbox for MULTI_EMAIL entries
+ * that are not already known contacts.
+ */
+export interface AddToContactsOptions {
+  knownEmails: string[];
+  selected: string[];
+  onChange: (emails: string[]) => void;
 }
 
 export interface SliderOptions {

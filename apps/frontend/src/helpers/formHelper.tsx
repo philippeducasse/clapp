@@ -46,7 +46,7 @@ export const getControlledInputs = (
       case ControlledFormElementType.TEXT_EDITOR:
         return <ControlledTextEditor field={field} />;
       case ControlledFormElementType.MULTI_EMAIL:
-        return <ControlledMultiEmail field={field} />;
+        return <ControlledMultiEmail field={field} addToContacts={formField.addToContacts} />;
       case ControlledFormElementType.FILE:
       case ControlledFormElementType.PDF:
         return <ControlledFile field={field} />;

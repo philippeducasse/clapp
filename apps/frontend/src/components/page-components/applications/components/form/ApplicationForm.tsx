@@ -3,9 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/reducers";
-import { selectFestival } from "@/redux/slices/festivalSlice";
-import { selectResidency } from "@/redux/slices/residencySlice";
-import { selectVenue } from "@/redux/slices/venueSlice";
+import { selectFestival, updateFestival } from "@/redux/slices/festivalSlice";
+import { selectResidency, updateResidency } from "@/redux/slices/residencySlice";
+import { selectVenue, updateVenue } from "@/redux/slices/venueSlice";
+import { Festival } from "@/interfaces/entities/Festival";
+import { Residency } from "@/interfaces/entities/Residency";
+import { Venue } from "@/interfaces/entities/Venue";
+import { mergeNewContacts } from "@/helpers/contactHelper";
 import { useParams } from "next/navigation";
 import { refreshFestival } from "@/components/page-components/festivals/helpers/refreshFestival";
 import { refreshResidency } from "@/components/page-components/residencies/helpers/refreshResidency";
@@ -73,8 +77,18 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
   const [bypassDuplicateWarning, setBypassDuplicateWarning] = useState(false);
   const dossiersSetRef = useRef(false);
+  const [contactsToAdd, setContactsToAdd] = useState<string[]>([]);
 
   const config = ENTITY_CONFIG[entityName];
+
+  const addToContacts = useMemo(
+    () => ({
+      knownEmails: entity?.contacts?.map((c) => c.email) ?? [],
+      selected: contactsToAdd,
+      onChange: setContactsToAdd,
+    }),
+    [entity, contactsToAdd],
+  );
 
   const formFields = useMemo(() => {
     const performances = profile?.performances ?? [];
@@ -88,8 +102,9 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
       dossiers,
       emailTemplates,
       seasons,
+      addToContacts,
     );
-  }, [entity, applicationMethod, profile, dossiers]);
+  }, [entity, applicationMethod, profile, dossiers, addToContacts]);
 
   const formSchema = useMemo(() => createZodFormSchema(formFields), [formFields]);
 
@@ -202,6 +217,32 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     }
   }, [selectedTemplateId, applicationMethod, profile, form, entity]);
 
+  // Persist recipients the user ticked "Add to contacts?" for. Failures here
+  // must not block the (already sent) application.
+  const saveNewContacts = async (recipients: string[]) => {
+    if (!entity || !contactsToAdd.length) return;
+    const contacts = mergeNewContacts(entity.contacts ?? [], contactsToAdd, recipients);
+    if (!contacts) return;
+    try {
+      if (entityName === EntityName.FESTIVAL) {
+        const updated = { ...(entity as Festival), contacts };
+        await festivalApiService.update(updated);
+        dispatch(updateFestival(updated));
+      } else if (entityName === EntityName.RESIDENCY) {
+        const updated = { ...(entity as Residency), contacts };
+        await residencyApiService.update(updated);
+        dispatch(updateResidency(updated));
+      } else {
+        const updated = { ...(entity as Venue), contacts };
+        await venueApiService.update(updated);
+        dispatch(updateVenue(updated));
+      }
+      setContactsToAdd([]);
+    } catch (error) {
+      console.error(`Failed to add contacts: ${error}`);
+    }
+  };
+
   const onSubmit = async (values: Record<string, unknown>) => {
     setIsLoading(true);
     const { attachmentsSent, ...vals } = values;
@@ -227,6 +268,8 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
           attachmentsSent as File[],
           "attachments_sent",
         )) as unknown as { applicationId?: number };
+
+        await saveNewContacts((vals.recipients as string[]) ?? []);
 
         if (response && "applicationId" in response) {
           router.push(`/applications/${response.applicationId}`);

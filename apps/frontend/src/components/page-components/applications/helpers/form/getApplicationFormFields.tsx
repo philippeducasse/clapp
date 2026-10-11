@@ -1,4 +1,8 @@
-import { ControlledFormElement, SelectOptions } from "@/interfaces/forms/ControlledFormElement";
+import {
+  AddToContactsOptions,
+  ControlledFormElement,
+  SelectOptions,
+} from "@/interfaces/forms/ControlledFormElement";
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
@@ -61,6 +65,7 @@ export const getApplicationFormFields = (
   dossiers: Dossier[],
   emailTemplates: EmailTemplate[] = [],
   seasons: ApplicationSeason[],
+  addToContacts?: AddToContactsOptions,
 ): ControlledFormElement[] => {
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
@@ -89,6 +94,7 @@ export const getApplicationFormFields = (
       type: ControlledFormElementType.MULTI_EMAIL,
       defaultValue: entity?.contacts?.map((c) => c.email) ?? [],
       helpText: "Enter recipients, hit enter or ',' to separate them",
+      addToContacts,
     },
     {
       label: "Email Template",
