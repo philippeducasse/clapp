@@ -2,6 +2,7 @@ import { ControlledFormElement } from "@/interfaces/forms/ControlledFormElement"
 import { ControlledFormElementType } from "@/interfaces/forms/ControlledFormElementType";
 import { getOptions } from "@/helpers/formHelper";
 import { FestivalType, ApplicationType } from "@/interfaces/entities/Festival";
+import { COUNTRY_OPTIONS } from "@/constants/countries";
 
 export const getFestivalFormFields = (
   isDiffForm: boolean = false
@@ -33,7 +34,8 @@ export const getFestivalFormFields = (
     {
       label: "Country",
       fieldName: "country",
-      type: ControlledFormElementType.TEXT,
+      type: ControlledFormElementType.SELECT,
+      options: COUNTRY_OPTIONS,
     },
     {
       label: "Town",

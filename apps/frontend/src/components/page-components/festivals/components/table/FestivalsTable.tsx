@@ -5,8 +5,8 @@ import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { useFestivalColumns } from "../../helpers/useFestivalColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
-import { setFestivals, deleteFestival } from "@/redux/slices/festivalSlice";
-import { EntityName } from "@/interfaces/Enums";
+import { setFestivals, deleteFestival, updateFestival } from "@/redux/slices/festivalSlice";
+import { EntityName, TagAction } from "@/interfaces/Enums";
 import { festivalApiService } from "@/api/festivalApiService";
 import { getFestivalFilters } from "../../helpers/getFestivalFilters";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
@@ -50,7 +50,28 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
     [dispatch],
   );
 
-  const columns = useFestivalColumns({ onDeleteClick: handleDeleteClick });
+  const handleTagClick = useCallback(
+    async (id: number, action: TagAction) => {
+      try {
+        const updated = await festivalApiService.tag(id, action);
+        setFestivalData((prev) => ({
+          ...prev,
+          results: prev.results.map((festival) =>
+            festival.id === id ? { ...festival, tag: updated.tag } : festival,
+          ),
+        }));
+        dispatch(updateFestival(updated));
+      } catch (error) {
+        console.error("Failed to tag festival:", error);
+      }
+    },
+    [dispatch],
+  );
+
+  const columns = useFestivalColumns({
+    onDeleteClick: handleDeleteClick,
+    onTagClick: handleTagClick,
+  });
 
   const filters = useMemo(() => getFestivalFilters(), []);
 

@@ -10,13 +10,22 @@ import { capitalizeFirst } from "@/utils/stringUtils";
 import { TagBadge } from "@/components/common/TagBadge";
 import { Application } from "@/interfaces/entities/Application";
 import { useCallback, useMemo } from "react";
+import { ReminderBell } from "@/components/common/table/ReminderBell";
+import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
+import { OrganisationType, TagAction } from "@/interfaces/Enums";
+import { TagDropdown } from "@/components/common/table/TagDropdown";
 
 interface UseFestivalColumnsProps {
   onDeleteClick: (id: number) => void;
+  onTagClick: (id: number, action: TagAction) => void;
 }
 
-const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnDef<Festival>[] => {
+const useFestivalColumns = ({
+  onDeleteClick,
+  onTagClick,
+}: UseFestivalColumnsProps): ColumnDef<Festival>[] => {
   const router = useRouter();
+  const remindersById = useUpcomingReminders(OrganisationType.FESTIVAL);
 
   const onEdit = useCallback(
     (id: string) => {
@@ -34,8 +43,11 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
         cell: ({ row }) => {
           const festival = row.original;
           return (
-            <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-primary hover:text-primary/80">
-              <Link href={`/festivals/${festival.id}`}>{festival.name}</Link>
+            <div className="flex items-center gap-1.5">
+              <div className="overflow-hidden text-ellipsis font-semibold whitespace-nowrap text-primary hover:text-primary/80">
+                <Link href={`/festivals/${festival.id}`}>{festival.name}</Link>
+              </div>
+              <ReminderBell reminders={remindersById.get(festival.id)} />
             </div>
           );
         },
@@ -111,7 +123,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
       {
         header: "Actions",
         id: "actions",
-        size: 75,
+        size: 100,
 
         cell: ({ row }) => {
           const festival = row.original;
@@ -139,6 +151,10 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
               >
                 <Send />
               </Button>
+              <TagDropdown
+                currentTag={festival.tag}
+                onTag={(action) => onTagClick(festival.id, action)}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -152,7 +168,7 @@ const useFestivalColumns = ({ onDeleteClick }: UseFestivalColumnsProps): ColumnD
         },
       },
     ],
-    [onDeleteClick, onEdit, router],
+    [onDeleteClick, onTagClick, onEdit, router, remindersById],
   );
 };
 

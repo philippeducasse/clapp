@@ -9,9 +9,16 @@ import { BaseControlledPropsWithOptionsAndLabels } from "@/interfaces/forms/Cont
 
 const ControlledSelect = ({
   field,
-  options,
+  options: baseOptions,
   showLabels,
 }: BaseControlledPropsWithOptionsAndLabels) => {
+  // Keep values that aren't in the option list (e.g. legacy free-text data) selectable
+  const currentValue = field.value as string | undefined;
+  const options =
+    currentValue && !baseOptions.some((o) => o.value === currentValue)
+      ? [{ label: currentValue, value: currentValue }, ...baseOptions]
+      : baseOptions;
+
   return showLabels ? (
     <Select
       defaultValue={field.value as string | undefined}
@@ -32,7 +39,8 @@ const ControlledSelect = ({
       </SelectContent>
     </Select>
   ) : (
-    <select className="max-w-fit" {...field} value={field.value as string}>
+    <select className="max-w-fit" {...field} value={(field.value as string) ?? ""}>
+      <option value="">—</option>
       {options.map((o, i) => (
         <option key={`${o.label}/${i}`} value={o.value}>
           {o.label}

@@ -3,10 +3,10 @@ import { useCallback, useMemo, useState } from "react";
 import { useResidencyColumns } from "../../helpers/useResidencyColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
-import { EntityName } from "@/interfaces/Enums";
+import { EntityName, TagAction } from "@/interfaces/Enums";
 import { AppDispatch } from "@/redux/store";
 import { Residency } from "@/interfaces/entities/Residency";
-import { setResidencies, deleteResidency } from "@/redux/slices/residencySlice";
+import { setResidencies, deleteResidency, updateResidency } from "@/redux/slices/residencySlice";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { residencyApiService } from "@/api/residencyApiService";
 import { getResidencyFilters } from "../../helpers/getResidencyFilters";
@@ -49,7 +49,28 @@ export const ResidenciesTable = ({ initialData }: ResidenciesTableProps) => {
     [dispatch],
   );
 
-  const columns = useResidencyColumns({ onDeleteClick: handleDeleteClick });
+  const handleTagClick = useCallback(
+    async (id: number, action: TagAction) => {
+      try {
+        const updated = await residencyApiService.tag(id, action);
+        setResidencyData((prev) => ({
+          ...prev,
+          results: prev.results.map((residency) =>
+            residency.id === id ? { ...residency, tag: updated.tag } : residency,
+          ),
+        }));
+        dispatch(updateResidency(updated));
+      } catch (error) {
+        console.error("Failed to tag residency:", error);
+      }
+    },
+    [dispatch],
+  );
+
+  const columns = useResidencyColumns({
+    onDeleteClick: handleDeleteClick,
+    onTagClick: handleTagClick,
+  });
 
   const filters = useMemo(() => getResidencyFilters(), []);
 

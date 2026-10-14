@@ -10,13 +10,17 @@ import { useRouter } from "next/navigation";
 import { TagBadge } from "@/components/common/TagBadge";
 import { useCallback, useMemo } from "react";
 import { Application } from "@/interfaces/entities/Application";
+import { TagAction } from "@/interfaces/Enums";
+import { TagDropdown } from "@/components/common/table/TagDropdown";
 
 interface UseResidencyColumnsProps {
   onDeleteClick: (id: number) => void;
+  onTagClick: (id: number, action: TagAction) => void;
 }
 
 const useResidencyColumns = ({
   onDeleteClick,
+  onTagClick,
 }: UseResidencyColumnsProps): ColumnDef<Residency>[] => {
   const router = useRouter();
 
@@ -101,7 +105,7 @@ const useResidencyColumns = ({
       {
         header: "Actions",
         id: "actions",
-        size: 75,
+        size: 100,
         cell: ({ row }) => {
           const residency = row.original;
           const applyRoute = `/residencies/${residency.id}/apply`;
@@ -126,6 +130,10 @@ const useResidencyColumns = ({
               >
                 <Send />
               </Button>
+              <TagDropdown
+                currentTag={residency.tag}
+                onTag={(action) => onTagClick(residency.id, action)}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -139,7 +147,7 @@ const useResidencyColumns = ({
         },
       },
     ],
-    [onDeleteClick, onEdit, router]
+    [onDeleteClick, onTagClick, onEdit, router]
   );
 };
 

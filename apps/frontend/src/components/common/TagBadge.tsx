@@ -52,4 +52,4 @@ function TagBadge({ className, tag, ...props }: TagBadgeProps) {
   );
 }
 
-export { TagBadge, tagBadgeVariants };
+export { TagBadge, tagBadgeVariants, TAG_ICONS };

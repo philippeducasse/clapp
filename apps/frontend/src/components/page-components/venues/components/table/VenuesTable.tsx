@@ -4,8 +4,8 @@ import { Venue } from "@/interfaces/entities/Venue";
 import { useVenueColumns } from "../../helpers/useVenueColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
-import { setVenues, deleteVenue } from "@/redux/slices/venueSlice";
-import { EntityName } from "@/interfaces/Enums";
+import { setVenues, deleteVenue, updateVenue } from "@/redux/slices/venueSlice";
+import { EntityName, TagAction } from "@/interfaces/Enums";
 import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { venueApiService } from "@/api/venueApiService";
 import { getVenueFilters } from "../../helpers/getVenueFilters";
@@ -48,7 +48,28 @@ export const VenuesTable = ({ initialData }: VenuesTableProps) => {
     [dispatch],
   );
 
-  const columns = useVenueColumns({ onDeleteClick: handleDeleteClick });
+  const handleTagClick = useCallback(
+    async (id: number, action: TagAction) => {
+      try {
+        const updated = await venueApiService.tag(id, action);
+        setVenueData((prev) => ({
+          ...prev,
+          results: prev.results.map((venue) =>
+            venue.id === id ? { ...venue, tag: updated.tag } : venue,
+          ),
+        }));
+        dispatch(updateVenue(updated));
+      } catch (error) {
+        console.error("Failed to tag venue:", error);
+      }
+    },
+    [dispatch],
+  );
+
+  const columns = useVenueColumns({
+    onDeleteClick: handleDeleteClick,
+    onTagClick: handleTagClick,
+  });
 
   const filters = useMemo(() => getVenueFilters(), []);
 

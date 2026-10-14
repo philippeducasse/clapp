@@ -10,12 +10,18 @@ import { useRouter } from "next/navigation";
 import { capitalizeFirst } from "@/utils/stringUtils";
 import { TagBadge } from "@/components/common/TagBadge";
 import { useCallback, useMemo } from "react";
+import { TagAction } from "@/interfaces/Enums";
+import { TagDropdown } from "@/components/common/table/TagDropdown";
 
 interface UseVenueColumnsProps {
   onDeleteClick: (id: number) => void;
+  onTagClick: (id: number, action: TagAction) => void;
 }
 
-const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Venue>[] => {
+const useVenueColumns = ({
+  onDeleteClick,
+  onTagClick,
+}: UseVenueColumnsProps): ColumnDef<Venue>[] => {
   const router = useRouter();
 
   const onEdit = useCallback(
@@ -96,7 +102,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
       {
         header: "Actions",
         id: "actions",
-        size: 75,
+        size: 100,
         cell: ({ row }) => {
           const venue = row.original;
           const applyRoute = venue.applied ? `/application/${1}` : `/venues/${venue.id}/apply`; // find way to reference application id
@@ -121,6 +127,10 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
               >
                 <Send />
               </Button>
+              <TagDropdown
+                currentTag={venue.tag}
+                onTag={(action) => onTagClick(venue.id, action)}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -134,7 +144,7 @@ const useVenueColumns = ({ onDeleteClick }: UseVenueColumnsProps): ColumnDef<Ven
         },
       },
     ],
-    [onDeleteClick, onEdit, router],
+    [onDeleteClick, onTagClick, onEdit, router],
   );
 };
 
