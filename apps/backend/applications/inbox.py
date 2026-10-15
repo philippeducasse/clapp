@@ -82,11 +82,14 @@ KEYWORD_PATTERN = re.compile(
     + r")s?\b"
 )
 KEYWORD_SEARCH_CHARS = 5000
+REMINDER_EMAIL = os.getenv("EMAIL_HOST_USER", "support@clapp.ovh")
 
 
 def is_skipped(message: MailMessage) -> bool:
     """Mailing lists, newsletters, bounces and our own messages. Auto-replies are kept."""
     headers = message.headers
+    if message.from_ == REMINDER_EMAIL:
+        return True
     if any(name in headers for name in BULK_HEADERS):
         return True
     precedence = " ".join(headers.get("precedence", ())).strip().lower()

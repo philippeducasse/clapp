@@ -119,7 +119,7 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const applicationMethodWatch = form.watch("applicationMethod") ?? "EMAIL";
   const performanceSelection = form.watch("performances") as string[];
   const language = form.watch("language") as string;
-  const messageLength = form.watch("messageLength");
+  const messageLength = form.watch("messageLength") as number | undefined;
   const selectedTemplateId = form.watch("emailTemplate") as string;
 
   useEffect(() => {
@@ -293,10 +293,10 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
             const result = await festivalApiService.generateEmail(entityId, data);
             message = result.message;
           } else if (entityName === EntityName.RESIDENCY) {
-            const result = await residencyApiService.generateEmail(entityId);
+            const result = await residencyApiService.generateEmail(entityId, data);
             message = result.message;
           } else {
-            const result = await venueApiService.generateEmail(entityId);
+            const result = await venueApiService.generateEmail(entityId, data);
             message = result.message;
           }
           form.setValue("message", message);

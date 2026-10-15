@@ -7,10 +7,9 @@ import {
   patchRequest,
 } from "./fetchHelper";
 import { ApplicationCreate } from "@/interfaces/entities/Application";
-import { Profile } from "@/interfaces/entities/Profile";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { GetAllParams } from "@/interfaces/api/ApiService";
+import { GenerateEmailRequest, GetAllParams } from "@/interfaces/api/ApiService";
 import { buildQueryParams } from "./helpers/buildQueryParams";
 
 const endpoint = "/api/festivals";
@@ -60,9 +59,9 @@ const update = (festival: Festival): Promise<Festival> => {
 
 const generateEmail = (
   festivalId: number,
-  data: { profile: Profile; selectedPerformanceIds?: number[] },
+  data: GenerateEmailRequest,
 ): Promise<{ message: string }> => {
-  return sendRequest<{ profile: Profile; selectedPerformanceIds?: number[] }, { message: string }>(
+  return sendRequest<GenerateEmailRequest, { message: string }>(
     `${endpoint}/${festivalId}/generate_email`,
     data,
     "POST",

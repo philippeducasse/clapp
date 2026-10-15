@@ -1,4 +1,11 @@
-export const LANGUAGES = [
+// ISO 639-1 codes. Must stay in sync with apps/backend/profiles/constants.py.
+// The backend stores and expects the `code`; `name` is for display only.
+export interface Language {
+  code: string;
+  name: string;
+}
+
+export const LANGUAGES: readonly Language[] = [
   { code: "af", name: "Afrikaans" },
   { code: "sq", name: "Albanian" },
   { code: "ar", name: "Arabic" },
@@ -67,3 +74,16 @@ export const LANGUAGES = [
   { code: "vi", name: "Vietnamese" },
   { code: "cy", name: "Welsh" },
 ];
+
+export const DEFAULT_LANGUAGE_CODE = "en";
+
+const LANGUAGE_NAMES_BY_CODE: ReadonlyMap<string, string> = new Map(
+  LANGUAGES.map((lang) => [lang.code, lang.name]),
+);
+
+/** Display name for a language code; falls back to the raw value if unknown. */
+export const getLanguageName = (code: string): string => LANGUAGE_NAMES_BY_CODE.get(code) ?? code;
+
+/** Select options with the code as value and the display name as label. */
+export const toLanguageOptions = (languages: readonly Language[] = LANGUAGES) =>
+  languages.map((lang) => ({ value: lang.code, label: lang.name }));

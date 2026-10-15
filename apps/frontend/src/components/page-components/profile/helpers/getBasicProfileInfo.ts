@@ -1,3 +1,4 @@
+import { getLanguageName } from "@/constants/languages";
 import { SectionCellProps } from "@/interfaces/DetailsView";
 import { Profile } from "@/interfaces/entities/Profile";
 
@@ -13,7 +14,7 @@ export const getBasicProfileInfo = (profile: Profile): SectionCellProps[] => {
     { title: "Nationality", value: profile.nationality },
     {
       title: "Spoken languages",
-      value: profile.spokenLanguages?.join(", ") || undefined
+      value: profile.spokenLanguages?.map(getLanguageName).join(", ") || undefined
     },
   ];
 };

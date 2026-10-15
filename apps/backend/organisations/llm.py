@@ -108,7 +108,11 @@ def generate_application_mail_prompt(
     language: str,
     length: int,
 ) -> str:
-    """Generate email application prompt for any organisation type."""
+    """Generate email application prompt for any organisation type.
+
+    `language` is a display name (e.g. "German"), not an ISO code; resolve codes
+    with `profiles.constants.get_language_name` before calling.
+    """
     primary_contact = organisation.contacts.first()
     contact_name = None
     contact_emails = []

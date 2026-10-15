@@ -68,7 +68,7 @@ class TestGenerateApplicationMailPrompt:
             performance_title="My Show",
             short_description="A great show",
         )
-        prompt = generate_application_mail_prompt(festival, profile, [performance], "ENGLISH", 3)
+        prompt = generate_application_mail_prompt(festival, profile, [performance], "English", 3)
         assert isinstance(prompt, str)
         assert "My Show" in prompt
 
@@ -99,7 +99,7 @@ class TestGenerateApplicationMailPrompt:
         performance = Performance.objects.create(
             profile=profile, performance_title="My Show", short_description="desc"
         )
-        prompt = generate_application_mail_prompt(festival, profile, [performance], "ENGLISH", 1)
+        prompt = generate_application_mail_prompt(festival, profile, [performance], "English", 1)
         assert "John Smith" in prompt
 
     def test_with_trailer_and_dossier(self):
@@ -113,7 +113,7 @@ class TestGenerateApplicationMailPrompt:
             short_description="desc",
             trailer="https://youtube.com/watch?v=123",
         )
-        prompt = generate_application_mail_prompt(festival, profile, [performance], "ENGLISH", 4)
+        prompt = generate_application_mail_prompt(festival, profile, [performance], "English", 4)
         assert "youtube.com" in prompt
 
     def test_with_multiple_trailers(self):
@@ -132,7 +132,7 @@ class TestGenerateApplicationMailPrompt:
             performance_title="Show B",
             short_description="desc",
         )
-        prompt = generate_application_mail_prompt(festival, profile, [p1, p2], "ENGLISH", 5)
+        prompt = generate_application_mail_prompt(festival, profile, [p1, p2], "English", 5)
         assert "Show A" in prompt
 
     def test_with_default_length(self):
@@ -144,7 +144,7 @@ class TestGenerateApplicationMailPrompt:
             profile=profile, performance_title="My Show", short_description="desc"
         )
         # length=None should use default (3)
-        prompt = generate_application_mail_prompt(festival, profile, [performance], "ENGLISH", None)
+        prompt = generate_application_mail_prompt(festival, profile, [performance], "English", None)
         assert isinstance(prompt, str)
 
 

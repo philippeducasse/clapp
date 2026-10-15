@@ -824,7 +824,7 @@ class TestCompleteApplicationWorkflowIntegration:
         mock_mistral_client.return_value = mock_mistral
 
         email_data = {
-            "language": "ENGLISH",
+            "language": "en",
             "message_length": "SHORT",
         }
         email_response = api_client.post(
@@ -1685,7 +1685,7 @@ class TestGenerateEmailAction:
         # Pass performance ID as string
         data = {
             "selected_performance_ids": str(performance.id),
-            "language": "ENGLISH",
+            "language": "en",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
@@ -1721,7 +1721,7 @@ class TestGenerateEmailAction:
         # Pass performance IDs as list
         data = {
             "selected_performance_ids": [perf1.id, perf2.id],
-            "language": "ENGLISH",
+            "language": "en",
             "message_length": "LONG",
         }
 
@@ -1756,7 +1756,7 @@ class TestGenerateEmailAction:
         # Pass performance ID as integer
         data = {
             "selected_performance_ids": performance.id,
-            "language": "ENGLISH",
+            "language": "en",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
@@ -1776,7 +1776,7 @@ class TestGenerateEmailAction:
         mock_mistral_client.return_value = mock_mistral
 
         data = {
-            "language": "ENGLISH",
+            "language": "en",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
@@ -1801,7 +1801,7 @@ class TestGenerateEmailErrorHandling:
 
         data = {
             "selected_performance_ids": "not-a-number",
-            "language": "ENGLISH",
+            "language": "en",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)
@@ -1821,7 +1821,7 @@ class TestGenerateEmailErrorHandling:
         mock_mistral_client.return_value = mock_mistral
 
         data = {
-            "language": "ENGLISH",
+            "language": "en",
         }
 
         response = authenticated_client.post(f"/api/festivals/{festival.id}/generate_email/", data)

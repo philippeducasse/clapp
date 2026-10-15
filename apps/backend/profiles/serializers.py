@@ -8,6 +8,7 @@ from rest_framework import serializers
 from applications.models import ApplicationSeason
 from clapp_backend.utils import NormalizedURLField
 from performances.serializers import PerformanceSerializer
+from profiles.constants import LANGUAGES
 from profiles.models import EmailTemplate, Profile, Reminder
 
 
@@ -74,7 +75,7 @@ class ProfileApplicationSeasonSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     performances = PerformanceSerializer(many=True, read_only=True)
     spoken_languages = serializers.ListField(
-        child=serializers.CharField(), required=False, allow_empty=True
+        child=serializers.ChoiceField(choices=LANGUAGES), required=False, allow_empty=True
     )
     email_templates = EmailTemplateSerializer(many=True, required=False)
     personal_website = NormalizedURLField(required=False, allow_blank=True)

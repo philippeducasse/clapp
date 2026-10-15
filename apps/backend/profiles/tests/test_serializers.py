@@ -73,3 +73,33 @@ class TestProfileSerializer:
 
         serializer = ProfileSerializer(data=data)
         assert not serializer.is_valid()
+
+
+@pytest.mark.django_db
+class TestProfileSerializerSpokenLanguages:
+    """spoken_languages must be ISO 639-1 codes from profiles.constants.LANGUAGES."""
+
+    def _profile(self):
+        return Profile.objects.create_user(email="lang@example.com", password="pass")
+
+    def test_accepts_language_codes(self):
+        profile = self._profile()
+        serializer = ProfileSerializer(
+            profile, data={"spoken_languages": ["en", "fr"]}, partial=True
+        )
+        assert serializer.is_valid(), serializer.errors
+        serializer.save()
+        profile.refresh_from_db()
+        assert list(profile.spoken_languages) == ["en", "fr"]
+
+    def test_accepts_empty_list(self):
+        serializer = ProfileSerializer(self._profile(), data={"spoken_languages": []}, partial=True)
+        assert serializer.is_valid(), serializer.errors
+
+    @pytest.mark.parametrize("value", ["English", "ENGLISH", "xx", ""])
+    def test_rejects_non_code_values(self, value):
+        serializer = ProfileSerializer(
+            self._profile(), data={"spoken_languages": [value]}, partial=True
+        )
+        assert not serializer.is_valid()
+        assert "spoken_languages" in serializer.errors

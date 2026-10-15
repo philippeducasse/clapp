@@ -44,7 +44,7 @@ describe('profileApiService', () => {
         personalWebsite: 'https://jane.com',
         location: 'Berlin, Germany',
         nationality: 'German',
-        spokenLanguages: ['English', 'German', 'French'],
+        spokenLanguages: ['en', 'de', 'fr'],
         instagramProfile: '@janesmith',
         facebookProfile: 'janesmith',
         youtubeProfile: 'JaneSmithChannel',
@@ -56,7 +56,7 @@ describe('profileApiService', () => {
 
       const result = await profileApiService.get();
 
-      expect(result.spokenLanguages).toEqual(['English', 'German', 'French']);
+      expect(result.spokenLanguages).toEqual(['en', 'de', 'fr']);
       expect(result.personalWebsite).toBe('https://jane.com');
     });
   });

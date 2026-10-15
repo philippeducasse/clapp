@@ -10,7 +10,7 @@ import { buildQueryParams } from "./helpers/buildQueryParams";
 import { ApplicationCreate } from "@/interfaces/entities/Application";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 import { TagAction } from "@/interfaces/Enums";
-import { GetAllParams, EntityApiService } from "@/interfaces/api/ApiService";
+import { GetAllParams, EntityApiService, GenerateEmailRequest } from "@/interfaces/api/ApiService";
 
 const endpoint = "/api/venues";
 
@@ -49,10 +49,13 @@ const update = (venue: Venue): Promise<Venue> => {
   );
 };
 
-const generateEmail = (venueId: number): Promise<{ message: string }> => {
-  return sendRequest<{ message: string }, { message: string }>(
+const generateEmail = (
+  venueId: number,
+  data: GenerateEmailRequest,
+): Promise<{ message: string }> => {
+  return sendRequest<GenerateEmailRequest, { message: string }>(
     `${endpoint}/${venueId}/generate_email`,
-    { message: "" },
+    data,
     "POST",
     "Email successfully generated"
   );

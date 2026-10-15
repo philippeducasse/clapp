@@ -8,7 +8,7 @@ import { Dossier, Performance } from "@/interfaces/entities/Performance";
 import { OrganisationContact } from "@/interfaces/entities/OrganisationContact";
 import { Profile, EmailTemplate } from "@/interfaces/entities/Profile";
 import { ApplicationMethod } from "@/interfaces/entities/Application";
-import { LANGUAGES } from "@/constants/languages";
+import { DEFAULT_LANGUAGE_CODE, LANGUAGES, toLanguageOptions } from "@/constants/languages";
 import { getOptions } from "@/helpers/formHelper";
 import { interpolateEmailTemplate } from "@/helpers/emailTemplateHelper";
 import { ApplicationSeason } from "@/interfaces/entities/Application";
@@ -70,7 +70,9 @@ export const getApplicationFormFields = (
   const performanceOptions = getPerformanceOptions(performances);
   const dossierOptions = getDossierOptions(dossiers);
   const emailTemplateOptions = getEmailTemplateOptions(emailTemplates);
-  const userLanguageCodes = profile?.spokenLanguages?.length ? profile.spokenLanguages : ["en"];
+  const userLanguageCodes = profile?.spokenLanguages?.length
+    ? profile.spokenLanguages
+    : [DEFAULT_LANGUAGE_CODE];
   const userLanguages = LANGUAGES.filter((lang) => userLanguageCodes.includes(lang.code));
 
   const defaultEmailSubject = interpolateEmailTemplate(profile?.defaultEmailSubject, {
@@ -126,10 +128,10 @@ export const getApplicationFormFields = (
       label: "Language",
       fieldName: "language",
       type: ControlledFormElementType.SELECT,
-      options: userLanguages.map((l) => ({ value: l.code, label: l.name })),
+      options: toLanguageOptions(userLanguages),
       helpText:
         "Provide the language for the email generation. You can add more languages under your profile <a class='underline text-blue-400' href='/profile'>settings</a>",
-      defaultValue: userLanguages[0]?.code ?? "en",
+      defaultValue: userLanguages[0]?.code ?? DEFAULT_LANGUAGE_CODE,
     },
   ];
 

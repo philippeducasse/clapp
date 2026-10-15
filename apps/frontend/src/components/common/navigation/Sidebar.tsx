@@ -22,6 +22,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
+import Link from "next/link";
 
 const items = [
   {
@@ -83,17 +84,25 @@ const Sidebar = () => {
         <SidebarGroup className="h-full">
           <SidebarGroupLabel className="text-primary mb-8 mt-5 gap-1">
             <h1 className="font-clapp text-4xl">Clapp</h1>
-            <Image src={"/logo.png"} width="60" height="60" alt="Clapping hands" />
+            <Image
+              src={"/logo.png"}
+              width="60"
+              height="60"
+              alt="Clapping hands"
+            />
           </SidebarGroupLabel>
           <SidebarGroupContent className="h-full my-6">
             <SidebarMenu className="flex h-full">
               {items.map((item, index) => (
-                <SidebarMenuItem key={item.title} className={index == 6 ? `mt-auto` : ""}>
+                <SidebarMenuItem
+                  key={item.title}
+                  className={index == 6 ? `mt-auto` : ""}
+                >
                   <SidebarMenuButton asChild size={"lg"}>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon className="text-primary h-6! w-6!" />
                       <span className="text-lg ml-4">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

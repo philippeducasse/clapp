@@ -68,3 +68,15 @@ LANGUAGES = [
     ("vi", "Vietnamese"),
     ("cy", "Welsh"),
 ]
+
+DEFAULT_LANGUAGE_CODE = "en"
+
+LANGUAGE_NAMES_BY_CODE = dict(LANGUAGES)
+LANGUAGE_CODES = frozenset(LANGUAGE_NAMES_BY_CODE)
+
+
+def get_language_name(code: object) -> str | None:
+    """Return the display name for an ISO 639-1 code, or None if unknown/invalid."""
+    if not isinstance(code, str):
+        return None
+    return LANGUAGE_NAMES_BY_CODE.get(code.strip().lower())

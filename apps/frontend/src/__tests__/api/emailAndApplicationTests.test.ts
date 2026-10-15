@@ -8,8 +8,21 @@ import {
   ApplicationMethod,
 } from "@/interfaces/entities/Application";
 import { Profile } from "@/interfaces/entities/Profile";
+import { GenerateEmailRequest } from "@/interfaces/api/ApiService";
 import { PerformanceType, PerformanceGenre } from "@/interfaces/entities/Performance";
 import { mockSendRequest, mockSendFormDataRequest, resetAllMocks } from "../mocks/fetchHelper";
+
+const generateEmailRequest: GenerateEmailRequest = {
+  profile: {
+    id: 1,
+    email: "performer@example.com",
+    confirmedAccount: true,
+    performances: [],
+  } as Profile,
+  selectedPerformanceIds: [1],
+  language: "de",
+  messageLength: 3,
+};
 
 describe("Email and Application Functionality", () => {
   beforeEach(() => {
@@ -117,11 +130,11 @@ describe("Email and Application Functionality", () => {
 
       mockSendRequest.mockResolvedValue(mockResponse);
 
-      const result = await residencyApiService.generateEmail(1);
+      const result = await residencyApiService.generateEmail(1, generateEmailRequest);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/residencies/1/generate_email",
-        { message: "" },
+        generateEmailRequest,
         "POST",
         "Email successfully generated",
       );
@@ -131,11 +144,11 @@ describe("Email and Application Functionality", () => {
     it("should generate email for different residency IDs", async () => {
       mockSendRequest.mockResolvedValue({ message: "Email generated" });
 
-      await residencyApiService.generateEmail(42);
+      await residencyApiService.generateEmail(42, generateEmailRequest);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/residencies/42/generate_email",
-        { message: "" },
+        generateEmailRequest,
         "POST",
         "Email successfully generated",
       );
@@ -150,11 +163,11 @@ describe("Email and Application Functionality", () => {
 
       mockSendRequest.mockResolvedValue(mockResponse);
 
-      const result = await venueApiService.generateEmail(1);
+      const result = await venueApiService.generateEmail(1, generateEmailRequest);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/venues/1/generate_email",
-        { message: "" },
+        generateEmailRequest,
         "POST",
         "Email successfully generated",
       );
@@ -164,11 +177,11 @@ describe("Email and Application Functionality", () => {
     it("should generate email for different venue IDs", async () => {
       mockSendRequest.mockResolvedValue({ message: "Email generated" });
 
-      await venueApiService.generateEmail(99);
+      await venueApiService.generateEmail(99, generateEmailRequest);
 
       expect(mockSendRequest).toHaveBeenCalledWith(
         "/api/venues/99/generate_email",
-        { message: "" },
+        generateEmailRequest,
         "POST",
         "Email successfully generated",
       );
@@ -573,7 +586,7 @@ describe("Email and Application Functionality", () => {
         personalWebsite: "https://alicejohnson.com",
         location: "Berlin, Germany",
         nationality: "British",
-        spokenLanguages: ["English", "German", "French"],
+        spokenLanguages: ["en", "de", "fr"],
         instagramProfile: "@alicejohnson",
         facebookProfile: "alicejohnson",
         confirmedAccount: true,

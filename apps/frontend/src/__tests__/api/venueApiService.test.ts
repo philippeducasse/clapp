@@ -1,3 +1,4 @@
+import { Profile } from '@/interfaces/entities/Profile';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { venueApiService } from '@/api/venueApiService';
 import { Venue, VenueType } from '@/interfaces/entities/Venue';
@@ -328,7 +329,7 @@ describe('venueApiService', () => {
 
       mockSendRequest.mockResolvedValue(response);
 
-      const result = await venueApiService.generateEmail(1);
+      const result = await venueApiService.generateEmail(1, { profile: {} as Profile, language: 'en' });
 
       expect(mockSendRequest).toHaveBeenCalled();
       expect(result.message).toBe('Email generated successfully');

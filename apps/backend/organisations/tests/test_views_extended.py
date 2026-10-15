@@ -377,7 +377,7 @@ class TestGenerateEmailAction:
         ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
-                {"selected_performance_ids": "1,2,3", "language": "ENGLISH"},
+                {"selected_performance_ids": "1,2,3", "language": "en"},
                 format="json",
             )
         assert response.status_code in [200, 500]
@@ -397,7 +397,7 @@ class TestGenerateEmailAction:
         ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
-                {"selected_performance_ids": [1, 2], "language": "FRENCH"},
+                {"selected_performance_ids": [1, 2], "language": "fr"},
                 format="json",
             )
         assert response.status_code in [200, 500]
@@ -417,7 +417,7 @@ class TestGenerateEmailAction:
         ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
-                {"selected_performance_ids": 1, "language": "ENGLISH"},
+                {"selected_performance_ids": 1, "language": "en"},
                 format="json",
             )
         assert response.status_code in [200, 500]
@@ -436,10 +436,68 @@ class TestGenerateEmailAction:
         ):
             response = client.post(
                 f"/api/festivals/{festival.id}/generate_email/",
-                {"language": "ENGLISH"},
+                {"language": "en"},
                 format="json",
             )
         assert response.status_code == 500
+
+    def test_generate_email_converts_language_code_to_name(self):
+        profile = Profile.objects.create_user(email="g@example.com", password="pass")
+        festival = Festival.objects.create(
+            name="Email Fest", town="Paris", country="France", user=profile
+        )
+        client = APIClient()
+        client.force_authenticate(user=profile)
+
+        with (
+            patch(
+                "organisations.views.generate_application_mail_prompt", return_value="prompt"
+            ) as mock_prompt,
+            patch("organisations.views.format_email", return_value="<p>Email</p>"),
+            patch("services.mistral_service.MistralClient.chat", return_value="Email content"),
+        ):
+            client.post(
+                f"/api/festivals/{festival.id}/generate_email/",
+                {"language": "de"},
+                format="json",
+            )
+        assert mock_prompt.call_args.args[3] == "German"
+
+    def test_generate_email_defaults_to_english(self):
+        profile = Profile.objects.create_user(email="g@example.com", password="pass")
+        festival = Festival.objects.create(
+            name="Email Fest", town="Paris", country="France", user=profile
+        )
+        client = APIClient()
+        client.force_authenticate(user=profile)
+
+        with (
+            patch(
+                "organisations.views.generate_application_mail_prompt", return_value="prompt"
+            ) as mock_prompt,
+            patch("organisations.views.format_email", return_value="<p>Email</p>"),
+            patch("services.mistral_service.MistralClient.chat", return_value="Email content"),
+        ):
+            client.post(f"/api/festivals/{festival.id}/generate_email/", {}, format="json")
+        assert mock_prompt.call_args.args[3] == "English"
+
+    @pytest.mark.parametrize("language", ["ENGLISH", "english", "xx", 1, ["en"]])
+    def test_generate_email_rejects_unknown_language(self, language):
+        profile = Profile.objects.create_user(email="g@example.com", password="pass")
+        festival = Festival.objects.create(
+            name="Email Fest", town="Paris", country="France", user=profile
+        )
+        client = APIClient()
+        client.force_authenticate(user=profile)
+
+        with patch("organisations.views.generate_application_mail_prompt") as mock_prompt:
+            response = client.post(
+                f"/api/festivals/{festival.id}/generate_email/",
+                {"language": language},
+                format="json",
+            )
+        assert response.status_code == 400
+        mock_prompt.assert_not_called()
 
 
 @pytest.mark.django_db

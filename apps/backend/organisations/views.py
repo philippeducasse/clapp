@@ -23,6 +23,7 @@ from organisations.festivals.models import Festival
 from organisations.residencies.models import Residency
 from organisations.venues.models import Venue
 from performances.models import Performance
+from profiles.constants import DEFAULT_LANGUAGE_CODE, get_language_name
 from services.mistral_service import ConversationResponse, MistralClient
 
 from .models import Organisation
@@ -506,7 +507,13 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
                 performance_objects = list(Performance.objects.filter(id__in=performance_ids))
 
-            language = request.data.get("language", "ENGLISH")
+            language_code = request.data.get("language") or DEFAULT_LANGUAGE_CODE
+            language = get_language_name(language_code)
+            if language is None:
+                return Response(
+                    {"error": f"Unsupported language code: {language_code}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             email_length = request.data.get("message_length", None)
 
             prompt = generate_application_mail_prompt(

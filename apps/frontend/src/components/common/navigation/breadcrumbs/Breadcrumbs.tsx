@@ -15,6 +15,7 @@ import {
   Breadcrumb as BreadcrumbType,
 } from "./breadcrumbsHelper";
 import { entityRegistry } from "./breadcrumbsConfig";
+import Link from "next/link";
 const Breadcrumbs = () => {
   const pathname = usePathname();
 
@@ -35,8 +36,8 @@ const Breadcrumbs = () => {
               {index === breadcrumbs.length - 1 ? (
                 <span className="text-base">{crumb.label}</span>
               ) : (
-                <BreadcrumbLink className="text-base" href={crumb.path}>
-                  {crumb.label}
+                <BreadcrumbLink asChild className="text-base">
+                  <Link href={crumb.path}>{crumb.label}</Link>
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>
