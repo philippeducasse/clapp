@@ -11,6 +11,9 @@ urlpatterns: List[URLPattern] = [
     path("clappmin/", admin.site.urls),
     path("health/", lambda request: JsonResponse({"status": "ok"})),
     path("sentry-debug/", lambda request: 1 / 0),
+    # Service-to-service endpoints. Not routed by nginx/Next.js, so only reachable inside
+    # the docker network, and protected by DISCOVERY_SERVICE_TOKEN on top of that.
+    path("internal/discovery/", include("discovery.internal_urls")),
     path(
         "api/",
         include(
@@ -24,6 +27,7 @@ urlpatterns: List[URLPattern] = [
                 path("venues/", include("organisations.venues.urls")),
                 path("profiles/", include("profiles.urls")),
                 path("support/", include("support.urls")),
+                path("discovery/", include("discovery.urls")),
                 path('schema/', SpectacularAPIView.as_view(), name='schema'),
             ]
         ),

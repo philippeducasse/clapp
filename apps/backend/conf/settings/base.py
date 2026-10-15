@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "organisations.residencies",
     "organisations.venues",
     "support",
+    "discovery",
 ]
 
 MIDDLEWARE = [
@@ -197,6 +198,11 @@ FIELD_ENCRYPTION_KEY = os.getenv("FERNET_KEY")
 BREVO_PROFILE_EMAIL = os.getenv("BREVO_PROFILE_EMAIL", "info@philippeducasse.com")
 BREVO_SMTP_USERNAME = os.getenv("BREVO_SMTP_USERNAME", "")
 BREVO_SMTP_PASSWORD = os.getenv("BREVO_SMTP_PASSWORD", "")
+
+# Discovery service (apps/discovery). Only superusers can use discovery.
+DISCOVERY_SERVICE_URL = os.getenv("DISCOVERY_SERVICE_URL", "http://localhost:8001")
+# Shared secret between backend and discovery service. Empty = internal endpoints reject everything.
+DISCOVERY_SERVICE_TOKEN = os.getenv("DISCOVERY_SERVICE_TOKEN", "")
 
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
