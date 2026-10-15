@@ -357,3 +357,49 @@ class TestReminderNotificationViews:
         reminder.refresh_from_db()
         assert reminder.delivered_at is None
         assert reminder.read_at is None
+
+
+@pytest.mark.django_db
+class TestProfilePrivilegeFields:
+    """Account/permission fields are exposed read-only and can't be changed via the profile API."""
+
+    def _client(self, profile):
+        client = APIClient()
+        client.force_authenticate(user=profile)
+        return client
+
+    def test_me_exposes_is_superuser(self):
+        admin = Profile.objects.create_superuser(email="admin@example.com", password="pass")
+        user = Profile.objects.create_user(email="user@example.com", password="pass")
+
+        assert self._client(admin).get("/api/profiles/me/").data["is_superuser"] is True
+        assert self._client(user).get("/api/profiles/me/").data["is_superuser"] is False
+
+    def test_me_does_not_expose_one_time_tokens(self):
+        user = Profile.objects.create_user(email="user@example.com", password="pass")
+        data = self._client(user).get("/api/profiles/me/").data
+
+        assert "reset_token" not in data
+        assert "confirmation_token" not in data
+
+    @pytest.mark.parametrize(
+        "field, value",
+        [
+            ("is_superuser", True),
+            ("is_staff", True),
+            ("is_active", False),
+            ("confirmed_account", True),
+        ],
+    )
+    def test_cannot_change_privilege_fields(self, field, value):
+        user = Profile.objects.create_user(email="user@example.com", password="pass")
+        before = getattr(user, field)
+
+        response = self._client(user).patch(
+            f"/api/profiles/{user.id}/", {field: value, "first_name": "Jo"}, format="json"
+        )
+
+        assert response.status_code == 200
+        user.refresh_from_db()
+        assert getattr(user, field) == before
+        assert user.first_name == "Jo"

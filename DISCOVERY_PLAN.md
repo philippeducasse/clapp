@@ -1,320 +1,352 @@
-# Plan: Discovering new festivals, residencies and venues
+# Plan: Discover (finding new festivals, residencies and venues)
 
-Scope: finding new organisations to apply to and getting them in front of the owner for review.
+Scope: a superuser-only tool that starts from a **starting point** (a link, a request in plain words, or both),
+explores the web, and proposes new organisations for review. Accepted organisations become seeds shared with every user.
 Drafting, sending and inbox handling are out of scope (see `LLM_AUTOMATION_PLAN.md` and `INBOX_PIPELINE_PLAN.md`).
 This plan replaces step 4 of `LLM_AUTOMATION_PLAN.md`.
 
-## Goal
-- Regularly suggest organisations that aren't in the database yet.
-- **Only the owner account runs discovery and reviews suggestions.** This mirrors how Brevo is limited to one account
-  (`BREVO_PROFILE_EMAIL`, `profiles/emails.py:17`).
-- **Accepted organisations are shared with every user:** existing users get a copy straight away, and new users get one at signup.
-- Nothing is added without the owner's approval.
-- Every suggestion shows how it was found (the path of pages and the text it was based on), so it can be checked quickly.
-- Contact emails are never invented.
+## What it does
 
-## Example workflow (the main use case)
-1. Search: "juggler tour dates 2025".
-2. A result is an **artist's personal website**.
-3. Go to the artist's **calendar / tour dates** page.
-4. Extract the list of festivals the artist performed at.
-5. **Check clapp** for each one and keep only the missing ones.
-6. For each missing festival: **find its official website**, go to its contact and application pages, and collect the details.
-7. Create candidates for review.
-8. The owner reviews them in clapp: accepting one creates a shared seed, dismissing removes it.
-9. Done.
+- Superusers get a **Discover** entry in the sidebar. Other users see nothing, and the API returns 403 for them.
+- The Discover page has a **starting point** text box that accepts anything:
+  - `https://some-juggler.com`
+  - `street theatre festivals in Belgium with open calls for 2027`
+  - `check the tour dates on https://some-juggler.com and find festivals we don't have`
+- A LangGraph workflow explores from there. The main example:
+  1. Land on an artist's website.
+  2. Find the calendar / tour dates page.
+  3. List the festivals the artist played at.
+  4. Check which ones clapp already has.
+  5. Research each missing festival: use the entich() function (in apps/backend/organisations/views.py)
+  6. Save them as **candidates**.
+- The superuser reviews the candidates on the same page.
+  - **Accept** creates a seed (`user=NULL`) and copies it to every user: existing users get it straight away, new users at signup.
+  - **Dismiss** removes it from the list.
+- Nothing is added to clapp without approval. Every candidate shows how it was found and which pages its facts came from.
+  Contact emails are never invented.
 
-This is why discovery is built with **LangGraph**:
-- The next step depends on what kind of page we land on (artist site, festival site, aggregator, irrelevant).
-- Moving around a site ("find the calendar", "find the contact page") is a loop where the LLM picks links.
-- Each missing festival becomes its own parallel sub-task (one per festival, using the `Send` API).
-- Budgets and hop limits have to apply across the whole run.
+## Architecture
 
-Artist calendars are a good source: if a similar act played somewhere, that festival is probably a good fit.
+The discovery code (LangGraph, scraping, AI libraries) lives in a **separate service**, `apps/discovery`,
+so none of it ships in the main backend image. The backend only gets a thin `discovery` Django app
+(models, review API and accept), with no new dependencies.
+
+```
+browser ──► frontend (/discover, superusers only)
+               │  /api/discovery/*   (session auth, superuser only)
+               ▼
+            backend (Django)  ── stores runs, candidates, sources; review; accept → seed → propagate
+               │  ▲
+   start run   │  │  /internal/discovery/*   (service token)
+   (HTTP)      ▼  │  progress, known-index, candidates, cancel check
+            apps/discovery (FastAPI + LangGraph, own container, no database)
+               │
+               ▼
+            web (search, artist sites, festival sites)
+```
+
+**Why it's split this way:**
+
+- **Backend:** data that belongs to clapp (candidates, seeds, copies to users) stays where the models are.
+  The frontend only talks to the backend, so there's no CORS or extra login to set up.
+- **Service:** all the heavy and risky parts: LangGraph, LangChain, fetching pages, the cache, and later Playwright.
+  It can be deployed, restarted or turned off without touching the main app.
+- **Service-facing endpoints** live under `/internal/discovery/`, not `/api/`.
+  - In prod, nginx only sends `/clappmin/` and `/health/` to Django, and Next.js only rewrites `/api/*` (`next.config.ts`).
+    So `/internal/` can't be reached from outside; only the `discovery` container can call it over `clapp-network`.
+  - It also requires `Authorization: Bearer <DISCOVERY_SERVICE_TOKEN>`.
 
 ## Current state (what we build on)
+
 - **Seeds and per-user copies:**
-  - Organisations with `user=NULL` are seeds. When a profile is created, `seed_user_organisations` (`profiles/signals.py`) copies every seed and its contacts to the new user, with `is_seed_clone=True`.
-  - **Seeds added later never reach existing users**, and there is no link from a copy back to its seed.
-  - Staff see seeds directly (`get_visibility_filter`, `organisations/views.py:75-78`). Everyone else sees only their own rows.
-  - All organisations in the local database are seeds (363 festivals, 8 residencies, 188 venues), so the owner already works directly on seed rows.
-  - Organisations created through the normal form are saved with `user=request.user` (`organisations/views.py:226-227`), so they are **not** shared.
-  - The copy code includes `comments`, so whatever the owner writes in a seed's comments is copied to new users.
-- **Web search:** `MistralClient.search()` uses a Mistral agent with the `web_search` tool (`services/mistral_service.py`).
-  `extract_search_results()` (`organisations/llm.py`) **drops the citation URLs**, which discovery needs.
-  `search()` is not counted by the rate limiter.
-- **Structured extraction:** `MistralClient.parse()` with Pydantic models.
-  `festivals/utils.py` and `residencies/utils.py` already contain good prompts for dates and application types.
-- **Enrichment:** `GET /{entity}/{id}/enrich/` fills one organisation and the frontend shows a diff before saving.
-- **Dedupe:** `normalize_domain()` (keeps subdomains). The Excel import dedupes per user by `name__iexact`, then by domain.
-- **Scraper:** `apps/scraper` is a standalone FastAPI app with two parsers (Buskers Central and an "Open Street" listing).
-  It writes nothing to the backend.
-- **Targeting data:** `Performance.performance_type` and `genres`, `Profile.location`, `nationality`, `spoken_languages`.
-- **Infrastructure:** Celery + Redis with beat in `clapp_backend/celery.py`. Postgres in prod, SQLite locally and in tests.
-  LLM quota is 100 calls per user per day (`services/rate_limit.py`). There's no LangChain dependency yet.
-- **UI pattern to copy:** the inbound-emails review queue (tabs plus approve/dismiss, `app/(main)/inbound-emails`).
+  - Organisations with `user=NULL` are seeds. `seed_user_organisations` (`profiles/signals.py`) copies every seed and its contacts to each **new** user, with `is_seed_clone=True`.
+  - Seeds added later never reach existing users.
+  - Staff see seeds directly (`get_visibility_filter`, `organisations/views.py:75-78`). Superusers are staff by default (`profiles/models.py:49-50`).
+  - All organisations in the local database are seeds (363 festivals, 8 residencies, 188 venues).
+  - The copy code includes `comments`, so whatever is written in a seed's comments is copied to new users.
+- **Profile API:** `ProfileSerializer` doesn't expose `is_superuser`, so the frontend can't tell who is a superuser yet.
+- **Sidebar:** `Sidebar.tsx` uses a fixed list of items, and `index == 6` pushes "Report a bug" and the items after it to the bottom.
+- **Web search:** `MistralClient.search()` uses a Mistral agent with `web_search` (`services/mistral_service.py`).
+  `extract_search_results()` (`organisations/llm.py`) drops the citation URLs. The service will have its own search client that keeps them.
+- **Prompts worth reusing:** the date and application-type rules in `organisations/festivals/utils.py` and `organisations/residencies/utils.py`.
+- **Dedupe helper:** `normalize_domain()` in `organisations/utils.py` (keeps subdomains).
+- **Deployment:**
+  - `apps/backend/docker/docker-compose.yml` runs `db`, `django`, `next`, `nginx`, `redis`, `celery_worker` and `celery_beat` on `clapp-network`.
+  - `backend-deploy.yml` overwrites `~/clapp/.env` on every deploy and copies the compose file and `nginx.conf` when they change.
+- **UI pattern to copy:** the inbound-emails review queue (`app/(main)/inbound-emails`, tabs plus approve/dismiss).
+- `apps/scraper` is left as it is.
 
-## Design decisions
+## Steps
 
-### 1. Discovery belongs to the owner only
-- Add a setting `DISCOVERY_PROFILE_EMAIL`. It defaults to `BREVO_PROFILE_EMAIL`, and the check uses the same lowercased email comparison.
-- Add a helper `is_discovery_owner(user)` and a DRF permission `IsDiscoveryOwner` on every discovery endpoint. Anyone else gets 403.
-- The profile serializer exposes `can_use_discovery`, so the frontend only shows the Discover page and dashboard card to the owner.
-- The owner must also be staff. That is how they see seed rows today, and it's already true for the owner account.
-- Since there's a single reviewer, there are no per-user suggestions: one candidate table with one review state.
+### Step 1: Backend, superuser flag and sharing seeds with every user
 
-### 2. Accepting creates a seed, and the seed is copied to everyone
-Accepting a suggestion:
-1. Creates a **seed**: a Festival, Residency or Venue with `user=NULL` and `is_seed_clone=False`, plus its contacts.
-   The owner sees it immediately through the staff visibility filter.
-2. Queues `propagate_seed(model, seed_id)`, which copies the seed and its contacts to **every existing non-owner profile** (`is_seed_clone=True`).
-   It skips a profile that already has a matching organisation (same domain, or same name and country), so nobody's own entry gets duplicated.
-3. New users get the seed through the existing signup signal.
+1. `ProfileSerializer`: add `is_superuser` (read-only). On the frontend, add `isSuperuser?: boolean` to `Profile.ts`.
+2. Move the copy code from `profiles/signals.py` into `organisations/seeding.py`:
+   - `clone_seeds_for_profiles(seeds, profiles)` copies organisations and their contacts.
+   - The signup signal calls it with all seeds and the one new profile, so its behaviour doesn't change.
+3. Celery task `organisations.tasks.propagate_seed(model_label, seed_id)` copies a single seed to every existing **non-superuser** profile.
+   It skips a profile that already has a matching organisation: same `normalize_domain(website_url)`, or same name (case-insensitive) and country.
+4. Tests:
+   - the serializer returns `is_superuser`
+   - the signup signal still copies everything (the existing tests pass unchanged)
+   - `propagate_seed` copies to the right profiles, skips duplicates, never copies to superusers, and running it twice creates nothing new
 
-The copy code in `profiles/signals.py` is moved into a reusable function, `organisations/seeding.py: clone_seeds_for_profiles(seeds, profiles)`.
-The signup signal and `propagate_seed` both call it.
+### Step 2: Backend, the `discovery` Django app (thin, no new dependencies)
 
-Copies stay independent, as today. If the owner later edits or enriches the seed, existing copies don't change.
+**Models**
 
-Text that is for the owner only (relevance reason, review notes) stays on the candidate. It is never written into the seed's `comments`, because those are copied to other users.
-
-### 3. LangGraph for the workflow, with a thin LangChain layer
-- **Dependencies:** `langgraph`, `langchain-core`, `langchain-mistralai`.
-  Add `langgraph-checkpoint-postgres` only when resumable runs are needed (phase 5).
-- **`services/llm/models.py: get_chat_model(purpose)`** returns `ChatMistralAI`. All structured outputs use `.with_structured_output(PydanticModel)`.
-  The model can be changed in one place, e.g. a small model for link-picking and a larger one for extraction.
-- **Budget callback:** a LangChain callback counts every LLM call against the run's budget and a separate `discovery` key in `services/rate_limit.py`.
-  It stops the run cleanly when the budget is exceeded, so discovery never uses up the owner's 100-per-day interactive quota.
-- **Search** stays on Mistral's `web_search` agent through `MistralClient`, wrapped behind a `SearchProvider` interface.
-  It is changed to **return the citation URLs** (a new `extract_search_sources()`).
-  I believe `ChatMistralAI` doesn't expose Mistral's built-in web search, so this stays outside LangChain; check before building.
-  Brave or Tavily can be added later behind the same interface (LangChain has tools for both).
-- **Tracing:** LangSmith, turned on with an environment setting (`LANGSMITH_TRACING`). Off in tests.
-- **Review happens in the app, not inside the graph.** The graph ends by saving candidates.
-  Reviews happen days later in the UI, so pausing graph runs with `interrupt()` and keeping them open would add state for no benefit.
-- Moving `organisations/llm.py` (enrichment, email drafting) to LangChain is **not** part of this plan.
-
-### 4. Code location
-Create a `discovery/` Django app in the backend:
-- `graph/state.py`, `graph/nodes/*.py`, `graph/build.py` for the graph
-- `tools/fetch.py`, `tools/search.py`, `tools/links.py` for fetching, search and link handling
-- `sources/` for the scraper parsers, ported from `apps/scraper/parser.py`, which can then be deleted
-
-### 5. Facts must come from fetched pages
-- The LLM extracts only from page text we fetched ourselves, never from the search agent's summary.
-- After extraction, every email and URL is checked against the fetched text, and anything not found there is dropped.
-- Link-following can only choose links that actually appear on the page: the LLM picks an index from a list, it doesn't write a URL.
-
-## The graph
-
-### State (`DiscoveryState`)
 ```
-run_id
-goal_queries          list[str]
-frontier              list[PageTask{url, kind_hint, depth, found_via}]   pages still to visit
-visited               set[url]
-leads                 list[Lead{name, town, country, year, url?, found_via}]   orgs mentioned on artist/aggregator pages
-missing_leads         list[Lead]       leads not yet in clapp
-candidates            list[CandidateDraft]   (reducer: append)
-budget                {llm_calls, pages, searches, max_*}
-errors                list[str]
+DiscoveryRun
+  starting_point      text (raw input)
+  status              QUEUED | RUNNING | DONE | FAILED | CANCELLED
+  cancel_requested    bool
+  plan                JSON   (how the service interpreted the starting point)
+  progress            JSON list of {at, step, message}   (shown live on the page)
+  counters            JSON   {searches, pages, llm_calls, leads, leads_missing, candidates}
+  errors              JSON list
+  created_by          FK Profile
+  created_at, started_at, finished_at, last_heartbeat_at
+
+DiscoveryCandidate
+  run                 FK DiscoveryRun
+  org_type            FESTIVAL | RESIDENCY | VENUE
+  name, country, town, description
+  website_url, domain (normalize_domain, indexed)
+  contact_emails      JSON list (only verified emails)
+  contacts            JSON list of {name, email, role}
+  application_url, application_type
+  start_date, end_date, approximate_date, application_date_start, application_date_end   (same formats as Festival)
+  subtype             festival_type / venue_type
+  found_via           JSON list of {kind, url, title}   e.g. search → artist site → calendar → festival site
+  sources             JSON list of {url, title, snippet}  (pages the facts came from)
+  relevance_reason    short text
+  state               PENDING | ACCEPTED | DISMISSED | ALREADY_KNOWN | UNRESOLVED
+  dismiss_reason      NOT_RELEVANT | WRONG_REGION | DEFUNCT | DUPLICATE | OTHER
+  created_seed        generic FK (Festival / Residency / Venue)
+  created_at
+
+DiscoverySource       (artist and aggregator sites that produced leads, for reuse)
+  url, domain, kind (ARTIST_SITE | AGGREGATOR), calendar_url
+  last_visited_at, leads_found, candidates_accepted
 ```
 
-### Nodes and edges
+Plus admin pages for all three.
+
+**Settings:** `DISCOVERY_SERVICE_URL` (default `http://discovery:8001`) and `DISCOVERY_SERVICE_TOKEN`.
+
+**Frontend-facing API: `/api/discovery/`** (session auth, `IsSuperuser` permission)
+
+- `POST runs/ {starting_point}`
+  - Creates a QUEUED run, then calls the service at `POST {DISCOVERY_SERVICE_URL}/runs` with `{run_id, starting_point}` (5-second timeout).
+  - If the service can't be reached, the run is marked FAILED with "discovery service unreachable".
+  - Only one active run at a time; a second request gets 409.
+- `GET runs/` lists recent runs.
+- `GET runs/{id}/` returns status, progress and counters, polled by the page.
+  - A RUNNING run with no heartbeat for 10 minutes is marked FAILED when it's read, which covers a service restart in the middle of a run.
+- `POST runs/{id}/cancel/` sets `cancel_requested`.
+- `GET candidates/?state=&run=`
+- `POST candidates/{id}/accept/ {overrides?}`
+  - Creates the seed (`user=NULL`, `is_seed_clone=False`) and its contacts, runs `clean_organisation_data`, and queues `propagate_seed`.
+  - Accepting twice returns the existing seed.
+  - `relevance_reason` is **not** copied into the seed's `comments`, because those are copied to other users.
+- `POST candidates/{id}/dismiss/ {reason}` and `POST candidates/{id}/restore/`
+
+**Service-facing API: `/internal/discovery/`** (service token, not reachable from outside)
+
+- `PATCH runs/{id}/` sets status, adds progress lines, counters, errors and the plan, and updates `last_heartbeat_at`.
+  The response includes `cancel_requested`, so the service learns about a cancel on every progress update.
+- `GET known-index/` returns `[{name, country, town, domain, org_type, source: SEED|SUPERUSER|CANDIDATE}]` for:
+  - all seeds
+  - organisations owned by superusers
+  - all existing candidates, whatever their state
+
+  It's about 600 short rows; the service fetches it once per run and does the fuzzy matching itself.
+
+- `POST runs/{id}/candidates/` takes a list of candidates and saves them.
+  The backend runs its own exact check (domain, or name + country) and saves matches as `ALREADY_KNOWN`, as a safety net.
+- `POST sources/` upserts `DiscoverySource` rows.
+
+**Tests:**
+
+- permissions: 403 for non-superusers, 401 for a missing or wrong service token
+- the one-run-at-a-time rule
+- the service being unreachable marks the run FAILED
+- the heartbeat timeout
+- accept, dismiss and restore
+- the `known-index` contents
+- the `ALREADY_KNOWN` safety net
+
+The service call is mocked with `respx` or by patching `httpx`.
+
+### Step 3: Service skeleton (`apps/discovery`)
+
+```
+apps/discovery/
+  pyproject.toml          uv; fastapi, uvicorn, httpx, pydantic-settings,
+                          langgraph, langchain-core, langchain-mistralai, mistralai,
+                          trafilatura, tldextract, rapidfuzz, diskcache
+  dockerfile
+  .env.example
+  discovery/
+    app.py                FastAPI: GET /health, POST /runs
+    config.py             BACKEND_URL, DISCOVERY_SERVICE_TOKEN, MISTRAL_API_KEY, limits, LANGSMITH_*
+    backend_client.py     typed calls to /internal/discovery/*
+    runner.py             runs one graph in the background; one run at a time (409 otherwise)
+    llm.py                get_chat_model(purpose) → ChatMistralAI; RunBudget callback
+    prompts/              classify, extract_leads, extract_org (date/application rules copied from the backend), pick_link
+    tools/                fetch.py, links.py, search.py, known.py, verify.py
+    graph/                state.py, nodes/*.py, navigate.py, research_org.py, build.py
+  tests/
+    fixtures/             saved HTML pages for a small fake web
+```
+
+1. `POST /runs {run_id, starting_point}` checks the token and returns 202 straight away. The graph then runs as a background asyncio task.
+2. `runner.py` runs a **stub graph** first: it posts a few progress lines and one fake candidate, then sets the run to DONE.
+   That proves the backend ↔ service ↔ frontend loop works before any LLM code exists.
+3. Local development:
+   - Run the service with `uv run fastapi dev discovery/app.py --port 8001`.
+   - The backend gets `DISCOVERY_SERVICE_URL=http://localhost:8001`, and the service gets `BACKEND_URL=http://localhost:8000`.
+   - Both use the same token.
+
+### Step 4: Service tools
+
+1. **`llm.py`**
+   - `get_chat_model(purpose)`: a small model for classifying pages and picking links, a larger one for extraction. All use `.with_structured_output()`.
+   - The `RunBudget` LangChain callback counts LLM calls and raises `BudgetExceeded` at the limit.
+   - **Default limits per run:** 80 LLM calls, 60 pages, 15 searches, 25 leads researched, 3 link hops per site.
+   - LangSmith tracing can be turned on with an environment variable.
+2. **`tools/search.py`:** Mistral `web_search` agent (same approach as the backend's `MistralClient`). It returns `list[SearchHit{url, title, snippet}]`, **including the citation URLs**.
+   It sits behind a `SearchProvider` interface, so Brave or Tavily can be added later.
+3. **`tools/fetch.py`:**
+   - `httpx` + `trafilatura`, with a timeout and a page-size cap
+   - respects `robots.txt`
+   - at most 1 request per second per domain
+   - pages cached for 30 days in `diskcache`, on a Docker volume
+   - JavaScript-only pages are logged as "empty content" and skipped
+4. **`tools/links.py`:** extracts same-domain links (anchor text + URL) and ranks them using keywords in several languages
+   (agenda, dates, tour, calendrier, termine, contact, candidature, bewerbung, open call, appel).
+5. **`tools/known.py`:** loads the `known-index` and checks leads against it by:
+   - domain
+   - registrable domain (`tldextract`)
+   - a `rapidfuzz` name match ≥ 90 within the same country
+6. **`tools/verify.py`:** keeps an email or URL only if it appears in text the workflow fetched itself.
+   Blocklisted hosts (social networks, ticketing sites, Wikipedia, news) are never used as an organisation's `website_url`.
+7. Unit tests for each tool.
+
+### Step 5: The graph
+
 ```
 START
-  → plan_queries            settings + owner profile → ~10 queries (templates, optionally one LLM call to translate)
-  → search                  SearchProvider → SearchHit list → frontier (+ peer-artist URLs from settings)
-  → visit_page   ◄──────────────────────────┐   fetch one page from frontier (robots.txt, cache, per-domain delay)
-  → classify_page                           │   LLM: ARTIST_SITE | ORG_SITE | AGGREGATOR | IRRELEVANT
-      ├─ ARTIST_SITE → navigate("calendar / tour dates / past shows")
-      │                 → extract_leads ────┤   list of {name, town, country, year, url?}
-      ├─ AGGREGATOR  → extract_leads ───────┤
-      ├─ ORG_SITE    → becomes a Lead with url
-      └─ IRRELEVANT  → next page ───────────┘
-  (when frontier is empty or the page budget is spent)
-  → check_known             no LLM: dedupe leads against seeds, owner rows and existing candidates → missing_leads
-  → fan out with Send(research_org, lead) for each missing lead, up to max_leads_per_run
-        research_org (subgraph, one per lead):
-          resolve_website     if there is no url: search "{name} {town} {year} festival", pick the official site
-                              (LLM picks from hits, blocklisted hosts excluded)
-          navigate("contact / application / open call / programme")   up to 2 extra pages on the same site
-          extract_org         structured CandidateExtraction (reuses festivals/residencies prompt rules)
-          verify              emails/URLs must appear in fetched text; require name + (website or email)
-          → returns CandidateDraft (or a "not resolved" note)
-  → dedupe_candidates       domain + eTLD+1 + fuzzy name/country across drafts and DB
-  → score                   one batched LLM call against the owner profile; "a peer artist played here" is a strong signal
-  → save                    DiscoveryCandidate rows + run counters
+ → interpret_start   URL(s) in the text      → pages to visit
+                     plain-words request     → LLM returns {goal, org_types, countries, queries}
+                     both                    → both; the request text becomes the goal
+ → load_known        GET /internal/discovery/known-index/
+ → search            (only if there are queries) → add the result links to the pages to visit
+ → visit_page ◄──────────────────────────────┐
+ → classify_page     ARTIST_SITE | ORG_SITE | AGGREGATOR | IRRELEVANT   (judged against the goal)
+     ARTIST_SITE → navigate("calendar / tour dates") → extract_leads ─┤
+     AGGREGATOR  → extract_leads ──────────────────────────────────────┤
+     ORG_SITE    → becomes a lead with its URL                        │
+     IRRELEVANT  → next page ──────────────────────────────────────────┘
+   (stops when there are no pages left or the page budget is used up)
+ → check_known       drop leads clapp already has → the missing leads
+ → Send(research_org, lead) for each missing lead (up to 25), in parallel
+      research_org:
+        resolve_website   no URL? search "{name} {town} {year}" and the LLM picks the official site from the results
+        navigate("contact / application / open call")   up to 2 more pages
+        extract_org       structured candidate (dates and application type, using the copied prompt rules)
+        verify            check emails/URLs; needs a name + (website or email); otherwise the lead is UNRESOLVED
+ → dedupe_candidates  among this run's candidates
+ → save               POST candidates and sources to the backend; status DONE
 END
 ```
 
-### `navigate(goal)`: a reusable subgraph for moving around a site
-1. Take the links from the current page (anchor text + href), keep only same-domain links, and drop ones already visited.
-   Rank them with keywords for the goal in several languages first (no LLM), e.g. agenda, dates, tour, calendrier, termine, contact, candidature, bewerbung, open call.
-2. If there is no clear keyword match, the LLM picks one link **index** from the top 20, or "stop".
-3. Fetch that link and check whether the goal is reached (a cheap LLM yes/no, or a keyword check).
-4. Loop until the goal is reached or the hop limit is hit (`max_hops`, default 3). It returns the pages visited.
+- `navigate(goal)` is a reusable subgraph. It tries keyword ranking first. If that doesn't find a clear match, the LLM picks the **number** of a link from the top 20, or "stop".
+  It never writes a URL itself. At most 3 links per site.
+- Every node:
+  - posts a short progress line, which also counts as the heartbeat
+  - stops the run cleanly if `cancel_requested` comes back as true
+  - catches its own errors, so one broken site doesn't stop the run
+- If the budget runs out, the candidates found so far are still saved and the run is marked DONE with a "budget reached" note.
+- `recursion_limit` is a safety net in case the workflow keeps looping.
+- **Tests:**
+  - Each node on its own, using LangChain's fake chat models and saved HTML pages.
+  - **End to end on a small fake web served by `respx`:** artist site → calendar listing 4 festivals, 2 of them in the fake known-index → festival sites → contact pages. It should:
+    - post exactly 2 candidates, with verified emails and the right `found_via` paths
+    - skip the 2 known festivals
+    - produce an `UNRESOLVED` candidate for a broken site, without failing the run
+    - stop cleanly when the budget runs out or a cancel is requested
 
-### Guardrails
-- **Hard limits per run** (in `DiscoverySettings`, enforced in state and by the budget callback):
-  - `max_pages` 60
-  - `max_llm_calls` 80
-  - `max_searches` 15
-  - `max_leads_per_run` 25
-  - `max_hops` 3
-- LangGraph `recursion_limit` is set as a backstop.
-- **Fetching:**
-  - `httpx` + `trafilatura`, with a timeout and a size cap
-  - respect `robots.txt`
-  - at most 1 request per second per domain
-  - cache by URL for 30 days, so re-runs are cheap
-  - no Playwright for now: JS-only pages are logged as "empty content" and skipped
-- **Blocklisted hosts** (social networks, ticketing sites, Wikipedia, news) can provide leads but are never an organisation's `website_url`.
-  Artist calendars hosted on Facebook or Instagram are out of scope at first.
-- Every node catches its own errors, adds them to `errors` and continues. One broken site must not stop the run.
+### Step 6: Frontend
 
-## Data model (`discovery/models.py`)
+1. **`Sidebar.tsx`:**
+   - Add `{ title: "Discover", url: "/discover", icon: Compass, superuserOnly: true }` after "Inbound emails".
+   - Filter the list using `profile.isSuperuser` from Redux.
+   - Replace the `index == 6` check with a `bottom: true` flag on "Report a bug".
+2. **`app/(main)/discover/page.tsx`** (redirects to `/dashboard` if the user isn't a superuser):
+   - **Starting point bar:** one text field with the placeholder "Paste a link, describe what to look for, or both…", plus a **Discover** button.
+     The button is disabled while a run is active.
+   - **Run panel:** status, the live progress log (polled every 3 seconds while the run is active), counters and a Cancel button.
+     Below it, a dropdown of recent runs.
+   - **Candidates:** tabs for To review / Unresolved / Accepted / Dismissed, using the inbound-emails pattern. Each card shows:
+     - name, type, location, dates and application type
+     - **found via**, e.g. "Calendar of X → festival site → contact page", with source links
+     - the relevance reason
+     - **Accept**, with inline editing of type and name, and the note "This will be added for all users"
+     - **Dismiss**, with a menu of reasons
+3. `api/discoveryApiService.ts` and `interfaces/entities/Discovery.ts`.
+4. After an accept, refresh the matching Redux slice (festivals, venues or residencies).
+5. Tests for the API service and the sidebar filtering.
 
-```
-DiscoveryCandidate
-  org_type          FESTIVAL | RESIDENCY | VENUE
-  name, country, town, description
-  website_url, domain           (domain = normalize_domain(website_url), indexed)
-  contact_emails    JSON list   (only verified emails)
-  application_url, application_type
-  dates / application dates     (same fields and formats as Festival / Residency)
-  subtype           festival_type / venue_type
-  genres            JSON list
-  found_via         JSON list of {kind: SEARCH|ARTIST_SITE|AGGREGATOR|SEED_SOURCE, url, title}
-                    e.g. "found on <artist>'s calendar (2025)"
-  sources           JSON list of {url, title, snippet, fetched_at}   (pages the facts came from)
-  relevance_score 0–1, relevance_reason
-  state             PENDING | ACCEPTED | DISMISSED | ALREADY_KNOWN | UNRESOLVED | DEAD
-  dismiss_reason    NOT_RELEVANT | WRONG_REGION | DEFUNCT | DUPLICATE | OTHER
-  created_seed      generic FK to the seed Festival/Residency/Venue created on accept
-  run               FK DiscoveryRun
-  first_seen_at, last_checked_at
-  llm_model, prompt_version
+### Step 7: Deployment
 
-DiscoverySource                 (sites that produced leads, worth revisiting)
-  url, domain, kind (ARTIST_SITE | AGGREGATOR)
-  calendar_url      (where navigate() found the calendar)
-  last_visited_at, leads_found, candidates_accepted
-  enabled
+1. **`apps/discovery/dockerfile`:** multi-stage uv build, the same pattern as the backend's. It runs `uvicorn discovery.app:app --port 8001`.
+2. **`docker-compose.yml`:** add the new service.
+   ```
+   discovery:
+     restart: unless-stopped
+     image: ${REGISTRY_URL}/clapp_discovery:latest
+     env_file: [.env.discovery]
+     volumes: [discovery_cache:/app/cache]
+     networks: [clapp-network]
+     healthcheck: GET http://localhost:8001/health
+   ```
 
-DiscoveryRun
-  trigger           SCHEDULED | MANUAL | SEED_SOURCE
-  queries JSON, started_at, finished_at, status, error, errors JSON
-  searches, pages_fetched, llm_calls, leads_found, leads_missing, candidates_created
-  langsmith_trace_url (optional)
+   - No published ports and no nginx route.
+   - Add `discovery_cache` to the volumes.
+3. **Environment:**
+   - The service uses a **separate** `~/clapp/.env.discovery`, because `backend-deploy.yml` overwrites `~/clapp/.env` on every deploy.
+   - Add `DISCOVERY_SERVICE_URL` and `DISCOVERY_SERVICE_TOKEN` to the backend's `.env` section in `backend-deploy.yml`.
+   - Add GitHub secrets for `DISCOVERY_SERVICE_TOKEN` and, if you want a separate key, a Mistral key for discovery.
+4. **Workflows:**
+   - `discovery-tests.yml`: runs on `apps/discovery/**`, `uv sync` + `pytest`.
+   - `discovery-deploy.yml`: runs on pushes to `production` that touch `apps/discovery/**`. It:
+     - runs the tests
+     - builds and pushes `clapp_discovery`
+     - writes `.env.discovery` on the server
+     - runs `docker compose pull discovery && docker compose up -d discovery`
+5. **Rollout order:**
+   1. Push the `clapp_discovery` image first.
+   2. Then deploy the backend change that adds `discovery` to the compose file. Otherwise the backend deploy's `docker compose pull` fails on a missing image.
+6. **Kill switch:** `docker compose stop discovery`. The backend then marks new runs FAILED ("service unreachable"), and the rest of clapp is unaffected.
 
-DiscoverySettings               (one row, edited by the owner)
-  enabled, frequency (WEEKLY | MONTHLY)
-  org_types         multi: FESTIVAL / RESIDENCY / VENUE
-  countries         multi (empty = derived from the owner's location/nationality)
-  peer_artist_urls  list (artists similar to the owner; their calendars are checked every run)
-  extra_keywords    free text
-  max_* limits      (see Guardrails)
-```
+### Step 8: Docs and clean-up
 
-Notes:
-- Dismissed and unresolved candidates are kept, so the same organisation isn't researched again.
-  `check_known` treats them as known, unless they're older than 12 months, in which case they're retried.
-- `UNRESOLVED` means a lead whose official site couldn't be found. It's kept with its `found_via`, so the owner can still see it and look it up by hand.
-- `DiscoverySource` lets the next run go straight back to productive artist calendars (via `calendar_url`) without searching.
+- `apps/discovery/README.md`: how to run it locally, environment variables, limits, and how to read a run.
+- Replace step 4 of `LLM_AUTOMATION_PLAN.md` with a link to this plan.
 
-## Review flow
+## Not in this version
 
-**API** (`/api/discovery/`, all endpoints require `IsDiscoveryOwner`)
-- `GET candidates/?state=PENDING`: candidate data, `found_via`, sources, score and reason.
-- `POST candidates/{id}/accept/`
-  - Takes optional field overrides, including correcting the org type.
-  - Creates the seed plus contacts, runs `clean_organisation_data`, and queues `propagate_seed`.
-  - Idempotent: a second accept returns the existing seed.
-- `POST candidates/{id}/dismiss/` with a `reason`.
-- `POST candidates/{id}/restore/`
-- `POST runs/`: run now (manual trigger, one active run at a time).
-- `GET runs/latest/`: status and counters for a "discovering…" indicator.
-- `GET/PUT settings/`
-- `GET/PATCH sources/`: see productive artist sites and turn them on or off.
-
-**Frontend** (shown only when `profile.canUseDiscovery`)
-- New `app/(main)/discover/page.tsx` that reuses the inbound-emails tab pattern: To review / Unresolved / Accepted / Dismissed.
-- Each item card shows:
-  - name, type, location, dates and application type
-  - the relevance reason
-  - **found via** (e.g. "Calendar of Artist X → festival site → contact page"), with source links and snippets you can expand
-  - Accept (with an inline edit for type/name), and Dismiss with a reason menu
-- A note on Accept: "This will be added for all users."
-- A settings panel (org types, countries, peer artist URLs, frequency, limits) and a run status/"Run now" button at the top of the page.
-- A dashboard card ("N new suggestions") and a sidebar entry, both owner-only.
-
-## Feedback loop
-- Dismiss reasons tune the next run:
-  - Repeated `WRONG_REGION` dismissals lower the weight of that country.
-  - `NOT_RELEVANT` reasons are passed to the scoring prompt as negative examples (the last 10).
-  - `DEFUNCT` marks the candidate `DEAD`.
-- `DiscoverySource.candidates_accepted` ranks artist sites: productive ones are revisited every run, and ones that produce nothing get turned off automatically after N runs.
-- Accept and dismiss rates per query template are logged on `DiscoveryRun`.
-
-## Scheduling and operations
-- Celery beat `discovery.tasks.run_scheduled_discovery` runs daily. It does nothing unless `DiscoverySettings.enabled` is on and a run is due.
-  The graph runs inside a single Celery task with a generous `time_limit`. The run's status is updated on `DiscoveryRun` as it goes.
-- `discovery.tasks.refresh_candidates` runs monthly. It re-checks pending and unresolved candidates and enabled sources.
-- Admin: list views for candidates, sources and runs, plus a "mark as duplicate" action.
-
-## Phases
-
-1. **Foundation**
-   - `discovery` app, models, admin and migrations.
-   - `DISCOVERY_PROFILE_EMAIL` and `IsDiscoveryOwner`.
-   - Move the copy code into `organisations/seeding.py`. The signup signal uses it, and its existing tests must still pass.
-   - `propagate_seed` task with its skip rule.
-   - `services/llm/` (`get_chat_model`, budget callback), and `extract_search_sources`.
-2. **Tools**
-   - fetch (cache, robots.txt, politeness), link extraction and ranking
-   - `SearchProvider`
-   - `check_known` dedupe (domain, eTLD+1, fuzzy name)
-   - port the scraper parsers as seed sources and delete `apps/scraper`
-3. **Graph**
-   - `navigate` subgraph, then `research_org` subgraph, then the main graph
-   - Start with a single entry point, `run_discovery --start-url <artist site>`, to test the example workflow end to end.
-   - Then add search-driven runs.
-4. **API and UI:** candidates, sources, settings and runs API, Discover page, dashboard card, `can_use_discovery`.
-5. **Automation and robustness**
-   - Celery beat scheduling, feedback loop, `refresh_candidates`
-   - Postgres checkpointer so a crashed run can resume, if runs turn out to be long
-6. **Later:** a Brave or Tavily provider, Playwright fetching, Facebook/Instagram calendars.
-
-## Testing
-- **Access:** a non-owner gets 403 on every discovery endpoint, and `can_use_discovery` is false for them.
-- **Seeding:**
-  - accept creates a seed of the right type, with contacts
-  - `propagate_seed` copies it to every non-owner profile, skips profiles that already have it, and doesn't create a copy for the owner
-  - accept twice creates nothing new
-  - a profile created afterwards gets the seed through the signup signal
-- **Tools:**
-  - link ranking and keywords in several languages
-  - same-domain filtering
-  - robots.txt and cache behaviour
-  - email/URL verification against fixture text
-  - dedupe (domain, eTLD+1, fuzzy name, `ALREADY_KNOWN` against seeds)
-- **Nodes:** each node is tested on its own with LangChain's fake chat models (`GenericFakeChatModel` / a fake structured-output model) and fixture pages.
-- **Graph end to end, with a "mini web" of fixture HTML served by `respx`:**
-  - Pages: search results → artist homepage → calendar page (lists 4 festivals, 2 already in the DB) → festival homepages → contact pages.
-  - Assert:
-    - exactly 2 candidates are created, with verified emails and the correct `found_via` path
-    - the known festivals are skipped
-    - budget limits stop the run cleanly
-    - one broken festival site produces an `UNRESOLVED` candidate without failing the run
-- **Budget callback:** counting, stopping when the budget is exceeded, and not touching the interactive quota.
+- Scheduled or automatic runs: every run starts from the starting point bar.
+- Playwright for JavaScript-heavy sites, and Facebook or Instagram calendars.
+- Brave or Tavily search.
+- Saving graph state so a crashed run can resume: for now a crashed run is marked FAILED and you start it again.
+- Learning from dismissals, relevance scores, and revisiting productive `DiscoverySource` sites automatically.
+- Automatically enriching a candidate when it's accepted (the existing enrich button still works on the seed).
 
 ## Open questions
-1. **Owner's manual adds:** organisations created through the normal form are currently private (`user=request.user`).
-   Should the owner's manual adds also become seeds and be shared, like accepted suggestions?
-2. **Backfill:** should a one-off `propagate_seed` run give existing users the seeds added after they signed up?
-3. **Starting points:** are search queries plus a hand-picked list of peer artist URLs enough? Or should the graph also look for peer artists itself
-   (e.g. "jugglers who performed at {known festival}"), which grows the source list automatically but costs more budget?
-4. **Search provider:** stay with Mistral web search only, or add Brave/Tavily now (better control over results, and LangChain tools exist for both)?
-5. **Venues:** include them from the start, or start with festivals and residencies?
-6. **Accept behaviour:** run enrichment automatically before creating the seed, or leave it to the enrich button?
+
+1. **Manual adds by superusers:** organisations created through the normal form are private (`user=request.user`). Should they also become shared seeds?
+2. **Backfill:** should a one-off `propagate_seed` run give existing users the seeds that were added after they signed up?
+3. **Venues:** include them from the start, or start with festivals and residencies?
+4. **Mistral key:** should discovery share the backend's Mistral key, or have its own so its usage and cost are tracked separately?

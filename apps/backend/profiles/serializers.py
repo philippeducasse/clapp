@@ -114,8 +114,20 @@ class ProfileSerializer(serializers.ModelSerializer):
             "outlook_oauth_refresh_token",
             "outlook_oauth_access_token",
             "outlook_oauth_token_expiry",
+            "confirmation_token",
+            "reset_token",
         )
-        read_only_fields = ("id",)
+        # Account/permission fields must never be writable through the profile endpoint,
+        # otherwise any user could PATCH themselves into staff/superuser.
+        read_only_fields = (
+            "id",
+            "is_superuser",
+            "is_staff",
+            "is_active",
+            "confirmed_account",
+            "last_login",
+            "date_joined",
+        )
 
     @transaction.atomic
     def update(self, instance, validated_data):

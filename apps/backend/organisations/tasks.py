@@ -160,3 +160,27 @@ def upload_user_data(file_bytes: bytes, user_id: int):
     except Exception as e:
         logger.error(f"Unexpected error during upload: {str(e)}", exc_info=True)
         return {"error": f"Upload failed: {str(e)}"}
+
+
+@shared_task
+def propagate_seed(model_label: str, seed_id: int) -> int:
+    """Copy one seed organisation to every existing non-staff user.
+
+    Staff are skipped because they already see seeds directly (see `get_visibility_filter`).
+    Users who already have a matching organisation (same domain, or name + country) are skipped.
+    Returns the number of copies created.
+    """
+    from django.apps import apps
+
+    from organisations.seeding import propagate_seed_to_profiles
+
+    model = apps.get_model(model_label)
+    seed = model.objects.filter(pk=seed_id, user__isnull=True).first()
+    if seed is None:
+        logger.warning(f"propagate_seed: no live seed {model_label} id={seed_id}")
+        return 0
+
+    profiles = get_user_model().objects.filter(is_staff=False)
+    created = propagate_seed_to_profiles(seed, profiles)
+    logger.info(f"propagate_seed: copied {model_label} {seed_id} to {created} profile(s)")
+    return created

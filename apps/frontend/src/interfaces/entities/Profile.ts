@@ -15,6 +15,7 @@ export interface Profile {
   id: number;
   email: string;
   confirmedAccount: boolean;
+  isSuperuser?: boolean;
   firstName?: string;
   lastName?: string;
   companyName?: string;
