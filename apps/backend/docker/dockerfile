@@ -53,6 +53,7 @@ COPY --from=build --chown=django:django /app/manage.py .
 COPY --from=build --chown=django:django /app/clapp_backend ./clapp_backend
 COPY --from=build --chown=django:django /app/conf ./conf
 COPY --from=build --chown=django:django /app/applications ./applications
+COPY --from=build --chown=django:django /app/discovery ./discovery
 COPY --from=build --chown=django:django /app/organisations ./organisations
 COPY --from=build --chown=django:django /app/performances ./performances
 COPY --from=build --chown=django:django /app/profiles ./profiles

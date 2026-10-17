@@ -1,0 +1,35 @@
+[project]
+name = "clapp-discovery"
+version = "0.1.0"
+description = "Discovery service: finds new festivals, residencies and venues for clapp."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "diskcache>=5.6.3",
+    "fastapi[standard]>=0.143.3",
+    "httpx>=0.28.1",
+    "langchain-core>=1.6.12",
+    "langchain-mistralai>=1.1.6",
+    "langgraph>=1.2.16",
+    "mistralai>=3.2.0",
+    "pydantic-settings>=2.16.0",
+    "rapidfuzz>=3.14.6",
+    "tldextract>=5.4.0",
+    "trafilatura>=2.3.1",
+    "uvicorn>=0.54.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "respx>=0.23.1",
+]
