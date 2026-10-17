@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import pytest
 import respx
@@ -8,6 +9,16 @@ from discovery.config import Settings
 BACKEND = "http://backend.test"
 INTERNAL = f"{BACKEND}/internal/discovery"
 TOKEN = "test-token"
+FIXTURES = Path(__file__).parent / "fixtures"
+
+
+def fixture_bytes(name: str) -> bytes:
+    """A saved page from tests/fixtures, as served over HTTP."""
+    return (FIXTURES / name).read_bytes()
+
+
+def fixture_text(name: str) -> str:
+    return fixture_bytes(name).decode("utf-8")
 
 
 @pytest.fixture

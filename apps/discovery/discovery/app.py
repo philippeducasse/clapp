@@ -35,6 +35,7 @@ from pydantic import BaseModel, Field
 
 from discovery.backend_client import BackendClient
 from discovery.config import Settings, get_settings
+from discovery.llm import configure_tracing
 from discovery.runner import Graph, Runner, RunnerBusy, stub_graph
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -87,6 +88,7 @@ def create_app(
     a fake graph, or a mocked HTTP transport for calls to the backend.
     """
     settings = settings or get_settings()
+    configure_tracing(settings)
 
     # Lifespan: code before `yield` runs once when the server starts, code after `yield`
     # runs once when it shuts down. It's FastAPI's replacement for the old
