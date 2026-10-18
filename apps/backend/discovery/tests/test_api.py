@@ -659,6 +659,22 @@ class TestAccept:
 
         assert DiscoverySource.objects.get().candidates_accepted == 1
 
+    def test_credits_sources_with_lowercase_kinds_from_the_service(self, admin_client):
+        DiscoverySource.objects.create(
+            url="https://juggler.com/", domain="juggler.com", kind="ARTIST_SITE"
+        )
+        candidate = make_candidate(
+            found_via=[
+                {"kind": "artist_site", "url": "https://juggler.com/"},
+                {"kind": "calendar", "url": "https://juggler.com/agenda/"},
+                {"kind": "festival_site", "url": "https://fest.org/"},
+            ]
+        )
+
+        admin_client.post(f"/api/discovery/candidates/{candidate.id}/accept/")
+
+        assert DiscoverySource.objects.get().candidates_accepted == 1
+
 
 @pytest.mark.django_db
 class TestDismissRestore:

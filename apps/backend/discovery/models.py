@@ -128,7 +128,9 @@ class DiscoveryCandidate(models.Model):
     contacts = models.JSONField(default=list, blank=True)
 
     # Evidence. found_via: the path that led here, e.g. search → artist site → calendar → site.
-    # [{"kind": "SEARCH"|"ARTIST_SITE"|"AGGREGATOR"|"ORG_SITE", "url", "title"}]
+    # [{"kind", "url", "title", "snippet"}], kind is one of (lowercase): start, search,
+    # artist_site, aggregator, calendar, org_site, festival_site / residency_site / venue_site,
+    # contact, application.
     found_via = models.JSONField(default=list, blank=True)
     # Pages the facts came from: [{"url", "title", "snippet"}]
     sources = models.JSONField(default=list, blank=True)

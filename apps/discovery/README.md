@@ -9,9 +9,11 @@ the backend's `discovery` Django app (`apps/backend/discovery`), which also hand
 
 See `DISCOVERY_PLAN.md` at the repo root for the full plan.
 
-> **Status:** step 5 of the plan. The service runs the LangGraph workflow (`discovery/graph/`).
-> Set `USE_STUB_GRAPH=true` to run the stub graph instead: it posts a few progress lines and one
-> fake candidate ("Stub festival (run N)") without any LLM or web calls.
+> **Status:** the plan is implemented. The service runs the LangGraph workflow
+> (`discovery/graph/`), superusers use it from the **Discover** page (`/discover`), and it deploys
+> as its own container (see [Deployment](#deployment)). Set `USE_STUB_GRAPH=true` to run the stub
+> graph instead: it posts a few progress lines and one fake candidate ("Stub festival (run N)")
+> without any LLM or web calls.
 
 ## How it fits together
 
@@ -307,6 +309,60 @@ SDK's own models (the SDK uses `httpx2`, which `respx` doesn't intercept), LLM c
 `GenericFakeChatModel`, and `tldextract` uses its bundled suffix list.
 
 Lint and format with `uvx ruff check . && uvx ruff format .`.
+
+## Using it (frontend)
+
+Superusers see **Discover** in the sidebar (everyone else doesn't, and the API answers 403).
+
+1. Type a starting point: a link, a request in plain words, or both, and press **Discover**. The
+   button is disabled while a run is active (one run at a time).
+2. The run panel polls the run every 3 seconds: status, the progress log, the counters and a
+   **Cancel** button. The dropdown above it shows recent runs.
+3. Candidates appear in **To review** (or **Unresolved**) when the run finishes. Each card shows the
+   facts, the **found via** path (each hop links to the page), the sources and the relevance reason.
+   - **Accept** creates a seed and copies it to every user. **Edit name and type** first if needed.
+   - **Dismiss** with a reason; dismissed candidates can be moved back to review.
+
+Frontend code: `app/(main)/discover/page.tsx`, `components/page-components/discover/`,
+`api/discoveryApiService.ts`, `interfaces/entities/Discovery.ts`, and `sidebarItems.ts`.
+
+## Deployment
+
+- **Image:** `apps/discovery/dockerfile` (multi-stage uv build, non-root user, runs
+  `uvicorn discovery.app:app --host 0.0.0.0 --port 8001`, healthcheck on `/health`).
+- **Compose:** the `discovery` service in `apps/backend/docker/docker-compose.yml`. It has no
+  published ports and no nginx route, so only `clapp-network` can reach it. The page cache is the
+  `discovery_cache` volume (`/app/cache`). `BACKEND_URL=http://django:8000` is set in the compose
+  file.
+- **Environment:** the service reads `~/clapp/.env.discovery` (`DISCOVERY_SERVICE_TOKEN`,
+  `MISTRAL_API_KEY`). It's a separate file because `backend-deploy.yml` overwrites `~/clapp/.env`
+  on every deploy. The file is optional for compose: without it the service starts but refuses
+  every run. The backend's `.env` gets `DISCOVERY_SERVICE_URL=http://discovery:8001` and
+  `DISCOVERY_SERVICE_TOKEN` from `backend-deploy.yml`.
+- **GitHub secrets:** `DISCOVERY_SERVICE_TOKEN` (required, same value on both sides) and
+  `DISCOVERY_MISTRAL_API_KEY` (optional; without it the backend's `MISTRAL_API_KEY` is used, so
+  set it if you want discovery's usage tracked separately).
+- **Workflows:**
+  - `discovery-tests.yml`: on pushes and PRs touching `apps/discovery/**`, runs ruff and pytest.
+  - `discovery-deploy.yml`: on pushes to `production` touching `apps/discovery/**`, runs the
+    tests, builds and pushes `clapp_discovery`, writes `.env.discovery` and copies it and the
+    compose file to the server, then `docker compose pull discovery && docker compose up -d
+    discovery`.
+- **First rollout:**
+  1. Add the GitHub secrets.
+  2. Push the `apps/discovery` change to `production` first, so the `clapp_discovery` image exists.
+  3. Then deploy the backend change that adds `discovery` to the compose file. Otherwise the
+     backend deploy's `docker compose pull` fails on the missing image.
+- **Kill switch:** `docker compose stop discovery`. The backend then marks new runs FAILED
+  ("discovery service unreachable"), and the rest of clapp is unaffected.
+
+Build and try the image locally:
+
+```bash
+docker build -f apps/discovery/dockerfile -t clapp_discovery:local apps/discovery
+docker run --rm -p 8001:8001 -e DISCOVERY_SERVICE_TOKEN=change-me clapp_discovery:local
+curl localhost:8001/health
+```
 
 ## Reading a run
 

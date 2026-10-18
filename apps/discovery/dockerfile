@@ -1,0 +1,43 @@
+# Discovery service image. Same multi-stage uv pattern as the backend's.
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS base
+ARG APP_HOME=/app
+
+FROM base AS deps
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV UV_COMPILE_BYTECODE=0
+ENV UV_LINK_MODE=copy
+
+WORKDIR ${APP_HOME}
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+
+FROM base AS run
+WORKDIR ${APP_HOME}
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PATH="/app/.venv/bin:$PATH"
+# The discovery_cache volume is mounted here in production.
+ENV CACHE_DIR=/app/cache
+
+RUN addgroup --system --gid 999 discovery && \
+    adduser --system --uid 999 --gid 999 discovery
+
+# Created (and owned) in the image so a new named volume mounted on it is writable.
+RUN mkdir -p /app/cache && chown -R discovery:discovery /app
+
+COPY --from=deps --chown=discovery:discovery /app/.venv /app/.venv
+RUN find /app/.venv -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+COPY --chown=discovery:discovery discovery ./discovery
+
+USER discovery
+
+EXPOSE 8001
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 \
+    CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=4)"]
+
+CMD ["uvicorn", "discovery.app:app", "--host", "0.0.0.0", "--port", "8001"]

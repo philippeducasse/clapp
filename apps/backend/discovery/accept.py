@@ -131,7 +131,8 @@ def _credit_sources(candidate: DiscoveryCandidate) -> None:
     domains = {
         normalize_domain(step.get("url", ""))
         for step in candidate.found_via
-        if step.get("kind") in DiscoverySource.Kind.values
+        # The service writes kinds in lowercase ("artist_site"); older rows use uppercase.
+        if (step.get("kind") or "").upper() in DiscoverySource.Kind.values
     } - {""}
     if domains:
         DiscoverySource.objects.filter(domain__in=domains).update(

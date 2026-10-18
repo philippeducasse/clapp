@@ -1,0 +1,88 @@
+name: discovery deploy
+
+on:
+  push:
+    branches:
+      - production
+    paths:
+      - "apps/discovery/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/discovery
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run tests
+        run: uv run pytest
+
+  build_and_deploy_image:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build discovery image
+        run: docker build -f apps/discovery/dockerfile -t ${{ secrets.DOCKER_USERNAME }}/clapp_discovery:latest apps/discovery
+
+      - name: Push to registry
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/clapp_discovery:latest
+
+      # A separate file: backend-deploy.yml overwrites ~/clapp/.env on every deploy.
+      # DISCOVERY_MISTRAL_API_KEY is optional; without it the backend's key is used.
+      - name: Prepare .env.discovery file
+        run: |
+          echo "DISCOVERY_SERVICE_TOKEN=${{ secrets.DISCOVERY_SERVICE_TOKEN }}" > .env.discovery
+          echo "MISTRAL_API_KEY=${{ secrets.DISCOVERY_MISTRAL_API_KEY || secrets.MISTRAL_API_KEY }}" >> .env.discovery
+
+      - name: Copy .env.discovery to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".env.discovery"
+          target: "~/clapp/"
+
+      # The compose file defines the discovery service; copy it so this workflow works even if
+      # no backend deploy has shipped it yet.
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "apps/backend/docker/docker-compose.yml"
+          target: "~/clapp/"
+          strip_components: 3
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/clapp
+            docker compose pull discovery
+            docker compose up -d discovery
+            docker image prune -f

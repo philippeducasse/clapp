@@ -1,16 +1,6 @@
-import {
-  Home,
-  Flag,
-  ClipboardEdit,
-  Upload,
-  CircleQuestionMark,
-  University,
-  Theater,
-  Bug,
-  UserRound,
-  Mail,
-} from "lucide-react";
+"use client";
 
+import { useSelector } from "react-redux";
 import {
   Sidebar as ShadcnSidebar,
   SidebarContent,
@@ -23,61 +13,13 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Link from "next/link";
-
-const items = [
-  {
-    title: "Home",
-    url: "/dashboard",
-    icon: Home,
-  },
-  {
-    title: "Festivals",
-    url: "/festivals",
-    icon: Flag,
-  },
-  {
-    title: "Venues",
-    url: "/venues",
-    icon: Theater,
-  },
-  {
-    title: "Residencies",
-    url: "/residencies",
-    icon: University,
-  },
-  {
-    title: "Applications",
-    url: "/applications",
-    icon: ClipboardEdit,
-  },
-  {
-    title: "Inbound emails",
-    url: "/inbound-emails",
-    icon: Mail,
-  },
-  {
-    title: "Report a bug",
-    url: "/report-bug",
-    icon: Bug,
-  },
-  {
-    title: "Help",
-    url: "/help",
-    icon: CircleQuestionMark,
-  },
-  {
-    title: "Upload your data",
-    url: "/upload",
-    icon: Upload,
-  },
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: UserRound,
-  },
-];
+import { selectProfile } from "@/redux/slices/authSlice";
+import { getSidebarItems } from "./sidebarItems";
 
 const Sidebar = () => {
+  const profile = useSelector(selectProfile);
+  const items = getSidebarItems(profile?.isSuperuser);
+
   return (
     <ShadcnSidebar>
       <SidebarContent>
@@ -93,10 +35,10 @@ const Sidebar = () => {
           </SidebarGroupLabel>
           <SidebarGroupContent className="h-full my-6">
             <SidebarMenu className="flex h-full">
-              {items.map((item, index) => (
+              {items.map((item) => (
                 <SidebarMenuItem
                   key={item.title}
-                  className={index == 6 ? `mt-auto` : ""}
+                  className={item.bottom ? "mt-auto" : ""}
                 >
                   <SidebarMenuButton asChild size={"lg"}>
                     <Link href={item.url}>

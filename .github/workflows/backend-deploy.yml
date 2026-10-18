@@ -70,6 +70,8 @@ jobs:
           echo "BREVO_SMTP_PASSWORD=${{ secrets.BREVO_SMTP_PASSWORD }}" >> .env
           echo "IMAP_USERNAME=${{ secrets.IMAP_USERNAME }}" >> .env
           echo "IMAP_PASSWORD=${{ secrets.IMAP_PASSWORD }}" >> .env
+          echo "DISCOVERY_SERVICE_URL=http://discovery:8001" >> .env
+          echo "DISCOVERY_SERVICE_TOKEN=${{ secrets.DISCOVERY_SERVICE_TOKEN }}" >> .env
 
       - name: Get changed files in docker folder
         id: changed-files-docker

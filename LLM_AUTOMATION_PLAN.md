@@ -46,18 +46,12 @@ Mostly built already. Remaining:
 - Make sure `sent_message_id` is saved on send, so header matching works.
 - Optional: move the classifier to LangChain structured output for consistency.
 
-### 4. Discovery scraper (LangGraph)
-A LangGraph workflow, run weekly by a Celery task:
-1. **Generate queries:** turn the profile (discipline, regions, languages) into search queries,
-   e.g. "street theatre festival open call 2027 Belgium".
-2. **Search:** Tavily / Brave / SerpAPI tools, or the existing Mistral web search, plus seed lists (aggregator sites).
-3. **Fetch and clean:** `httpx` + trafilatura, or Playwright for JS-heavy pages.
-4. **Extract:** structured
-   `OrganisationCandidate {name, type, website, country, contact_emails, application_form_url, deadline, dates, relevance_score, evidence}`.
-5. **Dedupe** against existing organisations using `normalize_domain`.
-6. **Save** as `DiscoveredOrganisation` (`PENDING_REVIEW`). Approving one creates an `Organisation`, which then feeds step 2.
-
-Proposal: move `apps/scraper` into the backend as a `discovery/` Django app so it shares models and Celery.
+### 4. Discovery
+Replaced by [`DISCOVERY_PLAN.md`](DISCOVERY_PLAN.md): a superuser-only Discover page, a separate
+`apps/discovery` service (FastAPI + LangGraph) and a thin `discovery` Django app for review. Runs
+start from a starting point (a link, a request in plain words, or both) instead of a weekly Celery
+task, and accepted candidates become seeds shared with every user. How to run and deploy it:
+[`apps/discovery/README.md`](apps/discovery/README.md).
 
 ### 5. Testing and operations
 - Tests use LangChain fake chat models and mocked search/fetch, plus sample `.eml` files and HTML fixtures.
@@ -65,7 +59,7 @@ Proposal: move `apps/scraper` into the backend as a `discovery/` Django app so i
 
 ## Open questions
 1. **LangChain scope:** discovery and drafting only, with inbox classification on plain Mistral? Or everything through LangChain?
-2. **Search provider for discovery:** Tavily, Brave, SerpAPI, or Mistral web search?
+2. **Search provider for discovery:** decided in `DISCOVERY_PLAN.md` (Mistral web search for now).
 3. **Drafting trigger:** all eligible organisations automatically, or only shortlisted ones?
-4. **Scraper location:** move it into the backend as `discovery/`, or keep `apps/scraper` separate?
+4. **Scraper location:** decided in `DISCOVERY_PLAN.md` (a separate `apps/discovery` service; `apps/scraper` is left as it is).
 5. **Form-based applications:** also prepare answers for these, or email applications only for now?

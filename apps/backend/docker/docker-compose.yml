@@ -123,10 +123,34 @@ services:
     networks:
       - clapp-network
 
+  # Finds new festivals, residencies and venues (apps/discovery). Only reachable on
+  # clapp-network: no published ports, no nginx route. Kill switch: `docker compose stop
+  # discovery` (the backend then marks new runs FAILED, the rest of clapp is unaffected).
+  discovery:
+    restart: unless-stopped
+    image: ${REGISTRY_URL}/clapp_discovery:latest
+    # Written by discovery-deploy.yml, separate from .env (backend-deploy.yml overwrites it).
+    env_file:
+      - path: .env.discovery
+        required: false
+    environment:
+      - BACKEND_URL=http://django:8000
+      - CACHE_DIR=/app/cache
+    volumes:
+      - discovery_cache:/app/cache
+    networks:
+      - clapp-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+  discovery_cache:
 
 networks:
   clapp-network:
