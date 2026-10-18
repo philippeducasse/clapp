@@ -1,10 +1,12 @@
 # mypy: ignore-errors
 
+import json
 import logging
 import os
 import threading
 
 from mistralai import ConversationResponse, Mistral
+from pydantic import ValidationError
 from rest_framework.exceptions import Throttled
 
 from .rate_limit import check_llm_rate_limit, increment_llm_call_counter
@@ -21,6 +23,7 @@ class MistralClient:
     def __init__(self) -> None:
         self.client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
         self.model = os.getenv("MISTRAL_DEFAULT_MODEL")
+        self.fallback_model = os.getenv("MISTRAL_FALLBACK_MODEL", "mistral-medium-latest")
 
     @property
     def search_agent_id(self) -> str:
@@ -76,14 +79,33 @@ class MistralClient:
             if not allowed:
                 raise Throttled(detail="Daily LLM generation limit reached. Try again tomorrow.")
 
+        try:
+            parsed = self._parse_with(self.model, prompt, response_format)
+        except (json.JSONDecodeError, ValidationError) as e:
+            # Small models occasionally degenerate mid-output under constrained decoding
+            # (e.g. ministral emitting endless tabs, finish_reason="error"), producing
+            # truncated JSON. This is deterministic per prompt, so retry on a stronger model.
+            if not self.fallback_model or self.fallback_model == self.model:
+                raise
+            logger.warning(
+                "Structured output from %s was invalid (%s); retrying with %s",
+                self.model,
+                e,
+                self.fallback_model,
+            )
+            parsed = self._parse_with(self.fallback_model, prompt, response_format)
+
+        if tenant_schema is not None:
+            increment_llm_call_counter(tenant_schema)
+        return parsed
+
+    def _parse_with(self, model: str, prompt: str, response_format):
         response = self.client.chat.parse(
             response_format=response_format,
-            model=self.model,
+            model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0,
         )
-        if tenant_schema is not None:
-            increment_llm_call_counter(tenant_schema)
         return response.choices[0].message.parsed
 
     def search(self, query: str) -> ConversationResponse:

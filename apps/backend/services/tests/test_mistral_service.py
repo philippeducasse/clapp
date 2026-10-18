@@ -1,3 +1,4 @@
+import json
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -235,3 +236,79 @@ class TestMistralClientSearch:
         # Verify that search uses the stored agent
         call_kwargs = mock_client.beta.conversations.start.call_args[1]
         assert call_kwargs["agent_id"] == "agent_xyz"
+
+
+@pytest.mark.django_db
+class TestMistralClientParse:
+    """Tests for MistralClient.parse fallback on malformed structured output."""
+
+    ENV = {
+        "MISTRAL_API_KEY": "test_key",
+        "MISTRAL_DEFAULT_MODEL": "ministral-14b",
+        "MISTRAL_FALLBACK_MODEL": "mistral-medium-latest",
+    }
+
+    @staticmethod
+    def _ok(parsed):
+        return MagicMock(choices=[MagicMock(message=MagicMock(parsed=parsed))])
+
+    @patch("services.mistral_service.increment_llm_call_counter")
+    @patch("services.mistral_service.check_llm_rate_limit", return_value=(True, 10))
+    @patch.dict("os.environ", ENV)
+    @patch("services.mistral_service.Mistral")
+    def test_parse_success_uses_default_model(self, mock_mistral_class, _rl, mock_increment):
+        mock_client = mock_mistral_class.return_value
+        mock_client.chat.parse.return_value = self._ok("result")
+
+        assert MistralClient().parse("p", object, tenant_schema="t") == "result"
+        mock_client.chat.parse.assert_called_once()
+        assert mock_client.chat.parse.call_args[1]["model"] == "ministral-14b"
+        mock_increment.assert_called_once_with("t")
+
+    @patch("services.mistral_service.increment_llm_call_counter")
+    @patch("services.mistral_service.check_llm_rate_limit", return_value=(True, 10))
+    @patch.dict("os.environ", ENV)
+    @patch("services.mistral_service.Mistral")
+    def test_parse_falls_back_on_invalid_json(self, mock_mistral_class, _rl, mock_increment):
+        mock_client = mock_mistral_class.return_value
+        mock_client.chat.parse.side_effect = [
+            json.JSONDecodeError("Expecting ',' delimiter", '{"a": 1\t\t\t', 7),
+            self._ok("fallback result"),
+        ]
+
+        assert MistralClient().parse("p", object, tenant_schema="t") == "fallback result"
+        models = [c[1]["model"] for c in mock_client.chat.parse.call_args_list]
+        assert models == ["ministral-14b", "mistral-medium-latest"]
+        mock_increment.assert_called_once_with("t")
+
+    @patch("services.mistral_service.increment_llm_call_counter")
+    @patch.dict("os.environ", ENV)
+    @patch("services.mistral_service.Mistral")
+    def test_parse_raises_when_fallback_also_fails(self, mock_mistral_class, mock_increment):
+        mock_client = mock_mistral_class.return_value
+        mock_client.chat.parse.side_effect = json.JSONDecodeError("bad", "{", 1)
+
+        with pytest.raises(json.JSONDecodeError):
+            MistralClient().parse("p", object)
+        assert mock_client.chat.parse.call_count == 2
+        mock_increment.assert_not_called()
+
+    @patch.dict("os.environ", {**ENV, "MISTRAL_FALLBACK_MODEL": "ministral-14b"})
+    @patch("services.mistral_service.Mistral")
+    def test_parse_no_retry_when_fallback_equals_default(self, mock_mistral_class):
+        mock_client = mock_mistral_class.return_value
+        mock_client.chat.parse.side_effect = json.JSONDecodeError("bad", "{", 1)
+
+        with pytest.raises(json.JSONDecodeError):
+            MistralClient().parse("p", object)
+        mock_client.chat.parse.assert_called_once()
+
+    @patch.dict("os.environ", ENV)
+    @patch("services.mistral_service.Mistral")
+    def test_parse_does_not_retry_on_api_error(self, mock_mistral_class):
+        mock_client = mock_mistral_class.return_value
+        mock_client.chat.parse.side_effect = RuntimeError("network down")
+
+        with pytest.raises(RuntimeError):
+            MistralClient().parse("p", object)
+        mock_client.chat.parse.assert_called_once()
