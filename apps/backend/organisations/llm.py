@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from mistralai import ConversationResponse, TextChunk
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from organisations.models import Organisation
 from performances.models import Performance
@@ -16,13 +16,29 @@ class EnrichedContact(BaseModel):
     role: Optional[str] = None
 
 
+def _require_all_properties(schema: Dict[str, Any]) -> None:
+    # Under constrained decoding, keys missing from "required" may be skipped entirely,
+    # and the model tends to drop long free-text fields like description. Force every key
+    # to be emitted (still nullable); Python-side defaults stay for partial construction.
+    schema["required"] = list(schema.get("properties", {}))
+
+
 class OrganisationEnrichment(BaseModel):
     """Structured output for the enrichment LLM call. Subclassed per organisation type."""
+
+    # Inherited by subclasses, so their extra fields are required in the schema too.
+    model_config = ConfigDict(json_schema_extra=_require_all_properties)
 
     country: Optional[str] = None
     town: Optional[str] = None
     website_url: Optional[str] = None
-    description: Optional[str] = None
+    description: Optional[str] = Field(
+        default=None,
+        description=(
+            "A 1-3 sentence English summary of the organisation (what it is, what it programmes, "
+            "where). Keep the current description if the snippets add nothing new."
+        ),
+    )
     comments: Optional[str] = None
     contacts: List[EnrichedContact] = Field(
         default_factory=list,
