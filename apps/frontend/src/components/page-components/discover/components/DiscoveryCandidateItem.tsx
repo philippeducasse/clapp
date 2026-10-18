@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, ChevronDown, ExternalLink, Pencil, Undo2, X } from "lucide-react";
+import { Check, ChevronDown, ExternalLink, Globe, Pencil, Search, Undo2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -32,8 +32,10 @@ import {
   candidateDates,
   candidateLocation,
   hopLabel,
+  normalizeWebsiteUrl,
   ORG_TYPE_LABELS,
   seedUrl,
+  websiteSearchUrl,
 } from "../helpers/discoveryLabels";
 
 interface DiscoveryCandidateItemProps {
@@ -52,6 +54,7 @@ const DiscoveryCandidateItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(candidate.name);
   const [orgType, setOrgType] = useState<DiscoveryOrgType>(candidate.orgType);
+  const [website, setWebsite] = useState(candidate.websiteUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const reviewable =
@@ -61,6 +64,8 @@ const DiscoveryCandidateItem = ({
   const applicationDates = candidateApplicationDates(candidate);
   const location = candidateLocation(candidate);
   const acceptedUrl = seedUrl(candidate);
+  const normalizedWebsite = normalizeWebsiteUrl(website);
+  const websiteInvalid = isEditing && normalizedWebsite === null;
 
   const run = async (action: () => Promise<void>) => {
     setIsSubmitting(true);
@@ -77,6 +82,9 @@ const DiscoveryCandidateItem = ({
     const changes: AcceptOverrides = {};
     if (name.trim() && name.trim() !== candidate.name) changes.name = name.trim();
     if (orgType !== candidate.orgType) changes.orgType = orgType;
+    if (normalizedWebsite !== null && normalizedWebsite !== candidate.websiteUrl) {
+      changes.websiteUrl = normalizedWebsite;
+    }
     return changes;
   };
 
@@ -114,7 +122,22 @@ const DiscoveryCandidateItem = ({
               </span>
             </p>
           )}
-          {candidate.websiteUrl && (
+          {isEditing ? (
+            <div className="space-y-1">
+              <Input
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+                placeholder="Website, e.g. https://festival.org"
+                className="w-full max-w-xl"
+                aria-label="Website"
+                aria-invalid={websiteInvalid}
+                inputMode="url"
+              />
+              {websiteInvalid && (
+                <p className="text-sm text-red-700">Enter a web address, like festival.org.</p>
+              )}
+            </div>
+          ) : candidate.websiteUrl ? (
             <a
               href={candidate.websiteUrl}
               target="_blank"
@@ -122,6 +145,18 @@ const DiscoveryCandidateItem = ({
               className="text-primary hover:underline text-sm inline-flex items-center gap-1 break-all"
             >
               {candidate.websiteUrl} <ExternalLink className="h-3 w-3" />
+            </a>
+          ) : (
+            <p className="text-sm text-muted-foreground">No website found.</p>
+          )}
+          {reviewable && !candidate.websiteUrl && (
+            <a
+              href={websiteSearchUrl(candidate)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline text-sm inline-flex items-center gap-1"
+            >
+              <Search className="h-3 w-3" /> Search the web for it
             </a>
           )}
         </div>
@@ -212,7 +247,7 @@ const DiscoveryCandidateItem = ({
           <>
             <Button
               size="sm"
-              disabled={isSubmitting || (isEditing && !name.trim())}
+              disabled={isSubmitting || (isEditing && (!name.trim() || websiteInvalid))}
               onClick={() => run(() => onAccept(candidate, overrides()))}
             >
               <Check /> Accept
@@ -224,7 +259,15 @@ const DiscoveryCandidateItem = ({
                 disabled={isSubmitting}
                 onClick={() => setIsEditing(true)}
               >
-                <Pencil /> Edit name and type
+                {candidate.websiteUrl ? (
+                  <>
+                    <Pencil /> Edit
+                  </>
+                ) : (
+                  <>
+                    <Globe /> Add website
+                  </>
+                )}
               </Button>
             )}
             <DropdownMenu>

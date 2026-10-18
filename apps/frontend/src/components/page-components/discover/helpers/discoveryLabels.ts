@@ -54,6 +54,31 @@ export const seedUrl = (candidate: DiscoveryCandidate): string | null =>
 export const candidateLocation = (candidate: DiscoveryCandidate): string =>
   [candidate.town, candidate.country].filter(Boolean).join(", ");
 
+/**
+ * A website typed by the reviewer, ready for the backend: "" when blank, `null` when it isn't a
+ * usable http(s) address. Adds "https://" when the scheme is missing ("fest.be" → "https://fest.be").
+ */
+export const normalizeWebsiteUrl = (input: string): string | null => {
+  const value = input.trim();
+  if (!value) return "";
+  const withScheme = /^[a-z][a-z\d+.-]*:/i.test(value) ? value : `https://${value}`;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== "http:" && url.protocol !== "https:") return null;
+    // A host without a dot ("https://festival") is a typo, not a website.
+    if (!url.hostname.includes(".") || url.hostname.endsWith(".")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+};
+
+/** A web search for the candidate's own site: name, town and country. */
+export const websiteSearchUrl = (candidate: DiscoveryCandidate): string => {
+  const query = [candidate.name, candidate.town, candidate.country].filter(Boolean).join(" ");
+  return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+};
+
 /** "11 Jun 2027 – 13 Jun 2027", or the approximate date, or "". */
 export const candidateDates = (candidate: DiscoveryCandidate): string => {
   const format = (value: string) =>

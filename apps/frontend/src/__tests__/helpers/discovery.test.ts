@@ -5,7 +5,9 @@ import {
   candidateDates,
   foundViaSummary,
   hopLabel,
+  normalizeWebsiteUrl,
   seedUrl,
+  websiteSearchUrl,
 } from "@/components/page-components/discover/helpers/discoveryLabels";
 import {
   DiscoveryCandidate,
@@ -101,6 +103,45 @@ describe("discovery labels", () => {
     expect(candidateDates(candidate())).toBe("");
     expect(candidateApplicationDates(candidate({ applicationDateEnd: "2027-01-31" }))).toBe(
       "until 2027-01-31",
+    );
+  });
+});
+
+describe("normalizeWebsiteUrl", () => {
+  it("keeps a full address", () => {
+    expect(normalizeWebsiteUrl("https://www.fest.be/en")).toBe("https://www.fest.be/en");
+    expect(normalizeWebsiteUrl("http://fest.be/")).toBe("http://fest.be/");
+  });
+
+  it("adds https:// when the scheme is missing and trims spaces", () => {
+    expect(normalizeWebsiteUrl("  fest.be ")).toBe("https://fest.be/");
+    expect(normalizeWebsiteUrl("www.fest.be/agenda")).toBe("https://www.fest.be/agenda");
+  });
+
+  it("returns an empty string for a blank value", () => {
+    expect(normalizeWebsiteUrl("")).toBe("");
+    expect(normalizeWebsiteUrl("   ")).toBe("");
+  });
+
+  it("rejects what isn't a web address", () => {
+    expect(normalizeWebsiteUrl("festival")).toBeNull();
+    expect(normalizeWebsiteUrl("not a url")).toBeNull();
+    expect(normalizeWebsiteUrl("mailto:info@fest.be")).toBeNull();
+    expect(normalizeWebsiteUrl("javascript:alert(1)")).toBeNull();
+    expect(normalizeWebsiteUrl("ftp://fest.be")).toBeNull();
+  });
+});
+
+describe("websiteSearchUrl", () => {
+  it("searches for the name, town and country", () => {
+    expect(websiteSearchUrl(candidate({ name: "Fête & Co" }))).toBe(
+      "https://www.google.com/search?q=F%C3%AAte%20%26%20Co%20Namur%20Belgium",
+    );
+  });
+
+  it("skips missing parts", () => {
+    expect(websiteSearchUrl(candidate({ town: "", country: "" }))).toBe(
+      "https://www.google.com/search?q=Fest",
     );
   });
 });

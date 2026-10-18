@@ -179,6 +179,8 @@ const DiscoverPage = () => {
               runs={runs}
               onSelectRun={handleSelectRun}
               onCancel={handleCancel}
+              onRerun={(target) => handleStart(target.startingPoint)}
+              rerunDisabled={hasActiveRun}
             />
           )}
         </CardContent>
