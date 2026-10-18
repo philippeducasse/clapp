@@ -21,8 +21,8 @@ from urllib.robotparser import RobotFileParser
 import diskcache
 import httpx
 import lxml.html
-from lxml import etree
 import trafilatura
+from lxml import etree
 from pydantic import BaseModel
 
 from discovery.config import Settings
@@ -263,6 +263,8 @@ def _extract(html: str, url: str) -> tuple[str, str]:
     if not html.strip():
         return "", title
     text = (
+        # get main text from the page, excluding headers, navigation, footers, etc. input: raw HTML, output: text.
+        # client side rendered pages will show nothing here.
         trafilatura.extract(
             html,
             url=url,
