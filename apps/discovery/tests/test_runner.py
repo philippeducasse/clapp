@@ -135,3 +135,20 @@ async def test_known_index_and_sources(settings):
         assert saved == 1
         assert sources.calls.last.request.headers["Authorization"] == "Bearer test-token"
         await backend_client.aclose()
+
+
+async def test_errors_plan_and_notes_are_reported(client, settings, backend):
+    async def graph(ctx):
+        await ctx.set_plan({"goal": "g"})
+        await ctx.report_error("visit_page", "https://x.org: robots")
+        ctx.add_note("budget reached: pages")
+        ctx.add_note("budget reached: pages")
+
+    runner = Runner(client, settings, graph)
+    runner.start(3, "x")
+    await runner.wait()
+
+    assert backend.plan == {"goal": "g"}
+    assert backend.errors == ["visit_page: https://x.org: robots"]
+    assert backend.updates[-1]["status"] == "DONE"
+    assert backend.messages[-1] == "Run finished (budget reached: pages)."

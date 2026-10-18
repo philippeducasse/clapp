@@ -4,6 +4,7 @@ import httpx
 import pytest
 
 from discovery.app import create_app
+from discovery.runner import stub_graph
 from tests.conftest import TOKEN
 
 
@@ -64,7 +65,7 @@ async def test_start_run_validates_body(make_client, backend):
 
 
 async def test_start_run_returns_202_and_runs_stub_graph(make_client, backend):
-    client, runner = await make_client()
+    client, runner = await make_client(graph=stub_graph)
     response = await client.post(
         "/runs", json={"run_id": 7, "starting_point": "https://some-juggler.com"}, headers=AUTH
     )
@@ -111,3 +112,12 @@ async def test_shutdown_reports_active_run_as_failed(settings, backend):
 
     assert backend.statuses == ["RUNNING", "FAILED"]
     assert "shutting down" in backend.updates[-1]["progress"][0]["message"]
+
+
+async def test_graph_selection(settings, backend):
+    from discovery.graph.build import discovery_graph
+
+    for use_stub, expected in ((False, discovery_graph), (True, stub_graph)):
+        app = create_app(settings.model_copy(update={"use_stub_graph": use_stub}))
+        async with app.router.lifespan_context(app):
+            assert app.state.runner.graph is expected

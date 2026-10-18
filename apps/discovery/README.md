@@ -9,10 +9,9 @@ the backend's `discovery` Django app (`apps/backend/discovery`), which also hand
 
 See `DISCOVERY_PLAN.md` at the repo root for the full plan.
 
-> **Status:** step 4 of the plan. The tools the graph will use (LLM models and budget, search,
-> fetching, links, known-index matching, verification) exist and are tested, but the service still
-> runs the **stub graph**: it posts a few progress lines and one fake candidate ("Stub festival
-> (run N)"), then finishes. The real graph comes in step 5.
+> **Status:** step 5 of the plan. The service runs the LangGraph workflow (`discovery/graph/`).
+> Set `USE_STUB_GRAPH=true` to run the stub graph instead: it posts a few progress lines and one
+> fake candidate ("Stub festival (run N)") without any LLM or web calls.
 
 ## How it fits together
 
@@ -58,15 +57,31 @@ discovery/
     links.py         extract_links (same site), rank_links (multilingual keywords per goal)
     known.py         KnownIndex: is a lead already in clapp? (domain, registrable domain, fuzzy name)
     verify.py        blocklisted hosts, extract_emails, SeenContent + verified_emails/url/website
+  prompts/           one module per LLM call: output schema + messages()
+    interpret.py     plain-words request → goal, org types, countries, search queries
+    classify.py      ARTIST_SITE | ORG_SITE | AGGREGATOR | IRRELEVANT
+    pick_link.py     link numbers to follow (navigate's fallback)
+    pick_website.py  number of the official site among search results
+    extract_leads.py organisations named on a calendar or listing page
+    extract_org.py   the candidate's facts (date / application rules copied from the backend)
+  graph/
+    build.py         the main graph, run_discovery(), discovery_graph (what the app runs)
+    state.py         DiscoveryState, PageTask, Lead, add_hop
+    deps.py          Deps (tools + run-wide bookkeeping, the LangGraph runtime context), guarded
+    navigate.py      navigate(goal): keyword ranking, then LLM picks link numbers
+    leads.py         same organisation?, country filter, merging leads and candidates
+    research_org.py  the per-lead subgraph and build_candidate (verification)
+    nodes/           explore.py, check_known.py, finish.py
 tests/
   conftest.py        settings fixture, FakeBackend (respx mock of /internal/discovery/*), fixture loaders
   fixtures/          saved HTML pages (artist home, calendar, festival contact, JavaScript-only page)
   test_app.py        HTTP endpoints: token, 202/409/422, shutdown
   test_runner.py     run lifecycle: DONE / CANCELLED / FAILED, backend client errors
   test_llm.py, test_search.py, test_fetch.py, test_links.py, test_known.py, test_verify.py
+  graph_fakes.py     ScriptedChatModel, FakeSearch, FakeWeb (respx)
+  test_graph_nodes.py  each node on its own
+  test_graph_e2e.py  the whole graph on a small fake web (tests/fixtures/web/)
 ```
-
-Coming in step 5: `prompts/` and `graph/` (the LangGraph workflow that replaces `stub_graph`).
 
 ## Tools (step 4)
 
@@ -98,6 +113,82 @@ Coming in step 5: `prompts/` and `graph/` (the LangGraph workflow that replaces 
   found in text, `mailto:` links and simple `[at]`/`(dot)` obfuscation. `is_blocklisted` covers
   social networks, ticketing and listing sites, encyclopedias, news and file hosting: these are
   never an organisation's `website_url`.
+
+## The graph (step 5)
+
+```
+START
+ → interpret_start   URL(s) → pages to visit; plain words → LLM {goal, org_types, countries,
+                     queries}; both → both, and the request text becomes the goal
+ → load_known        GET known-index/
+ → search            (only if there are queries) result pages join the pages to visit
+ → visit_page ◄────────────────────────────────────────────┐
+ → classify_page     ARTIST_SITE  → find_calendar → extract_leads ┤
+                     AGGREGATOR   → extract_leads ─────────────────┤
+                     ORG_SITE     → add_org_lead ──────────────────┤
+                     IRRELEVANT   ─────────────────────────────────┘
+   (until no pages are left or exploring has used its share of the budget)
+ → check_known       drop leads clapp already has; keep up to MAX_LEADS missing ones
+ → research_org × each missing lead, in parallel (Send; RESEARCH_CONCURRENCY at a time)
+      resolve_website  no URL? search "{name} {town} {year}", LLM picks a result by number;
+                       a site clapp already has ends the research
+      visit_site       the site + navigate("contact", "application"), up to 2 more pages
+      extract_org      structured facts
+      verify           build_candidate: keep only what the fetched pages show
+ → dedupe_candidates  merge duplicates; drop any clapp has under the researched name/site
+ → save               POST candidates (one by one if the batch is refused) and sources
+END
+```
+
+**Rules every node follows**
+
+- It posts a short progress line, which is also the heartbeat. A reply with `cancel_requested`
+  raises `RunCancelled`, which goes straight through the graph: the run ends `CANCELLED` and
+  nothing is saved.
+- It catches its own errors (`guarded` in `graph/deps.py`): they're posted to the run's `errors`
+  and the node carries on with what it has, so one broken site doesn't stop the run. Backend
+  errors are the exception: without the backend nothing can be saved, so the run fails.
+- `BudgetExceeded` stops the part of the work that hit it. The candidates found so far are still
+  saved and the run ends `DONE` with "budget reached: …" in the final line.
+
+**Budget**
+
+- Exploring (visiting pages, classifying, reading calendars) may use `EXPLORE_SHARE` (half) of the
+  page and LLM-call budgets, so researching the leads always has something left.
+- A page is fetched, and counted, once per run (`Deps.fetch` remembers pages and failures).
+- `navigate` follows at most `MAX_HOPS_PER_SITE` links per site over the whole run.
+- `recursion_limit` (`MAX_PAGES × 5 + 30` steps) is a safety net against loops.
+
+**What the LLM is never trusted with**
+
+- URLs: links are always picked **by number** from a list the workflow built (`navigate`,
+  `extract_leads`, `resolve_website`). An extracted `application_url` is kept only if it appears
+  on the organisation's pages.
+- Emails: kept only if they appear on the pages fetched for that organisation. With no extracted
+  contacts, up to 3 emails of the site's own domain found on those pages are used instead.
+- Choices: `subtype` and `application_type` must be one of the backend's choices for that type;
+  dates must be ISO. Anything else is dropped.
+- Web content is wrapped in `<page>` tags and the prompts say it's data, not instructions.
+
+**PENDING or UNRESOLVED.** A candidate needs a name and either a website that could be read or a
+verified email. Otherwise it's saved as `UNRESOLVED`, and `relevance_reason` starts with "Could
+not research: …" (no website found, site unreachable, JavaScript-only…). A lead skipped because
+the budget ran out before anything was fetched is **not** saved (the known-index includes every
+candidate, so it would never be proposed again); its name appears in the progress log.
+
+**found_via and sources.** `found_via` is the path to the organisation, one hop per page:
+`start` / `search` → `artist_site` | `aggregator` → `calendar` → `festival_site` (or
+`residency_site`, `venue_site`, `org_site`) → `contact` / `application`. A hop to the same page as
+the previous one replaces it, so a search result that turns out to be an artist site is one hop
+(`artist_site`, with the query in `snippet`). `sources` lists the pages the facts came from: the
+listing page and the organisation's pages, with the first 300 characters of each.
+
+**Counters** posted with every progress line: `pages`, `searches`, `llm_calls` (spent),
+`leads` (found while exploring), `leads_missing` (not in clapp), `candidates` (saved).
+
+**Defaults.** A starting point with only links looks for festivals (`org_types: ["FESTIVAL"]`).
+A plain-words request gets up to 5 search queries (`min(5, MAX_SEARCHES / 2)`); the rest of the
+search budget is for finding websites of leads.
 
 ## What happens at runtime
 
@@ -148,9 +239,12 @@ Then run the backend as usual (`uv run python manage.py migrate && uv run python
 
 - `curl localhost:8001/health` should return `{"status": "ok", "active_run": null}`.
 - http://localhost:8001/docs shows the interactive API docs.
-- As a superuser, `POST /api/discovery/runs/ {"starting_point": "..."}` on the backend should reach `DONE`
-  within a second or two, and the stub candidate should appear in `GET /api/discovery/candidates/`.
-  Dismiss it afterwards.
+- With `USE_STUB_GRAPH=true`: as a superuser, `POST /api/discovery/runs/ {"starting_point": "..."}`
+  on the backend should reach `DONE` within a second or two, and the stub candidate should appear
+  in `GET /api/discovery/candidates/`. Dismiss it afterwards.
+- With the real graph (needs `MISTRAL_API_KEY`): start a run from an artist's website and follow
+  `GET /api/discovery/runs/{id}/`'s `progress`. Lower `MAX_PAGES` / `MAX_LLM_CALLS` while trying
+  things out.
 
 **Notes:**
 
@@ -180,6 +274,9 @@ Then run the backend as usual (`uv run python manage.py migrate && uv run python
 | `MAX_SEARCHES` | `15` | Per-run limit |
 | `MAX_LEADS` | `25` | Per-run limit: missing organisations researched |
 | `MAX_HOPS_PER_SITE` | `3` | Per-run limit: links followed per site |
+| `EXPLORE_SHARE` | `0.5` | Share of the page and LLM-call budgets exploring may use; the rest is for research |
+| `RESEARCH_CONCURRENCY` | `4` | Leads researched at the same time |
+| `USE_STUB_GRAPH` | `false` | Run the stub graph (one fake candidate, no LLM or web calls) |
 | `LANGSMITH_TRACING`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT` | off | Optional LangSmith tracing |
 
 Generate a token with `python -c "import secrets; print(secrets.token_urlsafe(32))"`.
@@ -194,6 +291,15 @@ The backend is never contacted. `tests/conftest.py`'s `FakeBackend` intercepts t
 calls with `respx`, records what the service sent (`updates`, `candidates`, `statuses`, `steps`) and
 answers like the backend. Set `cancel_after_updates` to simulate a cancel. The app tests run the
 real `lifespan` and call the app in-process through `httpx.ASGITransport`.
+
+The graph tests (`test_graph_nodes.py`, `test_graph_e2e.py`) use `tests/graph_fakes.py`:
+`ScriptedChatModel` is a LangChain chat model whose answers come from a Python function of
+(purpose, prompt), and goes through LangChain's callbacks so the budget counts it; `FakeSearch`
+answers from a dict; `FakeWeb` serves `tests/fixtures/web/` with `respx` (anything else is a 404).
+The end-to-end test runs an artist site → a calendar with 4 festivals, 2 already known → the 2
+festival sites and their contact pages, and checks the posted candidates, `found_via` paths,
+verified emails, sources and counters; other cases cover a broken site, the page and LLM budgets,
+a cancel, a plain-words request, and a batch the backend refuses.
 
 The tool tests never touch the network either: web pages are served by `respx` from
 `tests/fixtures/`, the Mistral search client is replaced by a fake whose responses are parsed by the

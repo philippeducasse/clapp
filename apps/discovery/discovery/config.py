@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     max_searches: int = Field(default=15, ge=0)
     max_leads: int = Field(default=25, ge=0)
     max_hops_per_site: int = Field(default=3, ge=0)
+    # Share of the page and LLM-call budgets that exploring (visiting the starting point and search
+    # results, reading calendars) may use; the rest is kept for researching the leads.
+    explore_share: float = Field(default=0.5, gt=0, le=1)
+    # Leads researched at the same time.
+    research_concurrency: int = Field(default=4, ge=1)
+    # Run the stub graph (one fake candidate, no LLM or web calls) instead of the real one.
+    use_stub_graph: bool = False
 
     # LangSmith reads its own LANGSMITH_* variables; these are here so they show up in one place.
     langsmith_tracing: bool = False

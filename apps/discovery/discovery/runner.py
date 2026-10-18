@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 from discovery.backend_client import (
     BackendClient,
@@ -40,13 +41,34 @@ class RunContext:
         self.backend = backend
         self.settings = settings
         self.counters: dict[str, int] = dict.fromkeys(COUNTER_NAMES, 0)
+        # Short remarks added to the final "Run finished." line, e.g. "budget reached (pages)".
+        self.notes: list[str] = []
 
     async def progress(self, step: str, message: str) -> None:
         """Post a progress line (also the heartbeat). Raises RunCancelled if we should stop."""
+        await self._update(step, message)
+
+    async def report_error(self, step: str, message: str) -> None:
+        """Post a problem that didn't stop the run: a progress line plus an entry in `errors`."""
+        logger.info("Run %s: %s: %s", self.run_id, step, message)
+        await self._update(step, message, errors=[f"{step}: {message}"[:1000]])
+
+    async def set_plan(self, plan: dict[str, Any]) -> None:
+        """Record how the starting point was interpreted."""
+        result = await self.backend.update_run(self.run_id, plan=plan, counters=self.counters)
+        if result.cancel_requested:
+            raise RunCancelled()
+
+    def add_note(self, note: str) -> None:
+        if note not in self.notes:
+            self.notes.append(note)
+
+    async def _update(self, step: str, message: str, errors: list[str] | None = None) -> None:
         result = await self.backend.update_run(
             self.run_id,
-            progress=[ProgressLine(step=step, message=message)],
+            progress=[ProgressLine(step=step, message=message[:1000])],
             counters=self.counters,
+            errors=errors,
         )
         if result.cancel_requested:
             raise RunCancelled()
@@ -140,7 +162,8 @@ class Runner:
             logger.exception("Run %s failed", ctx.run_id)
             await self._finish(ctx, "FAILED", f"Run failed: {exc}", error=str(exc) or repr(exc))
         else:
-            await self._finish(ctx, "DONE", "Run finished.")
+            notes = f" ({'; '.join(ctx.notes)})" if ctx.notes else ""
+            await self._finish(ctx, "DONE", f"Run finished{notes}.")
 
     async def _finish(
         self, ctx: RunContext, status: RunStatus, message: str, error: str | None = None

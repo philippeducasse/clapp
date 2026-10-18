@@ -35,6 +35,7 @@ from pydantic import BaseModel, Field
 
 from discovery.backend_client import BackendClient
 from discovery.config import Settings, get_settings
+from discovery.graph.build import discovery_graph
 from discovery.llm import configure_tracing
 from discovery.runner import Graph, Runner, RunnerBusy, stub_graph
 
@@ -79,16 +80,19 @@ bearer = HTTPBearer(auto_error=False)
 
 def create_app(
     settings: Settings | None = None,
-    graph: Graph = stub_graph,
+    graph: Graph | None = None,
     backend_transport: httpx.AsyncBaseTransport | None = None,
 ) -> FastAPI:
     """Build the FastAPI application.
 
     A factory (rather than a module-level app only) so tests can pass their own settings,
-    a fake graph, or a mocked HTTP transport for calls to the backend.
+    a fake graph, or a mocked HTTP transport for calls to the backend. Without a graph, the
+    LangGraph workflow runs (or the stub graph when USE_STUB_GRAPH is set).
     """
     settings = settings or get_settings()
     configure_tracing(settings)
+    if graph is None:
+        graph = stub_graph if settings.use_stub_graph else discovery_graph
 
     # Lifespan: code before `yield` runs once when the server starts, code after `yield`
     # runs once when it shuts down. It's FastAPI's replacement for the old
