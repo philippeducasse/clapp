@@ -2,14 +2,21 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from discovery.prompts import ABOUT_CLAPP, UNTRUSTED_CONTENT, Message, OrgType, page_block
+from discovery.prompts import (
+    LLMOutput,
+    ABOUT_CLAPP,
+    UNTRUSTED_CONTENT,
+    Message,
+    OrgType,
+    page_block,
+)
 
 PageKind = Literal["ARTIST_SITE", "ORG_SITE", "AGGREGATOR", "IRRELEVANT"]
 
 
-class PageClassification(BaseModel):
+class PageClassification(LLMOutput):
     kind: PageKind
     lists_events: bool = Field(
         default=False,

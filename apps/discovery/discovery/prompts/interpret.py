@@ -1,11 +1,11 @@
 """interpret_start: turn a plain-words request into a goal, organisation types and search queries."""
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from discovery.prompts import ABOUT_CLAPP, Message, OrgType
+from discovery.prompts import LLMOutput, ABOUT_CLAPP, Message, OrgType
 
 
-class Interpretation(BaseModel):
+class Interpretation(LLMOutput):
     goal: str = Field(description="One sentence: what the research should find.")
     org_types: list[OrgType] = Field(
         default_factory=list,

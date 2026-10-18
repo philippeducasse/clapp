@@ -22,6 +22,15 @@ if DB_ENGINE == "django.db.backends.sqlite3":
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "data" / "db.sqlite3",
+            # The discovery service sends concurrent writes (progress PATCHes). With SQLite's
+            # default DEFERRED transactions, a read-then-write (select_for_update is a no-op on
+            # SQLite) fails at once with "database is locked". IMMEDIATE takes the write lock up
+            # front and waits up to `timeout` seconds; WAL lets reads run alongside a write.
+            "OPTIONS": {
+                "transaction_mode": "IMMEDIATE",
+                "timeout": 20,
+                "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+            },
         }
     }
 else:

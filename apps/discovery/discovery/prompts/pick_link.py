@@ -1,8 +1,8 @@
 """navigate: pick links by number when keyword ranking finds no clear match."""
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from discovery.prompts import UNTRUSTED_CONTENT, Message
+from discovery.prompts import LLMOutput, UNTRUSTED_CONTENT, Message
 from discovery.tools.links import Goal, Link
 
 GOAL_DESCRIPTIONS: dict[Goal, str] = {
@@ -14,7 +14,7 @@ GOAL_DESCRIPTIONS: dict[Goal, str] = {
 }
 
 
-class LinkChoice(BaseModel):
+class LinkChoice(LLMOutput):
     numbers: list[int] = Field(
         default_factory=list,
         description="Numbers of the links to follow, best first. Empty if none fits.",

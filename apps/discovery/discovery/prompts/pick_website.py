@@ -1,12 +1,12 @@
 """resolve_website: pick an organisation's official site from search results, by number."""
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from discovery.prompts import UNTRUSTED_CONTENT, Message
+from discovery.prompts import LLMOutput, UNTRUSTED_CONTENT, Message
 from discovery.tools.search import SearchHit
 
 
-class WebsiteChoice(BaseModel):
+class WebsiteChoice(LLMOutput):
     number: int | None = Field(
         default=None,
         description="Number of the organisation's official website, or null if none is.",

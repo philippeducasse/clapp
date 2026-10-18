@@ -12,6 +12,8 @@ class DiscoveryServiceError(Exception):
 
 def start_run(run: DiscoveryRun) -> None:
     """Ask the service to start exploring. Returns once the service has accepted the run."""
+    if not settings.DISCOVERY_SERVICE_TOKEN:
+        raise DiscoveryServiceError("DISCOVERY_SERVICE_TOKEN is not set on the backend.")
     try:
         response = httpx.post(
             f"{settings.DISCOVERY_SERVICE_URL.rstrip('/')}/runs",

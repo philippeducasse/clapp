@@ -1,12 +1,20 @@
 """extract_leads: list the organisations named on a calendar or listing page."""
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
-from discovery.prompts import ABOUT_CLAPP, UNTRUSTED_CONTENT, Message, OrgType, clip, page_block
+from discovery.prompts import (
+    LLMOutput,
+    ABOUT_CLAPP,
+    UNTRUSTED_CONTENT,
+    Message,
+    OrgType,
+    clip,
+    page_block,
+)
 from discovery.tools.links import Link
 
 
-class LeadOut(BaseModel):
+class LeadOut(LLMOutput):
     name: str = Field(description="Name of the festival, residency or venue, as on the page.")
     org_type: OrgType
     town: str = ""
@@ -19,7 +27,7 @@ class LeadOut(BaseModel):
     )
 
 
-class LeadList(BaseModel):
+class LeadList(LLMOutput):
     leads: list[LeadOut] = Field(default_factory=list)
 
 

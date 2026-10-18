@@ -8,7 +8,26 @@ instructions, so a page can't steer the workflow. The LLM never writes a URL the
 visits: links are always picked by number from a list the workflow built.
 """
 
-from typing import Literal
+from typing import Any, Literal
+
+from pydantic import BaseModel, model_validator
+
+
+class LLMOutput(BaseModel):
+    """Base for structured-output schemas.
+
+    Models often answer `null` for a field they have nothing for, even when the schema says it's
+    a string with a default. Dropping `null`s lets the field default apply instead of failing the
+    whole answer (one lead with `"town": null` would otherwise lose every lead on the page).
+    """
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drop_nulls(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if v is not None}
+        return data
+
 
 OrgType = Literal["FESTIVAL", "RESIDENCY", "VENUE"]
 ORG_TYPES: tuple[OrgType, ...] = ("FESTIVAL", "RESIDENCY", "VENUE")

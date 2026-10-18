@@ -5,9 +5,10 @@ The date and application-type rules are copied from the backend's enrichment pro
 come out in the same formats as `enrich()` produces. Keep them in sync.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from discovery.prompts import (
+    LLMOutput,
     ABOUT_CLAPP,
     FESTIVAL_APPLICATION_TYPES,
     FESTIVAL_TYPES,
@@ -20,13 +21,13 @@ from discovery.prompts import (
 )
 
 
-class ContactOut(BaseModel):
+class ContactOut(LLMOutput):
     email: str = Field(description="An email address copied verbatim from the pages. Never guess.")
     name: str = ""
     role: str = ""
 
 
-class OrgExtraction(BaseModel):
+class OrgExtraction(LLMOutput):
     name: str = Field(description="Official name, without the year or edition number.")
     org_type: OrgType
     country: str = Field(default="", description="English country name.")
