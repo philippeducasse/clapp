@@ -1,12 +1,52 @@
 """Small helpers about leads and candidates: same organisation?, country filter, merging."""
 
+import re
+
 from rapidfuzz import fuzz
 
-from discovery.backend_client import CandidateIn, Evidence
+from discovery.backend_client import CandidateContact, CandidateIn, Evidence
 from discovery.graph.state import Lead
 from discovery.tools.domains import domain_of
 from discovery.tools.known import NAME_THRESHOLD, normalize_country, normalize_name
 from discovery.tools.verify import is_blocklisted, url_key
+
+MAX_CONTACTS = 3
+
+# Matched against the email's local part and the role, as word stems (any language we see often).
+# Who decides on bookings / applications comes first; press, tickets, admin, etc. last.
+PREFERRED_CONTACT = re.compile(
+    r"prog|book|artis|direc|direz|curat|kurat|apply|applica|candidat|bewerb|residen|open.?call|"
+    r"diffusion"
+)
+UNWANTED_CONTACT = re.compile(
+    r"press|presse|prensa|stampa|media|comm|ticket|billet|biglietter|taquill|kasse|shop|boutique|"
+    r"tienda|store|job|recruit|hr\b|rh\b|career|emploi|volunt|benevol|webmaster|web|newsletter|"
+    r"privacy|gdpr|rgpd|dpo|compta|account|factur|invoice|billing|admin|partner|sponsor|mecen|"
+    r"noreply|no-reply|technique|tech\b|regie|security|securite"
+)
+
+
+def contact_priority(contact: CandidateContact) -> int:
+    """Lower is better: 0 programming/booking/applications, 1 general or unknown, 2 unwanted."""
+    local = contact.email.partition("@")[0].lower()
+    role = contact.role.lower()
+    if PREFERRED_CONTACT.search(role) or PREFERRED_CONTACT.search(local):
+        return 0
+    if UNWANTED_CONTACT.search(role) or UNWANTED_CONTACT.search(local):
+        return 2
+    return 1
+
+
+def best_contacts(contacts: list[CandidateContact]) -> list[CandidateContact]:
+    """At most MAX_CONTACTS contacts, one per email, the most useful first. Within the same
+    priority the given order is kept (the LLM's own ranking)."""
+    unique: list[CandidateContact] = []
+    seen: set[str] = set()
+    for contact in contacts:
+        if contact.email and contact.email not in seen:
+            seen.add(contact.email)
+            unique.append(contact)
+    return sorted(unique, key=contact_priority)[:MAX_CONTACTS]
 
 
 def site_key(url: str) -> str:
@@ -95,12 +135,10 @@ def dedupe_candidates(candidates: list[CandidateIn]) -> list[CandidateIn]:
                 if candidate_rank(candidate) > candidate_rank(other)
                 else (other, candidate)
             )
-            emails = {c.email for c in best.contacts}
             kept[index] = best.model_copy(
                 update={
                     "sources": merge_evidence(best.sources, rest.sources),
-                    "contacts": best.contacts
-                    + [c for c in rest.contacts if c.email and c.email not in emails],
+                    "contacts": best_contacts(best.contacts + rest.contacts),
                 }
             )
             break

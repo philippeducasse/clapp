@@ -8,13 +8,13 @@ come out in the same formats as `enrich()` produces. Keep them in sync.
 from pydantic import Field
 
 from discovery.prompts import (
-    LLMOutput,
     ABOUT_CLAPP,
     FESTIVAL_APPLICATION_TYPES,
     FESTIVAL_TYPES,
     RESIDENCY_APPLICATION_TYPES,
     UNTRUSTED_CONTENT,
     VENUE_TYPES,
+    LLMOutput,
     Message,
     OrgType,
     page_block,
@@ -44,7 +44,9 @@ class OrgExtraction(LLMOutput):
     approximate_date: str = Field(default="", description='e.g. "mid July".')
     application_date_start: str = ""
     application_date_end: str = ""
-    contacts: list[ContactOut] = Field(default_factory=list)
+    contacts: list[ContactOut] = Field(
+        default_factory=list, description="At most 3, most useful for applying first."
+    )
     relevance_reason: str = Field(
         default="", description="One sentence: why this organisation fits the goal."
     )
@@ -63,6 +65,10 @@ TASK
 CONTACTS
 - Only include contacts whose email address appears in the pages. If there is none, return an
   empty list. Do NOT invent or guess email addresses.
+- Return at most 3 contacts, most useful first, even if the pages list many more people.
+  Prefer, in this order: programming / booking / artistic direction / applications or open
+  call; then a general address (info@, contact@). Skip press, ticketing, shop, jobs, volunteers,
+  accounting, technical staff and webmaster unless there is nothing else.
 - application_url must be a URL that appears in the pages.
 
 {{type_rules}}

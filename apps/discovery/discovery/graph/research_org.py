@@ -24,7 +24,7 @@ from langgraph.runtime import Runtime
 
 from discovery.backend_client import CandidateContact, CandidateIn, Evidence
 from discovery.graph.deps import Deps, guarded
-from discovery.graph.leads import merge_evidence
+from discovery.graph.leads import best_contacts, merge_evidence
 from discovery.graph.navigate import navigate
 from discovery.graph.state import Lead, add_hop
 from discovery.llm import BudgetExceeded
@@ -47,7 +47,6 @@ from discovery.tools.verify import (
 )
 
 MAX_SEARCH_HITS = 8
-MAX_FALLBACK_EMAILS = 3
 
 
 class ResearchState(TypedDict, total=False):
@@ -307,7 +306,8 @@ def verified_contacts(
     extraction: OrgExtraction | None, own: SeenContent, pages: list[tuple[str, Page]], website: str
 ) -> list[CandidateContact]:
     """The extracted contacts whose email is on the organisation's pages. If there are none, the
-    emails on those pages that belong to the organisation's own domain."""
+    emails on those pages that belong to the organisation's own domain. Either way, at most
+    MAX_CONTACTS, the most useful first."""
     contacts: list[CandidateContact] = []
     emails: set[str] = set()
     for contact in extraction.contacts if extraction else []:
@@ -322,16 +322,14 @@ def verified_contacts(
                 )
             )
     if contacts or not website:
-        return contacts
+        return best_contacts(contacts)
     site = registrable_domain(website)
     for _, page in pages:
         for email in sorted(extract_emails(page.html) | extract_emails(page.text)):
             if email not in emails and registrable_domain(email.rpartition("@")[2]) == site:
                 emails.add(email)
                 contacts.append(CandidateContact(email=email))
-            if len(contacts) >= MAX_FALLBACK_EMAILS:
-                return contacts
-    return contacts
+    return best_contacts(contacts)
 
 
 def extracted_fields(extraction: OrgExtraction, org_type: str) -> dict[str, Any]:

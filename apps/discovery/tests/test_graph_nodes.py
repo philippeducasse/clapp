@@ -6,7 +6,14 @@ import pytest
 
 from discovery.backend_client import CandidateContact, CandidateIn, Evidence, KnownEntry
 from discovery.graph.deps import guarded
-from discovery.graph.leads import country_ok, dedupe_candidates, merge_lead, same_org
+from discovery.graph.leads import (
+    MAX_CONTACTS,
+    best_contacts,
+    country_ok,
+    dedupe_candidates,
+    merge_lead,
+    same_org,
+)
 from discovery.graph.navigate import navigate
 from discovery.graph.nodes.check_known import check_known, fan_out
 from discovery.graph.nodes.explore import (
@@ -511,10 +518,11 @@ async def test_build_candidate_falls_back_to_emails_of_the_sites_domain(make_dep
         {"lead": lead(listing_url=f"{ARTIST}/agenda/"), "website_url": f"{FDR}/", "pages": pages},
         deps.pages,
     )
-    # No extraction (e.g. LLM budget reached): emails on the site's own domain are used.
+    # No extraction (e.g. LLM budget reached): emails on the site's own domain are used,
+    # programming before press.
     assert [c.email for c in candidate.contacts] == [
-        "presse@festival-des-rues.be",
         "programmation@festival-des-rues.be",
+        "presse@festival-des-rues.be",
     ]
     assert candidate.state == "PENDING"
     assert candidate.relevance_reason == ""
@@ -578,6 +586,50 @@ def test_dedupe_keeps_the_best_and_merges_sources_and_contacts():
     assert [s.url for s in first.sources] == ["https://a.org/1", "https://a.org/2"]
     assert [c.email for c in first.contacts] == ["a@fdr.be"]
     assert second.name == "Other"
+
+
+def test_dedupe_keeps_at_most_three_contacts_across_duplicates():
+    def with_contacts(*emails):
+        return candidate(
+            "Fest",
+            website_url="https://fest.be/",
+            contacts=[CandidateContact(email=e) for e in emails],
+        )
+
+    [merged] = dedupe_candidates(
+        [
+            with_contacts("presse@fest.be", "info@fest.be", "anna@fest.be"),
+            with_contacts("info@fest.be", "programmation@fest.be", "tickets@fest.be"),
+        ]
+    )
+    assert [c.email for c in merged.contacts] == [
+        "programmation@fest.be",
+        "info@fest.be",
+        "anna@fest.be",
+    ]
+
+
+def test_best_contacts_ranks_dedupes_and_caps():
+    contacts = [
+        CandidateContact(email="press@f.be", role="Press officer"),
+        CandidateContact(email="jan@f.be", role="Comptabilité"),
+        CandidateContact(email="info@f.be"),
+        CandidateContact(email="info@f.be"),
+        CandidateContact(email="marie@f.be", role="Programmatrice"),
+        CandidateContact(email="booking@f.be"),
+        CandidateContact(email="tom@f.be", role="Artistic director"),
+    ]
+    assert [c.email for c in best_contacts(contacts)] == [
+        "marie@f.be",
+        "booking@f.be",
+        "tom@f.be",
+    ]
+    assert [c.email for c in best_contacts(contacts[:4])] == [
+        "info@f.be",
+        "press@f.be",
+        "jan@f.be",
+    ]
+    assert len(best_contacts(contacts)) == MAX_CONTACTS
 
 
 def test_same_org_rules():
