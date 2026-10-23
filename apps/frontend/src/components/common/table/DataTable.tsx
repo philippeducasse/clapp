@@ -32,23 +32,18 @@ import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
 
 interface FetchParams {
-  offset: number;
-  limit: number;
   search?: string;
   filters?: Record<string, unknown>;
 }
 
-const DEFAULT_PAGE_SIZE = 25;
+const DEFAULT_PAGE_SIZE = 50;
 
 const buildFetchParams = (
-  pagination: PaginationState,
   columnFilters: ColumnFiltersState,
   searchBarFilter: string,
 ): FetchParams => {
   const filterParams = toFilterParams(columnFilters);
   return {
-    offset: pagination.pageIndex * pagination.pageSize,
-    limit: pagination.pageSize,
     search: searchBarFilter || undefined,
     filters: Object.keys(filterParams).length > 0 ? filterParams : undefined,
   };
@@ -56,10 +51,12 @@ const buildFetchParams = (
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  /** Server-rendered first page, fetched with `initialColumnFilters`, no search, offset 0. */
+  /**
+   * All rows, server-rendered with `initialColumnFilters` and no search.
+   * Pagination is done client-side.
+   */
   data: TData[];
   entityName: TableEntityName;
-  totalCount?: number;
   filters?: FilterConfig[];
   defaultSorting?: SortingState;
   /**
@@ -77,7 +74,6 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   entityName,
-  totalCount,
   filters,
   defaultSorting = [],
   initialColumnFilters = EMPTY_FILTERS,
@@ -120,13 +116,6 @@ export function DataTable<TData, TValue>({
     pageSize: DEFAULT_PAGE_SIZE,
   });
 
-  const handlePaginationChange: OnChangeFn<PaginationState> = useCallback((updater) => {
-    setPagination((prev) => {
-      const newPagination = typeof updater === "function" ? updater(prev) : updater;
-      return newPagination;
-    });
-  }, []);
-
   // Push the server-rendered data to the parent once on mount
   const hasSentInitialData = useRef(false);
   useEffect(() => {
@@ -135,24 +124,20 @@ export function DataTable<TData, TValue>({
     if (data.length > 0 && onDataFetched) {
       onDataFetched({
         results: data,
-        count: totalCount || data.length,
+        count: data.length,
       } as PaginatedResponse<TData>);
     }
-  }, [data, totalCount, onDataFetched]);
+  }, [data, onDataFetched]);
 
   // Key of the params the currently shown data was fetched with. Starts as the
   // server's request, so we don't refetch on mount unless the params differ
   // (e.g. persisted filters/search from a previous visit).
-  const lastRequestKey = useRef(
-    JSON.stringify(
-      buildFetchParams({ pageIndex: 0, pageSize: DEFAULT_PAGE_SIZE }, initialColumnFilters, ""),
-    ),
-  );
+  const lastRequestKey = useRef(JSON.stringify(buildFetchParams(initialColumnFilters, "")));
 
-  // Fetch data when pagination, filters, or search changes
+  // Refetch all rows when filters or search change; pagination is client-side
   useEffect(() => {
     if (!fetchData) return;
-    const params = buildFetchParams(pagination, columnFilters, searchBarFilter);
+    const params = buildFetchParams(columnFilters, searchBarFilter);
     const key = JSON.stringify(params);
     if (key === lastRequestKey.current) return;
     lastRequestKey.current = key;
@@ -161,7 +146,7 @@ export function DataTable<TData, TValue>({
       // Ignore stale responses if params changed while the request was in flight
       if (lastRequestKey.current === key) onDataFetched?.(response);
     });
-  }, [pagination, columnFilters, searchBarFilter, fetchData, onDataFetched]);
+  }, [columnFilters, searchBarFilter, fetchData, onDataFetched]);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
@@ -174,9 +159,10 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setSearchBarFilter,
     getFilteredRowModel: getFilteredRowModel(),
-    onPaginationChange: handlePaginationChange,
-    manualPagination: true,
-    pageCount: totalCount ? Math.ceil(totalCount / pagination.pageSize) : undefined,
+    onPaginationChange: setPagination,
+    // Page is reset explicitly on filter/search change; don't reset on every
+    // data update (e.g. tagging a row).
+    autoResetPageIndex: false,
     state: {
       sorting,
       columnFilters,
@@ -188,6 +174,14 @@ export function DataTable<TData, TValue>({
   useEffect(() => {
     setPagination((prev) => ({ pageIndex: 0, pageSize: prev.pageSize }));
   }, [columnFilters, searchBarFilter]);
+
+  // Stay within bounds when rows disappear (e.g. deleting the last row of the last page)
+  const pageCount = table.getPageCount();
+  useEffect(() => {
+    if (pagination.pageIndex > 0 && pagination.pageIndex >= pageCount) {
+      setPagination((prev) => ({ ...prev, pageIndex: Math.max(0, pageCount - 1) }));
+    }
+  }, [pageCount, pagination.pageIndex]);
 
   return (
     <>
@@ -238,7 +232,6 @@ export function DataTable<TData, TValue>({
         table={table}
         pagination={pagination}
         entityName={entityName}
-        totalCount={totalCount}
       />
     </>
   );

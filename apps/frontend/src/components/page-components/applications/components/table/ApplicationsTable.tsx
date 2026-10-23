@@ -110,7 +110,6 @@ export const ApplicationsTable = ({
         filters={filters}
         defaultSorting={[{ id: "createdAt", desc: true }]}
         initialColumnFilters={initialColumnFilters}
-        totalCount={applicationData.count}
         fetchData={applicationApiService.getAll}
         onDataFetched={handleDataFetched}
       />

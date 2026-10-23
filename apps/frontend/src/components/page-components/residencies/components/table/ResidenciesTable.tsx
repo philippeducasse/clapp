@@ -87,7 +87,6 @@ export const ResidenciesTable = ({ initialData }: ResidenciesTableProps) => {
         data={residencyData.results}
         entityName={EntityName.RESIDENCY}
         filters={filters}
-        totalCount={residencyData.count}
         fetchData={residencyApiService.getAll}
         onDataFetched={handleDataFetched}
       />

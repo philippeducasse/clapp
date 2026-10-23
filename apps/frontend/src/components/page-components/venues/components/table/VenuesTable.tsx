@@ -86,7 +86,6 @@ export const VenuesTable = ({ initialData }: VenuesTableProps) => {
         data={venueData.results}
         entityName={EntityName.VENUE}
         filters={filters}
-        totalCount={venueData.count}
         fetchData={venueApiService.getAll}
         onDataFetched={handleDataFetched}
       />

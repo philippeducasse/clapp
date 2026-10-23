@@ -27,24 +27,17 @@ interface TablePaginationProps<TData> {
     pageIndex: number;
     pageSize: number;
   };
-  totalCount?: number;
 }
 
 function TablePagination<TData>({
   table,
   pagination,
   entityName,
-  totalCount,
 }: TablePaginationProps<TData>) {
   const currentPage = pagination.pageIndex + 1;
 
-  const totalPages = totalCount
-    ? Math.ceil(totalCount / pagination.pageSize)
-    : Math.ceil(table.getFilteredRowModel().rows.length / pagination.pageSize);
-
-  const totalItems = totalCount
-    ? totalCount
-    : table.getFilteredRowModel().rows.length;
+  const totalItems = table.getFilteredRowModel().rows.length;
+  const totalPages = Math.max(1, table.getPageCount());
 
   const getPageNumbers = () => {
     const pageNumbers = [];
@@ -65,7 +58,7 @@ function TablePagination<TData>({
 
   const handlePageSizeChange = (newPageSize: string) => {
     if (newPageSize === "All") {
-      table.setPageSize(totalItems);
+      table.setPageSize(Math.max(1, totalItems));
     } else {
       const size = parseInt(newPageSize);
       table.setPageSize(size);

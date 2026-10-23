@@ -87,7 +87,6 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
         columns={columns}
         data={festivalData.results}
         entityName={EntityName.FESTIVAL}
-        totalCount={festivalData.count}
         filters={filters}
         fetchData={festivalApiService.getAll}
         onDataFetched={handleDataFetched}
