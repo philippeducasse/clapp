@@ -35,8 +35,11 @@ import { selectProfile } from "@/redux/slices/authSlice";
 import { Profile } from "@/interfaces/entities/Profile";
 import { useRouter } from "next/navigation";
 import { Dossier } from "@/interfaces/entities/Performance";
-import { selectAllApplications } from "@/redux/slices/applicationSlice";
 import { AlertModal } from "@/components/common/modals/AlertModal";
+import {
+  buildEmailApplicationWarnings,
+  hasRecentApplication,
+} from "../../helpers/getEmailApplicationWarnings";
 import { interpolateEmailTemplate } from "@/helpers/emailTemplateHelper";
 
 interface ApplicationFormProps {
@@ -67,15 +70,14 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   const profile = useSelector((state: RootState) => selectProfile(state));
   const router = useRouter();
   const dispatch = useDispatch();
-  const allApplications = useSelector((state: RootState) => selectAllApplications(state));
   const [isLoading, setIsLoading] = useState(false);
   const [dossiers, setDossiers] = useState<Dossier[]>([]);
   const [selectedPerformanceIds, setSelectedPerformanceIds] = useState<number[]>([]);
   const [applicationMethod, setApplicationMethod] = useState<
     ApplicationMethod.EMAIL | ApplicationMethod.FORM
   >(ApplicationMethod.EMAIL);
-  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
-  const [bypassDuplicateWarning, setBypassDuplicateWarning] = useState(false);
+  const [sendWarnings, setSendWarnings] = useState<string[]>([]);
+  const [pendingValues, setPendingValues] = useState<Record<string, unknown> | null>(null);
   const dossiersSetRef = useRef(false);
   const [contactsToAdd, setContactsToAdd] = useState<string[]>([]);
 
@@ -170,26 +172,6 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
   }, [entityId, entity, entityName, dispatch]);
 
   useEffect(() => {
-    if (!entity || !profile) return;
-
-    const now = new Date();
-    const twelveMonthsAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-
-    const duplicateApplication = allApplications.find((app) => {
-      const appDate = new Date(app.applicationDate);
-      const sameEntity =
-        app.organisation?.id === entity.id && app.organisationType === config.objectType;
-      return sameEntity && appDate >= twelveMonthsAgo && appDate <= now && !bypassDuplicateWarning;
-    });
-
-    if (duplicateApplication && !bypassDuplicateWarning) {
-      setShowDuplicateWarning(true);
-    } else {
-      setShowDuplicateWarning(false);
-    }
-  }, [entity, profile, allApplications, bypassDuplicateWarning, config.objectType]);
-
-  useEffect(() => {
     if (!entity?.contacts?.length) return;
     const emails = entity.contacts.map((c) => c.email).filter(Boolean);
     if (emails.length > 0) {
@@ -243,7 +225,38 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
     }
   };
 
+  // Before sending by email, warn if the organisation wants a form or was applied to recently.
+  const getSendWarnings = async (): Promise<string[]> => {
+    let recent = false;
+    try {
+      recent = await hasRecentApplication(config.objectType, entityId);
+    } catch (error) {
+      // Don't block sending if the check fails.
+      console.error(`Failed to check recent applications: ${error}`);
+    }
+    return buildEmailApplicationWarnings({
+      organisationName: entity?.name,
+      // Venues have no applicationType.
+      applicationType: (entity as Festival | Residency | undefined)?.applicationType,
+      hasRecentApplication: recent,
+    });
+  };
+
   const onSubmit = async (values: Record<string, unknown>) => {
+    if (values.applicationMethod === ApplicationMethod.EMAIL) {
+      setIsLoading(true);
+      const warnings = await getSendWarnings();
+      setIsLoading(false);
+      if (warnings.length > 0) {
+        setPendingValues(values);
+        setSendWarnings(warnings);
+        return;
+      }
+    }
+    await submitApplication(values);
+  };
+
+  const submitApplication = async (values: Record<string, unknown>) => {
     setIsLoading(true);
     const { attachmentsSent, ...vals } = values;
     if (profile) {
@@ -356,15 +369,25 @@ const ApplicationForm = ({ entityName }: ApplicationFormProps) => {
         disabled={!hasEmailConfigured}
       />
       <AlertModal
-        open={showDuplicateWarning}
-        onOpenChange={setShowDuplicateWarning}
+        open={sendWarnings.length > 0}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSendWarnings([]);
+            setPendingValues(null);
+          }
+        }}
         variant="warning"
-        title="Application Already Submitted"
-        description={`You have already submitted an application to ${entity?.name} this year. Are you sure you want to submit another one?`}
-        confirmText="Continue anyway"
+        title="Send this application?"
+        description={`${sendWarnings.join(" ")} Are you sure you want to send it by email?`}
+        confirmText="Send anyway"
         cancelText="Cancel"
         showCancel={true}
-        onConfirm={() => setBypassDuplicateWarning(true)}
+        onConfirm={async () => {
+          const values = pendingValues;
+          setSendWarnings([]);
+          setPendingValues(null);
+          if (values) await submitApplication(values);
+        }}
       />
     </>
   );

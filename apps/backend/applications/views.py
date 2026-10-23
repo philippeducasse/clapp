@@ -20,10 +20,19 @@ NO_SEASON = "__none__"
 # converts URL query params into an ORM call.
 class ApplicationFilter(django_filters.FilterSet):
     season = django_filters.CharFilter(method="filter_season")
+    # e.g. ?organisation_type=festival&organisation=12&applied_after=2026-04-23
+    organisation_type = django_filters.CharFilter(method="filter_organisation_type")
+    organisation = django_filters.NumberFilter(field_name="object_id")
+    applied_after = django_filters.DateFilter(field_name="application_date", lookup_expr="gte")
 
     class Meta:
         model = Application
-        fields = ["season"]
+        fields = ["season", "organisation_type", "organisation", "applied_after"]
+
+    def filter_organisation_type(
+        self, queryset: QuerySet[Application], name: str, value: str
+    ) -> QuerySet[Application]:
+        return queryset.filter(content_type__model=value.lower())
 
     def filter_season(
         self, queryset: QuerySet[Application], name: str, value: str
