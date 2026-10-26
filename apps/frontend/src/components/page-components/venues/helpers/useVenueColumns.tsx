@@ -12,6 +12,7 @@ import { TagBadge } from "@/components/common/TagBadge";
 import { useCallback, useMemo } from "react";
 import { TagAction } from "@/interfaces/Enums";
 import { TagDropdown } from "@/components/common/table/TagDropdown";
+import { getExcludeTagColumn, includeTagFilterFn } from "@/helpers/tagFilters";
 
 interface UseVenueColumnsProps {
   onDeleteClick: (id: number) => void;
@@ -50,10 +51,7 @@ const useVenueColumns = ({
         accessorKey: "tag",
         header: getSortableHeader("Tag"),
         size: 50,
-        filterFn: (row, columnId, filterValue): boolean => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-          return filterValue.includes(row.getValue(columnId));
-        },
+        filterFn: includeTagFilterFn<Venue>(),
         cell: ({ row }) => {
           const tag = row.original?.tag;
           return <TagBadge tag={tag} />;
@@ -143,6 +141,7 @@ const useVenueColumns = ({
           );
         },
       },
+      getExcludeTagColumn<Venue>(),
     ],
     [onDeleteClick, onTagClick, onEdit, router],
   );

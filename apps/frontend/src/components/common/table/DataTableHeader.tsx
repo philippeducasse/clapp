@@ -27,25 +27,20 @@ const DataTableHeader = <TData,>({
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
 
   const activeFilters =
-    filters
-      ?.map((filter) => {
-        const column = table.getColumn(filter.column);
-        const value = column?.getFilterValue();
-        if (value) {
-          if (Array.isArray(value)) {
-            return value.map((v) => ({
-              column: filter.column,
-              value: v,
-            }));
-          }
-          return {
-            column: filter.column,
-            value,
-          };
-        }
-        return null;
-      })
-      .filter(Boolean) ?? [];
+    filters?.flatMap((filter) => {
+      const value = table.getColumn(filter.column)?.getFilterValue();
+      if (!value) return [];
+      const values = Array.isArray(value) ? value : [value];
+      return values.map((v) => {
+        const label =
+          filter.options?.find((option) => option.value === v)?.label ?? capitalizeFirst(String(v));
+        return {
+          column: filter.column,
+          value: v,
+          label: filter.chipPrefix ? `${filter.chipPrefix} ${label.toLowerCase()}` : label,
+        };
+      });
+    }) ?? [];
 
   const handleRemoveFilter = (columnId: string, valueToRemove?: unknown) => {
     const column = table.getColumn(columnId);
@@ -80,23 +75,18 @@ const DataTableHeader = <TData,>({
             />
           </div>
           <div className="flex ">
-            {activeFilters && activeFilters.length > 0 && (
+            {activeFilters.length > 0 && (
               <div className="flex flex-wrap gap-2 items-center">
-                {activeFilters.flat().map((filter) => {
+                {activeFilters.map((filter) => {
                   return (
                     <Button
-                      key={filter?.value}
+                      key={`${filter.column}-${String(filter.value)}`}
                       variant="outline"
                       size="sm"
                       className="h-7 px-2 text-xs gap-1"
-                      onClick={() =>
-                        handleRemoveFilter(
-                          filter?.column as string,
-                          filter?.value,
-                        )
-                      }
+                      onClick={() => handleRemoveFilter(filter.column, filter.value)}
                     >
-                      <span>{capitalizeFirst(String(filter?.value))}</span>
+                      <span>{filter.label}</span>
                       <X className="h-3 w-3 ml-1 text-primary" />
                     </Button>
                   );

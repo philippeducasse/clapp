@@ -7,6 +7,8 @@ export interface FilterConfig {
   type: FilterType;
   options?: SelectOptions[];
   multiple?: boolean;
+  /** Shown before each active-filter chip value, e.g. "Not" for exclusion filters. */
+  chipPrefix?: string;
 }
 
 export interface ColumnFilter {

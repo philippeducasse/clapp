@@ -14,6 +14,7 @@ import { ReminderBell } from "@/components/common/table/ReminderBell";
 import { useUpcomingReminders } from "@/hooks/useUpcomingReminders";
 import { OrganisationType, TagAction } from "@/interfaces/Enums";
 import { TagDropdown } from "@/components/common/table/TagDropdown";
+import { getExcludeTagColumn, includeTagFilterFn } from "@/helpers/tagFilters";
 
 interface UseFestivalColumnsProps {
   onDeleteClick: (id: number) => void;
@@ -79,10 +80,7 @@ const useFestivalColumns = ({
         accessorKey: "tag",
         header: getSortableHeader("Tag"),
         size: 30,
-        filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-          return filterValue.includes(row.getValue(columnId));
-        },
+        filterFn: includeTagFilterFn<Festival>(),
         cell: ({ row }) => {
           const tag = row.original?.tag;
           return <TagBadge tag={tag} />;
@@ -167,6 +165,7 @@ const useFestivalColumns = ({
           );
         },
       },
+      getExcludeTagColumn<Festival>(),
     ],
     [onDeleteClick, onTagClick, onEdit, router, remindersById],
   );

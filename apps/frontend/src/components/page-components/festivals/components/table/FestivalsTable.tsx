@@ -2,6 +2,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { Festival } from "@/interfaces/entities/Festival";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
+import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 import { useFestivalColumns } from "../../helpers/useFestivalColumns";
 import { DataTable } from "@/components/common/table/DataTable";
 import { useDispatch } from "react-redux";
@@ -13,9 +14,11 @@ import { DeleteModal } from "@/components/common/modals/DeleteModal";
 
 interface FestivalsTableProps {
   initialData: PaginatedResponse<Festival>;
+  /** Filters the server applied to `initialData` (e.g. hidden tags). */
+  initialColumnFilters?: ColumnFilter[];
 }
 
-export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
+export const FestivalsTable = ({ initialData, initialColumnFilters }: FestivalsTableProps) => {
   const dispatch = useDispatch();
   const [festivalData, setFestivalData] = useState<PaginatedResponse<Festival>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -88,6 +91,7 @@ export const FestivalsTable = ({ initialData }: FestivalsTableProps) => {
         data={festivalData.results}
         entityName={EntityName.FESTIVAL}
         filters={filters}
+        initialColumnFilters={initialColumnFilters}
         fetchData={festivalApiService.getAll}
         onDataFetched={handleDataFetched}
       />

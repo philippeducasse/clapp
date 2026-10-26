@@ -69,6 +69,7 @@ class Organisation(models.Model):
         ("WARNING", "Warning"),
         ("INACTIVE", "Inactive"),
         ("WATCH", "Watch"),
+        ("IRRELEVANT", "Irrelevant"),
         ("OTHER", "Other"),
     ]
     name = models.CharField(max_length=200)

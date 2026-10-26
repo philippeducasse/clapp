@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   ColumnDef,
   flexRender,
@@ -12,6 +12,7 @@ import {
   getSortedRowModel,
   PaginationState,
   OnChangeFn,
+  VisibilityState,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -116,6 +117,17 @@ export function DataTable<TData, TValue>({
     pageSize: DEFAULT_PAGE_SIZE,
   });
 
+  // Filter-only columns (meta.hidden) hold a column filter but are never rendered
+  const columnVisibility = useMemo<VisibilityState>(
+    () =>
+      Object.fromEntries(
+        columns
+          .filter((column) => column.meta?.hidden && column.id)
+          .map((column) => [column.id as string, false]),
+      ),
+    [columns],
+  );
+
   // Push the server-rendered data to the parent once on mount
   const hasSentInitialData = useRef(false);
   useEffect(() => {
@@ -168,6 +180,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
       globalFilter: searchBarFilter,
       pagination,
+      columnVisibility,
     },
   });
   // Reset to page 0 when filters or search changes
@@ -220,7 +233,7 @@ export function DataTable<TData, TValue>({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell colSpan={table.getVisibleLeafColumns().length} className="h-24 text-center">
                   No results
                 </TableCell>
               </TableRow>

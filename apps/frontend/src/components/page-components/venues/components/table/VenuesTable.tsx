@@ -10,12 +10,15 @@ import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { venueApiService } from "@/api/venueApiService";
 import { getVenueFilters } from "../../helpers/getVenueFilters";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
+import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 
 interface VenuesTableProps {
   initialData: PaginatedResponse<Venue>;
+  /** Filters the server applied to `initialData` (e.g. hidden tags). */
+  initialColumnFilters?: ColumnFilter[];
 }
 
-export const VenuesTable = ({ initialData }: VenuesTableProps) => {
+export const VenuesTable = ({ initialData, initialColumnFilters }: VenuesTableProps) => {
   const dispatch = useDispatch();
   const [venueData, setVenueData] = useState<PaginatedResponse<Venue>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -86,6 +89,7 @@ export const VenuesTable = ({ initialData }: VenuesTableProps) => {
         data={venueData.results}
         entityName={EntityName.VENUE}
         filters={filters}
+        initialColumnFilters={initialColumnFilters}
         fetchData={venueApiService.getAll}
         onDataFetched={handleDataFetched}
       />

@@ -1,18 +1,12 @@
+import { getTagFilterConfigs } from "@/helpers/tagFilters";
 import { getOptions } from "@/helpers/formHelper";
-import { TagAction } from "@/interfaces/Enums";
 import { FilterConfig } from "@/interfaces/table/FilterCongig";
 import { FilterType } from "@/interfaces/forms/ControlledFormElementType";
 import { VenueType } from "@/interfaces/entities/Venue";
 
 export const getVenueFilters = (): FilterConfig[] => {
   return [
-    {
-      column: "tag",
-      label: "Tags",
-      type: FilterType.MULTI_SELECT,
-      options: getOptions(TagAction),
-      multiple: true,
-    },
+    ...getTagFilterConfigs(),
     {
       column: "venueType",
       label: "Type",

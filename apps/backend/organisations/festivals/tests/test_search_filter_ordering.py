@@ -270,6 +270,88 @@ class TestFestivalFilter:
         assert "Epsilon Dance" in names
 
 
+@pytest.fixture
+def tagged_festivals(festival_set):
+    """Tag the festival set: Alpha STAR, Beta IRRELEVANT, Gamma INACTIVE, Delta WATCH, Epsilon untagged."""
+    for festival, tag in zip(festival_set, ["STAR", "IRRELEVANT", "INACTIVE", "WATCH", ""]):
+        festival.tag = tag
+        festival.save()
+    return festival_set
+
+
+def _names(response):
+    return sorted(r["name"] for r in response.data["results"])
+
+
+@pytest.mark.django_db
+class TestFestivalTagFilter:
+    """Tests for the tag (include) and exclude_tag filters on FestivalViewSet."""
+
+    def test_filter_by_tag_returns_only_that_tag(self, authenticated_client, tagged_festivals):
+        response = authenticated_client.get("/api/festivals/?tag=STAR")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert _names(response) == ["Alpha Street Festival"]
+
+    def test_filter_by_multiple_tags_is_case_insensitive(
+        self, authenticated_client, tagged_festivals
+    ):
+        response = authenticated_client.get("/api/festivals/?tag=star,watch")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert _names(response) == ["Alpha Street Festival", "Delta Music Fest"]
+
+    def test_exclude_tag_drops_matching_and_keeps_untagged(
+        self, authenticated_client, tagged_festivals
+    ):
+        response = authenticated_client.get("/api/festivals/?exclude_tag=IRRELEVANT,INACTIVE")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert _names(response) == ["Alpha Street Festival", "Delta Music Fest", "Epsilon Dance"]
+
+    def test_exclude_tag_is_case_insensitive(self, authenticated_client, tagged_festivals):
+        response = authenticated_client.get("/api/festivals/?exclude_tag=irrelevant")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert "Beta Circus Event" not in _names(response)
+        assert response.data["count"] == 4
+
+    def test_empty_exclude_tag_is_ignored(self, authenticated_client, tagged_festivals):
+        response = authenticated_client.get("/api/festivals/?exclude_tag=,")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 5
+
+    def test_unknown_exclude_tag_excludes_nothing(self, authenticated_client, tagged_festivals):
+        response = authenticated_client.get("/api/festivals/?exclude_tag=NOPE")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["count"] == 5
+
+    def test_include_and_exclude_combine(self, authenticated_client, tagged_festivals):
+        response = authenticated_client.get(
+            "/api/festivals/?tag=STAR,INACTIVE&exclude_tag=INACTIVE"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert _names(response) == ["Alpha Street Festival"]
+
+    @pytest.mark.parametrize("endpoint", ["/api/residencies/", "/api/venues/"])
+    def test_exclude_tag_applies_to_other_organisations(self, authenticated_client, user, endpoint):
+        from organisations.residencies.models import Residency
+        from organisations.venues.models import Venue
+
+        model = Residency if "residencies" in endpoint else Venue
+        model.objects.create(name="Keep", tag="STAR", user=user)
+        model.objects.create(name="Untagged", user=user)
+        model.objects.create(name="Drop", tag="IRRELEVANT", user=user)
+
+        response = authenticated_client.get(f"{endpoint}?exclude_tag=IRRELEVANT,INACTIVE")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert _names(response) == ["Keep", "Untagged"]
+
+
 # ---------------------------------------------------------------------------
 # Ordering tests
 # ---------------------------------------------------------------------------

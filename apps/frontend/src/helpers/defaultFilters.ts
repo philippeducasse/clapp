@@ -1,6 +1,7 @@
 import { EntityName, TableEntityName } from "@/interfaces/Enums";
 import { Profile } from "@/interfaces/entities/Profile";
 import { ColumnFilter } from "@/interfaces/table/FilterCongig";
+import { getDefaultExcludedTagsFilter } from "@/helpers/tagFilters";
 
 /**
  * A default filter rule: derives one column filter from the user's profile,
@@ -15,11 +16,17 @@ const defaultSeason: DefaultFilterRule = (profile) => {
   return season ? { id: "season", value: season.name } : undefined;
 };
 
+// Hide irrelevant/inactive organisations (see DEFAULT_EXCLUDED_TAGS).
+const defaultExcludedTags: DefaultFilterRule = () => getDefaultExcludedTagsFilter();
+
 // --- Registry ----------------------------------------------------------------
 // To add a default filter, write a rule above and list it for its table.
 
 const defaultFilterRules: Partial<Record<TableEntityName, DefaultFilterRule[]>> = {
   [EntityName.APPLICATION]: [defaultSeason],
+  [EntityName.FESTIVAL]: [defaultExcludedTags],
+  [EntityName.RESIDENCY]: [defaultExcludedTags],
+  [EntityName.VENUE]: [defaultExcludedTags],
 };
 
 /** Default column filters for a table, derived from the user's profile. */

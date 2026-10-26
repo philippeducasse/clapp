@@ -45,21 +45,42 @@ from .utils import clean_organisation_data
 logger = logging.getLogger(__name__)
 
 
-def filter_in_iexact(queryset: QuerySet, name: str, value: str) -> QuerySet:
-    """Match any of the comma-separated values, case-insensitively (e.g. ?country=france,spain)."""
-    values = [v.strip() for v in value.split(",") if v.strip()]
-    if not values:
-        return queryset
+def _split_csv(value: str) -> List[str]:
+    return [v.strip() for v in value.split(",") if v.strip()]
+
+
+def _any_iexact(field: str, values: List[str]) -> Q:
     query = Q()
     for v in values:
-        query |= Q(**{f"{name}__iexact": v})
-    return queryset.filter(query)
+        query |= Q(**{f"{field}__iexact": v})
+    return query
+
+
+def filter_in_iexact(queryset: QuerySet, name: str, value: str) -> QuerySet:
+    """Match any of the comma-separated values, case-insensitively (e.g. ?country=france,spain)."""
+    values = _split_csv(value)
+    if not values:
+        return queryset
+    return queryset.filter(_any_iexact(name, values))
+
+
+def filter_tag_exclude(queryset: QuerySet, name: str, value: str) -> QuerySet:
+    """Drop rows whose tag is any of the comma-separated values (e.g. ?exclude_tag=irrelevant,inactive).
+
+    Untagged rows are always kept.
+    """
+    values = _split_csv(value)
+    if not values:
+        return queryset
+    return queryset.exclude(_any_iexact("tag", values))
 
 
 # Django filters transforms query params into ORM .filter() calls.
 # Filters shared by all organisation types; subclass per entity to add type-specific ones.
 class OrganisationFilter(django_filters.FilterSet):
     country = django_filters.CharFilter(method=filter_in_iexact)
+    tag = django_filters.CharFilter(method=filter_in_iexact)
+    exclude_tag = django_filters.CharFilter(method=filter_tag_exclude)
 
 
 def get_current_application_year_range(today: Optional[date] = None) -> Tuple[date, date]:

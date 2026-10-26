@@ -12,6 +12,7 @@ import { useCallback, useMemo } from "react";
 import { Application } from "@/interfaces/entities/Application";
 import { TagAction } from "@/interfaces/Enums";
 import { TagDropdown } from "@/components/common/table/TagDropdown";
+import { getExcludeTagColumn, includeTagFilterFn } from "@/helpers/tagFilters";
 
 interface UseResidencyColumnsProps {
   onDeleteClick: (id: number) => void;
@@ -68,10 +69,7 @@ const useResidencyColumns = ({
         accessorKey: "tag",
         header: getSortableHeader("Tag"),
         size: 50,
-        filterFn: (row, columnId, filterValue) => {
-          if (!Array.isArray(filterValue) || filterValue.length === 0) return true;
-          return filterValue.includes(row.getValue(columnId));
-        },
+        filterFn: includeTagFilterFn<Residency>(),
         cell: ({ row }) => {
           const tag = row.original?.tag;
           return <TagBadge tag={tag} />;
@@ -146,6 +144,7 @@ const useResidencyColumns = ({
           );
         },
       },
+      getExcludeTagColumn<Residency>(),
     ],
     [onDeleteClick, onTagClick, onEdit, router]
   );

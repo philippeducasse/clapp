@@ -11,12 +11,15 @@ import { DeleteModal } from "@/components/common/modals/DeleteModal";
 import { residencyApiService } from "@/api/residencyApiService";
 import { getResidencyFilters } from "../../helpers/getResidencyFilters";
 import { PaginatedResponse } from "@/interfaces/table/PaginatedResponse";
+import { ColumnFilter } from "@/interfaces/table/FilterCongig";
 
 interface ResidenciesTableProps {
   initialData: PaginatedResponse<Residency>;
+  /** Filters the server applied to `initialData` (e.g. hidden tags). */
+  initialColumnFilters?: ColumnFilter[];
 }
 
-export const ResidenciesTable = ({ initialData }: ResidenciesTableProps) => {
+export const ResidenciesTable = ({ initialData, initialColumnFilters }: ResidenciesTableProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const [residencyData, setResidencyData] = useState<PaginatedResponse<Residency>>(initialData);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -87,6 +90,7 @@ export const ResidenciesTable = ({ initialData }: ResidenciesTableProps) => {
         data={residencyData.results}
         entityName={EntityName.RESIDENCY}
         filters={filters}
+        initialColumnFilters={initialColumnFilters}
         fetchData={residencyApiService.getAll}
         onDataFetched={handleDataFetched}
       />
