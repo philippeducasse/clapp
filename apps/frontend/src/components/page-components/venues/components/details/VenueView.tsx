@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Flag, Send } from "lucide-react";
 import { VenueUpdateDialog } from "../update/VenueUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
+import ChangeTypeButton from "@/components/common/buttons/ChangeTypeButton";
 import { useSelector } from "react-redux";
 import { selectVenue, updateVenue } from "@/redux/slices/venueSlice";
 import { useParams } from "next/navigation";
@@ -101,6 +102,7 @@ const VenueView = () => {
               <Send /> Apply
             </Button>
             <VenueUpdateDialog />
+            <ChangeTypeButton organisationType={OrganisationType.VENUE} entityId={venue.id} />
             <EditButton href={`/venues/${venue.id}/edit`} />
             <DeleteButton
               onDelete={() => handleDelete("venue", venueId)}

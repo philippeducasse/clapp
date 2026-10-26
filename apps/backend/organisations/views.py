@@ -28,6 +28,7 @@ from services.mistral_service import ConversationResponse, MistralClient
 
 from .models import Organisation
 from .applications import create_form_application
+from .conversion import ConversionError, convert_organisation
 from .emails import (
     prepare_application_email,
     send_application_email,
@@ -574,6 +575,29 @@ class OrganisationViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(organisation)
         return Response(serializer.data)
+
+    @action(detail=True, methods=["post"], url_path="convert")
+    def convert(self, request: HttpRequest, pk: int) -> Response:
+        """Change the organisation's type, e.g. festival -> venue. Body: {"target_type": "VENUE"}.
+
+        The organisation gets a new id (types are separate tables); the response holds it.
+        """
+        organisation = self.get_object()
+        # Staff can see shared seeds, but converting one wouldn't convert users' copies.
+        if organisation.user_id != request.user.id:
+            return Response(
+                {"error": "You can only change the type of your own organisations"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        try:
+            converted = convert_organisation(organisation, request.data.get("target_type") or "")
+        except ConversionError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            {"id": converted.id, "organisation_type": converted.__class__.__name__.upper()},
+            status=status.HTTP_201_CREATED,
+        )
 
     @action(detail=False, methods=["post"], url_path="upload")
     def upload(self, request: HttpRequest) -> Response:

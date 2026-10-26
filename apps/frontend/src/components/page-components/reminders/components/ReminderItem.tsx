@@ -5,15 +5,9 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Reminder } from "@/interfaces/entities/Reminder";
-import { OrganisationType } from "@/interfaces/Enums";
+import { ORGANISATION_ROUTES } from "@/helpers/organisationRoutes";
 import { formatDate } from "@/utils/stringUtils";
 import { cn } from "@/lib/utils";
-
-const ORGANISATION_ROUTES: Record<OrganisationType, string> = {
-  [OrganisationType.FESTIVAL]: "/festivals",
-  [OrganisationType.VENUE]: "/venues",
-  [OrganisationType.RESIDENCY]: "/residencies",
-};
 
 interface ReminderItemProps {
   reminder: Reminder;

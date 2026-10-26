@@ -1,6 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { organisationApiService, OrganisationSearchResponse } from "@/api/organisationApiService";
-import { mockFetchRequest, mockSendFormDataRequest, resetAllMocks } from "../mocks/fetchHelper";
+import {
+  mockFetchRequest,
+  mockSendFormDataRequest,
+  mockSendRequest,
+  resetAllMocks,
+} from "../mocks/fetchHelper";
+import { OrganisationType } from "@/interfaces/Enums";
 
 describe("organisationApiService", () => {
   beforeEach(() => {
@@ -396,6 +402,45 @@ describe("organisationApiService", () => {
       const uploadResult = await organisationApiService.upload([mockFile]);
       expect(uploadResult).toBe(mockTaskId);
       expect(typeof uploadResult).toBe("string");
+    });
+  });
+
+  describe("convert", () => {
+    it.each([
+      [OrganisationType.FESTIVAL, "/api/festivals/7/convert"],
+      [OrganisationType.VENUE, "/api/venues/7/convert"],
+      [OrganisationType.RESIDENCY, "/api/residencies/7/convert"],
+    ])("posts the target type to the %s convert endpoint", async (type, url) => {
+      mockSendRequest.mockResolvedValue({ id: 42, organisationType: OrganisationType.VENUE });
+
+      await organisationApiService.convert(type, 7, OrganisationType.VENUE);
+
+      expect(mockSendRequest).toHaveBeenCalledWith(
+        url,
+        { targetType: OrganisationType.VENUE },
+        "POST",
+        "Organisation type changed",
+      );
+    });
+
+    it("returns the new id and type", async () => {
+      mockSendRequest.mockResolvedValue({ id: 42, organisationType: OrganisationType.RESIDENCY });
+
+      const result = await organisationApiService.convert(
+        OrganisationType.FESTIVAL,
+        7,
+        OrganisationType.RESIDENCY,
+      );
+
+      expect(result).toEqual({ id: 42, organisationType: OrganisationType.RESIDENCY });
+    });
+
+    it("propagates API errors", async () => {
+      mockSendRequest.mockRejectedValue(new Error("Invalid organisation type"));
+
+      await expect(
+        organisationApiService.convert(OrganisationType.FESTIVAL, 7, OrganisationType.FESTIVAL),
+      ).rejects.toThrow("Invalid organisation type");
     });
   });
 });

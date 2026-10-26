@@ -1,5 +1,7 @@
 import { UploadStats } from "@/components/page-components/upload/UploadForm";
-import { fetchRequest, sendFormDataRequest } from "./fetchHelper";
+import { fetchRequest, sendFormDataRequest, sendRequest } from "./fetchHelper";
+import { OrganisationType } from "@/interfaces/Enums";
+import { ORGANISATION_ROUTES } from "@/helpers/organisationRoutes";
 
 const endpoint = "/api/organisations";
 
@@ -9,6 +11,11 @@ export interface OrganisationSearchResponse {
   country: string;
   town: string;
   type: string;
+}
+
+export interface ConvertOrganisationResponse {
+  id: number;
+  organisationType: OrganisationType;
 }
 
 interface TaskResponse {
@@ -73,8 +80,25 @@ const pollTask = async (taskId: string): Promise<UploadStats> => {
   });
 };
 
+/**
+ * Change an organisation's type (e.g. festival -> venue). The organisation gets a
+ * new id; contacts, applications and reminders move with it.
+ */
+const convert = (
+  type: OrganisationType,
+  id: number,
+  targetType: OrganisationType,
+): Promise<ConvertOrganisationResponse> =>
+  sendRequest<{ targetType: OrganisationType }, ConvertOrganisationResponse>(
+    `/api${ORGANISATION_ROUTES[type]}/${id}/convert`,
+    { targetType },
+    "POST",
+    "Organisation type changed",
+  );
+
 export const organisationApiService = {
   search,
+  convert,
   upload,
   pollTask,
 };

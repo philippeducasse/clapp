@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Flag, Send } from "lucide-react";
 import { FestivalUpdateDialog } from "../update/FestivalUpdateDialog";
 import EditButton from "@/components/common/buttons/EditButton";
+import ChangeTypeButton from "@/components/common/buttons/ChangeTypeButton";
 import { useSelector } from "react-redux";
 import { selectFestival } from "@/redux/slices/festivalSlice";
 import { useParams } from "next/navigation";
@@ -102,6 +103,7 @@ const FestivalView = () => {
               <Send /> Apply
             </Button>
             <FestivalUpdateDialog />
+            <ChangeTypeButton organisationType={OrganisationType.FESTIVAL} entityId={festival.id} />
             <EditButton href={`/festivals/${festival.id}/edit`} />
             <DeleteButton
               onDelete={() => handleDelete("festival", festivalId)}

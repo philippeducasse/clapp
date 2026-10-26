@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { University, Send } from "lucide-react";
 import EditButton from "@/components/common/buttons/EditButton";
+import ChangeTypeButton from "@/components/common/buttons/ChangeTypeButton";
 import { useSelector } from "react-redux";
 import { selectResidency, updateResidency } from "@/redux/slices/residencySlice";
 import { RootState } from "@/redux/store";
@@ -101,6 +102,7 @@ const ResidencyView = () => {
               <Send /> Apply
             </Button>
             <ResidencyUpdateDialog />
+            <ChangeTypeButton organisationType={OrganisationType.RESIDENCY} entityId={residency.id} />
             <EditButton href={`/residencies/${residency.id}/edit`} />
             <DeleteButton
               onDelete={() => handleDelete("residency", residencyId)}
